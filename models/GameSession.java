@@ -10,6 +10,9 @@ public class GameSession {
     private boolean voteInProgress = false;
     private String voteStarter;
     private Map<String, Boolean> votes = new LinkedHashMap<>();
+    private GameMap map;
+    private int playerX, playerY;
+    private int energy = 100;
 
     public GameSession(List<String> players) {
         this.players = new ArrayList<>(players);
@@ -21,6 +24,19 @@ public class GameSession {
     public List<String> getPlayers(){return players;}
     public String getCurrentPlayer(){return players.get(turn%players.size());}
     public boolean isVoteInProgress(){return voteInProgress;}
+    public void setMap(GameMap map) {
+        this.map = map;
+        int mid = map.getSize()/2;
+        this.playerX = mid;
+        this.playerY = mid;
+    }
+    public GameMap getMap(){return map;}
+    public int getPlayerX(){return playerX;}
+    public int getPlayerY(){return playerY;}
+    public void setPlayerPosition(int x, int y){this.playerX = x;this.playerY = y;}
+    public int getEnergy(){return energy;}
+    public void reduceEnergy(int amount){energy -= amount;}
+
     public void startVote(String starter){
         voteInProgress = true;
         voteStarter = starter;
