@@ -8,7 +8,8 @@ public class User{
     private String gender;
     private double maxMoney = 0;
     private int gamesPlayed = 0;
-    private String securityQuestion = null;
+    private String securityQuestion = "What is your grandma's name? ";
+    private String securityAnswer = null;
 
     public User(String username, String passwordHash, String nickname, String email, String gender){
         this.username = username;
@@ -25,6 +26,7 @@ public class User{
     public int getGamesPlayed(){ return gamesPlayed; }
     public double getMaxMoney(){return maxMoney; }
     public String getSecurityQuestion(){ return securityQuestion; }
+    public String getSecurityAnswer(){return securityAnswer;}
 
     public void setUsername(String username){ this.username = username; }
     public void setPasswordHash(String passwordHash){ this.passwordHash = passwordHash; }
@@ -34,6 +36,7 @@ public class User{
     public void setGamesPlayed(int gamesPlayed){ this.gamesPlayed = gamesPlayed; }
     public void setMaxMoney(double maxMoney){ this.maxMoney = maxMoney; }
     public void setSecurityQuestion(String securityQuestion){ this.securityQuestion = securityQuestion; }
+    public void setSecurityAnswer(String securityAnswer){this.securityAnswer = securityAnswer; }
 
 
 }
