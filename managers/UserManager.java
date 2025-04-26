@@ -8,7 +8,6 @@ import java.nio.file.*;
 import java.security.*;
 import java.util.*;
 import java.util.stream.Collectors;
-
 public class UserManager {
     private final Map<String, User> users = new HashMap<>();
     private final Path storage = Paths.get("users.json");
