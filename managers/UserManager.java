@@ -1,21 +1,20 @@
-package com.example.game;
-package models;
-
+package managers;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import controllers.MenuController;
 import models.User;
-
 import java.io.*;
 import java.nio.file.*;
 import java.security.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 public class UserManager {
     private final Map<String, User> users = new HashMap<>();
     private final Path storage = Paths.get("users.json");
     private final Gson gson = new Gson();
+    private User currentUser;
+    private User signingUser;
 
     public UserManager() { load(); }
 
@@ -41,8 +40,10 @@ public class UserManager {
                 System.out.println("your password is not strong."); return false;
             }
             if (!pw.equals(pwc)) { System.out.println("make sure that you repeated your password correctly."); return false; }
-
             users.put(u, new User(u, hash(pw), nick, email, gen));
+            save();
+            signingUser = users.get(u);
+            System.out.println(signingUser.getSecurityQuestion());
             save();
             return true;
         } catch(Exception ex) {
@@ -66,20 +67,21 @@ public class UserManager {
         return user;
     }
 
-    public void startPasswordRecovery(String cmd) {
+    public String startPasswordRecovery(String cmd) {
         String u = cmd.split("\\s+")[3];
-        User user = users.get(u);
-        if (user==null) {
+        currentUser = users.get(u);
+        if (currentUser==null) {
             System.out.println("invalid username.");
+            return null;
         } else {
-            System.out.println("security question: " + user.getSecurityQuestion());
+            System.out.println("security question: " + currentUser.getSecurityQuestion());
+            return u;
         }
     }
-    public boolean checkSecurityAnswer(String username, String answer) {
-        User u = users.get(username);
-        if (u == null) return false;
+    public boolean checkSecurityAnswer(String answer) {
+        if (currentUser == null) return false;
         String Ans = hash(answer.trim().toLowerCase());
-        return Ans.equals(u.getSecurityAnswe());
+        return Ans.equals(currentUser.getSecurityAnswer());
     }
 
     public String resetPasswordRandom(String username) {
@@ -108,10 +110,11 @@ public class UserManager {
 
 
     public void completePasswordRecovery(String cmd) {
-        if (checkSecurityAnswer){
+        String answer = cmd.split("\\s+")[3];
+        if (checkSecurityAnswer(answer)){
             System.out.println("how do want to set new password?");}
         else{
-            System.out.println("incorrect answer")
+            System.out.println("incorrect answer");
         }
 
     }
@@ -219,9 +222,11 @@ public class UserManager {
     private void load() {
         try {
             if (Files.exists(storage)) {
-                var list = gson.fromJson(Files.readString(storage),
+                List<User> list = gson.fromJson(Files.readString(storage),
                         new TypeToken<List<User>>(){}.getType());
-                for (User u : list) users.put(u.getUsername(), u);
+                for (User u : list) {
+                    users.put(u.getUsername(), u);
+                }
             }
         } catch(IOException ignored) {}
     }
@@ -240,6 +245,11 @@ public class UserManager {
             for (byte b : bytes) sb.append(String.format("%02x", b));
             return sb.toString();
         } catch(Exception e) { return ""; }
+    }
+
+    public void setAnswer(String command){
+        String  answer = command.split("\\s+")[1];
+        signingUser.setSecurityAnswer(answer);
     }
 
 }
