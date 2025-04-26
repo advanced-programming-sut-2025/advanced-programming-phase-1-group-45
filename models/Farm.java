@@ -6,12 +6,12 @@ import java.util.Random;
 
 public class Farm {
     public static GameMap farm(int size) {
-        GameMap map = new GameMap(size);
+        GameMap map = new GameMap(size, false);
         placeElement(map, Tile.COTTAGE, 1,1,4,4);
         placeElement(map, Tile.GREENHOUSE, size-1-6, 1, 6, 5);
         placeElement(map, Tile.LAKE, 1, size-1-4, 6, 4);
         placeElement(map, Tile.QUARRY, size-1-5, size-1-3, 5, 3);
-        Random rand = new Random();
+        Random rnd = new Random();
         Scatter(map, Tile.TREE, size * size / 20, rnd);
         Scatter(map, Tile.STONE, size * size / 30, rnd);
         Scatter(map, Tile.FORAGING, size * size / 25, rnd);
