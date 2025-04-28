@@ -1,15 +1,20 @@
 package models;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class User{
     private String username;
     private String passwordHash;
     private String nickname;
     private String email;
     private String gender;
-    private double maxMoney = 0;
+    private double maxMoney = 0.0;
     private int gamesPlayed = 0;
     private String securityQuestion = "What is your grandma's name? ";
     private String securityAnswer = null;
+    private double money = 0.0;
+    private Map<String, Integer> inventory = new HashMap<>();
 
     public User(String username, String passwordHash, String nickname, String email, String gender){
         this.username = username;
@@ -17,6 +22,7 @@ public class User{
         this.nickname = nickname;
         this.email = email;
         this.gender = gender;
+        this.money = 0.0;
     }
     public String getUsername(){ return username; }
     public String getPasswordHash(){ return passwordHash; }
@@ -27,6 +33,18 @@ public class User{
     public double getMaxMoney(){return maxMoney; }
     public String getSecurityQuestion(){ return securityQuestion; }
     public String getSecurityAnswer(){return securityAnswer;}
+    public double getMoney(){return money; }
+    public int getInventoryCount(String item){ return inventory.getOrDefault(item, 0); }
+    public void addMoney(double delta){
+        this.money += delta;
+        if (this.money > this.maxMoney) this.maxMoney = this.money;
+    }
+    public void addItem(String item, int count){
+        int x = inventory.getOrDefault(item, 0);
+        int y = count + x;
+        if( y<= 0)inventory.remove(item);
+        else inventory.put(item, y);
+    }
 
     public void setUsername(String username){ this.username = username; }
     public void setPasswordHash(String passwordHash){ this.passwordHash = passwordHash; }
