@@ -2,6 +2,7 @@ package views;
 
 import managers.GameManager;
 import controllers.MenuController;
+import managers.UserManager;
 import models.GameSession;
 import models.Enums.Tile;
 import models.GameMap;
@@ -11,6 +12,7 @@ public class GameMenu implements Menu{
     public void handleCommand(String command, MenuController controller) {
         GameManager gm = controller.getGameManager();
         String me = controller.getCurrentUser().getUsername(); //current player
+        UserManager um = controller.getUserManager();
         if(command.startsWith("game new ")){
             GameSession s = gm.createNewGame(command, me);
             if(s != null){
@@ -78,6 +80,9 @@ public class GameMenu implements Menu{
             }
             else if(command.startsWith("print map")) {
                 GameMap.handlePrintMap(command, controller);
+            }
+            else if(command.startsWith("sell")){
+                um.handleSell(command, controller);
             }
     }
     }
