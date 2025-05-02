@@ -1,11 +1,12 @@
 package managers;
 import models.User;
 import models.GameSession;
-import gson.*;
 import java.io.*;
 import java.util.*;
 import java.nio.file.*;
-
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+//import com.google.gson.Gson;
 public class GameManager {
     private Map<String, List<GameSession>> gameSessions = new HashMap<>();
     private Path storage = Paths.get("games.json");
@@ -54,7 +55,7 @@ public class GameManager {
     private void load(){
         try{
             if(Files.exists(storage)){
-                var type = new TypeToken<Map<String,List<GameSession>>>(){}.getType;
+                var type = new TypeToken<Map<String,List<GameSession>>>(){}.getType();
                 var m = gson.fromJson(Files.readString(storage), type);
 
             }
