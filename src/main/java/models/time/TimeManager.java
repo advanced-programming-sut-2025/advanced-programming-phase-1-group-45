@@ -1,17 +1,15 @@
 package models.time;
 
-import models.Events.TurnAdvancedEvent;
-import models.Events.DayAdvancedEvent;
-import models.Events.GameEventBus;
+import models.Events.*;
 import models.Enums.Season;
-import models.Events.SeasonChangedEvent;
 
 public class TimeManager {
     private static final TimeManager instance = new TimeManager();
-    private int hour = 6;
+    private int hour = 9;
     private int day = 1;
     private Season season = Season.SPRING;
     private int turnsTaken;
+    private int totalDaysPlayed = 0;
     private TimeManager() {
         this.season = Season.SPRING;
     }
@@ -20,17 +18,25 @@ public class TimeManager {
     }
 
     public void advanceTurn() {
-        hour = (hour + 1) % 24;
         turnsTaken++;
         GameEventBus.INSTANCE.post(new TurnAdvancedEvent(hour, day, season));
         if (turnsTaken == 3) {
-            advanceDay();
+            advanceHour();
             turnsTaken = 0;
         }
+    }
+    public void advanceHour(){
+         hour ++;
+        GameEventBus.INSTANCE.post(new HourAdvancedEvent(hour, day, season));
+        if(hour == 22) {
+             advanceDay();
+             hour = 9;
+         }
     }
 
     private void advanceDay() {
         day++;
+        totalDaysPlayed++;
         GameEventBus.INSTANCE.post(new DayAdvancedEvent(day, season));
         if (day > 28) {
             advanceSeason();
