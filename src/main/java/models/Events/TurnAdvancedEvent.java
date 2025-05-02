@@ -1,4 +1,4 @@
-package managers;
+package models.Events;
 
 import models.Enums.Season;
 

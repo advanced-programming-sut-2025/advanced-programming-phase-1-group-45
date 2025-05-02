@@ -9,11 +9,11 @@ public enum GameEventBus {
         eventBus.post(event);
     }
 
-    public void register(Object object) {
-        eventBus.register(object);
+    public void register(Object subscriber) {
+        eventBus.register(subscriber);
     }
 
-    public void unregister(Object object) {
-        eventBus.unregister(object);
+    public void unregister(Object subscriber) {
+        eventBus.unregister(subscriber);
     }
 }

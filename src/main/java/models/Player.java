@@ -2,7 +2,8 @@ package models;
 
 import com.google.common.eventbus.Subscribe;
 import models.Events.GameEventBus;
-import managers.TurnAdvancedEvent;
+import models.Events.TurnAdvancedEvent;
+import models.time.TimeManager;
 
 public class Player {
     private String username;
@@ -45,11 +46,10 @@ public class Player {
 
     public void onTurnEnd(){
         gamesPlayed++;
+     //   System.out.println(" hi end turn %s" + this.username);
     }
-    @Subscribe
     public void onNewTurn(TurnAdvancedEvent event){
         //TODO
-        System.out.println("New turn ended");
-        //system.out.println("turn starting at time .... ");
+
     }
 }

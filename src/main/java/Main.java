@@ -3,6 +3,7 @@
 
 import managers.PlayerTurnManager;
 import models.Player;
+import models.time.TimeManager;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,8 +22,9 @@ public class Main {
         Player thirdplayer = new Player("pla", "999999" , "hoo", "eee", "zan");
         List<Player> players = Arrays.asList(firstPlayer, secondplayer, thirdplayer);
         PlayerTurnManager gameTurnManager = new PlayerTurnManager(players);
-        for (int i = 0; i < 10; i++) {
-            gameTurnManager.addCurrentTurn();
+        TimeManager timeManager = TimeManager.getInstance();
+        for (int i = 0; i < 3 * 29; i++) {
+            gameTurnManager.endTurn();
         }
     }
 }
