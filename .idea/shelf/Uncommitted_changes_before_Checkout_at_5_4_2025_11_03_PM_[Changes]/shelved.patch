@@ -1,0 +1,492 @@
+Index: src/main/java/managers/GameManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package managers;\r\nimport com.google.gson.Gson;\r\nimport com.google.gson.reflect.TypeToken;\r\nimport managers.Turn.PlayerTurnManager;\r\nimport models.Player;\r\nimport models.GameSession;\r\n//import gson.*;\r\nimport java.io.*;\r\nimport java.util.*;\r\nimport java.nio.file.*;\r\n\r\npublic class GameManager {\r\n    private Map<String, List<GameSession>> gameSessions = new HashMap<>();\r\n    private Path storage = Paths.get(\"games.json\");\r\n    private Gson gson = new Gson();\r\n    public PlayerTurnManager playerTurnManager;\r\n    public GameManager() {load();}\r\n    public void saveSession(GameSession session) {save();}\r\n    public void endSession(GameSession session){\r\n        for(String u: session.getPlayers()){\r\n            List<GameSession> sessions = gameSessions.get(u);\r\n            if(sessions != null) sessions.remove(session);\r\n        }\r\n        save();\r\n    }\r\n    public GameSession loadLastSession(Player u){\r\n        List<GameSession> sessions = gameSessions.get(u.getUsername());\r\n        if(sessions == null || sessions.isEmpty()) return null;\r\n        return sessions.get(sessions.size()-1);\r\n    }\r\n    public GameSession createNewGame(String command, String currentUser){\r\n        var parts = new ArrayList<>(Arrays.asList(command.split(\"\\\\s+\")));\r\n        parts.remove(0);\r\n        parts.remove(0);\r\n        parts.remove(0);\r\n        var users = parts;\r\n        if(users.size() < 1 || users.size() > 3){\r\n            System.out.println(\"Number on users must be between 1 and 3\");\r\n        }\r\n        users.add(0, currentUser);\r\n        var s = new GameSession(users);\r\n        for(var u: users){\r\n            gameSessions.computeIfAbsent(u, k -> new ArrayList<>()).add(s);\r\n        }\r\n        save();\r\n        return s;\r\n    }\r\n    public boolean selectMap(GameSession session, String command){\r\n        int m = Integer.parseInt(command.split(\"\\\\s+\")[2]);\r\n        if(m < 1 || m > 3){\r\n            System.out.println(\"invalid map number\");\r\n            return false;\r\n        }\r\n        session.setMapNumber(m);\r\n        save();\r\n        return true;\r\n    }\r\n    private void load(){\r\n        try{\r\n            if(Files.exists(storage)){\r\n                var type = new TypeToken<Map<String,List<GameSession>>>(){}.getType();\r\n                var m = gson.fromJson(Files.readString(storage), type);\r\n\r\n            }\r\n        } catch (IOException ignored) {}\r\n    }\r\n    private void save(){\r\n        try(Writer w = Files.newBufferedWriter(storage)){\r\n            gson.toJson(gameSessions, w);\r\n        } catch (IOException ignored) {\r\n        }\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/managers/GameManager.java b/src/main/java/managers/GameManager.java
+--- a/src/main/java/managers/GameManager.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ b/src/main/java/managers/GameManager.java	(date 1746387173089)
+@@ -1,19 +1,16 @@
+ package managers;
+-import com.google.gson.Gson;
+-import com.google.gson.reflect.TypeToken;
+-import managers.Turn.PlayerTurnManager;
+-import models.Player;
++import models.User;
+ import models.GameSession;
+-//import gson.*;
+ import java.io.*;
+ import java.util.*;
+ import java.nio.file.*;
+-
++import com.google.gson.*;
++import com.google.gson.reflect.TypeToken;
++//import com.google.gson.Gson;
+ public class GameManager {
+     private Map<String, List<GameSession>> gameSessions = new HashMap<>();
+     private Path storage = Paths.get("games.json");
+     private Gson gson = new Gson();
+-    public PlayerTurnManager playerTurnManager;
+     public GameManager() {load();}
+     public void saveSession(GameSession session) {save();}
+     public void endSession(GameSession session){
+@@ -23,7 +20,7 @@
+         }
+         save();
+     }
+-    public GameSession loadLastSession(Player u){
++    public GameSession loadLastSession(User u){
+         List<GameSession> sessions = gameSessions.get(u.getUsername());
+         if(sessions == null || sessions.isEmpty()) return null;
+         return sessions.get(sessions.size()-1);
+Index: src/main/java/models/Player.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models;\r\n\r\nimport models.Events.GameEventBus;\r\nimport models.Events.TurnChangedEvent;\r\n\r\npublic class Player {\r\n    private String username;\r\n    private String passwordHash;\r\n    private String nickname;\r\n    private String email;\r\n    private String gender;\r\n    private double maxMoney = 0;\r\n    private int gamesPlayed = 0;\r\n    private String securityQuestion = \"What is your grandma's name? \";\r\n    private String securityAnswer = null;\r\n\r\n    public Player(String username, String passwordHash, String nickname, String email, String gender){\r\n        this.username = username;\r\n        this.passwordHash = passwordHash;\r\n        this.nickname = nickname;\r\n        this.email = email;\r\n        this.gender = gender;\r\n        GameEventBus.INSTANCE.register(this);\r\n    }\r\n    public String getUsername(){ return username; }\r\n    public String getPasswordHash(){ return passwordHash; }\r\n    public String getNickname(){ return nickname; }\r\n    public String getEmail(){ return email; }\r\n    public String getGender(){ return gender; }\r\n    public int getGamesPlayed(){ return gamesPlayed; }\r\n    public double getMaxMoney(){return maxMoney; }\r\n    public String getSecurityQuestion(){ return securityQuestion; }\r\n    public String getSecurityAnswer(){return securityAnswer;}\r\n\r\n    public void setUsername(String username){ this.username = username; }\r\n    public void setPasswordHash(String passwordHash){ this.passwordHash = passwordHash; }\r\n    public void setNickname(String nickname){ this.nickname = nickname; }\r\n    public void setEmail(String email){ this.email = email; }\r\n    public void setGender(String gender){ this.gender = gender; }\r\n    public void setGamesPlayed(int gamesPlayed){ this.gamesPlayed = gamesPlayed; }\r\n    public void setMaxMoney(double maxMoney){ this.maxMoney = maxMoney; }\r\n    public void setSecurityQuestion(String securityQuestion){ this.securityQuestion = securityQuestion; }\r\n    public void setSecurityAnswer(String securityAnswer){this.securityAnswer = securityAnswer; }\r\n\r\n    public void onTurnEnd() {\r\n        gamesPlayed++;\r\n        //TODO\r\n//        System.out.println(this.username +\"'s turn ended\");\r\n//        System.out.println(TimeManager.getInstance().getTimeString());\r\n    }\r\n    public void onNewTurn(TurnChangedEvent event){\r\n        //TODO\r\n//        System.out.println(this.username + \"'s turn started\");\r\n//        System.out.println(TimeManager.getInstance().getTimeString());\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/models/Player.java b/src/main/java/models/Player.java
+--- a/src/main/java/models/Player.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ b/src/main/java/models/Player.java	(date 1746387215831)
+@@ -1,26 +1,28 @@
+ package models;
+ 
+-import models.Events.GameEventBus;
+-import models.Events.TurnChangedEvent;
++import java.util.HashMap;
++import java.util.Map;
+ 
+-public class Player {
++public class Player{
+     private String username;
+     private String passwordHash;
+     private String nickname;
+     private String email;
+     private String gender;
+-    private double maxMoney = 0;
++    private double maxMoney = 0.0;
+     private int gamesPlayed = 0;
+     private String securityQuestion = "What is your grandma's name? ";
+     private String securityAnswer = null;
++    private double money = 0.0;
++    private Map<String, Integer> inventory = new HashMap<>();
+ 
+-    public Player(String username, String passwordHash, String nickname, String email, String gender){
++    public User(String username, String passwordHash, String nickname, String email, String gender){
+         this.username = username;
+         this.passwordHash = passwordHash;
+         this.nickname = nickname;
+         this.email = email;
+         this.gender = gender;
+-        GameEventBus.INSTANCE.register(this);
++        this.money = 0.0;
+     }
+     public String getUsername(){ return username; }
+     public String getPasswordHash(){ return passwordHash; }
+@@ -31,6 +33,18 @@
+     public double getMaxMoney(){return maxMoney; }
+     public String getSecurityQuestion(){ return securityQuestion; }
+     public String getSecurityAnswer(){return securityAnswer;}
++    public double getMoney(){return money; }
++    public int getInventoryCount(String item){ return inventory.getOrDefault(item, 0); }
++    public void addMoney(double delta){
++        this.money += delta;
++        if (this.money > this.maxMoney) this.maxMoney = this.money;
++    }
++    public void addItem(String item, int count){
++        int x = inventory.getOrDefault(item, 0);
++        int y = count + x;
++        if( y<= 0)inventory.remove(item);
++        else inventory.put(item, y);
++    }
+ 
+     public void setUsername(String username){ this.username = username; }
+     public void setPasswordHash(String passwordHash){ this.passwordHash = passwordHash; }
+@@ -42,15 +56,5 @@
+     public void setSecurityQuestion(String securityQuestion){ this.securityQuestion = securityQuestion; }
+     public void setSecurityAnswer(String securityAnswer){this.securityAnswer = securityAnswer; }
+ 
+-    public void onTurnEnd() {
+-        gamesPlayed++;
+-        //TODO
+-//        System.out.println(this.username +"'s turn ended");
+-//        System.out.println(TimeManager.getInstance().getTimeString());
+-    }
+-    public void onNewTurn(TurnChangedEvent event){
+-        //TODO
+-//        System.out.println(this.username + "'s turn started");
+-//        System.out.println(TimeManager.getInstance().getTimeString());
+-    }
++
+ }
+Index: src/main/java/models/Enums/Tile.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models.Enums;\r\n\r\npublic enum Tile {\r\n    PLAIN (\".\", \"floor\"),\r\n    LAKE (\"L\", \"lake\"),\r\n    GREENHOUSE (\"G\", \"greenhouse\"),\r\n    COTTAGE (\"C\", \"cottage\"),\r\n    QUARRY (\"Q\", \"quarry\"),\r\n    TREE (\"T\", \"tree\"),\r\n    STONE (\"S\", \"stone\"),\r\n    FORAGING (\"f\", \"FORAGING\");\r\n    private char symbol;\r\n    private String description;\r\n    Tile(String symbol, String description) {\r\n        this.symbol = symbol.charAt(0);\r\n        this.description = description;\r\n    }\r\n\r\n    public char getSymbol() {return symbol;}\r\n    public String getDescription() {return description;}\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/models/Enums/Tile.java b/src/main/java/models/Enums/Tile.java
+--- a/src/main/java/models/Enums/Tile.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ b/src/main/java/models/Enums/Tile.java	(date 1746387175912)
+@@ -8,7 +8,8 @@
+     QUARRY ("Q", "quarry"),
+     TREE ("T", "tree"),
+     STONE ("S", "stone"),
+-    FORAGING ("f", "FORAGING");
++    FORAGING ("f", "FORAGING"),
++    SHIPPINGBIN("s", "shippingbin");
+     private char symbol;
+     private String description;
+     Tile(String symbol, String description) {
+@@ -18,4 +19,16 @@
+ 
+     public char getSymbol() {return symbol;}
+     public String getDescription() {return description;}
++    public static void printMapLegend() {
++        System.out.println("\nMap Symbols Legend:");
++        for(Tile tile : Tile.values()) {
++            System.out.printf("%-2s : %-15s (%s)%n",
++                    tile.symbol,
++                    tile.name(),
++                    tile.description);
++        }
++        System.out.println("\nExample Map Key:");
++        System.out.println("T . L C Q");
++        System.out.println("Tree, Plain, Lake, Cottage, Quarry\n");
++    }
+ }
+Index: src/main/java/models/Events/SeasonChangedEvent.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models.Events;\r\n\r\nimport models.Enums.Season;\r\n\r\npublic record SeasonChangedEvent(int hour, int day, Season previous, Season newSeason) {\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/models/Events/SeasonChangedEvent.java b/src/main/java/models/Events/SeasonChangedEvent.java
+--- a/src/main/java/models/Events/SeasonChangedEvent.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ b/src/main/java/models/Events/SeasonChangedEvent.java	(date 1746387175016)
+@@ -2,5 +2,5 @@
+ 
+ import models.Enums.Season;
+ 
+-public record SeasonChangedEvent(int hour, int day, Season previous, Season newSeason) {
++public record SeasonChangedEvent(Season previous, Season newSeason) {
+ }
+Index: src/main/java/models/Events/TurnChangedEvent.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models.Events;\r\n\r\nimport models.Enums.Season;\r\n\r\npublic class TurnChangedEvent {\r\n    private final int hour;\r\n    private final int day;\r\n    private final Season season;\r\n    public TurnChangedEvent(int hour, int day, Season season){\r\n        this.hour = hour;\r\n        this.day = day;\r\n        this.season = season;\r\n    }\r\n    public int getHour() {\r\n        return hour;\r\n    }\r\n    public int getDay() {\r\n        return day;\r\n    }\r\n    public Season getSeason() {\r\n        return season;\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/models/Events/TurnChangedEvent.java b/src/main/java/models/Events/TurnChangedEvent.java
+--- a/src/main/java/models/Events/TurnChangedEvent.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ b/src/main/java/models/Events/TurnChangedEvent.java	(date 1746387176210)
+@@ -2,11 +2,12 @@
+ 
+ import models.Enums.Season;
+ 
+-public class TurnChangedEvent {
+-    private final int hour;
+-    private final int day;
+-    private final Season season;
+-    public TurnChangedEvent(int hour, int day, Season season){
++public class TurnAdvancedEvent(int hour, int day, Season season) {
++    private int hour;
++    private int day;
++    private Season season;
++
++    TurnAdvancedEvent(int hour, int day, Season season) {
+         this.hour = hour;
+         this.day = day;
+         this.season = season;
+Index: src/main/java/models/Events/WeatherChangedEvent.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models.Events;\r\n\r\nimport models.Enums.Season;\r\nimport models.Enums.Weather;\r\n\r\npublic class WeatherChangedEvent {\r\n    private final Weather newWeather;\r\n    private final Weather oldWeather;\r\n    private final Season season;\r\n    public WeatherChangedEvent(Weather newWeather, Weather oldWeather, Season season){\r\n        this.newWeather = newWeather;\r\n        this.oldWeather = oldWeather;\r\n        this.season = season;\r\n    }\r\n    public Weather getNewWeather() {\r\n        return newWeather;\r\n    }\r\n    public Weather getOldWeather() {\r\n        return oldWeather;\r\n    }\r\n    public Season getSeason() {\r\n        return season;\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/models/Events/WeatherChangedEvent.java b/src/main/java/models/Events/WeatherChangedEvent.java
+--- a/src/main/java/models/Events/WeatherChangedEvent.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ b/src/main/java/models/Events/WeatherChangedEvent.java	(date 1746387176933)
+@@ -3,21 +3,25 @@
+ import models.Enums.Season;
+ import models.Enums.Weather;
+ 
+-public class WeatherChangedEvent {
+-    private final Weather newWeather;
+-    private final Weather oldWeather;
+-    private final Season season;
+-    public WeatherChangedEvent(Weather newWeather, Weather oldWeather, Season season){
++public record WeatherChangedEvent {
++    private Weather newWeather;
++    private Weather oldWeather;
++    private Season season;
++
++    WeatherChangedEvent(Weather newWeather, Weather oldWeather, Season season) {
+         this.newWeather = newWeather;
+         this.oldWeather = oldWeather;
+         this.season = season;
+     }
++
+     public Weather getNewWeather() {
+         return newWeather;
+     }
++
+     public Weather getOldWeather() {
+         return oldWeather;
+     }
++
+     public Season getSeason() {
+         return season;
+     }
+Index: src/main/java/views/GameMenu.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package views;\r\n\r\nimport managers.GameManager;\r\nimport controllers.MenuController;\r\nimport models.GameSession;\r\n\r\npublic class GameMenu implements Menu{\r\n    @Override\r\n    public void handleCommand(String command, MenuController controller) {\r\n        GameManager gm = controller.getGameManager();\r\n        String me = controller.getCurrentUser().getUsername(); //current player\r\n        if(command.startsWith(\"game new \")){\r\n            GameSession s = gm.createNewGame(command, me);\r\n            if(s != null){\r\n                controller.setCurrentSession(s);\r\n                System.out.println(\"New Game Created, now choose your map\");\r\n            }\r\n        } else if(command.startsWith(\"game map\")){\r\n            if(controller.getCurrentSession() != null && gm.selectMap(controller.getCurrentSession(), command)){\r\n                System.out.println(\"map selected\");\r\n            }\r\n        } else if(command.equals(\"load game\")){\r\n            GameSession s= gm.loadLastSession(controller.getCurrentUser());\r\n            if(s != null){\r\n                controller.setCurrentSession(s);\r\n                System.out.println(\"the last game loaded\");\r\n            } else System.out.println(\"no game exists\");\r\n        } else if(command.equals(\"next turn\")){\r\n            GameSession s = controller.getCurrentSession();\r\n            if(s != null){\r\n                s.nextTurn();\r\n                System.out.println(\"it's \" + s.getTurn() + \" turn!\");\r\n            }\r\n        } else if(command.equals(\"exit game\")){\r\n            GameSession s = controller.getCurrentSession();\r\n            if(!me.equals(s.getPlayers().get(0))){\r\n                System.out.println(\"only the creator can exit the game\");\r\n            } else {\r\n                controller.getGameManager().saveSession(s);\r\n\r\n                controller.setCurrentSession(null);\r\n                System.out.println(\"exiting the game\");\r\n            }\r\n        } else if(command.equals(\"force terminate\")){\r\n            GameSession s = controller.getCurrentSession();\r\n            s.startVote(me);\r\n            System.out.println(\"voting terminated\");\r\n        } else if(command.startsWith(\"vote\")){\r\n            GameSession s = controller.getCurrentSession();\r\n            if(!s.isVoteInProgress()){\r\n                System.out.println(\"no active voting\");\r\n            } else if(s.hasVoted(me)){\r\n                System.out.println(\"you already voted\");\r\n            } else {\r\n                boolean yes = command.equals(\"vote yes\");\r\n                s.recordVote(me, yes);\r\n                System.out.println(\"vote submitted\");\r\n                if(s.allVoted()){\r\n                    if(s.isVoteSuccessful()){\r\n                        controller.getGameManager().endSession(s);\r\n                        System.out.println(\"All votes were positive ,ending the game\");\r\n                        controller.setCurrentSession(null);\r\n                        controller.setCurrentMenu(new MainMenu());\r\n                    } else {\r\n                        s.clearVote();\r\n                        System.out.println(\"there is at least one negative vote, continuing the game\");\r\n                    }\r\n                }\r\n            }\r\n        }\r\n    }\r\n    }
+===================================================================
+diff --git a/src/main/java/views/GameMenu.java b/src/main/java/views/GameMenu.java
+--- a/src/main/java/views/GameMenu.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ b/src/main/java/views/GameMenu.java	(date 1746387173702)
+@@ -2,13 +2,17 @@
+ 
+ import managers.GameManager;
+ import controllers.MenuController;
++import managers.UserManager;
+ import models.GameSession;
++import models.Enums.Tile;
++import models.GameMap;
+ 
+ public class GameMenu implements Menu{
+     @Override
+     public void handleCommand(String command, MenuController controller) {
+         GameManager gm = controller.getGameManager();
+         String me = controller.getCurrentUser().getUsername(); //current player
++        UserManager um = controller.getUserManager();
+         if(command.startsWith("game new ")){
+             GameSession s = gm.createNewGame(command, me);
+             if(s != null){
+@@ -45,18 +49,18 @@
+             GameSession s = controller.getCurrentSession();
+             s.startVote(me);
+             System.out.println("voting terminated");
+-        } else if(command.startsWith("vote")){
++        } else if(command.startsWith("vote")) {
+             GameSession s = controller.getCurrentSession();
+-            if(!s.isVoteInProgress()){
++            if (!s.isVoteInProgress()) {
+                 System.out.println("no active voting");
+-            } else if(s.hasVoted(me)){
++            } else if (s.hasVoted(me)) {
+                 System.out.println("you already voted");
+             } else {
+                 boolean yes = command.equals("vote yes");
+                 s.recordVote(me, yes);
+                 System.out.println("vote submitted");
+-                if(s.allVoted()){
+-                    if(s.isVoteSuccessful()){
++                if (s.allVoted()) {
++                    if (s.isVoteSuccessful()) {
+                         controller.getGameManager().endSession(s);
+                         System.out.println("All votes were positive ,ending the game");
+                         controller.setCurrentSession(null);
+@@ -68,5 +72,17 @@
+                 }
+             }
+         }
++            if (command.equals("help reading map")){
++                GameMap.printMapLegend();
++            }
++            else if(command.startsWith("walk -l")) {
++                GameMap.handleWalkCommand(command, controller);
++            }
++            else if(command.startsWith("print map")) {
++                GameMap.handlePrintMap(command, controller);
++            }
++            else if(command.startsWith("sell")){
++                um.handleSell(command, controller);
++            }
++    }
+     }
+-    }
+\ No newline at end of file
+Index: src/main/java/models/GameMap.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models;\r\nimport models.Enums.Tile;\r\n\r\nimport java.util.Random;\r\n//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1\r\npublic class GameMap {\r\n    private int size;\r\n    private Tile[][] grid;\r\n    public GameMap(int size, boolean random) {\r\n        this.size = size;\r\n        grid = new Tile[size][size];\r\n        if(random) generateRandomMap();\r\n        else fillPlain();\r\n    }\r\n    private void generateRandomMap() {\r\n        Random rand = new Random();\r\n        fillPlain();\r\n        for (Tile t : new Tile[]{Tile.LAKE, Tile.GREENHOUSE, Tile.COTTAGE, Tile.QUARRY}){\r\n            placeRandom(t, rand);\r\n        }\r\n    }\r\n    private void placeRandom(Tile t, Random rand) {\r\n        int x, y;\r\n        do{\r\n            x = rand.nextInt(size);\r\n            y = rand.nextInt(size);\r\n        } while (grid[y][x] != Tile.PLAIN);\r\n        grid[y][x] = t;\r\n    }\r\n    public Tile getTile(int x, int y) {\r\n        if(x < 0 || y < 0 || x >= size || y >= size){\r\n            return null;\r\n        }\r\n        return grid[y][x];\r\n    }\r\n\r\n    public int getSize() {return size;}\r\n\r\n    public void setTile(int x, int y, Tile tile) {\r\n        if(x < 0 || y < 0 || x >= size || y >= size){\r\n            return ;\r\n        }\r\n         grid[y][x] = tile;\r\n    }\r\n\r\n    private void fillPlain() {\r\n        for (int y = 0; y < size; y++) {\r\n            for (int x = 0; x < size; x++) {\r\n                grid[y][x] = Tile.PLAIN;\r\n            }\r\n        }\r\n    }\r\n}
+===================================================================
+diff --git a/src/main/java/models/GameMap.java b/src/main/java/models/GameMap.java
+--- a/src/main/java/models/GameMap.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ b/src/main/java/models/GameMap.java	(date 1746387173394)
+@@ -1,8 +1,9 @@
+ package models;
++import controllers.MenuController;
+ import models.Enums.Tile;
+ 
+-import java.util.Random;
+-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
++import java.util.*;
++
+ public class GameMap {
+     private int size;
+     private Tile[][] grid;
+@@ -50,4 +51,164 @@
+             }
+         }
+     }
+-}
+\ No newline at end of file
++    public static List<int[]> findPath(GameMap map, int startX, int startY, int endX, int endY) {
++        // پیاده‌سازی الگوریتم BFS
++        Queue<int[]> queue = new LinkedList<>();
++        Map<String, int[]> parent = new HashMap<>();
++        boolean[][] visited = new boolean[map.getSize()][map.getSize()];
++
++        queue.add(new int[]{startX, startY});
++        visited[startY][startX] = true;
++
++        while(!queue.isEmpty()) {
++            int[] current = queue.poll();
++            if(current[0] == endX && current[1] == endY) {
++                return reconstructPath(parent, current);
++            }
++
++            for(int[] neighbor : map.getNeighbors(current[0], current[1])) {
++                String key = neighbor[0] + "," + neighbor[1];
++                if(!visited[neighbor[1]][neighbor[0]]) {
++                    visited[neighbor[1]][neighbor[0]] = true;
++                    parent.put(key, current);
++                    queue.add(neighbor);
++                }
++            }
++        }
++        return Collections.emptyList(); // هیچ مسیری یافت نشد
++    }
++
++    private static List<int[]> reconstructPath(Map<String, int[]> parent, int[] end) {
++        List<int[]> path = new ArrayList<>();
++        int[] current = end;
++        while(current != null) {
++            path.add(current);
++            current = parent.get(current[0] + "," + current[1]);
++        }
++        Collections.reverse(path);
++        return path;
++    }
++
++    public static int calculateEnergy(List<int[]> path) {
++        return (int) Math.ceil(path.size() / 20.0);
++    }
++
++    public static void printMapLegend() {
++        System.out.println("\nMap Symbols Legend:");
++        for(Tile tile : Tile.values()) {
++            System.out.printf("%-2s : %-15s (%s)%n",
++                    tile.getSymbol(),
++                    tile.name(),
++                    tile.getDescription());
++        }
++        System.out.println("\nExample Map Key:");
++        System.out.println("T . L C Q");
++        System.out.println("Tree, Plain, Lake, Cottage, Quarry\n");
++    }
++
++    public boolean isTilePassable(int x, int y) {
++        Tile tile = getTile(x, y);
++        return tile != null &&
++                tile != Tile.LAKE &&
++                tile != Tile.STONE;
++    }
++
++    // 2. یافتن همسایه‌های مجاز
++    public List<int[]> getNeighbors(int x, int y) {
++        List<int[]> neighbors = new ArrayList<>();
++        int[][] directions = {{-1,0}, {1,0}, {0,-1}, {0,1},
++                {-1,-1}, {-1,1}, {1,-1}, {1,1}};
++
++        for(int[] dir : directions) {
++            int nx = x + dir[0];
++            int ny = y + dir[1];
++            if(isTilePassable(nx, ny)) {
++                neighbors.add(new int[]{nx, ny});
++            }
++        }
++        return neighbors;
++    }
++
++    // 3. چاپ بخشی از نقشه
++    public void printMapArea(int centerX, int centerY, int size) {
++        int half = size / 2;
++        int startX = Math.max(0, centerX - half);
++        int startY = Math.max(0, centerY - half);
++        int endX = Math.min(size-1, centerX + half);
++        int endY = Math.min(size-1, centerY + half);
++
++        for(int y = startY; y <= endY; y++) {
++            for(int x = startX; x <= endX; x++) {
++                Tile tile = getTile(x, y);
++                System.out.print(tile.getSymbol() + " ");
++            }
++            System.out.println();
++        }
++    }
++
++    public static void handleWalkCommand(String command, MenuController controller) {
++        try {
++            String[] parts = command.split(" ");
++            String[] coords = parts[2].split(",");
++            int x = Integer.parseInt(coords[0]);
++            int y = Integer.parseInt(coords[1]);
++            GameSession session = controller.getCurrentSession();
++            GameMap map = session.getMap();
++
++
++            // بررسی وجود خانه مقصد
++            if(!map.isTilePassable(x, y)) {
++                System.out.println("Destination is blocked!");
++                return;
++            }
++
++            // یافتن مسیر
++            List<int[]> path = findPath(
++                    map,
++                    session.getPlayerX(),
++                    session.getPlayerY(),
++                    x,
++                    y
++            );
++
++            if(path.isEmpty()) {
++                System.out.println("No path found!");
++                return;
++            }
++
++            //  انرژی
++            int energyCost = calculateEnergy(path);
++            System.out.println("Energy needed: " + energyCost + ". Confirm? (Y/N)");
++
++            //  تایید کاربر
++            String input = scanner.nextLine();
++            if(input.equalsIgnoreCase("Y")) {
++                if(session.getEnergy() >= energyCost) {
++                    session.setPlayerPosition(x, y);
++                    session.reduceEnergy(energyCost);
++                    System.out.println("Moved successfully!");
++                } else {
++                    System.out.println("Insufficient energy! You fainted.");
++                   // player.faint();
++                }
++            }
++        } catch (Exception e) {
++            System.out.println("Invalid command format! Usage: walk -l <x,y>");
++        }
++    }
++
++    public static void handlePrintMap(String command, MenuController controller) {
++        GameSession session = controller.getCurrentSession();
++        try {
++            String[] parts = command.split(" ");
++            String[] coords = parts[2].split(",");
++            int x = Integer.parseInt(coords[0]);
++            int y = Integer.parseInt(coords[1]);
++            int size = Integer.parseInt(parts[4]);
++
++            session.getMap().printMapArea(x, y, size);
++        } catch (Exception e) {
++            System.out.println("Invalid command format! Usage: print map -l <x,y> -s <size>");
++        }
++    }
++}
