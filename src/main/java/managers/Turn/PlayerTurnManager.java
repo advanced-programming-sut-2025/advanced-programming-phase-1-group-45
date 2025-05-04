@@ -2,7 +2,7 @@ package managers;
 
 import com.google.common.eventbus.Subscribe;
 import models.Events.GameEventBus;
-import models.Events.TurnAdvancedEvent;
+import models.Events.TurnChangedEvent;
 import models.Events.TurnEndedEvent;
 import models.Player;
 import models.time.TimeManager;
@@ -33,7 +33,7 @@ public class PlayerTurnManager {
     }
 
     @Subscribe
-    private void onTimeAdvanced(TurnAdvancedEvent event) {
+    private void onTimeAdvanced(TurnChangedEvent event) {
         players.get(currentTurn).onNewTurn(event);
     }
 }

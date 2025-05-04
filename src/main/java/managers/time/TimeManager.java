@@ -11,7 +11,7 @@ public class TimeManager {
     private Season season = Season.SPRING;
     private int turnsTaken = 1;
     private int totalDaysPlayed = 0;
-    private WeatherController weatherController;
+    private static final WeatherController weatherController = new WeatherController();
 
     private TimeManager() {
         this.season = Season.SPRING;
@@ -23,7 +23,7 @@ public class TimeManager {
 
     public void nextTurn() {
         turnsTaken++;
-        GameEventBus.INSTANCE.post(new TurnAdvancedEvent(hour, day, season));
+        GameEventBus.INSTANCE.post(new TurnChangedEvent(hour, day, season));
         if (turnsTaken == 3) {
             advanceHour();
             turnsTaken = 0;
@@ -39,7 +39,7 @@ public class TimeManager {
         }
     }
 
-    private void advanceDay() {
+    public void advanceDay() {
         day++;
         totalDaysPlayed++;
         GameEventBus.INSTANCE.post(new DayChangedEvent(day, season));
@@ -48,11 +48,11 @@ public class TimeManager {
         }
     }
 
-    private void advanceSeason() {
+    public void advanceSeason() {
         Season previousSeason = season;
         season = season.next();
         day = 1;
-        GameEventBus.INSTANCE.post(new SeasonChangedEvent(previousSeason, season));
+        GameEventBus.INSTANCE.post(new SeasonChangedEvent(hour, day, previousSeason, season));
     }
 
     public int getTotalDaysPlayed() {
@@ -62,5 +62,9 @@ public class TimeManager {
     public String getTimeString() {
         return String.format("Day %d , %02d:00 - %s",
                 day, hour, season.toString());
+    }
+
+    public Season getSeason() {
+        return this.season;
     }
 }

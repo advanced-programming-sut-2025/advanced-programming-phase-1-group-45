@@ -1,10 +1,7 @@
 package models;
 
-import com.google.common.eventbus.Subscribe;
 import models.Events.GameEventBus;
-import models.Events.TurnAdvancedEvent;
-import models.Events.TurnEndedEvent;
-import models.time.TimeManager;
+import models.Events.TurnChangedEvent;
 
 public class Player {
     private String username;
@@ -48,12 +45,12 @@ public class Player {
     public void onTurnEnd() {
         gamesPlayed++;
         //TODO
-        System.out.println(this.username +"'s turn ended");
-        System.out.println(TimeManager.getInstance().getTimeString());
+//        System.out.println(this.username +"'s turn ended");
+//        System.out.println(TimeManager.getInstance().getTimeString());
     }
-    public void onNewTurn(TurnAdvancedEvent event){
+    public void onNewTurn(TurnChangedEvent event){
         //TODO
-        System.out.println(this.username + "'s turn started");
-        System.out.println(TimeManager.getInstance().getTimeString());
+//        System.out.println(this.username + "'s turn started");
+//        System.out.println(TimeManager.getInstance().getTimeString());
     }
 }
