@@ -2,5 +2,5 @@ package models.Events;
 
 import models.Enums.Season;
 
-public record DayAdvancedEvent(int day, Season season) {
+public record DayChangedEvent(int day, Season season) {
 }

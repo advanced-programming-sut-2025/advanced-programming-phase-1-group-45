@@ -24,12 +24,12 @@ public class PlayerTurnManager {
         Player player = players.get(currentTurn);
         player.onTurnEnd();
         GameEventBus.INSTANCE.post(new TurnEndedEvent(player));
-        TimeManager.getInstance().advanceTurn();
         advanceToNextPlayer();
     }
 
     private void advanceToNextPlayer() {
         currentTurn = (currentTurn + 1) % players.size();
+        TimeManager.getInstance().nextTurn();
     }
 
     @Subscribe

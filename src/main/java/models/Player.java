@@ -3,6 +3,7 @@ package models;
 import com.google.common.eventbus.Subscribe;
 import models.Events.GameEventBus;
 import models.Events.TurnAdvancedEvent;
+import models.Events.TurnEndedEvent;
 import models.time.TimeManager;
 
 public class Player {
@@ -44,12 +45,15 @@ public class Player {
     public void setSecurityQuestion(String securityQuestion){ this.securityQuestion = securityQuestion; }
     public void setSecurityAnswer(String securityAnswer){this.securityAnswer = securityAnswer; }
 
-    public void onTurnEnd(){
+    public void onTurnEnd() {
         gamesPlayed++;
-     //   System.out.println(" hi end turn %s" + this.username);
+        //TODO
+        System.out.println(this.username +"'s turn ended");
+        System.out.println(TimeManager.getInstance().getTimeString());
     }
     public void onNewTurn(TurnAdvancedEvent event){
         //TODO
-
+        System.out.println(this.username + "'s turn started");
+        System.out.println(TimeManager.getInstance().getTimeString());
     }
 }

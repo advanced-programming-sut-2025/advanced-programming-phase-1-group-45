@@ -1,5 +1,7 @@
 package models;
 
+import managers.PlayerTurnManager;
+
 import java.util.*;
 import java.util.Map;
 
@@ -13,7 +15,6 @@ public class GameSession {
     private GameMap map;
     private int playerX, playerY;
     private int energy = 100;
-    private int day
 
     public GameSession(List<String> players) {
         this.players = new ArrayList<>(players);

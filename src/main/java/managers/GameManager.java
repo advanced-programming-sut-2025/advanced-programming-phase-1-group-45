@@ -12,6 +12,7 @@ public class GameManager {
     private Map<String, List<GameSession>> gameSessions = new HashMap<>();
     private Path storage = Paths.get("games.json");
     private Gson gson = new Gson();
+    public PlayerTurnManager playerTurnManager;
     public GameManager() {load();}
     public void saveSession(GameSession session) {save();}
     public void endSession(GameSession session){
