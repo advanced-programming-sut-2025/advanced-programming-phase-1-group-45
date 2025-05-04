@@ -4,7 +4,7 @@ import controllers.MovementController;
 import models.Enums.NPCCharacters;
 import models.Enums.Season;
 import models.Enums.Weather;
-import models.time.TimeManager;
+import managers.time.TimeManager;
 
 public class NPC {
     private String name;

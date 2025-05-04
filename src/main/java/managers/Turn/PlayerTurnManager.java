@@ -1,11 +1,11 @@
-package managers;
+package managers.Turn;
 
 import com.google.common.eventbus.Subscribe;
 import models.Events.GameEventBus;
 import models.Events.TurnChangedEvent;
 import models.Events.TurnEndedEvent;
 import models.Player;
-import models.time.TimeManager;
+import managers.time.TimeManager;
 
 import java.util.List;
 

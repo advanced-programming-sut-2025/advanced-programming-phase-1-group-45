@@ -1,7 +1,7 @@
 package models;
 
 import controllers.TradingController;
-import models.time.TimeManager;
+import managers.time.TimeManager;
 
 public class Friendship implements Ability {
    // private Map<NPC, Integer> npcRelationships;

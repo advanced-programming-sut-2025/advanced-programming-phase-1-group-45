@@ -1,11 +1,10 @@
 //package org.example;
 
 
-import managers.PlayerTurnManager;
+import managers.Turn.PlayerTurnManager;
 import models.Player;
-import models.time.TimeManager;
+import managers.time.TimeManager;
 
-import java.sql.Time;
 import java.util.Arrays;
 import java.util.List;
 
