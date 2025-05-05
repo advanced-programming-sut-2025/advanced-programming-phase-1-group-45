@@ -23,7 +23,7 @@ public class TimeManager {
 
     public void nextTurn() {
         turnsTaken++;
-        GameEventBus.INSTANCE.post(new TurnAdvancedEvent(hour, day, season));
+        GameEventBus.INSTANCE.post(new TurnChangedEvent(hour, day, season));
         if (turnsTaken == 3) {
             advanceHour();
             turnsTaken = 0;
