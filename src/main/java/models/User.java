@@ -97,4 +97,15 @@ public class User{
     public void applyEnergyPenalty() {
         this.energy *= 0.5;
     }
+    public void onTurnEnd() {
+        gamesPlayed++;
+        //TODO
+        System.out.println(this.username +"'s turn ended");
+       System.out.println(TimeManager.getInstance().getTimeString());
+    }
+    public void onNewTurn(TurnChangedEvent event){
+        //TODO
+       System.out.println(this.username + "'s turn started");
+        System.out.println(TimeManager.getInstance().getTimeString());
+    }
 }
