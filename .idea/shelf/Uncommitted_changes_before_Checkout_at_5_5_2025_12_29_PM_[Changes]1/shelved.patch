@@ -1,0 +1,1241 @@
+Index: .gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>target/\r\n!.mvn/wrapper/maven-wrapper.jar\r\n!**/src/main/**/target/\r\n!**/src/test/**/target/\r\n\r\n### IntelliJ IDEA ###\r\n.idea/modules.xml\r\n.idea/jarRepositories.xml\r\n.idea/compiler.xml\r\n.idea/libraries/\r\n*.iws\r\n*.iml\r\n*.ipr\r\n\r\n### Eclipse ###\r\n.apt_generated\r\n.classpath\r\n.factorypath\r\n.project\r\n.settings\r\n.springBeans\r\n.sts4-cache\r\n\r\n### NetBeans ###\r\n/nbproject/private/\r\n/nbbuild/\r\n/dist/\r\n/nbdist/\r\n/.nb-gradle/\r\nbuild/\r\n!**/src/main/**/build/\r\n!**/src/test/**/build/\r\n\r\n### VS Code ###\r\n.vscode/\r\n\r\n### Mac OS ###\r\n.DS_Store
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.gitignore b/.gitignore
+--- a/.gitignore	(revision 775c85455e1931b252dbf4ab2c99de48fdc1e350)
++++ b/.gitignore	(date 1746392313309)
+@@ -18,7 +18,7 @@
+ .factorypath
+ .project
+ .settings
+-.springBeans
++.SPRINGBeans
+ .sts4-cache
+ 
+ ### NetBeans ###
+Index: src/main/java/models/crops/Crops.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/crops/Crops.json b/src/main/java/models/crops/Crops.json
+new file mode 100644
+--- /dev/null	(date 1746393425289)
++++ b/src/main/java/models/crops/Crops.json	(date 1746393425289)
+@@ -0,0 +1,537 @@
++{
++  "crops": [
++    {
++      "name": "Blue Jazz",
++      "source": "Jazz Seeds",
++      "stages": [1, 2, 2, 2],
++      "totalHarvestTime": 7,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 50,
++      "isEdible": true,
++      "energy": 45,
++      "season": ["SPRING"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Carrot",
++      "source": "Carrot Seeds",
++      "stages": [1, 1, 1],
++      "totalHarvestTime": 3,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 35,
++      "isEdible": true,
++      "energy": 75,
++      "season": ["SPRING"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Cauliflower",
++      "source": "Cauliflower Seeds",
++      "stages": [1, 2, 4, 4, 1],
++      "totalHarvestTime": 12,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 175,
++      "isEdible": true,
++      "energy": 75,
++      "season": ["SPRING"],
++      "canBecomeGiant": true
++    },
++    {
++      "name": "Coffee Bean",
++      "source": "Coffee Bean",
++      "stages": [1, 2, 3, 3, 2],
++      "totalHarvestTime": 10,
++      "isOneTime": false,
++      "regrowthTime": 2,
++      "baseSellPrice": 15,
++      "isEdible": false,
++      "energy": null,
++      "season": ["SPRING", "SUMMER"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Garlic",
++      "source": "Garlic Seeds",
++      "stages": [1, 1, 1, 1],
++      "totalHarvestTime": 4,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 80,
++      "isEdible": true,
++      "energy": 20,
++      "season": ["SPRING"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Green Bean",
++      "source": "Bean Starter",
++      "stages": [1, 1, 1, 3, 4],
++      "totalHarvestTime": 10,
++      "isOneTime": false,
++      "regrowthTime": 3,
++      "baseSellPrice": 40,
++      "isEdible": true,
++      "energy": 25,
++      "season": ["SPRING"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Kale",
++      "source": "Kale Seeds",
++      "stages": [1, 2, 2, 1],
++      "totalHarvestTime": 6,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 110,
++      "isEdible": true,
++      "energy": 50,
++      "season": ["SPRING"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Parsnip",
++      "source": "Parsnip Seeds",
++      "stages": [1, 1, 1, 1],
++      "totalHarvestTime": 4,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 35,
++      "isEdible": true,
++      "energy": 25,
++      "season": ["SPRING"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Potato",
++      "source": "Potato Seeds",
++      "stages": [1, 1, 1, 2, 1],
++      "totalHarvestTime": 6,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 80,
++      "isEdible": true,
++      "energy": 25,
++      "season": ["SPRING"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Rhubarb",
++      "source": "Rhubarb Seeds",
++      "stages": [2, 2, 2, 3, 4],
++      "totalHarvestTime": 13,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 220,
++      "isEdible": false,
++      "energy": null,
++      "season": ["SPRING"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Strawberry",
++      "source": "Strawberry Seeds",
++      "stages": [1, 1, 2, 2, 2],
++      "totalHarvestTime": 8,
++      "isOneTime": false,
++      "regrowthTime": 4,
++      "baseSellPrice": 120,
++      "isEdible": true,
++      "energy": 50,
++      "season": ["SPRING"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Tulip",
++      "source": "Tulip Bulb",
++      "stages": [1, 1, 2, 2],
++      "totalHarvestTime": 6,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 30,
++      "isEdible": true,
++      "energy": 45,
++      "season": ["SPRING"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Unmilled Rice",
++      "source": "Rice Shoot",
++      "stages": [1, 2, 2, 3],
++      "totalHarvestTime": 9,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 30,
++      "isEdible": true,
++      "energy": 3,
++      "season": ["SPRING"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Blueberry",
++      "source": "Blueberry Seeds",
++      "stages": [1, 3, 3, 4, 2],
++      "totalHarvestTime": 13,
++      "isOneTime": false,
++      "regrowthTime": 4,
++      "baseSellPrice": 50,
++      "isEdible": true,
++      "energy": 25,
++      "season": ["SUMMER"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Corn",
++      "source": "Corn Seeds",
++      "stages": [2, 3, 3, 3, 3],
++      "totalHarvestTime": 14,
++      "isOneTime": false,
++      "regrowthTime": 4,
++      "baseSellPrice": 50,
++      "isEdible": true,
++      "energy": 25,
++      "season": ["SUMMER", "AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Hops",
++      "source": "Hops Starter",
++      "stages": [1, 1, 2, 3, 4],
++      "totalHarvestTime": 11,
++      "isOneTime": false,
++      "regrowthTime": 1,
++      "baseSellPrice": 25,
++      "isEdible": true,
++      "energy": 45,
++      "season": ["SUMMER"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Hot Pepper",
++      "source": "Pepper Seeds",
++      "stages": [1, 1, 1, 1, 1],
++      "totalHarvestTime": 5,
++      "isOneTime": false,
++      "regrowthTime": 3,
++      "baseSellPrice": 40,
++      "isEdible": true,
++      "energy": 13,
++      "season": ["SUMMER"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Melon",
++      "source": "Melon Seeds",
++      "stages": [1, 2, 3, 3, 3],
++      "totalHarvestTime": 12,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 250,
++      "isEdible": true,
++      "energy": 113,
++      "season": ["SUMMER"],
++      "canBecomeGiant": true
++    },
++    {
++      "name": "Poppy",
++      "source": "Poppy Seeds",
++      "stages": [1, 2, 2, 2],
++      "totalHarvestTime": 7,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 140,
++      "isEdible": true,
++      "energy": 45,
++      "season": ["SUMMER"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Radish",
++      "source": "Radish Seeds",
++      "stages": [2, 1, 2, 1],
++      "totalHarvestTime": 9,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 90,
++      "isEdible": true,
++      "energy": 45,
++      "season": ["SUMMER"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Red Cabbage",
++      "source": "Red Cabbage Seeds",
++      "stages": [2, 1, 2, 2, 2],
++      "totalHarvestTime": 9,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 280,
++      "isEdible": true,
++      "energy": 75,
++      "season": ["SUMMER"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Starfruit",
++      "source": "Starfruit Seeds",
++      "stages": [2, 3, 2, 3, 3],
++      "totalHarvestTime": 13,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 750,
++      "isEdible": true,
++      "energy": 125,
++      "season": ["SUMMER"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "SUMMER Spangle",
++      "source": "Spangle Seeds",
++      "stages": [1, 2, 3, 1],
++      "totalHarvestTime": 8,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 90,
++      "isEdible": true,
++      "energy": 45,
++      "season": ["SUMMER"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "SUMMER Squash",
++      "source": "SUMMER Squash Seeds",
++      "stages": [1, 1, 1, 2, 1],
++      "totalHarvestTime": 6,
++      "isOneTime": false,
++      "regrowthTime": 3,
++      "baseSellPrice": 45,
++      "isEdible": true,
++      "energy": 63,
++      "season": ["SUMMER"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Sunflower",
++      "source": "Sunflower Seeds",
++      "stages": [1, 2, 3, 2],
++      "totalHarvestTime": 9,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 80,
++      "isEdible": true,
++      "energy": 45,
++      "season": ["SUMMER", "AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Tomato",
++      "source": "Tomato Seeds",
++      "stages": [2, 2, 2, 2, 3],
++      "totalHarvestTime": 11,
++      "isOneTime": false,
++      "regrowthTime": 4,
++      "baseSellPrice": 60,
++      "isEdible": true,
++      "energy": 20,
++      "season": ["SUMMER"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Wheat",
++      "source": "Wheat Seeds",
++      "stages": [1, 1, 1, 1],
++      "totalHarvestTime": 4,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 25,
++      "isEdible": false,
++      "energy": null,
++      "season": ["SUMMER", "AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Amaranth",
++      "source": "Amaranth Seeds",
++      "stages": [1, 2, 2, 2],
++      "totalHarvestTime": 7,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 150,
++      "isEdible": true,
++      "energy": 50,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Artichoke",
++      "source": "Artichoke Seeds",
++      "stages": [2, 2, 1, 2, 1],
++      "totalHarvestTime": 8,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 160,
++      "isEdible": true,
++      "energy": 30,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Beet",
++      "source": "Beet Seeds",
++      "stages": [1, 1, 2, 2],
++      "totalHarvestTime": 6,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 100,
++      "isEdible": true,
++      "energy": 30,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Bok Choy",
++      "source": "Bok Choy Seeds",
++      "stages": [1, 1, 1, 1],
++      "totalHarvestTime": 4,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 80,
++      "isEdible": true,
++      "energy": 25,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Broccoli",
++      "source": "Broccoli Seeds",
++      "stages": [2, 2, 2, 2],
++      "totalHarvestTime": 9,
++      "isOneTime": false,
++      "regrowthTime": 4,
++      "baseSellPrice": 70,
++      "isEdible": true,
++      "energy": 68,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Cranberries",
++      "source": "Cranberry Seeds",
++      "stages": [1, 2, 1, 1, 2],
++      "totalHarvestTime": 7,
++      "isOneTime": false,
++      "regrowthTime": 5,
++      "baseSellPrice": 75,
++      "isEdible": true,
++      "energy": 38,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Eggplant",
++      "source": "Eggplant Seeds",
++      "stages": [1, 1, 1, 1],
++      "totalHarvestTime": 5,
++      "isOneTime": false,
++      "regrowthTime": 5,
++      "baseSellPrice": 80,
++      "isEdible": true,
++      "energy": 20,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Fairy Rose",
++      "source": "Fairy Seeds",
++      "stages": [1, 4, 4, 3],
++      "totalHarvestTime": 12,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 290,
++      "isEdible": true,
++      "energy": 45,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Grape",
++      "source": "Grape Starter",
++      "stages": [1, 1, 2, 3, 3],
++      "totalHarvestTime": 10,
++      "isOneTime": false,
++      "regrowthTime": 3,
++      "baseSellPrice": 80,
++      "isEdible": true,
++      "energy": 38,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Pumpkin",
++      "source": "Pumpkin Seeds",
++      "stages": [1, 2, 3, 4, 3],
++      "totalHarvestTime": 13,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 320,
++      "isEdible": false,
++      "energy": null,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": true
++    },
++    {
++      "name": "Yam",
++      "source": "Yam Seeds",
++      "stages": [1, 3, 3, 3],
++      "totalHarvestTime": 10,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 160,
++      "isEdible": true,
++      "energy": 45,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Sweet Gem Berry",
++      "source": "Rare Seed",
++      "stages": [1, 3, 5, 6, 6],
++      "totalHarvestTime": 24,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 3000,
++      "isEdible": false,
++      "energy": null,
++      "season": ["AUTUMN"],
++      "canBecomeGiant": false
++    },
++    {
++      "name": "Powdermelon",
++      "source": "Powdermelon Seeds",
++      "stages": [1, 2, 1, 2, 1],
++      "totalHarvestTime": 7,
++      "isOneTime": true,
++      "regrowthTime": null,
++      "baseSellPrice": 60,
++      "isEdible": true,
++      "energy": 63,
++      "season": ["WINTER"],
++      "canBecomeGiant": true
++    },
++    {
++      "name": "Ancient Fruit",
++      "source": "Ancient Seeds",
++      "stages": [2, 7, 7, 7, 5],
++      "totalHarvestTime": 28,
++      "isOneTime": false,
++      "regrowthTime": 7,
++      "baseSellPrice": 550,
++      "isEdible": false,
++      "energy": null,
++      "season": ["SPRING", "SUMMER", "AUTUMN"],
++      "canBecomeGiant": false
++    }
++  ]
++}
+\ No newline at end of file
+Index: src/main/java/models/crops/Trees.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/crops/Trees.json b/src/main/java/models/crops/Trees.json
+new file mode 100644
+--- /dev/null	(date 1746393425246)
++++ b/src/main/java/models/crops/Trees.json	(date 1746393425246)
+@@ -0,0 +1,172 @@
++{
++  "Trees": [
++    {
++      "name": "Apricot Tree",
++      "source": "Apricot Sapling",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Apricot",
++      "fruitHarvestCycle": 1,
++      "fruitBaseSellPrice": 59,
++      "isFruitEdible": true,
++      "fruitEnergy": 38,
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Cherry Tree",
++      "source": "Cherry Sapling",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Cherry",
++      "fruitHarvestCycle": 1,
++      "fruitBaseSellPrice": 80,
++      "isFruitEdible": true,
++      "fruitEnergy": 38,
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Banana Tree",
++      "source": "Banana Sapling",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Banana",
++      "fruitHarvestCycle": 1,
++      "fruitBaseSellPrice": 150,
++      "isFruitEdible": true,
++      "fruitEnergy": 75,
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Mango Tree",
++      "source": "Mango Sapling",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Mango",
++      "fruitHarvestCycle": 1,
++      "fruitBaseSellPrice": 130,
++      "isFruitEdible": true,
++      "fruitEnergy": 100,
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Orange Tree",
++      "source": "Orange Sapling",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Orange",
++      "fruitHarvestCycle": 1,
++      "fruitBaseSellPrice": 100,
++      "isFruitEdible": true,
++      "fruitEnergy": 38,
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Peach Tree",
++      "source": "Peach Sapling",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Peach",
++      "fruitHarvestCycle": 1,
++      "fruitBaseSellPrice": 140,
++      "isFruitEdible": true,
++      "fruitEnergy": 38,
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Apple Tree",
++      "source": "Apple Sapling",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Apple",
++      "fruitHarvestCycle": 1,
++      "fruitBaseSellPrice": 100,
++      "isFruitEdible": true,
++      "fruitEnergy": 38,
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Pomegranate Tree",
++      "source": "Pomegranate Sapling",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Pomegranate",
++      "fruitHarvestCycle": 1,
++      "fruitBaseSellPrice": 140,
++      "isFruitEdible": true,
++      "fruitEnergy": 38,
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Oak Tree",
++      "source": "Acorns",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Oak Resin",
++      "fruitHarvestCycle": 7,
++      "fruitBaseSellPrice": 150,
++      "isFruitEdible": false,
++      "fruitEnergy": null,
++      "season": ["Special"]
++    },
++    {
++      "name": "Maple Tree",
++      "source": "Maple Seeds",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Maple Syrup",
++      "fruitHarvestCycle": 9,
++      "fruitBaseSellPrice": 200,
++      "isFruitEdible": false,
++      "fruitEnergy": null,
++      "season": ["Special"]
++    },
++    {
++      "name": "Pine Tree",
++      "source": "Pine Cones",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Pine Tar",
++      "fruitHarvestCycle": 6,
++      "fruitBaseSellPrice": 100,
++      "isFruitEdible": false,
++      "fruitEnergy": null,
++      "season": ["Special"]
++    },
++    {
++      "name": "Mahogany Tree",
++      "source": "Mahogany Seeds",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Sap",
++      "fruitHarvestCycle": 1,
++      "fruitBaseSellPrice": 2,
++      "isFruitEdible": true,
++      "fruitEnergy": null,
++      "season": ["Special"]
++    },
++    {
++      "name": "Mushroom Tree",
++      "source": "Mushroom Tree Seeds",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Common Mushroom",
++      "fruitHarvestCycle": 1,
++      "fruitBaseSellPrice": 40,
++      "isFruitEdible": true,
++      "fruitEnergy": 38,
++      "season": ["Special"]
++    },
++    {
++      "name": "Mystic Tree",
++      "source": "Mystic Tree Seeds",
++      "stages": [7, 7, 7, 7],
++      "totalHarvestTime": 28,
++      "fruit": "Mystic Syrup",
++      "fruitHarvestCycle": 7,
++      "fruitBaseSellPrice": 1000,
++      "isFruitEdible": true,
++      "fruitEnergy": 500,
++      "season": ["Special"]
++    }
++  ]
++}
+\ No newline at end of file
+Index: src/main/java/models/crops/foragingSeeds.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/crops/foragingSeeds.json b/src/main/java/models/crops/foragingSeeds.json
+new file mode 100644
+--- /dev/null	(date 1746392338079)
++++ b/src/main/java/models/crops/foragingSeeds.json	(date 1746392338079)
+@@ -0,0 +1,192 @@
++{
++  "seeds": [
++    {
++      "name": "Jazz Seeds",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Carrot Seeds",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Cauliflower Seeds",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Coffee Bean",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Garlic Seeds",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Bean Starter",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Kale Seeds",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Parsnip Seeds",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Potato Seeds",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Rhubarb Seeds",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Strawberry Seeds",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Tulip Bulb",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Rice Shoot",
++      "season": ["SPRING"]
++    },
++    {
++      "name": "Blueberry Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Corn Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Hops Starter",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Pepper Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Melon Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Poppy Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Radish Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Red Cabbage Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Starfruit Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Spangle Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "SUMMER Squash Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Sunflower Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Tomato Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Wheat Seeds",
++      "season": ["SUMMER"]
++    },
++    {
++      "name": "Amaranth Seeds",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Artichoke Seeds",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Beet Seeds",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Bok Choy Seeds",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Broccoli Seeds",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Cranberry Seeds",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Eggplant Seeds",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Fairy Seeds",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Grape Starter",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Pumpkin Seeds",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Yam Seeds",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Rare Seed",
++      "season": ["AUTUMN"]
++    },
++    {
++      "name": "Powdermelon Seeds",
++      "season": ["WINTER"]
++    },
++    {
++      "name": "Ancient Seeds",
++      "season": ["Special"]
++    },
++    {
++      "name": "Mixed Seeds",
++      "season": ["Special"]
++    },
++    {
++      "name": "Acorns",
++      "season": ["Special"]
++    },
++    {
++      "name": "Maple Seeds",
++      "season": ["Special"]
++    },
++    {
++      "name": "Pine Cones",
++      "season": ["Special"]
++    },
++    {
++      "name": "Mahogany Seeds",
++      "season": ["Special"]
++    },
++    {
++      "name": "Mushroom Tree Seeds",
++      "season": ["Special"]
++    }
++  ]
++}
+\ No newline at end of file
+Index: src/main/java/models/crops/foragingCrops.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/crops/foragingCrops.json b/src/main/java/models/crops/foragingCrops.json
+new file mode 100644
+--- /dev/null	(date 1746393425228)
++++ b/src/main/java/models/crops/foragingCrops.json	(date 1746393425228)
+@@ -0,0 +1,142 @@
++{
++  "foragedItems": [
++    {
++      "name": "Common Mushroom",
++      "season": ["SPRING", "SUMMER", "AUTUMN"],
++      "baseSellPrice": 40,
++      "energy": 38
++    },
++    {
++      "name": "Daffodil",
++      "season": ["SPRING"],
++      "baseSellPrice": 30,
++      "energy": 0
++    },
++    {
++      "name": "Dandelion",
++      "season": ["SPRING"],
++      "baseSellPrice": 40,
++      "energy": 25
++    },
++    {
++      "name": "Leek",
++      "season": ["SPRING"],
++      "baseSellPrice": 60,
++      "energy": 40
++    },
++    {
++      "name": "Morel",
++      "season": ["SPRING"],
++      "baseSellPrice": 150,
++      "energy": 20
++    },
++    {
++      "name": "Salmonberry",
++      "season": ["SPRING"],
++      "baseSellPrice": 5,
++      "energy": 25
++    },
++    {
++      "name": "SPRING Onion",
++      "season": ["SPRING"],
++      "baseSellPrice": 8,
++      "energy": 13
++    },
++    {
++      "name": "Wild Horseradish",
++      "season": ["SPRING"],
++      "baseSellPrice": 50,
++      "energy": 13
++    },
++    {
++      "name": "Fiddlehead Fern",
++      "season": ["SUMMER"],
++      "baseSellPrice": 90,
++      "energy": 25
++    },
++    {
++      "name": "Grape",
++      "season": ["SUMMER"],
++      "baseSellPrice": 80,
++      "energy": 38
++    },
++    {
++      "name": "Red Mushroom",
++      "season": ["SUMMER"],
++      "baseSellPrice": 75,
++      "energy": -50
++    },
++    {
++      "name": "Spice Berry",
++      "season": ["SUMMER"],
++      "baseSellPrice": 80,
++      "energy": 25
++    },
++    {
++      "name": "Sweet Pea",
++      "season": ["SUMMER"],
++      "baseSellPrice": 50,
++      "energy": 0
++    },
++    {
++      "name": "Blackberry",
++      "season": ["AUTUMN"],
++      "baseSellPrice": 25,
++      "energy": 25
++    },
++    {
++      "name": "Chanterelle",
++      "season": ["AUTUMN"],
++      "baseSellPrice": 160,
++      "energy": 75
++    },
++    {
++      "name": "Hazelnut",
++      "season": ["AUTUMN"],
++      "baseSellPrice": 40,
++      "energy": 38
++    },
++    {
++      "name": "Purple Mushroom",
++      "season": ["AUTUMN"],
++      "baseSellPrice": 90,
++      "energy": 30
++    },
++    {
++      "name": "Wild Plum",
++      "season": ["AUTUMN"],
++      "baseSellPrice": 80,
++      "energy": 25
++    },
++    {
++      "name": "Crocus",
++      "season": ["WINTER"],
++      "baseSellPrice": 60,
++      "energy": 0
++    },
++    {
++      "name": "Crystal Fruit",
++      "season": ["WINTER"],
++      "baseSellPrice": 150,
++      "energy": 63
++    },
++    {
++      "name": "Holly",
++      "season": ["WINTER"],
++      "baseSellPrice": 80,
++      "energy": -37
++    },
++    {
++      "name": "Snow Yam",
++      "season": ["WINTER"],
++      "baseSellPrice": 100,
++      "energy": 30
++    },
++    {
++      "name": "WINTER Root",
++      "season": ["WINTER"],
++      "baseSellPrice": 70,
++      "energy": 25
++    }
++  ]
++}
+\ No newline at end of file
+Index: src/main/java/models/crops/Tree.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/crops/Tree.java b/src/main/java/models/crops/Tree.java
+new file mode 100644
+--- /dev/null	(date 1746392738090)
++++ b/src/main/java/models/crops/Tree.java	(date 1746392738090)
+@@ -0,0 +1,4 @@
++package models.crops;
++
++public class Tree {
++}
+Index: src/main/java/models/crops/Crop.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/crops/Crop.java b/src/main/java/models/crops/Crop.java
+new file mode 100644
+--- /dev/null	(date 1746393425270)
++++ b/src/main/java/models/crops/Crop.java	(date 1746393425270)
+@@ -0,0 +1,67 @@
++package models.crops;
++
++import models.Enums.Season;
++
++public class Crop {
++    private final String name;
++    private final String source;
++    private final int[] stages;
++    private final int totalHarvestTime;
++    private final boolean isOneTime;
++    private final int regrowTime;
++    private final long baseSellPrice;
++    private final boolean isEdible;
++    private final int energy;
++    private final Season[] season;
++    private final boolean canBecomeGiant;
++
++    Crop(String name, String source, int[] stages,
++         int totalHarvestTime, boolean isOneTime, int regrowTime,
++         long baseSellPrice, boolean isEdible, int energy,
++         Season[] season, boolean canBecomeGiant) {
++        this.name = name;
++        this.source = source;
++        this.stages = stages;
++        this.totalHarvestTime = totalHarvestTime;
++        this.isOneTime = isOneTime;
++        this.regrowTime = regrowTime;
++        this.baseSellPrice = baseSellPrice;
++        this.isEdible = isEdible;
++        this.energy = energy;
++        this.season = season;
++        this.canBecomeGiant = canBecomeGiant;
++    }
++    public String getName() {
++        return name;
++    }
++    public String getSource() {
++        return source;
++    }
++    public int[] getStages() {
++        return stages;
++    }
++    public int getTotalHarvestTime() {
++        return totalHarvestTime;
++    }
++    public boolean isOneTime() {
++        return isOneTime;
++    }
++    public int getRegrowTime() {
++        return regrowTime;
++    }
++    public long getBaseSellPrice() {
++        return baseSellPrice;
++    }
++    public boolean isEdible() {
++        return isEdible;
++    }
++    public int getEnergy() {
++        return energy;
++    }
++    public Season[] getSeason() {
++        return season;
++    }
++    public boolean isCanBecomeGiant() {
++        return canBecomeGiant;
++    }
++}
+Index: src/main/java/models/crops/foragingMinerals.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/crops/foragingMinerals.json b/src/main/java/models/crops/foragingMinerals.json
+new file mode 100644
+--- /dev/null	(date 1746395038664)
++++ b/src/main/java/models/crops/foragingMinerals.json	(date 1746395038664)
+@@ -0,0 +1,7 @@
++{
++  "foragingMinerals": [
++    {
++
++    }
++  ]
++}
+\ No newline at end of file
+Index: src/main/java/models/crops/Seed.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/crops/Seed.java b/src/main/java/models/crops/Seed.java
+new file mode 100644
+--- /dev/null	(date 1746392746452)
++++ b/src/main/java/models/crops/Seed.java	(date 1746392746452)
+@@ -0,0 +1,4 @@
++package models.crops;
++
++public class Seed {
++}
+Index: .idea/.name
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/.name b/.idea/.name
+new file mode 100644
+--- /dev/null	(date 1746435481618)
++++ b/.idea/.name	(date 1746435481618)
+@@ -0,0 +1,1 @@
++Season.java
+\ No newline at end of file
