@@ -7,7 +7,7 @@ import models.Events.DayChangedEvent;
 import models.Events.GameEventBus;
 import models.Events.SeasonChangedEvent;
 import models.Events.WeatherChangedEvent;
-import managers.time.TimeManager;
+import managers.TimeManager;
 
 import java.util.Random;
 
