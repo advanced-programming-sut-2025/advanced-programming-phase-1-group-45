@@ -1,4 +1,4 @@
-package models.time;
+package managers;
 
 import controllers.WeatherController;
 import models.Events.*;
