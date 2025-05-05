@@ -1,6 +1,6 @@
 package models.Events;
 
-import models.Player;
+import models.User;
 
-public record TurnEndedEvent(Player player) {
+public record TurnEndedEvent(User player) {
 }

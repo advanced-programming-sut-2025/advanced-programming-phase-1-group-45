@@ -1,10 +1,7 @@
 package views;
 
 import controllers.AvatarController;
-import controllers.MenuController;
 
-public class AvatarMenu implements Menu{
+public class AvatarMenu {
     AvatarController controller;
-    public void handleCommand(String command, MenuController controller){}
-
 }

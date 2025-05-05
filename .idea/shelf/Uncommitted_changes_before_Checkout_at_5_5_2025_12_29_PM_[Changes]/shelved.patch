@@ -1,0 +1,378 @@
+Index: src/main/java/models/Enums/Season.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models.Enums;\r\n\r\npublic enum Season {\r\n    SPRING,\r\n    SUMMER,\r\n    AUTUMN,\r\n    WINTER;\r\n    private static final Season[] values = values();\r\n\r\n    public Season next() {\r\n        if (values.length == 0) {\r\n            throw new IllegalStateException(\"No season available\");\r\n        }\r\n        return values[(this.ordinal() + 1) % values.length];\r\n    }\r\n\r\n    public Weather[] getWeathers() {\r\n        return switch (this) {\r\n            case SPRING, SUMMER, AUTUMN -> new Weather[]{\r\n                    Weather.SUNNY, Weather.RAINY\r\n                    , Weather.STORMY\r\n            };\r\n            case WINTER -> new Weather[]{\r\n                    Weather.SUNNY, Weather.SNOWY\r\n            };\r\n        };\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/models/Enums/Season.java b/src/main/java/models/Enums/Season.java
+--- a/src/main/java/models/Enums/Season.java	(revision 775c85455e1931b252dbf4ab2c99de48fdc1e350)
++++ b/src/main/java/models/Enums/Season.java	(date 1746393425307)
+@@ -25,4 +25,5 @@
+             };
+         };
+     }
++
+ }
+Index: src/main/java/views/AppView.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package views;\r\n\r\nimport models.Player;\r\n\r\npublic class AppView {\r\n    Player currentPlayer;\r\n    public void setCurrentUser(Player currentPlayer) {\r\n        this.currentPlayer = currentPlayer;\r\n    }\r\n    public Player getCurrentUser() {\r\n        return currentPlayer;\r\n    }\r\n\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/views/AppView.java b/src/main/java/views/AppView.java
+--- a/src/main/java/views/AppView.java	(revision 775c85455e1931b252dbf4ab2c99de48fdc1e350)
++++ b/src/main/java/views/AppView.java	(date 1746395038715)
+@@ -1,13 +1,13 @@
+ package views;
+ 
+-import models.Player;
++import models.User;
+ 
+ public class AppView {
+-    Player currentPlayer;
+-    public void setCurrentUser(Player currentPlayer) {
++    User currentPlayer;
++    public void setCurrentUser(User currentPlayer) {
+         this.currentPlayer = currentPlayer;
+     }
+-    public Player getCurrentUser() {
++    public User getCurrentUser() {
+         return currentPlayer;
+     }
+ 
+Index: src/main/java/views/LoginMenu.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package views;\r\n\r\nimport controllers.MenuController;\r\nimport models.Player;\r\n\r\npublic class LoginMenu implements Menu{\r\n    @Override\r\n    public void handleCommand(String command, MenuController controller){\r\n        if(command.startsWith(\"login\")){\r\n            Player u = controller.getUserManager().login(command);\r\n            if(u != null){\r\n                controller.setCurrentUser(u);\r\n                System.out.println(\"Login Successful, moving to main menu\");\r\n                controller.setCurrentMenu(new MainMenu());\r\n            }\r\n        } else if(command.startsWith(\"forget password\")){\r\n            String um = controller.getUserManager().startPasswordRecovery(command);\r\n            controller.setPendingRecoveryUsername(um);\r\n        } else if(command.startsWith(\"answer\")){\r\n            controller.getUserManager().completePasswordRecovery(command);\r\n        } else if(command.equals(\"reset random\")){\r\n            String user = controller.getPendingRecoveryUsername();\r\n            if(user != null){\r\n                String newPassword = controller.getUserManager().resetPasswordRandom(user);\r\n                System.out.println(\"your new password is: \" + newPassword);\r\n                controller.setPendingRecoveryUsername(null);\r\n            }\r\n        } else if(command.startsWith(\"reset set -p \")){\r\n            String user = controller.getPendingRecoveryUsername();\r\n            if(user != null){\r\n                String newPassword = command.substring(\"reset set -p \".length());\r\n                if(controller.getUserManager().resetPasswordManual(user, newPassword)){\r\n                    System.out.println(\"Password reset successful\");\r\n                    controller.setPendingRecoveryUsername(null);\r\n                }\r\n            }\r\n        }\r\n        else if(command.equals(\"show current menu\")){\r\n            System.out.println(\"you are now in Login Menu\");\r\n        } else if(command.equals(\"menu exit\")){\r\n            System.out.println(\"Goodbye\");\r\n            System.exit(0);\r\n        } else System.out.println(\"Invalid command\");\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/views/LoginMenu.java b/src/main/java/views/LoginMenu.java
+--- a/src/main/java/views/LoginMenu.java	(revision 775c85455e1931b252dbf4ab2c99de48fdc1e350)
++++ b/src/main/java/views/LoginMenu.java	(date 1746395038634)
+@@ -1,13 +1,13 @@
+ package views;
+ 
+ import controllers.MenuController;
+-import models.Player;
++import models.User;
+ 
+ public class LoginMenu implements Menu{
+     @Override
+     public void handleCommand(String command, MenuController controller){
+         if(command.startsWith("login")){
+-            Player u = controller.getUserManager().login(command);
++            User u = controller.getUserManager().login(command);
+             if(u != null){
+                 controller.setCurrentUser(u);
+                 System.out.println("Login Successful, moving to main menu");
+Index: src/main/java/managers/UserManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package managers;\r\nimport com.google.gson.Gson;\r\nimport com.google.gson.reflect.TypeToken;\r\nimport models.Player;\r\nimport java.io.*;\r\nimport java.nio.file.*;\r\nimport java.security.*;\r\nimport java.util.*;\r\nimport java.util.stream.Collectors;\r\npublic class UserManager {\r\n    private final Map<String, Player> users = new HashMap<>();\r\n    private final Path storage = Paths.get(\"users.json\");\r\n    private final Gson gson = new Gson();\r\n    private Player currentPlayer;\r\n    private Player signingPlayer;\r\n\r\n    public UserManager() { load(); }\r\n\r\n    public boolean register(String cmd) {\r\n        try {\r\n            String[] p = cmd.split(\"\\\\s+\");\r\n            String u=null, pw=null, pwc=null, nick=null, email=null, gen=null;\r\n            for (int i=1; i<p.length; i++) {\r\n                switch(p[i]) {\r\n                    case \"-u\": u=p[++i]; break;\r\n                    case \"-p\": pw=p[++i]; pwc=p[++i]; break;\r\n                    case \"-n\": nick=p[++i]; break;\r\n                    case \"-e\": email=p[++i]; break;\r\n                    case \"-g\": gen=p[++i]; break;\r\n                }\r\n            }\r\n            if (users.containsKey(u)) { System.out.println(\"username already used.\"); return false; }\r\n            if (!email.matches(\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,}$\")) {\r\n                System.out.println(\"invalid email format.\"); return false;\r\n            }\r\n            if (pw.length()<8 || !pw.matches(\".*[A-Z].*\") || !pw.matches(\".*[a-z].*\")\r\n                    || !pw.matches(\".*\\\\d.*\") || !pw.matches(\".*[!@#$%^&*()].*\")) {\r\n                System.out.println(\"your password is not strong.\"); return false;\r\n            }\r\n            if (!pw.equals(pwc)) { System.out.println(\"make sure that you repeated your password correctly.\"); return false; }\r\n            users.put(u, new Player(u, hash(pw), nick, email, gen));\r\n            save();\r\n            signingPlayer = users.get(u);\r\n            System.out.println(signingPlayer.getSecurityQuestion());\r\n            save();\r\n            return true;\r\n        } catch(Exception ex) {\r\n            System.out.println(\"error.\");\r\n            return false;\r\n        }\r\n    }\r\n\r\n    public Player login(String cmd) {\r\n        String[] p = cmd.split(\"\\\\s+\");\r\n        String u=null, pw=null;\r\n        for (int i=1; i<p.length; i++) {\r\n            if (p[i].equals(\"-u\")) u=p[++i];\r\n            if (p[i].equals(\"-p\")) pw=p[++i];\r\n        }\r\n        Player player = users.get(u);\r\n        if (player ==null || !player.getPasswordHash().equals(hash(pw))) {\r\n            System.out.println(\"user name or password is incorrect.\");\r\n            return null;\r\n        }\r\n        return player;\r\n    }\r\n\r\n    public String startPasswordRecovery(String cmd) {\r\n        String u = cmd.split(\"\\\\s+\")[3];\r\n        currentPlayer = users.get(u);\r\n        if (currentPlayer ==null) {\r\n            System.out.println(\"invalid username.\");\r\n            return null;\r\n        } else {\r\n            System.out.println(\"security question: \" + currentPlayer.getSecurityQuestion());\r\n            return u;\r\n        }\r\n    }\r\n    public boolean checkSecurityAnswer(String answer) {\r\n        if (currentPlayer == null) return false;\r\n        String Ans = hash(answer.trim().toLowerCase());\r\n        return Ans.equals(currentPlayer.getSecurityAnswer());\r\n    }\r\n\r\n    public String resetPasswordRandom(String username) {\r\n        Player u = users.get(username);\r\n        if (u == null) return null;\r\n        String newPw = generateRandomPassword(12);\r\n        u.setPasswordHash(hash(newPw));\r\n        save();\r\n        return newPw;\r\n    }\r\n\r\n    public boolean resetPasswordManual(String username, String newPassword) {\r\n        Player u = users.get(username);\r\n        if (u == null) return false;\r\n        if (newPassword.length() < 8\r\n                || !newPassword.matches(\".*[A-Z].*\")\r\n                || !newPassword.matches(\".*[a-z].*\")\r\n                || !newPassword.matches(\".*\\\\d.*\")\r\n                || !newPassword.matches(\".*[!@#$%^&*()].*\")) {\r\n            return false;\r\n        }\r\n        u.setPasswordHash(hash(newPassword));\r\n        save();\r\n        return true;\r\n    }\r\n\r\n\r\n    public void completePasswordRecovery(String cmd) {\r\n        String answer = cmd.split(\"\\\\s+\")[3];\r\n        if (checkSecurityAnswer(answer)){\r\n            System.out.println(\"how do want to set new password?\");}\r\n        else{\r\n            System.out.println(\"incorrect answer\");\r\n        }\r\n\r\n    }\r\n    private String generateRandomPassword(int length) {\r\n        String upper = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\";\r\n        String lower = \"abcdefghijklmnopqrstuvwxyz\";\r\n        String digits = \"0123456789\";\r\n        String symbols = \"!@#$%^&*()-_=+[]{};:,.<>?\";\r\n        String all = upper + lower + digits + symbols;\r\n\r\n        SecureRandom rnd = new SecureRandom();\r\n        StringBuilder sb = new StringBuilder(length);\r\n\r\n        sb.append(upper.charAt(rnd.nextInt(upper.length())));\r\n        sb.append(lower.charAt(rnd.nextInt(lower.length())));\r\n        sb.append(digits.charAt(rnd.nextInt(digits.length())));\r\n        sb.append(symbols.charAt(rnd.nextInt(symbols.length())));\r\n\r\n        for (int i = 4; i < length; i++) {\r\n            sb.append(all.charAt(rnd.nextInt(all.length())));\r\n        }\r\n\r\n        List<Character> pwdChars = sb.chars()\r\n                .mapToObj(c -> (char)c)\r\n                .collect(Collectors.toList());\r\n        Collections.shuffle(pwdChars, rnd);\r\n\r\n        StringBuilder pwd = new StringBuilder();\r\n        pwdChars.forEach(pwd::append);\r\n        return pwd.toString();\r\n    }\r\n\r\n\r\n    public String getUserInfo(Player u) {\r\n        return String.format(\"username: %s\\n nickname: %s\\n max money: %.2f\\n game played: %d\",\r\n                u.getUsername(), u.getNickname(), u.getMaxMoney(), u.getGamesPlayed());\r\n    }\r\n\r\n    public boolean changeUsername(Player player, String newUsername) {\r\n        if (newUsername == null || !newUsername.matches(\"^[A-Za-z0-9]+$\")) {\r\n            System.out.println(\"invalid username\");\r\n            return false;\r\n        }\r\n        if (users.containsKey(newUsername)) {\r\n            System.out.println(\"this username is already used by another person.\");\r\n            return false;\r\n        }\r\n        String old = player.getUsername();\r\n        player.setUsername(newUsername);\r\n        users.remove(old);\r\n        users.put(newUsername, player);\r\n        save();\r\n        System.out.println(\"your username changed to\" + newUsername + \"successfully.\");\r\n        return true;\r\n    }\r\n\r\n    public boolean changeNickname(Player player, String newNickname) {\r\n        if (newNickname == null || newNickname.isBlank()) {\r\n            System.out.println(\"your nickname can't be empty\");\r\n            return false;\r\n        }\r\n        player.setNickname(newNickname);\r\n        save();\r\n        System.out.println(\"your nick name changed to \" + newNickname + \" succesfully.\");\r\n        return true;\r\n    }\r\n\r\n    public boolean changeEmail(Player player, String newEmail) {\r\n        if (newEmail == null || !newEmail.matches(\"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,}$\")) {\r\n            System.out.println(\"invalid email format\");\r\n            return false;\r\n        }\r\n        for (Player u : users.values()) {\r\n            if (u.getEmail().equalsIgnoreCase(newEmail)) {\r\n                System.out.println(\"this email is already used.\");\r\n                return false;\r\n            }\r\n        }\r\n        player.setEmail(newEmail);\r\n        save();\r\n        System.out.println(\"your email changed to \" + newEmail + \"succesfully\");\r\n        return true;\r\n    }\r\n\r\n    public boolean changePassword(Player player, String oldPassword, String newPassword) {\r\n        String oldHash = hash(oldPassword);\r\n        if (!player.getPasswordHash().equals(oldHash)) {\r\n            System.out.println(\"incorrect password.\");\r\n            return false;\r\n        }\r\n        if (newPassword.length() < 8\r\n                || !newPassword.matches(\".*[A-Z].*\")\r\n                || !newPassword.matches(\".*[a-z].*\")\r\n                || !newPassword.matches(\".*\\\\d.*\")\r\n                || !newPassword.matches(\".*[!@#$%^&*()].*\")) {\r\n            System.out.println(\"new password is not strong.\");\r\n            return false;\r\n        }\r\n        player.setPasswordHash(hash(newPassword));\r\n        save();\r\n        System.out.println(\"password changed successfully.\");\r\n        return true;\r\n    }\r\n\r\n    private void load() {\r\n        try {\r\n            if (Files.exists(storage)) {\r\n                List<Player> list = gson.fromJson(Files.readString(storage),\r\n                        new TypeToken<List<Player>>(){}.getType());\r\n                for (Player u : list) {\r\n                    users.put(u.getUsername(), u);\r\n                }\r\n            }\r\n        } catch(IOException ignored) {}\r\n    }\r\n\r\n    private void save() {\r\n        try (Writer w = Files.newBufferedWriter(storage)) {\r\n            gson.toJson(new ArrayList<>(users.values()), w);\r\n        } catch(IOException ignored) {}\r\n    }\r\n\r\n    private String hash(String pw) {\r\n        try {\r\n            var md = MessageDigest.getInstance(\"SHA-256\");\r\n            var bytes = md.digest(pw.getBytes(\"UTF-8\"));\r\n            var sb = new StringBuilder();\r\n            for (byte b : bytes) sb.append(String.format(\"%02x\", b));\r\n            return sb.toString();\r\n        } catch(Exception e) { return \"\"; }\r\n    }\r\n\r\n    public void setAnswer(String command){\r\n        String  answer = command.split(\"\\\\s+\")[1];\r\n        signingPlayer.setSecurityAnswer(answer);\r\n    }\r\n\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/managers/UserManager.java b/src/main/java/managers/UserManager.java
+--- a/src/main/java/managers/UserManager.java	(revision 775c85455e1931b252dbf4ab2c99de48fdc1e350)
++++ b/src/main/java/managers/UserManager.java	(date 1746395038706)
+@@ -1,18 +1,18 @@
+ package managers;
+ import com.google.gson.Gson;
+ import com.google.gson.reflect.TypeToken;
+-import models.Player;
++import models.User;
+ import java.io.*;
+ import java.nio.file.*;
+ import java.security.*;
+ import java.util.*;
+ import java.util.stream.Collectors;
+ public class UserManager {
+-    private final Map<String, Player> users = new HashMap<>();
++    private final Map<String, User> users = new HashMap<>();
+     private final Path storage = Paths.get("users.json");
+     private final Gson gson = new Gson();
+-    private Player currentPlayer;
+-    private Player signingPlayer;
++    private User currentPlayer;
++    private User signingPlayer;
+ 
+     public UserManager() { load(); }
+ 
+@@ -38,7 +38,7 @@
+                 System.out.println("your password is not strong."); return false;
+             }
+             if (!pw.equals(pwc)) { System.out.println("make sure that you repeated your password correctly."); return false; }
+-            users.put(u, new Player(u, hash(pw), nick, email, gen));
++            users.put(u, new User(u, hash(pw), nick, email, gen));
+             save();
+             signingPlayer = users.get(u);
+             System.out.println(signingPlayer.getSecurityQuestion());
+@@ -50,14 +50,14 @@
+         }
+     }
+ 
+-    public Player login(String cmd) {
++    public User login(String cmd) {
+         String[] p = cmd.split("\\s+");
+         String u=null, pw=null;
+         for (int i=1; i<p.length; i++) {
+             if (p[i].equals("-u")) u=p[++i];
+             if (p[i].equals("-p")) pw=p[++i];
+         }
+-        Player player = users.get(u);
++        User player = users.get(u);
+         if (player ==null || !player.getPasswordHash().equals(hash(pw))) {
+             System.out.println("user name or password is incorrect.");
+             return null;
+@@ -83,7 +83,7 @@
+     }
+ 
+     public String resetPasswordRandom(String username) {
+-        Player u = users.get(username);
++        User u = users.get(username);
+         if (u == null) return null;
+         String newPw = generateRandomPassword(12);
+         u.setPasswordHash(hash(newPw));
+@@ -92,7 +92,7 @@
+     }
+ 
+     public boolean resetPasswordManual(String username, String newPassword) {
+-        Player u = users.get(username);
++        User u = users.get(username);
+         if (u == null) return false;
+         if (newPassword.length() < 8
+                 || !newPassword.matches(".*[A-Z].*")
+@@ -146,12 +146,12 @@
+     }
+ 
+ 
+-    public String getUserInfo(Player u) {
++    public String getUserInfo(User u) {
+         return String.format("username: %s\n nickname: %s\n max money: %.2f\n game played: %d",
+                 u.getUsername(), u.getNickname(), u.getMaxMoney(), u.getGamesPlayed());
+     }
+ 
+-    public boolean changeUsername(Player player, String newUsername) {
++    public boolean changeUsername(User player, String newUsername) {
+         if (newUsername == null || !newUsername.matches("^[A-Za-z0-9]+$")) {
+             System.out.println("invalid username");
+             return false;
+@@ -169,7 +169,7 @@
+         return true;
+     }
+ 
+-    public boolean changeNickname(Player player, String newNickname) {
++    public boolean changeNickname(User player, String newNickname) {
+         if (newNickname == null || newNickname.isBlank()) {
+             System.out.println("your nickname can't be empty");
+             return false;
+@@ -180,12 +180,12 @@
+         return true;
+     }
+ 
+-    public boolean changeEmail(Player player, String newEmail) {
++    public boolean changeEmail(User player, String newEmail) {
+         if (newEmail == null || !newEmail.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+             System.out.println("invalid email format");
+             return false;
+         }
+-        for (Player u : users.values()) {
++        for (User u : users.values()) {
+             if (u.getEmail().equalsIgnoreCase(newEmail)) {
+                 System.out.println("this email is already used.");
+                 return false;
+@@ -197,7 +197,7 @@
+         return true;
+     }
+ 
+-    public boolean changePassword(Player player, String oldPassword, String newPassword) {
++    public boolean changePassword(User player, String oldPassword, String newPassword) {
+         String oldHash = hash(oldPassword);
+         if (!player.getPasswordHash().equals(oldHash)) {
+             System.out.println("incorrect password.");
+@@ -220,9 +220,9 @@
+     private void load() {
+         try {
+             if (Files.exists(storage)) {
+-                List<Player> list = gson.fromJson(Files.readString(storage),
+-                        new TypeToken<List<Player>>(){}.getType());
+-                for (Player u : list) {
++                List<User> list = gson.fromJson(Files.readString(storage),
++                        new TypeToken<List<User>>(){}.getType());
++                for (User u : list) {
+                     users.put(u.getUsername(), u);
+                 }
+             }
+Index: src/main/java/managers/GameManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package managers;\r\nimport com.google.gson.Gson;\r\nimport com.google.gson.reflect.TypeToken;\r\nimport managers.Turn.PlayerTurnManager;\r\nimport models.Player;\r\nimport models.GameSession;\r\n//import gson.*;\r\nimport java.io.*;\r\nimport java.util.*;\r\nimport java.nio.file.*;\r\n\r\npublic class GameManager {\r\n    private Map<String, List<GameSession>> gameSessions = new HashMap<>();\r\n    private Path storage = Paths.get(\"games.json\");\r\n    private Gson gson = new Gson();\r\n    public PlayerTurnManager playerTurnManager;\r\n    public GameManager() {load();}\r\n    public void saveSession(GameSession session) {save();}\r\n    public void endSession(GameSession session){\r\n        for(String u: session.getPlayers()){\r\n            List<GameSession> sessions = gameSessions.get(u);\r\n            if(sessions != null) sessions.remove(session);\r\n        }\r\n        save();\r\n    }\r\n    public GameSession loadLastSession(Player u){\r\n        List<GameSession> sessions = gameSessions.get(u.getUsername());\r\n        if(sessions == null || sessions.isEmpty()) return null;\r\n        return sessions.get(sessions.size()-1);\r\n    }\r\n    public GameSession createNewGame(String command, String currentUser){\r\n        var parts = new ArrayList<>(Arrays.asList(command.split(\"\\\\s+\")));\r\n        parts.remove(0);\r\n        parts.remove(0);\r\n        parts.remove(0);\r\n        var users = parts;\r\n        if(users.size() < 1 || users.size() > 3){\r\n            System.out.println(\"Number on users must be between 1 and 3\");\r\n        }\r\n        users.add(0, currentUser);\r\n        var s = new GameSession(users);\r\n        for(var u: users){\r\n            gameSessions.computeIfAbsent(u, k -> new ArrayList<>()).add(s);\r\n        }\r\n        save();\r\n        return s;\r\n    }\r\n    public boolean selectMap(GameSession session, String command){\r\n        int m = Integer.parseInt(command.split(\"\\\\s+\")[2]);\r\n        if(m < 1 || m > 3){\r\n            System.out.println(\"invalid map number\");\r\n            return false;\r\n        }\r\n        session.setMapNumber(m);\r\n        save();\r\n        return true;\r\n    }\r\n    private void load(){\r\n        try{\r\n            if(Files.exists(storage)){\r\n                var type = new TypeToken<Map<String,List<GameSession>>>(){}.getType();\r\n                var m = gson.fromJson(Files.readString(storage), type);\r\n\r\n            }\r\n        } catch (IOException ignored) {}\r\n    }\r\n    private void save(){\r\n        try(Writer w = Files.newBufferedWriter(storage)){\r\n            gson.toJson(gameSessions, w);\r\n        } catch (IOException ignored) {\r\n        }\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/managers/GameManager.java b/src/main/java/managers/GameManager.java
+--- a/src/main/java/managers/GameManager.java	(revision 775c85455e1931b252dbf4ab2c99de48fdc1e350)
++++ b/src/main/java/managers/GameManager.java	(date 1746395038688)
+@@ -2,7 +2,7 @@
+ import com.google.gson.Gson;
+ import com.google.gson.reflect.TypeToken;
+ import managers.Turn.PlayerTurnManager;
+-import models.Player;
++import models.User;
+ import models.GameSession;
+ //import gson.*;
+ import java.io.*;
+@@ -23,7 +23,7 @@
+         }
+         save();
+     }
+-    public GameSession loadLastSession(Player u){
++    public GameSession loadLastSession(User u){
+         List<GameSession> sessions = gameSessions.get(u.getUsername());
+         if(sessions == null || sessions.isEmpty()) return null;
+         return sessions.get(sessions.size()-1);
+Index: src/main/java/managers/Turn/PlayerTurnManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package managers.Turn;\r\n\r\nimport com.google.common.eventbus.Subscribe;\r\nimport models.Events.GameEventBus;\r\nimport models.Events.TurnChangedEvent;\r\nimport models.Events.TurnEndedEvent;\r\nimport models.Player;\r\nimport managers.time.TimeManager;\r\n\r\nimport java.util.List;\r\n\r\npublic class PlayerTurnManager {\r\n    private List<Player> players;\r\n    private int currentTurn = 0;\r\n\r\n    public PlayerTurnManager(List<Player> players) {\r\n        if (players != null) {\r\n            this.players = players;\r\n        }\r\n        GameEventBus.INSTANCE.register(this);\r\n    }\r\n\r\n    public void endTurn() {\r\n        Player player = players.get(currentTurn);\r\n        player.onTurnEnd();\r\n        GameEventBus.INSTANCE.post(new TurnEndedEvent(player));\r\n        advanceToNextPlayer();\r\n    }\r\n\r\n    private void advanceToNextPlayer() {\r\n        currentTurn = (currentTurn + 1) % players.size();\r\n        TimeManager.getInstance().nextTurn();\r\n    }\r\n\r\n    @Subscribe\r\n    private void onTimeAdvanced(TurnChangedEvent event) {\r\n        players.get(currentTurn).onNewTurn(event);\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/managers/Turn/PlayerTurnManager.java b/src/main/java/managers/Turn/PlayerTurnManager.java
+--- a/src/main/java/managers/Turn/PlayerTurnManager.java	(revision 775c85455e1931b252dbf4ab2c99de48fdc1e350)
++++ b/src/main/java/managers/Turn/PlayerTurnManager.java	(date 1746395038698)
+@@ -4,16 +4,16 @@
+ import models.Events.GameEventBus;
+ import models.Events.TurnChangedEvent;
+ import models.Events.TurnEndedEvent;
+-import models.Player;
++import models.User;
+ import managers.time.TimeManager;
+ 
+ import java.util.List;
+ 
+ public class PlayerTurnManager {
+-    private List<Player> players;
++    private List<User> players;
+     private int currentTurn = 0;
+ 
+-    public PlayerTurnManager(List<Player> players) {
++    public PlayerTurnManager(List<User> players) {
+         if (players != null) {
+             this.players = players;
+         }
+@@ -21,7 +21,7 @@
+     }
+ 
+     public void endTurn() {
+-        Player player = players.get(currentTurn);
++        User player = players.get(currentTurn);
+         player.onTurnEnd();
+         GameEventBus.INSTANCE.post(new TurnEndedEvent(player));
+         advanceToNextPlayer();
+Index: src/main/java/models/User.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models;\r\n\r\nimport models.Events.GameEventBus;\r\nimport models.Events.TurnChangedEvent;\r\n\r\npublic class Player {\r\n    private String username;\r\n    private String passwordHash;\r\n    private String nickname;\r\n    private String email;\r\n    private String gender;\r\n    private double maxMoney = 0;\r\n    private int gamesPlayed = 0;\r\n    private String securityQuestion = \"What is your grandma's name? \";\r\n    private String securityAnswer = null;\r\n\r\n    public Player(String username, String passwordHash, String nickname, String email, String gender){\r\n        this.username = username;\r\n        this.passwordHash = passwordHash;\r\n        this.nickname = nickname;\r\n        this.email = email;\r\n        this.gender = gender;\r\n        GameEventBus.INSTANCE.register(this);\r\n    }\r\n    public String getUsername(){ return username; }\r\n    public String getPasswordHash(){ return passwordHash; }\r\n    public String getNickname(){ return nickname; }\r\n    public String getEmail(){ return email; }\r\n    public String getGender(){ return gender; }\r\n    public int getGamesPlayed(){ return gamesPlayed; }\r\n    public double getMaxMoney(){return maxMoney; }\r\n    public String getSecurityQuestion(){ return securityQuestion; }\r\n    public String getSecurityAnswer(){return securityAnswer;}\r\n\r\n    public void setUsername(String username){ this.username = username; }\r\n    public void setPasswordHash(String passwordHash){ this.passwordHash = passwordHash; }\r\n    public void setNickname(String nickname){ this.nickname = nickname; }\r\n    public void setEmail(String email){ this.email = email; }\r\n    public void setGender(String gender){ this.gender = gender; }\r\n    public void setGamesPlayed(int gamesPlayed){ this.gamesPlayed = gamesPlayed; }\r\n    public void setMaxMoney(double maxMoney){ this.maxMoney = maxMoney; }\r\n    public void setSecurityQuestion(String securityQuestion){ this.securityQuestion = securityQuestion; }\r\n    public void setSecurityAnswer(String securityAnswer){this.securityAnswer = securityAnswer; }\r\n\r\n    public void onTurnEnd() {\r\n        gamesPlayed++;\r\n        //TODO\r\n//        System.out.println(this.username +\"'s turn ended\");\r\n//        System.out.println(TimeManager.getInstance().getTimeString());\r\n    }\r\n    public void onNewTurn(TurnChangedEvent event){\r\n        //TODO\r\n//        System.out.println(this.username + \"'s turn started\");\r\n//        System.out.println(TimeManager.getInstance().getTimeString());\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/models/User.java b/src/main/java/models/User.java
+--- a/src/main/java/models/User.java	(revision 775c85455e1931b252dbf4ab2c99de48fdc1e350)
++++ b/src/main/java/models/User.java	(date 1746395038672)
+@@ -3,7 +3,7 @@
+ import models.Events.GameEventBus;
+ import models.Events.TurnChangedEvent;
+ 
+-public class Player {
++public class User {
+     private String username;
+     private String passwordHash;
+     private String nickname;
+@@ -14,7 +14,7 @@
+     private String securityQuestion = "What is your grandma's name? ";
+     private String securityAnswer = null;
+ 
+-    public Player(String username, String passwordHash, String nickname, String email, String gender){
++    public User(String username, String passwordHash, String nickname, String email, String gender){
+         this.username = username;
+         this.passwordHash = passwordHash;
+         this.nickname = nickname;
+Index: src/main/java/Main.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>//package org.example;\r\n\r\n\r\nimport managers.Turn.PlayerTurnManager;\r\nimport models.Player;\r\nimport managers.time.TimeManager;\r\n\r\nimport java.util.Arrays;\r\nimport java.util.List;\r\n\r\npublic class Main {\r\n    public static void main(String[] args) {\r\n//        System.out.printf(\"Hello and welcome!\");\r\n//\r\n//        for (int i = 1; i <= 5; i++) {\r\n//            //TIP Press <shortcut actionId=\"Debug\"/> to start debugging your code. We have set one <icon src=\"AllIcons.Debugger.Db_set_breakpoint\"/> breakpoint\r\n//            // for you, but you can always add more by pressing <shortcut actionId=\"ToggleLineBreakpoint\"/>.\r\n//            System.out.println(\"i = \" + i);\r\n//        }\r\n        Player firstPlayer = new Player(\"kevin\", \"999999\" ,\r\n                \"hoo\", \"jssj\", \"zan\");\r\n        Player secondplayer = new Player(\"peter\", \"999999\" ,\r\n                \"hoo\", \"nnn\", \"zan\");\r\n        Player thirdplayer = new Player(\"rose\", \"999999\" ,\r\n                \"hoo\", \"eee\", \"zan\");\r\n        List<Player> players = Arrays.asList(firstPlayer, secondplayer, thirdplayer);\r\n        PlayerTurnManager gameTurnManager = new PlayerTurnManager(players);\r\n        TimeManager timeManager = TimeManager.getInstance();\r\n        for (int i = 0; i < 4 ; i++) {\r\n            timeManager.advanceSeason();\r\n        }\r\n    }\r\n}
+===================================================================
+diff --git a/src/main/java/Main.java b/src/main/java/Main.java
+--- a/src/main/java/Main.java	(revision 775c85455e1931b252dbf4ab2c99de48fdc1e350)
++++ b/src/main/java/Main.java	(date 1746395038652)
+@@ -2,7 +2,7 @@
+ 
+ 
+ import managers.Turn.PlayerTurnManager;
+-import models.Player;
++import models.User;
+ import managers.time.TimeManager;
+ 
+ import java.util.Arrays;
+@@ -17,13 +17,13 @@
+ //            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
+ //            System.out.println("i = " + i);
+ //        }
+-        Player firstPlayer = new Player("kevin", "999999" ,
++        User firstPlayer = new User("kevin", "999999" ,
+                 "hoo", "jssj", "zan");
+-        Player secondplayer = new Player("peter", "999999" ,
++        User secondplayer = new User("peter", "999999" ,
+                 "hoo", "nnn", "zan");
+-        Player thirdplayer = new Player("rose", "999999" ,
++        User thirdplayer = new User("rose", "999999" ,
+                 "hoo", "eee", "zan");
+-        List<Player> players = Arrays.asList(firstPlayer, secondplayer, thirdplayer);
++        List<User> players = Arrays.asList(firstPlayer, secondplayer, thirdplayer);
+         PlayerTurnManager gameTurnManager = new PlayerTurnManager(players);
+         TimeManager timeManager = TimeManager.getInstance();
+         for (int i = 0; i < 4 ; i++) {
+Index: src/main/java/models/Events/TurnEndedEvent.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models.Events;\r\n\r\nimport models.Player;\r\n\r\npublic record TurnEndedEvent(Player player) {\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/models/Events/TurnEndedEvent.java b/src/main/java/models/Events/TurnEndedEvent.java
+--- a/src/main/java/models/Events/TurnEndedEvent.java	(revision 775c85455e1931b252dbf4ab2c99de48fdc1e350)
++++ b/src/main/java/models/Events/TurnEndedEvent.java	(date 1746395038645)
+@@ -1,6 +1,6 @@
+ package models.Events;
+ 
+-import models.Player;
++import models.User;
+ 
+-public record TurnEndedEvent(Player player) {
++public record TurnEndedEvent(User player) {
+ }
+Index: src/main/java/controllers/MenuController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package controllers;\r\nimport managers.GameManager;\r\nimport managers.UserManager;\r\nimport models.Player;\r\nimport models.GameSession;\r\nimport views.Menu;\r\nimport views.StartMenu;\r\n\r\n\r\nimport java.util.*;\r\n\r\npublic class MenuController {\r\n    private Menu currentMenu = new StartMenu();\r\n    private Scanner scanner = new Scanner(System.in);\r\n    private GameManager gameManager = new GameManager();\r\n    private UserManager userManager = new UserManager();\r\n    private Player currentPlayer;\r\n    private GameSession currentSession;\r\n    private String pendingRecoveryUsername;\r\n\r\n\r\n    public UserManager getUserManager() {return userManager;}\r\n    public GameManager getGameManager() {return gameManager;}\r\n    public Player getCurrentUser() {return currentPlayer;}\r\n    public GameSession getCurrentSession() {return currentSession;};\r\n    public void setCurrentUser(Player u) {this.currentPlayer = u;}\r\n    public void setCurrentMenu(Menu menu) {this.currentMenu = menu;}\r\n    public void setCurrentSession(GameSession s) {this.currentSession = s;};//save user, map\r\n    public void setPendingRecoveryUsername(String p) {this.pendingRecoveryUsername = p;}\r\n    public String getPendingRecoveryUsername() {return this.pendingRecoveryUsername;}\r\n\r\n    public void run(){\r\n        while(true){\r\n            System.out.println(\"> \");\r\n            String line = scanner.nextLine();\r\n            currentMenu.handleCommand(line, this);\r\n        }\r\n    }\r\n}
+===================================================================
+diff --git a/src/main/java/controllers/MenuController.java b/src/main/java/controllers/MenuController.java
+--- a/src/main/java/controllers/MenuController.java	(revision 775c85455e1931b252dbf4ab2c99de48fdc1e350)
++++ b/src/main/java/controllers/MenuController.java	(date 1746395038681)
+@@ -1,7 +1,7 @@
+ package controllers;
+ import managers.GameManager;
+ import managers.UserManager;
+-import models.Player;
++import models.User;
+ import models.GameSession;
+ import views.Menu;
+ import views.StartMenu;
+@@ -14,16 +14,16 @@
+     private Scanner scanner = new Scanner(System.in);
+     private GameManager gameManager = new GameManager();
+     private UserManager userManager = new UserManager();
+-    private Player currentPlayer;
++    private User currentPlayer;
+     private GameSession currentSession;
+     private String pendingRecoveryUsername;
+ 
+ 
+     public UserManager getUserManager() {return userManager;}
+     public GameManager getGameManager() {return gameManager;}
+-    public Player getCurrentUser() {return currentPlayer;}
++    public User getCurrentUser() {return currentPlayer;}
+     public GameSession getCurrentSession() {return currentSession;};
+-    public void setCurrentUser(Player u) {this.currentPlayer = u;}
++    public void setCurrentUser(User u) {this.currentPlayer = u;}
+     public void setCurrentMenu(Menu menu) {this.currentMenu = menu;}
+     public void setCurrentSession(GameSession s) {this.currentSession = s;};//save user, map
+     public void setPendingRecoveryUsername(String p) {this.pendingRecoveryUsername = p;}

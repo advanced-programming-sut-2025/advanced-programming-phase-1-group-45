@@ -2,13 +2,20 @@ package views;
 
 import managers.GameManager;
 import controllers.MenuController;
+import managers.ShopManager;
+import managers.UserManager;
+import models.Enums.Shop;
 import models.GameSession;
+import models.Enums.Tile;
+import models.GameMap;
 
 public class GameMenu implements Menu{
     @Override
     public void handleCommand(String command, MenuController controller) {
         GameManager gm = controller.getGameManager();
         String me = controller.getCurrentUser().getUsername(); //current player
+        ShopManager sm = controller.getShopManager();
+        UserManager um = controller.getUserManager();
         if(command.startsWith("game new ")){
             GameSession s = gm.createNewGame(command, me);
             if(s != null){
@@ -45,18 +52,18 @@ public class GameMenu implements Menu{
             GameSession s = controller.getCurrentSession();
             s.startVote(me);
             System.out.println("voting terminated");
-        } else if(command.startsWith("vote")){
+        } else if(command.startsWith("vote")) {
             GameSession s = controller.getCurrentSession();
-            if(!s.isVoteInProgress()){
+            if (!s.isVoteInProgress()) {
                 System.out.println("no active voting");
-            } else if(s.hasVoted(me)){
+            } else if (s.hasVoted(me)) {
                 System.out.println("you already voted");
             } else {
                 boolean yes = command.equals("vote yes");
                 s.recordVote(me, yes);
                 System.out.println("vote submitted");
-                if(s.allVoted()){
-                    if(s.isVoteSuccessful()){
+                if (s.allVoted()) {
+                    if (s.isVoteSuccessful()) {
                         controller.getGameManager().endSession(s);
                         System.out.println("All votes were positive ,ending the game");
                         controller.setCurrentSession(null);
@@ -67,6 +74,51 @@ public class GameMenu implements Menu{
                     }
                 }
             }
+        }
+            if (command.equals("help reading map")){
+                GameMap.printMapLegend();
+            }
+             if(command.startsWith("walk -l")) {
+                GameMap.handleWalkCommand(command, controller);
+            }
+             if(command.startsWith("print map")) {
+                GameMap.handlePrintMap(command, controller);
+            }
+             if(command.startsWith("sell")){
+                um.handleSell(command, controller);
+            }
+             else if(command.equals("show all products")) {
+                 sm.getAllProducts(Shop.GENERAL_STORE);
+             }
+             else if(command.equals("show all available products")) {
+                 sm.getAvailableProducts(Shop.GENERAL_STORE);
+             }
+             else if(command.startsWith("purchase ")) {
+                 handlePurchaseCommand(command, sm, controller);
+             }
+    }
+
+    private void handlePurchaseCommand(String command, ShopManager sm, MenuController controller) {
+        try {
+            String[] parts = command.split(" -n ");
+            if(parts.length != 2) {
+                System.out.println("Invalid format! Use: purchase <product_name> -n <count>");
+                return;
+            }
+
+            String productName = parts[0].replace("purchase ", "").trim();
+            int count = Integer.parseInt(parts[1].trim());
+
+            String result = sm.purchase(
+                    controller.getCurrentUser().getUsername(),
+                    Shop.GENERAL_STORE, // Replace with actual shop instance
+                    productName,
+                    count
+            );
+
+            System.out.println(result);
+        } catch(NumberFormatException e) {
+            System.out.println("Invalid quantity format!");
         }
     }
     }

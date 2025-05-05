@@ -1,0 +1,2996 @@
+Index: src/main/java/views/SellView.java
+===================================================================
+diff --git a/src/main/java/views/SellView.java b/src/main/java/views/SellView.java
+deleted file mode 100644
+--- a/src/main/java/views/SellView.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ /dev/null	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
+@@ -1,11 +0,0 @@
+-package views;
+-
+-import controllers.MainController;
+-import controllers.SellController;
+-import models.Tool;
+-
+-public class SellView {
+-    SellController controller;
+-    public void displayInventoryGrid() { /* Visual item arrangement */ }
+-    public void highlightSelectedItem(Tool item) { /* UI feedback */ }
+-}
+Index: src/main/java/controllers/MovementController.java
+===================================================================
+diff --git a/src/main/java/controllers/MovementController.java b/src/main/java/controllers/MovementController.java
+deleted file mode 100644
+--- a/src/main/java/controllers/MovementController.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ /dev/null	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
+@@ -1,4 +0,0 @@
+-package controllers;
+-
+-public class MovementController {
+-}
+Index: src/main/java/views/BuyView.java
+===================================================================
+diff --git a/src/main/java/views/BuyView.java b/src/main/java/views/BuyView.java
+deleted file mode 100644
+--- a/src/main/java/views/BuyView.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ /dev/null	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
+@@ -1,9 +0,0 @@
+-package views;
+-
+-import controllers.BuyController;
+-
+-public class BuyView {
+-    BuyController controller;
+-    public void displayInventoryGrid() { /* Visual item arrangement */ }
+-    //public void highlightSelectedItem(Item item) { /* UI feedback */ }
+-}
+Index: src/main/java/controllers/SellController.java
+===================================================================
+diff --git a/src/main/java/controllers/SellController.java b/src/main/java/controllers/SellController.java
+deleted file mode 100644
+--- a/src/main/java/controllers/SellController.java	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
++++ /dev/null	(revision f1c0e8265beeacd7e396418c09f34bce586caf2f)
+@@ -1,16 +0,0 @@
+-package controllers;
+-
+-import models.Backpack;
+-import models.Enums.Shop;
+-import models.Tool;
+-
+-public class SellController {
+-    // Attributes
+-    private Backpack playerInventory;
+-    private MovementController movementController;
+-    // Methods
+-    public void showSellableItems() { /* Filter inventory */ }
+-    public void sellItem(Tool item, int quantity) { /* Handle transaction */ }
+-    public void calculateTotalValue() { /* Sum selected items */ }
+-    Shop[] shops;
+-}
+Index: src/main/java/managers/ShopManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/managers/ShopManager.java b/src/main/java/managers/ShopManager.java
+new file mode 100644
+--- /dev/null	(date 1746386909104)
++++ b/src/main/java/managers/ShopManager.java	(date 1746386909104)
+@@ -0,0 +1,103 @@
++package managers;
++
++import com.google.gson.reflect.TypeToken;
++import models.Enums.Shop;
++import models.TradeRequest;
++import models.User;
++import com.google.gson.*;
++import java.io.*;
++import java.time.LocalTime;
++import java.util.*;
++import java.nio.file.*;
++//import static sun.font.FontManagerNativeLibrary.load;
++
++public class ShopManager {
++    private UserManager um;
++    private final Path storage = Paths.get("shopTransactions.json");
++    private final Gson gson = new Gson();
++    List<ShopTransaction> history = new ArrayList<>();
++    public ShopManager(UserManager userManager) {
++        this.um = new UserManager();
++        load();
++    }
++
++    private void load() {
++        try {
++            if (Files.exists(storage)) {
++                var type = new TypeToken<List<ShopTransaction>>() {}.getType();
++                List<ShopTransaction> t = gson.fromJson(Files.readString(storage), type);
++                if (t != null) history.addAll(t);
++            }
++        } catch(IOException ignored) {}
++    }
++
++    private void save() {
++        try (Writer w = Files.newBufferedWriter(storage)) {
++            gson.toJson(history, w);
++        } catch(IOException ignored) {}
++    }
++
++    public Map<String, Double> getAllProducts(Shop shop) {
++       Map<String, Double> products = getAllProducts(shop);
++       products.forEach((item, price) -> System.out.printf("%s : %.2f $\n", item, price));
++       return products;
++    }
++
++    public Map<String, Double> getAvailableProducts(Shop shop) {
++        int hour = LocalTime.now().getHour();
++        boolean open;
++        if(Shop.getOpenHour() <= hour && shop.getCloseHour() > hour){
++            open = true;
++        } else open = false;
++        if(!open) return Collections.emptyMap();
++        Map<String, Double> Map = new LinkedHashMap<>();
++        Map<String, Integer> productsCount = stock.get(shop);
++        shop.getItems().forEach((item) -> {
++            int r = productsCount.getOrDefault(item, 0);
++            if( r > 0) Map.put(item.getName(), item.getPrice());
++        });
++        return Map;
++    }
++
++    public String purchase(String username, Shop shop, String item, int count) {
++        User user = um.getUser(username);
++        Map<String, Double> availableProducts = getAvailableProducts(shop);
++        if(!availableProducts.containsKey(item)) {
++            return "product not available in this shop!";
++        }
++        if(count <= 0) return "count must be greater than 0!";
++        int remainder = stock.get(shop).get(item);
++        if(count >= remainder) {
++            return String.format("This shop only has %d %s", remainder, item);
++        }
++        double total = availableProducts.get(item) * count;
++        if(user.getMoney() < total){
++            return "you do not have enough money!";
++        }
++        user.addMoney(-total);
++        user.addItem(item, count);
++        stock.get(shop).put(item, remainder - count);
++        history.add(new ShopTransaction(username, shop, item, count, total, LocalTime.now()));
++        save();
++        return "Shopping successfully!";
++    }
++
++    public static class ShopTransaction {
++        public String user;
++        public Shop shop;
++        public String item;
++        public LocalTime time;
++        public int count;
++        public double totalPrice;
++
++
++        public ShopTransaction(String user, Shop shop, String item, int count, double totalPrice, LocalTime time) {
++            this.user = user;
++            this.shop = shop;
++            this.item = item;
++            this.time = time;
++            this.count = count;
++            this.totalPrice = totalPrice;
++        }
++    }
++}
+Index: src/main/java/models/TradeRequest.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/TradeRequest.java b/src/main/java/models/TradeRequest.java
+new file mode 100644
+--- /dev/null	(date 1746386910561)
++++ b/src/main/java/models/TradeRequest.java	(date 1746386910561)
+@@ -0,0 +1,42 @@
++package models;
++
++public class TradeRequest {
++    public enum Type{OFFER, REQUEST}
++    public enum Status{PENDING,ACCEPTED,REJECTED}
++    private String id;
++    private String fromUser;
++    private String toUser;
++    private Type type;
++    private Status status;
++    private String item;
++    private int amount;
++    private double price;
++    private String targetItem;
++    private int targetAmount;
++
++    public TradeRequest(String id, String fromUSer, String toUser, Type type, String item, int amount,
++                        double price, String targetItem, int targetAmount) {
++        this.id = id;
++        this.fromUser = fromUSer;
++        this.toUser = toUser;
++        this.type = type;
++        this.item = item;
++        this.amount = amount;
++        this.price = price;
++        this.targetItem = targetItem;
++        this.targetAmount = targetAmount;
++        this.status = status.PENDING;
++    }
++    public void setStatus(Status status) {this.status = status;}
++
++    public String getId() {return id;}
++    public String getFromUser() {return fromUser;}
++    public String getToUser() {return toUser;}
++    public Type getType() {return type;}
++    public Status getStatus() {return status;}
++    public String getItem() {return item;}
++    public int getAmount() {return amount;}
++    public double getPrice() {return price;}
++    public String getTargetItem() {return targetItem;}
++    public int getTargetAmount() {return targetAmount;}
++}
+Index: src/main/java/managers/TradeManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/managers/TradeManager.java b/src/main/java/managers/TradeManager.java
+new file mode 100644
+--- /dev/null	(date 1746386910242)
++++ b/src/main/java/managers/TradeManager.java	(date 1746386910242)
+@@ -0,0 +1,161 @@
++package managers;
++
++import java.nio.file.*;
++import java.util.*;
++import java.io.*;
++import com.google.gson.Gson;
++import com.google.gson.reflect.TypeToken;
++
++import models.TradeRequest;
++import models.User;
++import managers.UserManager;
++
++public class TradeManager {
++    private final Map<String, List<TradeRequest>> trades = new HashMap<>();
++    private final Path storage = Paths.get("trades.json");
++    private final Gson gson = new Gson();
++    private UserManager um = new UserManager();
++
++    public TradeManager(UserManager um) {
++        this.um = um;
++        load();
++    }
++
++    public String creatTrades(String fromUser, String toUser, String typeStr, String amountStr, String priceStr,
++                              String item, String targetItem, String targetAmountStr) {
++        User sender = um.getUser(fromUser);
++        User receiver = um.getUser(toUser);
++        if(receiver == null) return "targetUser " + toUser + " not found!";
++        TradeRequest.Type type;
++        try{
++            type = TradeRequest.Type.valueOf(typeStr);
++        } catch(Exception e) {return "invalid trading type";}
++
++        int amount;
++        try{amount = Integer.parseInt(amountStr);}
++        catch(NumberFormatException e) {return "invalid amount format";}
++        if (amount <= 0) return "amount must be greater than 0";
++
++        Double price = null;
++        Integer targetAmount = null;
++        if(type == TradeRequest.Type.OFFER){
++            if (priceStr == null ) return "You should specify price for offer trading.";
++            try{price = Double.parseDouble(priceStr);}
++            catch(NumberFormatException e) {return "invalid price format";}
++            if( price < 0) return "price cannot be negative.";
++            if (item.equals("money")){
++                if (sender.getMoney() < amount * price){
++                    return "You do not have enough money for trading.";
++                }  else {
++                    if (sender.getInventoryCount(item) < amount){
++                        return "Insufficient inventory for trading.";
++                    }
++                }
++            }
++        } else {
++            if (targetAmountStr == null || targetItem == null)
++                return "You should specify targetAmount and targetItem for trading.";
++            try{targetAmount = Integer.parseInt(targetAmountStr);}
++            catch(NumberFormatException e) {return "invalid amount format";}
++            if (targetAmount <= 0) return "amount must be greater than 0";
++            if (targetItem.equals("money")){
++                if (sender.getMoney() < amount){
++                    return "You do not have enough money to exchange.";
++                } else{
++                    if (sender.getInventoryCount(item) < amount) {
++                        return "Insufficient inventory for trading.";
++                    }
++                }
++            }
++
++        }
++        String id = UUID.randomUUID().toString();
++        TradeRequest request = new TradeRequest(id, fromUser, toUser, type, item, amount, price, targetItem,
++                targetAmount);
++        trades.computeIfAbsent(toUser, k -> new ArrayList<>()).add(request);
++        save();
++        return "Your request has been sent with id:" + id + ".";
++    }
++
++    public List<TradeRequest> getPendingTradesList(String username) {
++        return trades.getOrDefault(username, Collections.emptyList());
++    }
++
++    public String respond(String username, String id, boolean accept){
++        List<TradeRequest> list = trades.get(username);
++        if (list == null)return "You do not have any trades.";
++        for (TradeRequest t : list) {
++            if (t.getId().equals(id) && t.getStatus() == TradeRequest.Status.PENDING){
++                if (accept){
++                    User sender = um.getUser(t.getFromUser());
++                    User receiver = um.getUser(t.getToUser());
++                    if (t.getType() == TradeRequest.Type.OFFER){
++                        double total = t.getAmount() * t.getPrice();
++                        if (receiver.getMoney() < total)
++                            return " customer does not have enough money.";
++                        receiver.addMoney(-total);
++                        sender.addMoney(total);
++                        sender.addItem(t.getItem(), -t.getAmount());
++                        receiver.addItem(t.getItem(), t.getAmount());
++                    } else{
++                        if (receiver.getInventoryCount(t.getItem()) < t.getAmount())
++                            return "Insufficient inventory for trading.";
++                        if (t.getTargetItem().equals("money")){
++                            double amount = t.getTargetAmount();
++                            if(sender.getMoney() < amount)
++                                return "You do not have enough money to exchange.";
++                            sender.addItem(t.getItem(), t.getAmount());
++                            receiver.addItem(t.getItem(), -t.getAmount());
++                            sender.addMoney(-amount);
++                            receiver.addMoney(amount);
++                        } else {
++                            if(sender.getInventoryCount(t.getItem()) < t.getAmount())
++                                return "Insufficient inventory for exchanging.";
++                            sender.addItem(t.getItem(), t.getAmount());
++                            receiver.addItem(t.getItem(), -t.getAmount());
++                            sender.addItem(t.getTargetItem(), -t.getTargetAmount());
++                            receiver.addItem(t.getTargetItem(), t.getTargetAmount());
++                        }
++                    }
++                    t.setStatus(TradeRequest.Status.ACCEPTED);
++                    save();
++                    return "Request accepted successfully.";
++                } else {
++                    t.setStatus(TradeRequest.Status.REJECTED);
++                    save();
++                    return "Request rejected.";
++                }
++            }
++        }
++        return "request not found or accepted before.";
++    }
++
++    public List<TradeRequest> history(String username) {
++        List<TradeRequest> all = new ArrayList<>();
++        for (List<TradeRequest> list : trades.values()) {
++            for (TradeRequest tr : list) {
++                if (tr.getFromUser().equals(username) || tr.getToUser().equals(username)) {
++                    all.add(tr);
++                }
++            }
++        }
++        return all;
++    }
++
++    private void load() {
++        try {
++            if (Files.exists(storage)) {
++                var type = new TypeToken<Map<String,List<TradeRequest>>>() {}.getType();
++                Map<String, List<TradeRequest>> t = gson.fromJson(Files.readString(storage), type);
++                if (t != null) trades.putAll(t);
++            }
++        } catch(IOException ignored) {}
++    }
++
++    private void save() {
++        try (Writer w = Files.newBufferedWriter(storage)) {
++            gson.toJson(new ArrayList<>(trades.values()), w);
++        } catch(IOException ignored) {}
++    }
++
++}
+Index: src/main/java/managers/PlayerTurnManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/managers/PlayerTurnManager.java b/src/main/java/managers/PlayerTurnManager.java
+new file mode 100644
+--- /dev/null	(date 1746386907343)
++++ b/src/main/java/managers/PlayerTurnManager.java	(date 1746386907343)
+@@ -0,0 +1,39 @@
++package managers.Turn;
++
++import com.google.common.eventbus.Subscribe;
++import models.Events.GameEventBus;
++import models.Events.TurnChangedEvent;
++import models.Events.TurnEndedEvent;
++import models.Player;
++import managers.time.TimeManager;
++
++import java.util.List;
++
++public class PlayerTurnManager {
++    private List<Player> players;
++    private int currentTurn = 0;
++
++    public PlayerTurnManager(List<Player> players) {
++        if (players != null) {
++            this.players = players;
++        }
++        GameEventBus.INSTANCE.register(this);
++    }
++
++    public void endTurn() {
++        Player player = players.get(currentTurn);
++        player.onTurnEnd();
++        GameEventBus.INSTANCE.post(new TurnEndedEvent(player));
++        advanceToNextPlayer();
++    }
++
++    private void advanceToNextPlayer() {
++        currentTurn = (currentTurn + 1) % players.size();
++        TimeManager.getInstance().nextTurn();
++    }
++
++    @Subscribe
++    private void onTimeAdvanced(TurnChangedEvent event) {
++        players.get(currentTurn).onNewTurn(event);
++    }
++}
+Index: src/main/java/managers/TimeManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/managers/TimeManager.java b/src/main/java/managers/TimeManager.java
+new file mode 100644
+--- /dev/null	(date 1746386909898)
++++ b/src/main/java/managers/TimeManager.java	(date 1746386909898)
+@@ -0,0 +1,70 @@
++package models.time;
++
++import controllers.WeatherController;
++import models.Events.*;
++import models.Enums.Season;
++
++public class TimeManager {
++    private static final TimeManager instance = new TimeManager();
++    private int hour = 9;
++    private int day = 1;
++    private Season season = Season.SPRING;
++    private int turnsTaken = 1;
++    private int totalDaysPlayed = 0;
++    private static final WeatherController weatherController = new WeatherController();
++
++    private TimeManager() {
++        this.season = Season.SPRING;
++    }
++
++    public static TimeManager getInstance() {
++        return instance;
++    }
++
++    public void nextTurn() {
++        turnsTaken++;
++        GameEventBus.INSTANCE.post(new TurnAdvancedEvent(hour, day, season));
++        if (turnsTaken == 3) {
++            advanceHour();
++            turnsTaken = 0;
++        }
++    }
++
++    public void advanceHour() {
++        hour++;
++        GameEventBus.INSTANCE.post(new HourAdvancedEvent(hour, day, season));
++        if (hour == 22) {
++            advanceDay();
++            hour = 9;
++        }
++    }
++
++    private void advanceDay() {
++        day++;
++        totalDaysPlayed++;
++        GameEventBus.INSTANCE.post(new DayChangedEvent(hour, day, season));
++        if (day == 28) {
++            advanceSeason();
++        }
++    }
++
++    private void advanceSeason() {
++        Season previousSeason = season;
++        season = season.next();
++        day = 1;
++        GameEventBus.INSTANCE.post(new SeasonChangedEvent(previousSeason, season));
++    }
++
++    public int getTotalDaysPlayed() {
++        return totalDaysPlayed;
++    }
++
++    public String getTimeString() {
++        return String.format("Day %d , %02d:00 - %s",
++                day, hour, season.toString());
++    }
++
++    public Season getSeason() {
++        return this.season;
++    }
++}
+Index: src/main/java/managers/PriceManager.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/managers/PriceManager.java b/src/main/java/managers/PriceManager.java
+new file mode 100644
+--- /dev/null	(date 1746386907642)
++++ b/src/main/java/managers/PriceManager.java	(date 1746386907642)
+@@ -0,0 +1,184 @@
++package managers;
++
++import java.util.Map;
++import java.util.HashMap;
++
++public class PriceManager {
++    private static Map<String, Double> baseSellPrice = new HashMap<>();
++    static {
++        //stock
++        baseSellPrice.put("Cooper Ore", 75.0);
++        baseSellPrice.put("Iron Ore", 150.0);
++        baseSellPrice.put("Gold Ore", 75.0);
++        baseSellPrice.put("Coal", 150.0);
++        //upgrade tools
++        baseSellPrice.put("Copper Tool", 2000.0);
++        baseSellPrice.put("Gold Tool", 10000.0);
++        baseSellPrice.put("Iridium Tool", 25000.0);
++        baseSellPrice.put("Copper Trash Can", 1000.0);
++        baseSellPrice.put("Steel Trash Can", 2500.0);
++        baseSellPrice.put("Gold Trash Can", 5000.0);
++        baseSellPrice.put("Iridium Trash Can", 12500.0);
++        //shop inventory
++        baseSellPrice.put("Hay", 50.0);
++        baseSellPrice.put("Milk Pail", 1000.0);
++        baseSellPrice.put("Shears", 1000.0);
++        //lives tock
++        baseSellPrice.put("Chicken", 800.0);
++        baseSellPrice.put("Cow", 1500.0);
++        baseSellPrice.put("Goat", 4000.0);
++        baseSellPrice.put("Duck", 1200.0);
++        baseSellPrice.put("Sheep", 8000.0);
++        baseSellPrice.put("Rabbit", 8000.0);
++        baseSellPrice.put("Dinosaur", 14000.0);
++        baseSellPrice.put("Pig", 16000.0);
++        //Permanent Stock
++        baseSellPrice.put("Beer", 400.0);
++        baseSellPrice.put("Salad", 220.0);
++        baseSellPrice.put("Bread", 120.0);
++        baseSellPrice.put("Spaghetti", 240.0);
++        baseSellPrice.put("Pizza", 600.0);
++        baseSellPrice.put("Coffee", 300.0);
++        baseSellPrice.put("Hashbrowns", 50.0);
++        baseSellPrice.put("Omelet", 100.0);
++        baseSellPrice.put("Pancakes", 100.0);
++        baseSellPrice.put("Bread", 100.0);
++        baseSellPrice.put("Tortilla", 100.0);
++        baseSellPrice.put("Pizza", 150.0);
++        baseSellPrice.put("Maki Roll", 300.0);
++        baseSellPrice.put("Triple Shot Espresso", 5000.0);
++        baseSellPrice.put("Cookie", 300.0);
++        //permanent stock
++        baseSellPrice.put("Wood",10.0);
++        baseSellPrice.put("Stone", 20.0);
++        //farm buildings
++        baseSellPrice.put("Barn", 6000.0);
++        baseSellPrice.put("Big Barn", 12000.0);
++        baseSellPrice.put("Delux Barn", 25000.0);
++        baseSellPrice.put("Coop", 4000.0);
++        baseSellPrice.put("Big Coop", 10000.0);
++        baseSellPrice.put("Delux Coop", 20000.0);
++        baseSellPrice.put("Well", 1000.0);
++        baseSellPrice.put("Shipping Bin", 250.0);
++        baseSellPrice.put("Joja Cola", 75.0);
++        baseSellPrice.put("Ancient Seed", 500.0);
++        baseSellPrice.put("Grass Starter", 125.0);
++        baseSellPrice.put("Sugar", 125.0);
++        baseSellPrice.put("Wheat Flour", 125.0);
++        baseSellPrice.put("Rice", 250.0);
++
++// Spring Stock
++        baseSellPrice.put("Parsnip Seeds", 25.0);
++        baseSellPrice.put("Bean Starter", 75.0);
++        baseSellPrice.put("Cauliflower Seeds", 100.0);
++        baseSellPrice.put("Potato Seeds", 62.0);
++        baseSellPrice.put("Strawberry Seeds", 100.0);
++        baseSellPrice.put("Tulip Bulb", 25.0);
++        baseSellPrice.put("Kale Seeds", 87.0);
++        baseSellPrice.put("Coffee Beans", 200.0);
++        baseSellPrice.put("Carrot Seeds", 5.0);
++        baseSellPrice.put("Rhubarb Seeds", 100.0);
++        baseSellPrice.put("Jazz Seeds", 37.0);
++
++// Summer Stock
++        baseSellPrice.put("Tomato Seeds", 62.0);
++        baseSellPrice.put("Pepper Seeds", 50.0);
++        baseSellPrice.put("Wheat Seeds", 12.0);
++        baseSellPrice.put("Summer Squash Seeds", 10.0);
++        baseSellPrice.put("Radish Seeds", 50.0);
++        baseSellPrice.put("Melon Seeds", 100.0);
++        baseSellPrice.put("Hops Starter", 75.0);
++        baseSellPrice.put("Poppy Seeds", 125.0);
++        baseSellPrice.put("Spangle Seeds", 62.0);
++        baseSellPrice.put("Starfruit Seeds", 400.0);
++        baseSellPrice.put("Sunflower Seeds", 125.0);
++
++// Fall Stock
++        baseSellPrice.put("Corn Seeds", 187.0);
++        baseSellPrice.put("Eggplant Seeds", 25.0);
++        baseSellPrice.put("Pumpkin Seeds", 125.0);
++        baseSellPrice.put("Broccoli Seeds", 15.0);
++        baseSellPrice.put("Amaranth Seeds", 87.0);
++        baseSellPrice.put("Grape Starter", 75.0);
++        baseSellPrice.put("Beet Seeds", 20.0);
++        baseSellPrice.put("Yam Seeds", 75.0);
++        baseSellPrice.put("Bok Choy Seeds", 62.0);
++        baseSellPrice.put("Cranberry Seeds", 300.0);
++        baseSellPrice.put("Fairy Seeds", 250.0);
++        baseSellPrice.put("Rare Seed", 1000.0);
++
++// Winter Stock
++        baseSellPrice.put("Powdermelon Seeds", 20.0);
++        baseSellPrice.put("Rice", 200.0);
++        baseSellPrice.put("Wheat Flour", 100.0);
++        baseSellPrice.put("Bouquet", 1000.0);
++        baseSellPrice.put("Wedding Ring", 10000.0);
++        baseSellPrice.put("Dehydrator (Recipe)", 10000.0);
++        baseSellPrice.put("Grass Starter (Recipe)", 1000.0);
++        baseSellPrice.put("Sugar", 100.0);
++        baseSellPrice.put("Oil", 200.0);
++        baseSellPrice.put("Vinegar", 200.0);
++        baseSellPrice.put("Deluxe Retaining Soil", 150.0);
++        baseSellPrice.put("Grass Starter", 100.0);
++        baseSellPrice.put("Speed-Gro", 100.0);
++        baseSellPrice.put("Apple Sapling", 4000.0);
++        baseSellPrice.put("Apricot Sapling", 2000.0);
++        baseSellPrice.put("Cherry Sapling", 3400.0);
++        baseSellPrice.put("Orange Sapling", 4000.0);
++        baseSellPrice.put("Peach Sapling", 6000.0);
++        baseSellPrice.put("Pomegranate Sapling", 6000.0);
++        baseSellPrice.put("Basic Retaining Soil", 100.0);
++        baseSellPrice.put("Quality Retaining Soil", 150.0);
++        // Year-Round Stock
++        // Inventory Upgrades
++        baseSellPrice.put("Large Pack", 2000.0);
++        baseSellPrice.put("Deluxe Pack", 10000.0);
++
++// Spring Seeds (in-season prices)
++        baseSellPrice.put("Parsnip Seeds", 20.0);
++        baseSellPrice.put("Bean Starter", 60.0);
++        baseSellPrice.put("Cauliflower Seeds", 80.0);
++        baseSellPrice.put("Potato Seeds", 50.0);
++        baseSellPrice.put("Tulip Bulb", 20.0);
++        baseSellPrice.put("Kale Seeds", 70.0);
++        baseSellPrice.put("Jazz Seeds", 30.0);
++        baseSellPrice.put("Garlic Seeds", 40.0);
++        baseSellPrice.put("Rice Shoot", 40.0);
++
++// Summer Seeds (in-season prices)
++        baseSellPrice.put("Melon Seeds", 80.0);
++        baseSellPrice.put("Tomato Seeds", 50.0);
++        baseSellPrice.put("Blueberry Seeds", 80.0);
++        baseSellPrice.put("Pepper Seeds", 40.0);
++        baseSellPrice.put("Wheat Seeds", 10.0);
++        baseSellPrice.put("Radish Seeds", 40.0);
++        baseSellPrice.put("Poppy Seeds", 100.0);
++        baseSellPrice.put("Spangle Seeds", 50.0);
++        baseSellPrice.put("Hops Starter", 60.0);
++        baseSellPrice.put("Corn Seeds", 150.0);
++        baseSellPrice.put("Sunflower Seeds", 200.0);
++        baseSellPrice.put("Red Cabbage Seeds", 100.0);
++
++// Fall Seeds (in-season prices)
++        baseSellPrice.put("Eggplant Seeds", 20.0);
++        baseSellPrice.put("Pumpkin Seeds", 100.0);
++        baseSellPrice.put("Bok Choy Seeds", 50.0);
++        baseSellPrice.put("Yam Seeds", 60.0);
++        baseSellPrice.put("Cranberry Seeds", 240.0);
++        baseSellPrice.put("Fairy Seeds", 200.0);
++        baseSellPrice.put("Amaranth Seeds", 70.0);
++        baseSellPrice.put("Grape Starter", 60.0);
++        baseSellPrice.put("Artichoke Seeds", 30.0);
++        // Fishing Equipment and Recipes
++        baseSellPrice.put("Fish Smoker (Recipe)", 10000.0);
++        baseSellPrice.put("Trout Soup", 250.0);
++        baseSellPrice.put("Bamboo Pole", 500.0);
++        baseSellPrice.put("Training Rod", 25.0);
++        baseSellPrice.put("Fiberglass Rod", 1800.0);
++        baseSellPrice.put("Iridium Rod", 7500.0);
++
++    }
++
++    public static double getBasePrice(String product) {return baseSellPrice.get(product);}
++
++}
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+new file mode 100644
+--- /dev/null	(date 1746386838249)
++++ b/.idea/workspace.xml	(date 1746386838249)
+@@ -0,0 +1,226 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="AutoImportSettings">
++    <option name="autoReloadType" value="SELECTIVE" />
++  </component>
++  <component name="ChangeListManager">
++    <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time">
++      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/managers/TimeManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/managers/TimeManager.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/models/Events/TurnChangedEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/models/Events/TurnChangedEvent.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/models/Events/WeatherChangedEvent.java" beforeDir="false" afterPath="$PROJECT_DIR$/models/Events/WeatherChangedEvent.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/models/time/EnterToNextDay.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/models/time/GameTimeAndDate.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/models/time/UpdateTimeAndDate.java" beforeDir="false" />
++    </list>
++    <option name="SHOW_DIALOG" value="false" />
++    <option name="HIGHLIGHT_CONFLICTS" value="true" />
++    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
++    <option name="LAST_RESOLUTION" value="IGNORE" />
++  </component>
++  <component name="FileTemplateManagerImpl">
++    <option name="RECENT_TEMPLATES">
++      <list>
++        <option value="Enum" />
++        <option value="Class" />
++        <option value="Record" />
++      </list>
++    </option>
++  </component>
++  <component name="Git.Rebase.Settings">
++    <option name="NEW_BASE" value="main" />
++  </component>
++  <component name="Git.Settings">
++    <option name="RECENT_BRANCH_BY_REPOSITORY">
++      <map>
++        <entry key="$PROJECT_DIR$" value="main" />
++      </map>
++    </option>
++    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
++  </component>
++  <component name="GitHubPullRequestSearchHistory">{
++  &quot;lastFilter&quot;: {
++    &quot;state&quot;: &quot;OPEN&quot;,
++    &quot;assignee&quot;: &quot;fateme4626&quot;
++  }
++}</component>
++  <component name="GithubPullRequestsUISettings">{
++  &quot;selectedUrlAndAccountId&quot;: {
++    &quot;url&quot;: &quot;https://github.com/advanced-programming-sut-2025/advanced-programming-phase-1-group-45.git&quot;,
++    &quot;accountId&quot;: &quot;220a72aa-0ecb-412f-a62a-a98659e69220&quot;
++  }
++}</component>
++  <component name="ProjectColorInfo">{
++  &quot;associatedIndex&quot;: 4
++}</component>
++  <component name="ProjectId" id="2wMyJfjBNyrwEjDKjdJJVpQRyF0" />
++  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
++  <component name="ProjectViewState">
++    <option name="hideEmptyMiddlePackages" value="true" />
++    <option name="showLibraryContents" value="true" />
++  </component>
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "Application.Main.executor": "Run",
++    "Maven.javafx-json-app [clean,install,-U].executor": "Run",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "RunOnceActivity.git.unshallow": "true",
++    "git-widget-placeholder": "main",
++    "ignore.virus.scanning.warn.message": "true",
++    "kotlin-language-version-configured": "true",
++    "last_opened_file_path": "C:/Users/ASUS/IdeaProjects/jadid",
++    "node.js.detected.package.eslint": "true",
++    "node.js.detected.package.tslint": "true",
++    "node.js.selected.package.eslint": "(autodetect)",
++    "node.js.selected.package.tslint": "(autodetect)",
++    "nodejs_package_manager_path": "npm",
++    "project.structure.last.edited": "Modules",
++    "project.structure.proportion": "0.0",
++    "project.structure.side.proportion": "0.0",
++    "vue.rearranger.settings.migration": "true"
++  }
++}]]></component>
++  <component name="RunAnythingCache">
++    <option name="myCommands">
++      <command value="mvn clean install -U" />
++    </option>
++  </component>
++  <component name="RunManager">
++    <configuration default="true" type="JetRunConfigurationType">
++      <module name="advanced-programming-phase-1-group-45" />
++      <method v="2">
++        <option name="Make" enabled="true" />
++      </method>
++    </configuration>
++    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
++      <module name="advanced-programming-phase-1-group-45" />
++      <option name="filePath" />
++      <method v="2" />
++    </configuration>
++  </component>
++  <component name="SharedIndexes">
++    <attachedChunks>
++      <set>
++        <option value="bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.24978.46" />
++        <option value="bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-IU-243.24978.46" />
++      </set>
++    </attachedChunks>
++  </component>
++  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
++  <component name="TaskManager">
++    <task active="true" id="Default" summary="Default task">
++      <changelist id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="" />
++      <created>1745865666402</created>
++      <option name="number" value="Default" />
++      <option name="presentableId" value="Default" />
++      <updated>1745865666402</updated>
++      <workItem from="1745865667755" duration="1066000" />
++      <workItem from="1746103080258" duration="2581000" />
++      <workItem from="1746114868247" duration="136000" />
++      <workItem from="1746115057064" duration="10000" />
++      <workItem from="1746116478448" duration="7255000" />
++      <workItem from="1746168876227" duration="7239000" />
++      <workItem from="1746179100585" duration="753000" />
++      <workItem from="1746190116118" duration="1622000" />
++      <workItem from="1746192007982" duration="687000" />
++      <workItem from="1746192855794" duration="4437000" />
++      <workItem from="1746203024997" duration="1489000" />
++      <workItem from="1746206348096" duration="55000" />
++      <workItem from="1746379176538" duration="1966000" />
++      <workItem from="1746382699214" duration="2265000" />
++      <workItem from="1746385095329" duration="948000" />
++    </task>
++    <task id="LOCAL-00001" summary="time manager first">
++      <option name="closed" value="true" />
++      <created>1746122612646</created>
++      <option name="number" value="00001" />
++      <option name="presentableId" value="LOCAL-00001" />
++      <option name="project" value="LOCAL" />
++      <updated>1746122612646</updated>
++    </task>
++    <task id="LOCAL-00002" summary="update time">
++      <option name="closed" value="true" />
++      <created>1746173060739</created>
++      <option name="number" value="00002" />
++      <option name="presentableId" value="LOCAL-00002" />
++      <option name="project" value="LOCAL" />
++      <updated>1746173060739</updated>
++    </task>
++    <option name="localTasksCounter" value="3" />
++    <servers />
++  </component>
++  <component name="TypeScriptGeneratedFilesManager">
++    <option name="version" value="3" />
++  </component>
++  <component name="Vcs.Log.Tabs.Properties">
++    <option name="OPEN_GENERIC_TABS">
++      <map>
++        <entry key="8866e24b-17cd-4bd9-934f-380b906a7fd4" value="TOOL_WINDOW" />
++      </map>
++    </option>
++    <option name="RECENT_FILTERS">
++      <map>
++        <entry key="Branch">
++          <value>
++            <list>
++              <RecentGroup>
++                <option name="FILTER_VALUES">
++                  <option value="origin/main" />
++                </option>
++              </RecentGroup>
++              <RecentGroup>
++                <option name="FILTER_VALUES">
++                  <option value="HEAD" />
++                </option>
++              </RecentGroup>
++              <RecentGroup>
++                <option name="FILTER_VALUES">
++                  <option value="main" />
++                </option>
++              </RecentGroup>
++            </list>
++          </value>
++        </entry>
++      </map>
++    </option>
++    <option name="TAB_STATES">
++      <map>
++        <entry key="8866e24b-17cd-4bd9-934f-380b906a7fd4">
++          <value>
++            <State>
++              <option name="CUSTOM_BOOLEAN_PROPERTIES">
++                <map>
++                  <entry key="Show.Git.Branches" value="true" />
++                </map>
++              </option>
++            </State>
++          </value>
++        </entry>
++        <entry key="MAIN">
++          <value>
++            <State>
++              <option name="FILTERS">
++                <map>
++                  <entry key="branch">
++                    <value>
++                      <list>
++                        <option value="fatemehBranch" />
++                      </list>
++                    </value>
++                  </entry>
++                </map>
++              </option>
++            </State>
++          </value>
++        </entry>
++      </map>
++    </option>
++  </component>
++  <component name="VcsManagerConfiguration">
++    <MESSAGE value="time manager" />
++    <MESSAGE value="time manager" />
++    <MESSAGE value="update time" />
++    <option name="LAST_COMMIT_MESSAGE" value="update time" />
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch
+new file mode 100644
+--- /dev/null	(date 1746386838247)
++++ b/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch	(date 1746386838247)
+@@ -0,0 +1,2007 @@
++Index: models/GameMap.java
++===================================================================
++diff --git a/models/GameMap.java b/models/GameMap.java
++deleted file mode 100644
++--- a/models/GameMap.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,53 +0,0 @@
++-package models;
++-import models.Enums.Tile;
++-
++-import java.util.Random;
++-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
++-public class GameMap {
++-    private int size;
++-    private Tile[][] grid;
++-    public GameMap(int size, boolean random) {
++-        this.size = size;
++-        grid = new Tile[size][size];
++-        if(random) generateRandomMap();
++-        else fillPlain();
++-    }
++-    private void generateRandomMap() {
++-        Random rand = new Random();
++-        fillPlain();
++-        for (Tile t : new Tile[]{Tile.LAKE, Tile.GREENHOUSE, Tile.COTTAGE, Tile.QUARRY}){
++-            placeRandom(t, rand);
++-        }
++-    }
++-    private void placeRandom(Tile t, Random rand) {
++-        int x, y;
++-        do{
++-            x = rand.nextInt(size);
++-            y = rand.nextInt(size);
++-        } while (grid[y][x] != Tile.PLAIN);
++-        grid[y][x] = t;
++-    }
++-    public Tile getTile(int x, int y) {
++-        if(x < 0 || y < 0 || x >= size || y >= size){
++-            return null;
++-        }
++-        return grid[y][x];
++-    }
++-
++-    public int getSize() {return size;}
++-
++-    public void setTile(int x, int y, Tile tile) {
++-        if(x < 0 || y < 0 || x >= size || y >= size){
++-            return ;
++-        }
++-         grid[y][x] = tile;
++-    }
++-
++-    private void fillPlain() {
++-        for (int y = 0; y < size; y++) {
++-            for (int x = 0; x < size; x++) {
++-                grid[y][x] = Tile.PLAIN;
++-            }
++-        }
++-    }
++-}
++\ No newline at end of file
++Index: views/StartMenu.java
++===================================================================
++diff --git a/views/StartMenu.java b/views/StartMenu.java
++deleted file mode 100644
++--- a/views/StartMenu.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,26 +0,0 @@
++-package views;
++-
++-import controllers.MenuController;
++-
++-public class StartMenu implements Menu{
++-    @Override
++-    public void handleCommand(String command, MenuController controller) {
++-        switch (command) {
++-            case "menu enter register":
++-                controller.setCurrentMenu(new SignUpMenu());
++-                break;
++-            case "menu enter login":
++-                controller.setCurrentMenu(new LoginMenu());
++-                break;
++-            case "show current menu":
++-                System.out.println("welcome");
++-                break;
++-            case "menu exit":
++-                System.out.println("Bye");
++-                System.exit(0);
++-                break;
++-            default:
++-                System.out.println("Invalid command");
++-        }
++-    }
++-}
++Index: models/Enums/StoneNames.java
++===================================================================
++diff --git a/models/Enums/StoneNames.java b/models/Enums/StoneNames.java
++deleted file mode 100644
++--- a/models/Enums/StoneNames.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models.Enums;
++-
++-public enum StoneNames {
++-}
++Index: views/AvatarMenu.java
++===================================================================
++diff --git a/views/AvatarMenu.java b/views/AvatarMenu.java
++deleted file mode 100644
++--- a/views/AvatarMenu.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,7 +0,0 @@
++-package views;
++-
++-import controllers.AvatarController;
++-
++-public class AvatarMenu {
++-    AvatarController controller;
++-}
++Index: models/Crafting.java
++===================================================================
++diff --git a/models/Crafting.java b/models/Crafting.java
++deleted file mode 100644
++--- a/models/Crafting.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,37 +0,0 @@
++-package models;
++-
++-import controllers.MovementController;
++-
++-public class Crafting {
++-    package models;
++-
++-import java.util.Map;
++-
++-    public class Craftsmanship {
++-        private Map<Recipe, Boolean> knownRecipes;
++-        private Energy energy;
++-
++-        public void craftItem(Recipe recipe) {
++-            if (hasMaterials(recipe) && energy.hasEnough(recipe.getEnergyCost())) {
++-                // Crafting implementation
++-                energy.consume(recipe.getEnergyCost());
++-            }
++-        }
++-
++-        /* private boolean hasMaterials(Recipe recipe) {
++-            // Material check logic
++-        } */
++-
++-        public void learnNewDesign() {
++-        }
++-
++-        public void putOnGround() {
++-            Backpack backpack = new Backpack();
++-            MovementController movementController = new MovementController();
++-        }
++-
++-        public void addItemToInventory(Tool tool) {
++-            Backpack backpack = new Backpack();
++-        }
++-    }
++-}
++Index: views/DeleteCurrentGame.java
++===================================================================
++diff --git a/views/DeleteCurrentGame.java b/views/DeleteCurrentGame.java
++deleted file mode 100644
++--- a/views/DeleteCurrentGame.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,6 +0,0 @@
++-package views;
++-
++-
++-public class DeleteCurrentGame {
++-
++-}
++Index: managers/UserManager.java
++===================================================================
++diff --git a/managers/UserManager.java b/managers/UserManager.java
++deleted file mode 100644
++--- a/managers/UserManager.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,254 +0,0 @@
++-package managers;
++-import com.google.gson.Gson;
++-import com.google.gson.reflect.TypeToken;
++-import controllers.MenuController;
++-import models.User;
++-import java.io.*;
++-import java.nio.file.*;
++-import java.security.*;
++-import java.util.*;
++-import java.util.stream.Collectors;
++-public class UserManager {
++-    private final Map<String, User> users = new HashMap<>();
++-    private final Path storage = Paths.get("users.json");
++-    private final Gson gson = new Gson();
++-    private User currentUser;
++-    private User signingUser;
++-
++-    public UserManager() { load(); }
++-
++-    public boolean register(String cmd) {
++-        try {
++-            String[] p = cmd.split("\\s+");
++-            String u=null, pw=null, pwc=null, nick=null, email=null, gen=null;
++-            for (int i=1; i<p.length; i++) {
++-                switch(p[i]) {
++-                    case "-u": u=p[++i]; break;
++-                    case "-p": pw=p[++i]; pwc=p[++i]; break;
++-                    case "-n": nick=p[++i]; break;
++-                    case "-e": email=p[++i]; break;
++-                    case "-g": gen=p[++i]; break;
++-                }
++-            }
++-            if (users.containsKey(u)) { System.out.println("username already used."); return false; }
++-            if (!email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
++-                System.out.println("invalid email format."); return false;
++-            }
++-            if (pw.length()<8 || !pw.matches(".*[A-Z].*") || !pw.matches(".*[a-z].*")
++-                    || !pw.matches(".*\\d.*") || !pw.matches(".*[!@#$%^&*()].*")) {
++-                System.out.println("your password is not strong."); return false;
++-            }
++-            if (!pw.equals(pwc)) { System.out.println("make sure that you repeated your password correctly."); return false; }
++-            users.put(u, new User(u, hash(pw), nick, email, gen));
++-            save();
++-            signingUser = users.get(u);
++-            System.out.println(signingUser.getSecurityQuestion());
++-            save();
++-            return true;
++-        } catch(Exception ex) {
++-            System.out.println("error.");
++-            return false;
++-        }
++-    }
++-
++-    public User login(String cmd) {
++-        String[] p = cmd.split("\\s+");
++-        String u=null, pw=null;
++-        for (int i=1; i<p.length; i++) {
++-            if (p[i].equals("-u")) u=p[++i];
++-            if (p[i].equals("-p")) pw=p[++i];
++-        }
++-        User user = users.get(u);
++-        if (user==null || !user.getPasswordHash().equals(hash(pw))) {
++-            System.out.println("user name or password is incorrect.");
++-            return null;
++-        }
++-        return user;
++-    }
++-
++-    public String startPasswordRecovery(String cmd) {
++-        String u = cmd.split("\\s+")[3];
++-        currentUser = users.get(u);
++-        if (currentUser==null) {
++-            System.out.println("invalid username.");
++-            return null;
++-        } else {
++-            System.out.println("security question: " + currentUser.getSecurityQuestion());
++-            return u;
++-        }
++-    }
++-    public boolean checkSecurityAnswer(String answer) {
++-        if (currentUser == null) return false;
++-        String Ans = hash(answer.trim().toLowerCase());
++-        return Ans.equals(currentUser.getSecurityAnswer());
++-    }
++-
++-    public String resetPasswordRandom(String username) {
++-        User u = users.get(username);
++-        if (u == null) return null;
++-        String newPw = generateRandomPassword(12);
++-        u.setPasswordHash(hash(newPw));
++-        save();
++-        return newPw;
++-    }
++-
++-    public boolean resetPasswordManual(String username, String newPassword) {
++-        User u = users.get(username);
++-        if (u == null) return false;
++-        if (newPassword.length() < 8
++-                || !newPassword.matches(".*[A-Z].*")
++-                || !newPassword.matches(".*[a-z].*")
++-                || !newPassword.matches(".*\\d.*")
++-                || !newPassword.matches(".*[!@#$%^&*()].*")) {
++-            return false;
++-        }
++-        u.setPasswordHash(hash(newPassword));
++-        save();
++-        return true;
++-    }
++-
++-
++-    public void completePasswordRecovery(String cmd) {
++-        String answer = cmd.split("\\s+")[3];
++-        if (checkSecurityAnswer(answer)){
++-            System.out.println("how do want to set new password?");}
++-        else{
++-            System.out.println("incorrect answer");
++-        }
++-
++-    }
++-    private String generateRandomPassword(int length) {
++-        String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
++-        String lower = "abcdefghijklmnopqrstuvwxyz";
++-        String digits = "0123456789";
++-        String symbols = "!@#$%^&*()-_=+[]{};:,.<>?";
++-        String all = upper + lower + digits + symbols;
++-
++-        SecureRandom rnd = new SecureRandom();
++-        StringBuilder sb = new StringBuilder(length);
++-
++-        sb.append(upper.charAt(rnd.nextInt(upper.length())));
++-        sb.append(lower.charAt(rnd.nextInt(lower.length())));
++-        sb.append(digits.charAt(rnd.nextInt(digits.length())));
++-        sb.append(symbols.charAt(rnd.nextInt(symbols.length())));
++-
++-        for (int i = 4; i < length; i++) {
++-            sb.append(all.charAt(rnd.nextInt(all.length())));
++-        }
++-
++-        List<Character> pwdChars = sb.chars()
++-                .mapToObj(c -> (char)c)
++-                .collect(Collectors.toList());
++-        Collections.shuffle(pwdChars, rnd);
++-
++-        StringBuilder pwd = new StringBuilder();
++-        pwdChars.forEach(pwd::append);
++-        return pwd.toString();
++-    }
++-
++-
++-    public String getUserInfo(User u) {
++-        return String.format("username: %s\n nickname: %s\n max money: %.2f\n game played: %d",
++-                u.getUsername(), u.getNickname(), u.getMaxMoney(), u.getGamesPlayed());
++-    }
++-
++-    public boolean changeUsername(User user, String newUsername) {
++-        if (newUsername == null || !newUsername.matches("^[A-Za-z0-9]+$")) {
++-            System.out.println("invalid username");
++-            return false;
++-        }
++-        if (users.containsKey(newUsername)) {
++-            System.out.println("this username is already used by another person.");
++-            return false;
++-        }
++-        String old = user.getUsername();
++-        user.setUsername(newUsername);
++-        users.remove(old);
++-        users.put(newUsername, user);
++-        save();
++-        System.out.println("your username changed to" + newUsername + "successfully.");
++-        return true;
++-    }
++-
++-    public boolean changeNickname(User user, String newNickname) {
++-        if (newNickname == null || newNickname.isBlank()) {
++-            System.out.println("your nickname can't be empty");
++-            return false;
++-        }
++-        user.setNickname(newNickname);
++-        save();
++-        System.out.println("your nick name changed to " + newNickname + " succesfully.");
++-        return true;
++-    }
++-
++-    public boolean changeEmail(User user, String newEmail) {
++-        if (newEmail == null || !newEmail.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
++-            System.out.println("invalid email format");
++-            return false;
++-        }
++-        for (User u : users.values()) {
++-            if (u.getEmail().equalsIgnoreCase(newEmail)) {
++-                System.out.println("this email is already used.");
++-                return false;
++-            }
++-        }
++-        user.setEmail(newEmail);
++-        save();
++-        System.out.println("your email changed to " + newEmail + "succesfully");
++-        return true;
++-    }
++-
++-    public boolean changePassword(User user, String oldPassword, String newPassword) {
++-        String oldHash = hash(oldPassword);
++-        if (!user.getPasswordHash().equals(oldHash)) {
++-            System.out.println("incorrect password.");
++-            return false;
++-        }
++-        if (newPassword.length() < 8
++-                || !newPassword.matches(".*[A-Z].*")
++-                || !newPassword.matches(".*[a-z].*")
++-                || !newPassword.matches(".*\\d.*")
++-                || !newPassword.matches(".*[!@#$%^&*()].*")) {
++-            System.out.println("new password is not strong.");
++-            return false;
++-        }
++-        user.setPasswordHash(hash(newPassword));
++-        save();
++-        System.out.println("password changed successfully.");
++-        return true;
++-    }
++-
++-    private void load() {
++-        try {
++-            if (Files.exists(storage)) {
++-                List<User> list = gson.fromJson(Files.readString(storage),
++-                        new TypeToken<List<User>>(){}.getType());
++-                for (User u : list) {
++-                    users.put(u.getUsername(), u);
++-                }
++-            }
++-        } catch(IOException ignored) {}
++-    }
++-
++-    private void save() {
++-        try (Writer w = Files.newBufferedWriter(storage)) {
++-            gson.toJson(new ArrayList<>(users.values()), w);
++-        } catch(IOException ignored) {}
++-    }
++-
++-    private String hash(String pw) {
++-        try {
++-            var md = MessageDigest.getInstance("SHA-256");
++-            var bytes = md.digest(pw.getBytes("UTF-8"));
++-            var sb = new StringBuilder();
++-            for (byte b : bytes) sb.append(String.format("%02x", b));
++-            return sb.toString();
++-        } catch(Exception e) { return ""; }
++-    }
++-
++-    public void setAnswer(String command){
++-        String  answer = command.split("\\s+")[1];
++-        signingUser.setSecurityAnswer(answer);
++-    }
++-
++-}
++Index: controllers/MovementController.java
++===================================================================
++diff --git a/controllers/MovementController.java b/controllers/MovementController.java
++deleted file mode 100644
++--- a/controllers/MovementController.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package controllers;
++-
++-public class MovementController {
++-}
++Index: views/SignUpMenu.java
++===================================================================
++diff --git a/views/SignUpMenu.java b/views/SignUpMenu.java
++deleted file mode 100644
++--- a/views/SignUpMenu.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,21 +0,0 @@
++-package views;
++-
++-import controllers.MenuController;
++-
++-public class SignUpMenu implements Menu{
++-    @Override
++-    public void handleCommand(String command, MenuController controller) {
++-        if(command.startsWith("register ")) {
++-            controller.getUserManager().register(command);
++-        } else if (command.startsWith("-a")){
++-            controller.getUserManager().setAnswer(command);
++-            System.out.println("User registered successfully");
++-            controller.setCurrentMenu(new MainMenu());
++-        } else if(command.equals("show current menu")){
++-            System.out.println("You are now in sign up menu");
++-        } else if(command.equals("exit")){
++-            System.out.println("Goodbye");
++-            System.exit(0);
++-        } else System.out.println("Invalid command");
++-    }
++-}
++Index: models/Weather.java
++===================================================================
++diff --git a/models/Weather.java b/models/Weather.java
++deleted file mode 100644
++--- a/models/Weather.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,8 +0,0 @@
++-package models;
++-public class Weather {
++-    private static models.Enums.Weather currentWeather;
++-    public static models.Enums.Weather showWeather(){
++-        return currentWeather;
++-    }
++-    public static void updateWeather(){}
++-}
++Index: views/MainMenu.java
++===================================================================
++diff --git a/views/MainMenu.java b/views/MainMenu.java
++deleted file mode 100644
++--- a/views/MainMenu.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,32 +0,0 @@
++-package views;
++-
++-import controllers.MenuController;
++-
++-
++-public class MainMenu implements Menu {
++-    @Override
++-    public void handleCommand(String command, MenuController controller) {
++-        switch (command) {
++-            case "menu enter Avatar":
++-                controller.setCurrentMenu(new AvatarMenu());
++-                break;
++-            case "menu enter profile":
++-                controller.setCurrentMenu(new ProfileMenu());
++-                break;
++-            case "menu enter game":
++-                controller.setCurrentMenu(new GameMenu());
++-                break;
++-            case "show current menu":
++-                System.out.println("You are now in main menu");
++-                break;
++-            case "user logout":
++-                controller.setCurrentUser(null);
++-                System.out.println("logged out successfully");
++-                controller.setCurrentMenu(new StartMenu());
++-                break;
++-            default:
++-                    System.out.println("Invalid command");
++-        }
++-    }
++-}
++-
++Index: models/Extraction.java
++===================================================================
++diff --git a/models/Extraction.java b/models/Extraction.java
++deleted file mode 100644
++--- a/models/Extraction.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,9 +0,0 @@
++-package models;
++-
++-public class Extraction implements Ability {
++-    @Override
++-    public void level1(){}
++-    public void level2(){}
++-    public void level3(){}
++-    public void level4(){}
++-}
++Index: models/User.java
++===================================================================
++diff --git a/models/User.java b/models/User.java
++deleted file mode 100644
++--- a/models/User.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,42 +0,0 @@
++-package models;
++-
++-public class User{
++-    private String username;
++-    private String passwordHash;
++-    private String nickname;
++-    private String email;
++-    private String gender;
++-    private double maxMoney = 0;
++-    private int gamesPlayed = 0;
++-    private String securityQuestion = "What is your grandma's name? ";
++-    private String securityAnswer = null;
++-
++-    public User(String username, String passwordHash, String nickname, String email, String gender){
++-        this.username = username;
++-        this.passwordHash = passwordHash;
++-        this.nickname = nickname;
++-        this.email = email;
++-        this.gender = gender;
++-    }
++-    public String getUsername(){ return username; }
++-    public String getPasswordHash(){ return passwordHash; }
++-    public String getNickname(){ return nickname; }
++-    public String getEmail(){ return email; }
++-    public String getGender(){ return gender; }
++-    public int getGamesPlayed(){ return gamesPlayed; }
++-    public double getMaxMoney(){return maxMoney; }
++-    public String getSecurityQuestion(){ return securityQuestion; }
++-    public String getSecurityAnswer(){return securityAnswer;}
++-
++-    public void setUsername(String username){ this.username = username; }
++-    public void setPasswordHash(String passwordHash){ this.passwordHash = passwordHash; }
++-    public void setNickname(String nickname){ this.nickname = nickname; }
++-    public void setEmail(String email){ this.email = email; }
++-    public void setGender(String gender){ this.gender = gender; }
++-    public void setGamesPlayed(int gamesPlayed){ this.gamesPlayed = gamesPlayed; }
++-    public void setMaxMoney(double maxMoney){ this.maxMoney = maxMoney; }
++-    public void setSecurityQuestion(String securityQuestion){ this.securityQuestion = securityQuestion; }
++-    public void setSecurityAnswer(String securityAnswer){this.securityAnswer = securityAnswer; }
++-
++-
++-}
++Index: models/Friendship.java
++===================================================================
++diff --git a/models/Friendship.java b/models/Friendship.java
++deleted file mode 100644
++--- a/models/Friendship.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,45 +0,0 @@
++-package models;
++-
++-import controllers.TradingController;
++-import models.time.GameTimeAndDate;
++-
++-public class Friendship implements Ability {
++-    private Map<NPC, Integer> npcRelationships;
++-
++-    public void increaseFriendship(NPC npc, int amount) { /* Relationship logic */ }
++-
++-    TradingController trade;
++-
++-    public void buyGift() {
++-    }
++-
++-    public void hug() {
++-    }
++-
++-    public void buyFlower() {
++-        Backpack backpack = new Backpack();
++-    }
++-
++-    @Override
++-    public void level1() {
++-    }
++-
++-    public void level2() {
++-    }
++-
++-    Backpack backpack = new Backpack();
++-
++-    public void level3() {
++-    }
++-
++-    public void level4() {
++-        marriage();
++-
++-    }
++-
++-    public void marriage() {
++-        Energy energy = new Energy();
++-        GameTimeAndDate gameTimeAndDate;
++-    }
++-
++-}
++Index: controllers/SellController.java
++===================================================================
++diff --git a/controllers/SellController.java b/controllers/SellController.java
++deleted file mode 100644
++--- a/controllers/SellController.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,16 +0,0 @@
++-package controllers;
++-
++-import models.Backpack;
++-import models.Enums.Shop;
++-import models.Tool;
++-
++-public class SellController {
++-    // Attributes
++-    private Backpack playerInventory;
++-    private MovementController movementController;
++-    // Methods
++-    public void showSellableItems() { /* Filter inventory */ }
++-    public void sellItem(Tool item, int quantity) { /* Handle transaction */ }
++-    public void calculateTotalValue() { /* Sum selected items */ }
++-    Shop[] shops;
++-}
++Index: models/Hoe.java
++===================================================================
++diff --git a/models/Hoe.java b/models/Hoe.java
++deleted file mode 100644
++--- a/models/Hoe.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,6 +0,0 @@
++-package models;
++-
++-public class Hoe implements Tool{
++-    private int tillRadius;
++-    public void tillSoil() { /* Implementation */ }
++-}
++Index: models/Farming.java
++===================================================================
++diff --git a/models/Farming.java b/models/Farming.java
++deleted file mode 100644
++--- a/models/Farming.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,18 +0,0 @@
++-package models;
++-import models.Crop;
++-import enums.Season;
++-
++-public class Farming implements Ability {
++-    public void plowing(){}
++-    public void planting(){}
++-    public void fertilizer(){}
++-    public void watering(){}
++-    public static void harvest(){
++-
++-    }
++-    @Override
++-    public void level1(){}
++-    public void level2(){}
++-    public void level3(){}
++-    public void level4(){}
++-}
++Index: models/Pickaxe.java
++===================================================================
++diff --git a/models/Pickaxe.java b/models/Pickaxe.java
++deleted file mode 100644
++--- a/models/Pickaxe.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models;
++-
++-public class Pickaxe implements Tool{
++-}
++Index: models/Scythe.java
++===================================================================
++diff --git a/models/Scythe.java b/models/Scythe.java
++deleted file mode 100644
++--- a/models/Scythe.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models;
++-
++-public class Scythe implements Tool{
++-}
++Index: models/Enums/FishType.java
++===================================================================
++diff --git a/models/Enums/FishType.java b/models/Enums/FishType.java
++deleted file mode 100644
++--- a/models/Enums/FishType.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models.Enums;
++-
++-public enum FishType {
++-}
++Index: views/GameMenu.java
++===================================================================
++diff --git a/views/GameMenu.java b/views/GameMenu.java
++deleted file mode 100644
++--- a/views/GameMenu.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,72 +0,0 @@
++-package views;
++-
++-import Managers.GameManager;
++-import controllers.MenuController;
++-import models.GameSession;
++-
++-public class GameMenu implements Menu{
++-    @Override
++-    public void handleCommand(String command, MenuController controller) {
++-        GameManager gm = controller.getGameManager();
++-        String me = controller.getCurrentUser().getUsername(); //current player
++-        if(command.startsWith("game new ")){
++-            GameSession s = gm.createNewGame(command, me);
++-            if(s != null){
++-                controller.setCurrentSession(s);
++-                System.out.println("New Game Created, now choose your map");
++-            }
++-        } else if(command.startsWith("game map")){
++-            if(controller.getCurrentSession() != null && gm.selectMap(controller.getCurrentSession(), command)){
++-                System.out.println("map selected");
++-            }
++-        } else if(command.equals("load game")){
++-            GameSession s= gm.loadLastSession(controller.getCurrentUser());
++-            if(s != null){
++-                controller.setCurrentSession(s);
++-                System.out.println("the last game loaded");
++-            } else System.out.println("no game exists");
++-        } else if(command.equals("next turn")){
++-            GameSession s = controller.getCurrentSession();
++-            if(s != null){
++-                s.nextTurn();
++-                System.out.println("it's " + s.getTurn() + " turn!");
++-            }
++-        } else if(command.equals("exit game")){
++-            GameSession s = controller.getCurrentSession();
++-            if(!me.equals(s.getPlayers().get(0))){
++-                System.out.println("only the creator can exit the game");
++-            } else {
++-                controller.getGameManager().saveSession(s);
++-
++-                controller.setCurrentSession(null);
++-                System.out.println("exiting the game");
++-            }
++-        } else if(command.equals("force terminate")){
++-            GameSession s = controller.getCurrentSession();
++-            s.startVote(me);
++-            System.out.println("voting terminated");
++-        } else if(command.startsWith("vote")){
++-            GameSession s = controller.getCurrentSession();
++-            if(!s.isVoteInProgress()){
++-                System.out.println("no active voting");
++-            } else if(s.hasVoted(me)){
++-                System.out.println("you already voted");
++-            } else {
++-                boolean yes = command.equals("vote yes");
++-                s.recordVote(me, yes);
++-                System.out.println("vote submitted");
++-                if(s.allVoted()){
++-                    if(s.isVoteSuccessful()){
++-                        controller.getGameManager().endSession(s);
++-                        System.out.println("All votes were positive ,ending the game");
++-                        controller.setCurrentSession(null);
++-                        controller.setCurrentMenu(new MainMenu());
++-                    } else {
++-                        s.clearVote();
++-                        System.out.println("there is at least one negative vote, continuing the game");
++-                    }
++-                }
++-            }
++-        }
++-    }
++-    }
++\ No newline at end of file
++Index: views/SellView.java
++===================================================================
++diff --git a/views/SellView.java b/views/SellView.java
++deleted file mode 100644
++--- a/views/SellView.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,11 +0,0 @@
++-package views;
++-
++-import controllers.MainController;
++-import controllers.SellController;
++-import models.Tool;
++-
++-public class SellView {
++-    SellController controller;
++-    public void displayInventoryGrid() { /* Visual item arrangement */ }
++-    public void highlightSelectedItem(Tool item) { /* UI feedback */ }
++-}
++Index: models/GameSession.java
++===================================================================
++diff --git a/models/GameSession.java b/models/GameSession.java
++deleted file mode 100644
++--- a/models/GameSession.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,60 +0,0 @@
++-package models;
++-
++-import java.util.*;
++-import java.util.Map;
++-
++-public class GameSession {
++-    private List<String> players;
++-    private int mapNumber = 0;
++-    private int turn = 0;
++-    private boolean voteInProgress = false;
++-    private String voteStarter;
++-    private Map<String, Boolean> votes = new LinkedHashMap<>();
++-    private GameMap map;
++-    private int playerX, playerY;
++-    private int energy = 100;
++-
++-    public GameSession(List<String> players) {
++-        this.players = new ArrayList<>(players);
++-    }
++-    public void nextTurn() {turn++;}
++-    public void setMapNumber(int mapNumber) {this.mapNumber = mapNumber;}
++-    public int getMapNumber() {return mapNumber;}
++-    public int getTurn(){return turn;}
++-    public List<String> getPlayers(){return players;}
++-    public String getCurrentPlayer(){return players.get(turn%players.size());}
++-    public boolean isVoteInProgress(){return voteInProgress;}
++-    public void setMap(GameMap map) {
++-        this.map = map;
++-        int mid = map.getSize()/2;
++-        this.playerX = mid;
++-        this.playerY = mid;
++-    }
++-    public GameMap getMap(){return map;}
++-    public int getPlayerX(){return playerX;}
++-    public int getPlayerY(){return playerY;}
++-    public void setPlayerPosition(int x, int y){this.playerX = x;this.playerY = y;}
++-    public int getEnergy(){return energy;}
++-    public void reduceEnergy(int amount){energy -= amount;}
++-
++-    public void startVote(String starter){
++-        voteInProgress = true;
++-        voteStarter = starter;
++-        votes.clear();
++-        votes.put(starter, true);
++-    }
++-    public boolean hasVoted(String user){return votes.containsKey(user);}
++-    public void recordVote(String user, boolean yes){votes.put(user, yes);}
++-    public boolean allVoted(){return votes.size() == players.size();}
++-    public boolean isVoteSuccessful(){
++-        for(boolean v : votes.values()){
++-            if(!v) return false;
++-        }
++-        return true;
++-    }
++-    public void clearVote(){
++-        voteInProgress = false;
++-        voteStarter = null;
++-        votes.clear();
++-    }
++-}
++Index: models/GreenHouse.java
++===================================================================
++diff --git a/models/GreenHouse.java b/models/GreenHouse.java
++deleted file mode 100644
++--- a/models/GreenHouse.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,20 +0,0 @@
++-package models;
++-
++-import models.Enums.Weather;
++-
++-public class GreenHouse {
++-    private Crop[][] cropGrid;
++-    private boolean lightening;
++-    Weather currentWeather = models.Weather.showWeather();
++-
++-    public void greenHouseBuild() {
++-    }
++-
++-    public static void autoWater() {
++-        /* Greenhouse logic */
++-    }
++-
++-    public static void plantGrowth() {
++-    }
++-
++-}
++Index: models/Enums/Weather.java
++===================================================================
++diff --git a/models/Enums/Weather.java b/models/Enums/Weather.java
++deleted file mode 100644
++--- a/models/Enums/Weather.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,11 +0,0 @@
++-package models.Enums;
++-
++-public enum Weather {
++-    SUNNY, RAINY, STORMY, SNOWY;
++-    private double fishingModifier;
++-    private boolean preventsOutdoorActivities;
++-    public boolean lightning = false;
++-    public static void applyDailyEffects(Weather weather, Season season) {
++-
++-    }
++-}
++Index: models/wateringCan.java
++===================================================================
++diff --git a/models/wateringCan.java b/models/wateringCan.java
++deleted file mode 100644
++--- a/models/wateringCan.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models;
++-
++-public class wateringCan implements Tool{
++-}
++Index: views/AppView.java
++===================================================================
++diff --git a/views/AppView.java b/views/AppView.java
++deleted file mode 100644
++--- a/views/AppView.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,6 +0,0 @@
++-package views;
++-
++-import models.Enums.Menu;
++-
++-public class AppView {
++-}
++Index: controllers/MenuController.java
++===================================================================
++diff --git a/controllers/MenuController.java b/controllers/MenuController.java
++deleted file mode 100644
++--- a/controllers/MenuController.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,35 +0,0 @@
++-package controllers;
++-import Managers.GameManager;
++-import Managers.UserManager;
++-import models.User;
++-import models.GameSession;
++-import views.Menu;
++-import views.StartMenu;
++-
++-
++-import java.util.*;
++-
++-public class MenuController {
++-    private Menu currentMenu = new StartMenu();
++-    private Scanner scanner = new Scanner(System.in);
++-    private GameManager gameManager = new GameManager();
++-    private UserManager userManager = new UserManager();
++-    private User currentUser;
++-    private GameSession currentSession;
++-
++-    public UserManager getUserManager() {return userManager;}
++-    public GameManager getGameManager() {return gameManager;}
++-    public User getCurrentUser() {return currentUser;}
++-    public GameSession getCurrentSession() {return currentSession;};
++-    public void setCurrentUser(User u) {this.currentUser = u;}
++-    public void setCurrentMenu(Menu menu) {this.currentMenu = menu;}
++-    public void setCurrentSession(GameSession s) {this.currentSession = s;};//save user, map
++-
++-    public void run(){
++-        while(true){
++-            System.out.println("> ");
++-            String line = scanner.nextLine();
++-            currentMenu.handleCommand(line, this);
++-        }
++-    }
++-}
++\ No newline at end of file
++Index: models/Shear.java
++===================================================================
++diff --git a/models/Shear.java b/models/Shear.java
++deleted file mode 100644
++--- a/models/Shear.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models;
++-
++-public class Shear implements Tool{
++-}
++Index: views/LoginMenu.java
++===================================================================
++diff --git a/views/LoginMenu.java b/views/LoginMenu.java
++deleted file mode 100644
++--- a/views/LoginMenu.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,45 +0,0 @@
++-package views;
++-
++-import controllers.MenuController;
++-import models.User;
++-
++-public class LoginMenu implements Menu{
++-    @Override
++-    public void handleCommand(String command, MenuController controller){
++-        if(command.startsWith("login")){
++-            User u = controller.getUserManager().login(command);
++-            if(u != null){
++-                controller.setCurrentUser(u);
++-                System.out.println("Login Successful, moving to main menu");
++-                controller.setCurrentMenu(new MainMenu());
++-            }
++-        } else if(command.startsWith("forget password")){
++-            String um = controller.getUserManager().startPasswordRecovery(command);
++-            controller.setPendingRecoveryUsername(um);
++-        } else if(command.startsWith("answer")){
++-            controller.getUserManager().completePasswordRecovery(command);
++-        } else if(command.equals("reset random")){
++-            String user = controller.getPendingRecoveryUsername();
++-            if(user != null){
++-                String newPassword = controller.getUserManager().resetPasswordRandom(user);
++-                System.out.println("your new password is: " + newPassword);
++-                controller.setPendingRecoveryUsername(null);
++-            }
++-        } else if(command.startsWith("reset set -p ")){
++-            String user = controller.getPendingRecoveryUsername();
++-            if(user != null){
++-                String newPassword = command.substring("reset set -p ".length());
++-                if(controller.getUserManager().resetPasswordManual(user, newPassword)){
++-                    System.out.println("Password reset successful");
++-                    controller.setPendingRecoveryUsername(null);
++-                }
++-            }
++-        }
++-        else if(command.equals("show current menu")){
++-            System.out.println("you are now in Login Menu");
++-        } else if(command.equals("menu exit")){
++-            System.out.println("Goodbye");
++-            System.exit(0);
++-        } else System.out.println("Invalid command");
++-    }
++-}
++Index: models/Processing.java
++===================================================================
++diff --git a/models/Processing.java b/models/Processing.java
++deleted file mode 100644
++--- a/models/Processing.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,11 +0,0 @@
++-package models;
++-
++-import models.Enums.Machines;
++-import models.time.GameTimeAndDate;
++-
++-public class Processing {
++-    private Machines[] machines;
++-    private GameTimeAndDate gameTimeAndDate;
++-    Farming farming;
++-    farming.harvest();
++-}
++Index: models/Foraging.java
++===================================================================
++diff --git a/models/Foraging.java b/models/Foraging.java
++deleted file mode 100644
++--- a/models/Foraging.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,10 +0,0 @@
++-package models;
++-
++-import models.Enums.Season;
++-
++-public class Foraging {
++-    Season season;
++-    Tool[] tools;
++-    PlantsAndTrees[] plantsAndTrees;
++-
++-}
++Index: models/NPC.java
++===================================================================
++diff --git a/models/NPC.java b/models/NPC.java
++deleted file mode 100644
++--- a/models/NPC.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,33 +0,0 @@
++-package models;
++-
++-import controllers.MovementController;
++-import models.Enums.NPCCharacters;
++-import models.Enums.Season;
++-import models.Enums.Weather;
++-import models.time.GameTimeAndDate;
++-
++-public class NPC {
++-    private String name;
++-    private String job;
++-    private String location;
++-    private NPCCharacters character;
++-
++-    Friendship friendship;
++-    MovementController movementController;
++-    GameTimeAndDate gameTimeAndDate;
++-
++-    public void dialogue() {
++-        Season season;
++-        Weather weather;
++-    }
++-    public void gift(){
++-        Friendship friendship;
++-    }
++-    public void friendship() {
++-        Friendship newFriendship = new Friendship();
++-    }
++-
++-    public void quest(){
++-
++-    }
++-}
++Index: models/Backpack.java
++===================================================================
++diff --git a/models/Backpack.java b/models/Backpack.java
++deleted file mode 100644
++--- a/models/Backpack.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,10 +0,0 @@
++-package models;
++-
++-public class Backpack {
++-    private int capacity;
++-
++-    public boolean addItem(Tool item) {
++-        // Implement stacking logic here
++-        return false;
++-    }
++-}
++Index: models/EcoTourism.java
++===================================================================
++diff --git a/models/EcoTourism.java b/models/EcoTourism.java
++deleted file mode 100644
++--- a/models/EcoTourism.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,9 +0,0 @@
++-package models;
++-
++-public class EcoTourism implements Ability{
++-    @Override
++-    public void level1(){}
++-    public void level2(){}
++-    public void level3(){}
++-    public void level4(){}
++-}
++Index: managers/GameManager.java
++===================================================================
++diff --git a/managers/GameManager.java b/managers/GameManager.java
++deleted file mode 100644
++--- a/managers/GameManager.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,69 +0,0 @@
++-package managers;
++-import models.User;
++-import models.GameSession;
++-import gson.*;
++-import java.io.*;
++-import java.util.*;
++-import java.nio.file.*;
++-
++-public class GameManager {
++-    private Map<String, List<GameSession>> gameSessions = new HashMap<>();
++-    private Path storage = Paths.get("games.json");
++-    private Gson gson = new Gson();
++-    public GameManager() {load();}
++-    public void saveSession(GameSession session) {save();}
++-    public void endSession(GameSession session){
++-        for(String u: session.getPlayers()){
++-            List<GameSession> sessions = gameSessions.get(u);
++-            if(sessions != null) sessions.remove(session);
++-        }
++-        save();
++-    }
++-    public GameSession loadLastSession(User u){
++-        List<GameSession> sessions = gameSessions.get(u.getUsername());
++-        if(sessions == null || sessions.isEmpty()) return null;
++-        return sessions.get(sessions.size()-1);
++-    }
++-    public GameSession createNewGame(String command, String currentUser){
++-        var parts = new ArrayList<>(Arrays.asList(command.split("\\s+")));
++-        parts.remove(0);
++-        parts.remove(0);
++-        parts.remove(0);
++-        var users = parts;
++-        if(users.size() < 1 || users.size() > 3){
++-            System.out.println("Number on users must be between 1 and 3");
++-        }
++-        users.add(0, currentUser);
++-        var s = new GameSession(users);
++-        for(var u: users){
++-            gameSessions.computeIfAbsent(u, k -> new ArrayList<>()).add(s);
++-        }
++-        save();
++-        return s;
++-    }
++-    public boolean selectMap(GameSession session, String command){
++-        int m = Integer.parseInt(command.split("\\s+")[2]);
++-        if(m < 1 || m > 3){
++-            System.out.println("invalid map number");
++-            return false;
++-        }
++-        session.setMapNumber(m);
++-        save();
++-        return true;
++-    }
++-    private void load(){
++-        try{
++-            if(Files.exists(storage)){
++-                var type = new TypeToken<Map<String,List<GameSession>>>(){}.getType;
++-                var m = gson.fromJson(Files.readString(storage), type);
++-
++-            }
++-        } catch (IOException ignored) {}
++-    }
++-    private void save(){
++-        try(Writer w = Files.newBufferedWriter(storage)){
++-            gson.toJson(gameSessions, w);
++-        } catch (IOException ignored) {
++-        }
++-    }
++-}
++Index: models/Enums/TreeType.java
++===================================================================
++diff --git a/models/Enums/TreeType.java b/models/Enums/TreeType.java
++deleted file mode 100644
++--- a/models/Enums/TreeType.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models.Enums;
++-
++-public enum TreeType {
++-}
++Index: controllers/AvatarController.java
++===================================================================
++diff --git a/controllers/AvatarController.java b/controllers/AvatarController.java
++deleted file mode 100644
++--- a/controllers/AvatarController.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,7 +0,0 @@
++-package controllers;
++-
++-import views.AvatarMenu;
++-
++-public class AvatarController {
++-
++-}
++Index: models/Result.java
++===================================================================
++diff --git a/models/Result.java b/models/Result.java
++deleted file mode 100644
++--- a/models/Result.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models;
++-
++-public record Result(boolean success, String message) {
++-}
++Index: models/time/EnterToNextDay.java
++===================================================================
++diff --git a/models/time/EnterToNextDay.java b/models/time/EnterToNextDay.java
++deleted file mode 100644
++--- a/models/time/EnterToNextDay.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,12 +0,0 @@
++-package models.time;
++-
++-import java.sql.Time;
++-
++-public class EnterToNextDay {
++-    public void sleep() {
++-    }
++-
++-    public void updateTimeToNextDay() {
++-        GameTimeAndDate.setCurrentTime(Time.valueOf("09:00:00"));
++-    }
++-}
++Index: models/Enums/DayOfWeek.java
++===================================================================
++diff --git a/models/Enums/DayOfWeek.java b/models/Enums/DayOfWeek.java
++deleted file mode 100644
++--- a/models/Enums/DayOfWeek.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,5 +0,0 @@
++-package models.Enums;
++-
++-public enum DayOfWeek {
++-    Saturday, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday;
++-}
++Index: models/Ability.java
++===================================================================
++diff --git a/models/Ability.java b/models/Ability.java
++deleted file mode 100644
++--- a/models/Ability.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,8 +0,0 @@
++-package models;
++-
++-public interface Ability {
++-    public void level1();
++-    public void level2();
++-    public void level3();
++-    public void level4();
++-}
++Index: models/PlantsAndTrees.java
++===================================================================
++diff --git a/models/PlantsAndTrees.java b/models/PlantsAndTrees.java
++deleted file mode 100644
++--- a/models/PlantsAndTrees.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,35 +0,0 @@
++-package models;
++-
++-import models.Enums.PlantType;
++-import models.Enums.Season;
++-import models.Enums.TreeType;
++-import models.Enums.Weather;
++-
++-public class PlantsAndTrees {
++-    private static PlantType[] plantType;
++-    private static TreeType[] treeType;
++-    private String name;
++-    private Energy energy;
++-    private Season season;
++-    private Weather weather;
++-    private String source;
++-    private int stage;
++-    private int timeToCompleteGrowth;
++-    private String takenSeveralTimes;
++-    private int harvestingIntervals;
++-    private int price;
++-    private boolean eatable;
++-    private boolean hugeProduct;
++-    private String fruit;
++-    private String coal;
++-
++-    public String harvestFruit() {
++-        return fruit;
++-    }
++-    public String treeIsBurned(){
++-        if(weather.lightning){
++-            return coal;
++-        }
++-    }
++-    public void crowAttack(){}
++-}
++Index: models/Enums/PlantType.java
++===================================================================
++diff --git a/models/Enums/PlantType.java b/models/Enums/PlantType.java
++deleted file mode 100644
++--- a/models/Enums/PlantType.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models.Enums;
++-
++-public enum PlantType {
++-}
++Index: models/Fishing.java
++===================================================================
++diff --git a/models/Fishing.java b/models/Fishing.java
++deleted file mode 100644
++--- a/models/Fishing.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,12 +0,0 @@
++-package models;
++-
++-import models.Enums.FishType;
++-
++-public class Fishing implements Ability{
++-    private FishType fishType;
++-    @Override
++-    public void level1(){}
++-    public void level2(){}
++-    public void level3(){}
++-    public void level4(){}
++-}
++Index: models/Enums/FoodType.java
++===================================================================
++diff --git a/models/Enums/FoodType.java b/models/Enums/FoodType.java
++deleted file mode 100644
++--- a/models/Enums/FoodType.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models.Enums;
++-
++-public enum FoodType {
++-}
++Index: models/Tool.java
++===================================================================
++diff --git a/models/Tool.java b/models/Tool.java
++deleted file mode 100644
++--- a/models/Tool.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models;
++-
++-public interface Tool {
++-}
++Index: models/Building.java
++===================================================================
++diff --git a/models/Building.java b/models/Building.java
++deleted file mode 100644
++--- a/models/Building.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,7 +0,0 @@
++-package models;
++-
++-public class Building {
++-    public void buildBarn() {
++-    }
++-
++-}
++Index: views/BuyView.java
++===================================================================
++diff --git a/views/BuyView.java b/views/BuyView.java
++deleted file mode 100644
++--- a/views/BuyView.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,9 +0,0 @@
++-package views;
++-
++-import controllers.BuyController;
++-
++-public class BuyView {
++-    BuyController controller;
++-    public void displayInventoryGrid() { /* Visual item arrangement */ }
++-    public void highlightSelectedItem(Item item) { /* UI feedback */ }
++-}
++Index: models/Enums/NPCCharacters.java
++===================================================================
++diff --git a/models/Enums/NPCCharacters.java b/models/Enums/NPCCharacters.java
++deleted file mode 100644
++--- a/models/Enums/NPCCharacters.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models.Enums;
++-
++-public enum NPCCharacters {
++-}
++Index: models/Cooking.java
++===================================================================
++diff --git a/models/Cooking.java b/models/Cooking.java
++deleted file mode 100644
++--- a/models/Cooking.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,20 +0,0 @@
++-package models;
++-
++-public class Cooking {
++-    Backpack backpack;
++-    public void refrigerator(){}
++-    public void showRecipes(){}
++-    public void learningCooking(){}
++-    public void makeFood(){
++-        Energy energy = new Energy();
++-        Backpack backpack = new Backpack();
++-    }
++-    public void eatFood(){
++-        Backpack backpack = new Backpack();
++-        Energy energy = new Energy();
++-    }
++-    //check it
++-    private Energy buff(){
++-
++-    }
++-}
++Index: models/Enums/Season.java
++===================================================================
++diff --git a/models/Enums/Season.java b/models/Enums/Season.java
++deleted file mode 100644
++--- a/models/Enums/Season.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,7 +0,0 @@
++-package models.Enums;
++-
++-public enum Season {
++-    SPRING, SUMMER, FALL, WINTER;
++-    private int cropGrowthModifier;
++-    private List<Crop> availableCrops;
++-}
++Index: models/time/GameTimeAndDate.java
++===================================================================
++diff --git a/models/time/GameTimeAndDate.java b/models/time/GameTimeAndDate.java
++deleted file mode 100644
++--- a/models/time/GameTimeAndDate.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,45 +0,0 @@
++-package models.time;
++-
++-import java.sql.Date;
++-import java.sql.Time;
++-import java.time.DayOfWeek;
++-import java.time.LocalDateTime;
++-
++-
++-import models.Enums.Season;
++-
++-public class GameTimeAndDate {
++-
++-    public Time displayTime() {
++-    }
++-
++-    // Attributes
++-    private LocalDateTime gameStartTime;
++-    private float timeScaleMultiplier;
++-    private static Time currentTime;
++-    private Date date;
++-    private DayOfWeek currentDay = null;
++-
++-    public static void setCurrentTime(Time time) {
++-        currentTime = time;
++-    }
++-
++-    // Methods
++-    public void pauseTime() { /* Stop time progression */ }
++-
++-    public void syncWithRealTime() { /* Real-time correlation */ }
++-
++-    public Season getCurrentSeason() { /* Calculate from day count */ }
++-
++-    public class GameTimeAndDate {
++-        // Add to existing class
++-
++-        public boolean isNewDay() {
++-            return getCurrentHour() == 6 && !wasPreviousHour6;
++-        }
++-    }
++-
++-    public static String showStatus() {
++-
++-    }
++-}
++Index: views/ProfileMenu.java
++===================================================================
++diff --git a/views/ProfileMenu.java b/views/ProfileMenu.java
++deleted file mode 100644
++--- a/views/ProfileMenu.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,17 +0,0 @@
++-package views;
++-
++-import controllers.MenuController;
++-
++-public class ProfileMenu implements Menu {
++-    @Override
++-    public void handleCommand(String command, MenuController controller){
++-        if(command.startsWith("change")){
++-            controller.getUserManager().updateProfile(command, controller.getCurrentUser());
++-        } else if(command.equals("user info")){
++-            System.out.println(controller.getUserManager().getUserInfo(controller.getCurrentUser()));
++-          } else if(command.equals("menu exit")){
++-            System.out.println("moving to main menu");
++-            controller.setCurrentMenu(new MainMenu());
++-        } else System.out.println("invalid command");
++-    }
++-}
++Index: models/Energy.java
++===================================================================
++diff --git a/models/Energy.java b/models/Energy.java
++deleted file mode 100644
++--- a/models/Energy.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,15 +0,0 @@
++-package models;
++-
++-public class Energy {
++-    public void updateEnergy() {}
++-    public void faint(){ }
++-    private int currentEnergy;
++-
++-    public int getCurrentEnergy() {
++-        return currentEnergy;
++-    }
++-
++-    private int maxEnergy;
++-    public void consume(int amount) { /* Energy management */ }
++-
++-}
++Index: models/Enums/AnimalType.java
++===================================================================
++diff --git a/models/Enums/AnimalType.java b/models/Enums/AnimalType.java
++deleted file mode 100644
++--- a/models/Enums/AnimalType.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models.Enums;
++-
++-public enum AnimalType {
++-}
++Index: models/Enums/Menu.java
++===================================================================
++diff --git a/models/Enums/Menu.java b/models/Enums/Menu.java
++deleted file mode 100644
++--- a/models/Enums/Menu.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,9 +0,0 @@
++-package models.Enums;
++-
++-public enum Menu {
++-    MainMenu,
++-    AvatarMenu,
++-    GameMenu,
++-    ExitMenu,
++-    ProfileMenu;
++-}
++Index: Main.java
++===================================================================
++diff --git a/Main.java b/Main.java
++deleted file mode 100644
++--- a/Main.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,17 +0,0 @@
++-package org.example;
++-
++-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
++-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
++-public class Main {
++-    public static void main(String[] args) {
++-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
++-        // to see how IntelliJ IDEA suggests fixing it.
++-        System.out.printf("Hello and welcome!");
++-
++-        for (int i = 1; i <= 5; i++) {
++-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
++-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
++-            System.out.println("i = " + i);
++-        }
++-    }
++-}
++\ No newline at end of file
++Index: views/Menu.java
++===================================================================
++diff --git a/views/Menu.java b/views/Menu.java
++deleted file mode 100644
++--- a/views/Menu.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,5 +0,0 @@
++-package views;
++-import controllers.MenuController;
++-public interface Menu {
++-    void handleCommand(String command, MenuController controller);
++-}
++Index: models/Enums/SingUpMenuCommands.java
++===================================================================
++diff --git a/models/Enums/SingUpMenuCommands.java b/models/Enums/SingUpMenuCommands.java
++deleted file mode 100644
++--- a/models/Enums/SingUpMenuCommands.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models.Enums;
++-
++-public enum SingUpMenuCommands {
++-}
++Index: models/TrashCan.java
++===================================================================
++diff --git a/models/TrashCan.java b/models/TrashCan.java
++deleted file mode 100644
++--- a/models/TrashCan.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models;
++-
++-public class TrashCan implements Tool{
++-}
++Index: models/Enums/MainMenuCommands.java
++===================================================================
++diff --git a/models/Enums/MainMenuCommands.java b/models/Enums/MainMenuCommands.java
++deleted file mode 100644
++--- a/models/Enums/MainMenuCommands.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,5 +0,0 @@
++-package models.Enums;
++-
++-public enum MainMenuCommands {
++-    NavigateToOtherMenu();
++-}
++Index: controllers/TradingController.java
++===================================================================
++diff --git a/controllers/TradingController.java b/controllers/TradingController.java
++deleted file mode 100644
++--- a/controllers/TradingController.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,21 +0,0 @@
++-package controllers;
++-
++-import models.Backpack;
++-
++-public class TradingController {
++-    public void request() {
++-    }
++-
++-    public void offer() {
++-    }
++-
++-    public void showList() {
++-        Backpack backpack;
++-    }
++-
++-    public boolean tradeResponse() {
++-    }
++-
++-    public void tradeHistory() {
++-    }
++-}
++Index: controllers/BuyController.java
++===================================================================
++diff --git a/controllers/BuyController.java b/controllers/BuyController.java
++deleted file mode 100644
++--- a/controllers/BuyController.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,8 +0,0 @@
++-package controllers;
++-
++-import models.Enums.Shop;
++-import models.Tool;
++-
++-public class BuyController {
++-
++-}
++Index: models/Farm.java
++===================================================================
++diff --git a/models/Farm.java b/models/Farm.java
++deleted file mode 100644
++--- a/models/Farm.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,40 +0,0 @@
++-package models;
++-
++-import models.Enums.Tile;
++-
++-import java.util.Random;
++-
++-public class Farm {
++-    public static GameMap farm(int size) {
++-        GameMap map = new GameMap(size, false);
++-        placeElement(map, Tile.COTTAGE, 1,1,4,4);
++-        placeElement(map, Tile.GREENHOUSE, size-1-6, 1, 6, 5);
++-        placeElement(map, Tile.LAKE, 1, size-1-4, 6, 4);
++-        placeElement(map, Tile.QUARRY, size-1-5, size-1-3, 5, 3);
++-        Random rnd = new Random();
++-        Scatter(map, Tile.TREE, size * size / 20, rnd);
++-        Scatter(map, Tile.STONE, size * size / 30, rnd);
++-        Scatter(map, Tile.FORAGING, size * size / 25, rnd);
++-        return map;
++-    }
++-
++-    private static void placeElement(GameMap map, Tile tile, int x, int y, int w, int h) {
++-        for (int j = y; j<y + h; j++) {
++-            for (int i = x; i<x + w; i++) {
++-                map.setTile(i, j, tile);
++-            }
++-        }
++-    }
++-
++-    private static void Scatter(GameMap map, Tile tile, int count, Random rnd) {
++-        int n = map.getSize();
++-        for (int i = 0; i < count; i++) {
++-            int x, y ;
++-            do{
++-                x = rnd.nextInt(n);
++-                y = rnd.nextInt(n);
++-            } while (map.getTile(x, y) != Tile.PLAIN);
++-            map.setTile(x, y, tile);
++-        }
++-    }
++-}
++Index: models/Animal.java
++===================================================================
++diff --git a/models/Animal.java b/models/Animal.java
++deleted file mode 100644
++--- a/models/Animal.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,21 +0,0 @@
++-package models;
++-
++-import controllers.MovementController;
++-import models.Enums.AnimalType;
++-import models.Enums.Shop;
++-import models.Enums.Weather;
++-
++-public class Animal {
++-    private AnimalType animal;
++-    private String name;
++-    private int friendshipLevel;
++-    private AnimalType type;
++-    private Friendship friendship;
++-    private Shop[] shops;
++-    private MovementController movementController;
++-    private Weather weather;
++-    private PlantsAndTrees[] plantsAndTrees;
++-    public void feed(){}
++-    private int price;
++-    public static void collectProduct(){}
++-}
++Index: models/Coop.java
++===================================================================
++diff --git a/models/Coop.java b/models/Coop.java
++deleted file mode 100644
++--- a/models/Coop.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models;
++-
++-public class Coop extends Building{
++-}
++Index: controllers/MainController.java
++===================================================================
++diff --git a/controllers/MainController.java b/controllers/MainController.java
++deleted file mode 100644
++--- a/controllers/MainController.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,1 +0,0 @@
++-package controllers;
++\ No newline at end of file
++Index: models/Enums/Shop.java
++===================================================================
++diff --git a/models/Enums/Shop.java b/models/Enums/Shop.java
++deleted file mode 100644
++--- a/models/Enums/Shop.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models.Enums;
++-
++-public enum Shop {
++-}
++Index: models/Barn.java
++===================================================================
++diff --git a/models/Barn.java b/models/Barn.java
++deleted file mode 100644
++--- a/models/Barn.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,9 +0,0 @@
++-package models;
++-
++-import java.util.List;
++-
++-public class Barn extends Building{
++-    private int capacity;
++-    private List<Animal> housedAnimals;
++-}
++-
++Index: models/FishingPole.java
++===================================================================
++diff --git a/models/FishingPole.java b/models/FishingPole.java
++deleted file mode 100644
++--- a/models/FishingPole.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models;
++-
++-public class FishingPole implements Tool{
++-}
++Index: models/Season.java
++===================================================================
++diff --git a/models/Season.java b/models/Season.java
++deleted file mode 100644
++--- a/models/Season.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,9 +0,0 @@
++-package models;
++-
++-public class Season {
++-    private static models.Enums.Season currentSeason;
++-
++-    public static models.Enums.Season getSeason() {
++-        return currentSeason;
++-    }
++-}
++Index: models/Enums/Machines.java
++===================================================================
++diff --git a/models/Enums/Machines.java b/models/Enums/Machines.java
++deleted file mode 100644
++--- a/models/Enums/Machines.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,5 +0,0 @@
++-package models.Enums;
++-
++-public enum Machines {
++-
++-}
++Index: models/Axe.java
++===================================================================
++diff --git a/models/Axe.java b/models/Axe.java
++deleted file mode 100644
++--- a/models/Axe.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models;
++-
++-public class Axe implements Tool{
++-}
++Index: models/time/UpdateTimeAndDate.java
++===================================================================
++diff --git a/models/time/UpdateTimeAndDate.java b/models/time/UpdateTimeAndDate.java
++deleted file mode 100644
++--- a/models/time/UpdateTimeAndDate.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,8 +0,0 @@
++-package models.time;
++-
++-import java.sql.Time;
++-
++-public interface UpdateTimeAndDate {
++-    private void initialize(){}
++-    private Time updateTime(){}
++-}
++Index: models/MilkPail.java
++===================================================================
++diff --git a/models/MilkPail.java b/models/MilkPail.java
++deleted file mode 100644
++--- a/models/MilkPail.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,4 +0,0 @@
++-package models;
++-
++-public class MilkPail implements Tool {
++-}
++Index: models/Enums/Tile.java
++===================================================================
++diff --git a/models/Enums/Tile.java b/models/Enums/Tile.java
++deleted file mode 100644
++--- a/models/Enums/Tile.java	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
+++++ /dev/null	(revision ef3391fa3b1228992472ac86191a03f18ecd604a)
++@@ -1,21 +0,0 @@
++-package models.Enums;
++-
++-public enum Tile {
++-    PLAIN (".", "floor"),
++-    LAKE ("L", "lake"),
++-    GREENHOUSE ("G", "greenhouse"),
++-    COTTAGE ("C", "cottage"),
++-    QUARRY ("Q", "quarry"),
++-    TREE ("T", "tree"),
++-    STONE ("S", "stone"),
++-    FORAGING ("f", "FORAGING");
++-    private char symbol;
++-    private String description;
++-    Tile(String symbol, String description) {
++-        this.symbol = symbol.charAt(0);
++-        this.description = description;
++-    }
++-
++-    public char getSymbol() {return symbol;}
++-    public String getDescription() {return description;}
++-}
++Index: src/models/Craftsmanship.java
++IDEA additional info:
++Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
++<+>UTF-8
++===================================================================
++diff --git a/src/models/Craftsmanship.java b/src/models/Craftsmanship.java
++new file mode 100644
++--- /dev/null	(date 1746104516227)
+++++ b/src/models/Craftsmanship.java	(date 1746104516227)
++@@ -0,0 +1,9 @@
+++package models;
+++
+++public class Craftsmanship implements Ability{
+++    @Override
+++    public void level1(){}
+++    public void level2(){}
+++    public void level3(){}
+++    public void level4(){}
+++}
+Index: .idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml
+new file mode 100644
+--- /dev/null	(date 1746386838248)
++++ b/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml	(date 1746386838248)
+@@ -0,0 +1,4 @@
++<changelist name="Uncommitted_changes_before_rebase_[Changes]" date="1746116633020" recycled="true" deleted="true">
++  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" />
++  <option name="DESCRIPTION" value="Uncommitted changes before rebase [Changes]" />
++</changelist>
+\ No newline at end of file

@@ -8,7 +8,7 @@ public class MainMenu implements Menu {
     public void handleCommand(String command, MenuController controller) {
         switch (command) {
             case "menu enter Avatar":
-                controller.setCurrentMenu(new AvatarMenu());
+                //controller.setCurrentMenu(new AvatarMenu());
                 break;
             case "menu enter profile":
                 controller.setCurrentMenu(new ProfileMenu());

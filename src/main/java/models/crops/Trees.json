@@ -1,0 +1,172 @@
+{
+  "Trees": [
+    {
+      "name": "Apricot Tree",
+      "source": "Apricot Sapling",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Apricot",
+      "fruitHarvestCycle": 1,
+      "fruitBaseSellPrice": 59,
+      "isFruitEdible": true,
+      "fruitEnergy": 38,
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Cherry Tree",
+      "source": "Cherry Sapling",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Cherry",
+      "fruitHarvestCycle": 1,
+      "fruitBaseSellPrice": 80,
+      "isFruitEdible": true,
+      "fruitEnergy": 38,
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Banana Tree",
+      "source": "Banana Sapling",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Banana",
+      "fruitHarvestCycle": 1,
+      "fruitBaseSellPrice": 150,
+      "isFruitEdible": true,
+      "fruitEnergy": 75,
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Mango Tree",
+      "source": "Mango Sapling",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Mango",
+      "fruitHarvestCycle": 1,
+      "fruitBaseSellPrice": 130,
+      "isFruitEdible": true,
+      "fruitEnergy": 100,
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Orange Tree",
+      "source": "Orange Sapling",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Orange",
+      "fruitHarvestCycle": 1,
+      "fruitBaseSellPrice": 100,
+      "isFruitEdible": true,
+      "fruitEnergy": 38,
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Peach Tree",
+      "source": "Peach Sapling",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Peach",
+      "fruitHarvestCycle": 1,
+      "fruitBaseSellPrice": 140,
+      "isFruitEdible": true,
+      "fruitEnergy": 38,
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Apple Tree",
+      "source": "Apple Sapling",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Apple",
+      "fruitHarvestCycle": 1,
+      "fruitBaseSellPrice": 100,
+      "isFruitEdible": true,
+      "fruitEnergy": 38,
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Pomegranate Tree",
+      "source": "Pomegranate Sapling",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Pomegranate",
+      "fruitHarvestCycle": 1,
+      "fruitBaseSellPrice": 140,
+      "isFruitEdible": true,
+      "fruitEnergy": 38,
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Oak Tree",
+      "source": "Acorns",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Oak Resin",
+      "fruitHarvestCycle": 7,
+      "fruitBaseSellPrice": 150,
+      "isFruitEdible": false,
+      "fruitEnergy": null,
+      "season": ["Special"]
+    },
+    {
+      "name": "Maple Tree",
+      "source": "Maple Seeds",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Maple Syrup",
+      "fruitHarvestCycle": 9,
+      "fruitBaseSellPrice": 200,
+      "isFruitEdible": false,
+      "fruitEnergy": null,
+      "season": ["Special"]
+    },
+    {
+      "name": "Pine Tree",
+      "source": "Pine Cones",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Pine Tar",
+      "fruitHarvestCycle": 6,
+      "fruitBaseSellPrice": 100,
+      "isFruitEdible": false,
+      "fruitEnergy": null,
+      "season": ["Special"]
+    },
+    {
+      "name": "Mahogany Tree",
+      "source": "Mahogany Seeds",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Sap",
+      "fruitHarvestCycle": 1,
+      "fruitBaseSellPrice": 2,
+      "isFruitEdible": true,
+      "fruitEnergy": null,
+      "season": ["Special"]
+    },
+    {
+      "name": "Mushroom Tree",
+      "source": "Mushroom Tree Seeds",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Common Mushroom",
+      "fruitHarvestCycle": 1,
+      "fruitBaseSellPrice": 40,
+      "isFruitEdible": true,
+      "fruitEnergy": 38,
+      "season": ["Special"]
+    },
+    {
+      "name": "Mystic Tree",
+      "source": "Mystic Tree Seeds",
+      "stages": [7, 7, 7, 7],
+      "totalHarvestTime": 28,
+      "fruit": "Mystic Syrup",
+      "fruitHarvestCycle": 7,
+      "fruitBaseSellPrice": 1000,
+      "isFruitEdible": true,
+      "fruitEnergy": 500,
+      "season": ["Special"]
+    }
+  ]
+}

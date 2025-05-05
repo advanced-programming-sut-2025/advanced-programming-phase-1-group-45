@@ -1,19 +1,16 @@
 package managers;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import managers.Turn.PlayerTurnManager;
-import models.Player;
+import models.User;
 import models.GameSession;
-//import gson.*;
 import java.io.*;
 import java.util.*;
 import java.nio.file.*;
-
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+//import com.google.gson.Gson;
 public class GameManager {
     private Map<String, List<GameSession>> gameSessions = new HashMap<>();
     private Path storage = Paths.get("games.json");
     private Gson gson = new Gson();
-    public PlayerTurnManager playerTurnManager;
     public GameManager() {load();}
     public void saveSession(GameSession session) {save();}
     public void endSession(GameSession session){
@@ -23,7 +20,7 @@ public class GameManager {
         }
         save();
     }
-    public GameSession loadLastSession(Player u){
+    public GameSession loadLastSession(User u){
         List<GameSession> sessions = gameSessions.get(u.getUsername());
         if(sessions == null || sessions.isEmpty()) return null;
         return sessions.get(sessions.size()-1);

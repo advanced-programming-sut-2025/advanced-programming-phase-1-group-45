@@ -1,0 +1,192 @@
+{
+  "seeds": [
+    {
+      "name": "Jazz Seeds",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Carrot Seeds",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Cauliflower Seeds",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Coffee Bean",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Garlic Seeds",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Bean Starter",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Kale Seeds",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Parsnip Seeds",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Potato Seeds",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Rhubarb Seeds",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Strawberry Seeds",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Tulip Bulb",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Rice Shoot",
+      "season": ["SPRING"]
+    },
+    {
+      "name": "Blueberry Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Corn Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Hops Starter",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Pepper Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Melon Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Poppy Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Radish Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Red Cabbage Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Starfruit Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Spangle Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "SUMMER Squash Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Sunflower Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Tomato Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Wheat Seeds",
+      "season": ["SUMMER"]
+    },
+    {
+      "name": "Amaranth Seeds",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Artichoke Seeds",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Beet Seeds",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Bok Choy Seeds",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Broccoli Seeds",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Cranberry Seeds",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Eggplant Seeds",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Fairy Seeds",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Grape Starter",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Pumpkin Seeds",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Yam Seeds",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Rare Seed",
+      "season": ["AUTUMN"]
+    },
+    {
+      "name": "Powdermelon Seeds",
+      "season": ["WINTER"]
+    },
+    {
+      "name": "Ancient Seeds",
+      "season": ["Special"]
+    },
+    {
+      "name": "Mixed Seeds",
+      "season": ["Special"]
+    },
+    {
+      "name": "Acorns",
+      "season": ["Special"]
+    },
+    {
+      "name": "Maple Seeds",
+      "season": ["Special"]
+    },
+    {
+      "name": "Pine Cones",
+      "season": ["Special"]
+    },
+    {
+      "name": "Mahogany Seeds",
+      "season": ["Special"]
+    },
+    {
+      "name": "Mushroom Tree Seeds",
+      "season": ["Special"]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-package managers.time;
+package managers;
 
 import controllers.WeatherController;
 import models.Events.*;
@@ -23,7 +23,7 @@ public class TimeManager {
 
     public void nextTurn() {
         turnsTaken++;
-        GameEventBus.INSTANCE.post(new TurnChangedEvent(hour, day, season));
+        GameEventBus.INSTANCE.post(new TurnAdvancedEvent(hour, day, season));
         if (turnsTaken == 3) {
             advanceHour();
             turnsTaken = 0;
@@ -39,20 +39,20 @@ public class TimeManager {
         }
     }
 
-    public void advanceDay() {
+    private void advanceDay() {
         day++;
         totalDaysPlayed++;
-        GameEventBus.INSTANCE.post(new DayChangedEvent(day, season));
+        GameEventBus.INSTANCE.post(new DayChangedEvent(hour, day, season));
         if (day == 28) {
             advanceSeason();
         }
     }
 
-    public void advanceSeason() {
+    private void advanceSeason() {
         Season previousSeason = season;
         season = season.next();
         day = 1;
-        GameEventBus.INSTANCE.post(new SeasonChangedEvent(hour, day, previousSeason, season));
+        GameEventBus.INSTANCE.post(new SeasonChangedEvent(previousSeason, season));
     }
 
     public int getTotalDaysPlayed() {

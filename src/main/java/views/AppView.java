@@ -1,14 +1,6 @@
 package views;
 
-import models.Player;
+import models.Enums.Menu;
 
 public class AppView {
-    Player currentPlayer;
-    public void setCurrentUser(Player currentPlayer) {
-        this.currentPlayer = currentPlayer;
-    }
-    public Player getCurrentUser() {
-        return currentPlayer;
-    }
-
 }
