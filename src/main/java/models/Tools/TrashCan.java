@@ -1,4 +1,4 @@
-package models;
+package models.Tools;
 
-public class TrashCan {
+public class TrashCan extends Tool {
 }

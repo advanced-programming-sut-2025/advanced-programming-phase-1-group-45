@@ -1,11 +1,14 @@
 package models;
 
+import managers.PlayerTurnManager;
+
 import java.util.*;
 import java.util.Map;
 
 public class GameSession {
-    private List<String> players;
+    private static List<String> players;
     private int mapNumber = 0;
+    private PlayerTurnManager playerTurnManager;
     private int turn = 0;
     private boolean voteInProgress = false;
     private String voteStarter;
@@ -24,7 +27,7 @@ public class GameSession {
     public int getMapNumber() {return mapNumber;}
     public int getTurn(){return turn;}
     public List<String> getPlayers(){return players;}
-    public String getCurrentPlayer(){return players.get(turn%players.size());}
+    public static String getCurrentPlayer(){return players.get(turn%players.size());}
     public boolean isVoteInProgress(){return voteInProgress;}
     public void setMap(GameMap map) {
         this.map = map;

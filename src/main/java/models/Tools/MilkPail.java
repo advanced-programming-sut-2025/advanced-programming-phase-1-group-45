@@ -1,4 +1,4 @@
-package models;
+package models.Tools;
 
-public class MilkPail {
+public class MilkPail extends Tool {
 }

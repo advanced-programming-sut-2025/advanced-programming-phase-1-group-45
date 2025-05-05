@@ -4,6 +4,6 @@ import java.util.List;
 
 public class Barn extends Building{
     private int capacity;
-    private List<Animal> housedAnimals;
+  //  private List<Animal> housedAnimals;
 }
 

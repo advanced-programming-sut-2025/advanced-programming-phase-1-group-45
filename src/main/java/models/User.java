@@ -2,6 +2,16 @@ package models;
 
 import java.util.HashMap;
 import java.util.Map;
+import managers.TimeManager;
+import models.Events.GameEventBus;
+import models.Events.ToolChangedEvent;
+import models.Events.TurnChangedEvent;
+import models.Tools.Axe;
+import models.Tools.Hoe;
+import models.Tools.Tool;
+import java.lang.reflect.InvocationTargetException;
+
+import static java.lang.Class.forName;
 
 public class User{
     private String username;
@@ -16,6 +26,7 @@ public class User{
     private double money = 0.0;
     private Map<String, Integer> inventory = new HashMap<>();
     private double energy;
+    private Tool currentTool;
 
     public User(String username, String passwordHash, String nickname, String email, String gender){
         this.username = username;
@@ -88,6 +99,9 @@ public class User{
         }
         return false;
     }
+    public Map<String, Integer> getInventory() {
+        return inventory;
+    }
 
     public void setMoney(double money) {
         this.money = money;
@@ -97,6 +111,33 @@ public class User{
     public void applyEnergyPenalty() {
         this.energy *= 0.5;
     }
+
+
+    //Tool
+    public void equipTool(String toolName) {
+        if(hasItem(toolName)){
+            try {
+                Class<?> toolClass = Class.forName(toolName);
+                Object instance = toolClass.getDeclaredConstructor().newInstance();
+                currentTool = (Tool) instance;
+            } catch (Exception e) {
+                System.out.println("Error finding tool: " + toolName);
+            }
+            GameEventBus.INSTANCE.post(new ToolChangedEvent(toolName,
+                    TimeManager.getInstance().getTimeString(),
+                    this));
+        }
+        else {
+            //TODO
+        }
+    }
+
+    public Tool getCurrentTool() {
+        return currentTool;
+    }
+
+
+    //turn manager
     public void onTurnEnd() {
         gamesPlayed++;
         //TODO

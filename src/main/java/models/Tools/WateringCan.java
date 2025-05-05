@@ -1,4 +1,4 @@
-package models;
+package models.Tools;
 
-public class wateringCan {
+public class WateringCan extends Tool {
 }

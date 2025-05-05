@@ -1,4 +1,4 @@
-package models;
+package models.Tools;
 
-public class Axe {
+public class Axe extends Tool {
 }

@@ -1,4 +1,4 @@
-package models;
+package models.Tools;
 
-public class FishingPole {
+public class FishingPole extends Tool {
 }

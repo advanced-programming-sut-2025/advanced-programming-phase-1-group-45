@@ -1,4 +1,4 @@
-package models;
+package models.Tools;
 
-public class Pickaxe {
+public class Pickaxe extends Tool {
 }

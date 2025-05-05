@@ -1,5 +1,7 @@
 package models;
 
+import models.Tools.Backpack;
+
 public class Cooking {
     Backpack backpack;
     public void refrigerator(){}
