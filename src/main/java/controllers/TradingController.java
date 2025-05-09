@@ -1,6 +1,6 @@
 package controllers;
 
-import models.Tools.Backpack;
+import models.Tools.Backpack.Backpack;
 
 public class TradingController {
     public void request() {

@@ -1,6 +1,6 @@
 package models;
 
-import models.Tools.Backpack;
+import models.Tools.Backpack.Backpack;
 
 public class Cooking {
     Backpack backpack;
