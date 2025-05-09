@@ -297,7 +297,7 @@ public class UserManager {
         System.out.println("product " + product + " has been sold");
     }
 
-    public class MapUtils(){
+    public class MapUtils{
         public static boolean isNearToBin(GameMap map, int x, int y) {
             int [][] directions = {{0, 1},{1, 0},{0, -1},{-1, 0}};
             for(int[] d : directions){
