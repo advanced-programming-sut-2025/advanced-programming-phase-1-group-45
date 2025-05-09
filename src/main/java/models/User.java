@@ -2,6 +2,9 @@ package models;
 
 import java.util.HashMap;
 import java.util.Map;
+import managers.TimeManager;
+import models.Events.TurnChangedEvent;
+
 
 public class User{
     private String username;
