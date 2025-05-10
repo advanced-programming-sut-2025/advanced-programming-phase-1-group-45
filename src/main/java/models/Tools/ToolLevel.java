@@ -1,11 +1,12 @@
-package models.Tools.hoe;
+package models.Tools;
 
 import com.google.common.eventbus.Subscribe;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
-import models.Farming;
+import models.Mining;
+import models.Tools.Pickaxe.PickaxeType;
 
-public enum HoeLevel {
+public enum ToolLevel {
     BASIC("Basic", 5),
     COPPER("Copper", 4),
     IRON("Iron", 3),
@@ -14,9 +15,9 @@ public enum HoeLevel {
 
     private final String name;
     private final int energy;
-    private int farmingReachedToMaxLevel = 0;
+    private int abilityReachedToLastLevel = 0;
 
-    HoeLevel(String name, int energy) {
+    ToolLevel(String name, int energy) {
         this.name = name;
         this.energy = energy;
         GameEventBus.INSTANCE.register(this);
@@ -26,11 +27,11 @@ public enum HoeLevel {
         return name;
     }
 
-    public int getEnergy() {
-        return energy - farmingReachedToMaxLevel;
+    public int getEnergy(){
+        return energy;
     }
 
-    public HoeLevel getNextLevel() {
+    public ToolLevel getNextLevel() {
         return switch (this) {
             case BASIC -> COPPER;
             case COPPER -> IRON;
@@ -40,10 +41,5 @@ public enum HoeLevel {
         };
     }
 
-    @Subscribe
-    public void onReachedMaxLevel(AbilityReachedMaxLevel event) {
-        if (event.ability() instanceof Farming) {
-            farmingReachedToMaxLevel = 1;
-        }
-    }
+
 }

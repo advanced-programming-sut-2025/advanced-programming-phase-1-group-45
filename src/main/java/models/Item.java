@@ -1,6 +1,6 @@
 package models;
 
-public abstract class Item {
+public class Item {
     private final String itemName;
     private final Class<?> itemSuperClass;
     public Item(String itemName, Class<?> itemSuperClass) {

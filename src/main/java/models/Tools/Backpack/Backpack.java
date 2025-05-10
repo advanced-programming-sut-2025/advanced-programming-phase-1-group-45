@@ -1,18 +1,26 @@
 package models.Tools.Backpack;
 
+import com.google.common.eventbus.Subscribe;
+import models.Events.GameEventBus;
+import models.Events.UpgradeToolEvent;
 import models.Item;
+import models.Tools.Tool;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class Backpack {
 
     private BackpackType backpackType;
-    private Map<Item, Integer> items;
+    private HashMap<Item, Integer> items;
+    private List<Tool> tools;
 
     public Backpack(int capacity) {
         this.backpackType = BackpackType.BASIC;
         this.items = new HashMap<>();
+        this.tools = new ArrayList<>();
+        GameEventBus.INSTANCE.register(this);
     }
 
     public void addItemAmount(Item item, int amount) {
@@ -59,6 +67,19 @@ public class Backpack {
 
     public void upgradeBackpack() {
         this.backpackType = backpackType.upgrade();
+    }
+
+    public void addTool(Tool tool) {
+        tools.add(tool);
+    }
+
+    @Subscribe
+    public void onToolUpgrade(UpgradeToolEvent event) {
+        int toolIndex = tools.indexOf(event.getTool());
+        Tool oldTool = tools.get(toolIndex);
+        tools.get(toolIndex).upgrade();
+        System.out.println(tools.get(toolIndex).getName() + " upgraded to " +
+                event.getTool().getLevel() + " level.");
     }
 
 }

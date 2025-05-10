@@ -1,6 +1,7 @@
 package models.Tools;
 
 import models.Item;
+import org.checkerframework.checker.fenum.qual.Fenum;
 
 public abstract class Tool extends Item {
     protected String toolName;
@@ -11,7 +12,8 @@ public abstract class Tool extends Item {
         this.energy = energy;
     }
 
-    public abstract String useTool();
+    public abstract void useTool();
+
 
     public String getName() {
         return toolName;
