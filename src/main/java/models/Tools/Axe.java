@@ -5,10 +5,9 @@ import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Foraging;
-import models.Tools.hoe.Hoe;
 import models.User;
 
-public class Axe extends Tool implements UpgradeAble{
+public class Axe extends Tool implements UpgradeAbleTool {
     private ToolLevel level;
     private int foragingReachedToMaxLevel = 0;
 
@@ -35,10 +34,9 @@ public class Axe extends Tool implements UpgradeAble{
 
     @Override
     public void upgrade() {
-        ToolLevel newHoeLevel = level.getNextLevel();
-        if (newHoeLevel != null) {
-            level = newHoeLevel;
-            models.Tools.hoe.Hoe newHoe = new Hoe(level);
+        ToolLevel newAxeLevel = level.getNextLevel();
+        if (newAxeLevel != null) {
+            level = newAxeLevel;
             GameEventBus.INSTANCE.post(new UpgradeToolEvent(this));
         } else {
             System.out.println("you reached to the last level");

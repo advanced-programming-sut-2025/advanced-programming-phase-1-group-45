@@ -7,10 +7,10 @@ import models.Events.UpgradeToolEvent;
 import models.Farming;
 import models.Tools.Tool;
 import models.Tools.ToolLevel;
-import models.Tools.UpgradeAble;
+import models.Tools.UpgradeAbleTool;
 import models.User;
 
-public class Hoe extends Tool implements UpgradeAble {
+public class Hoe extends Tool implements UpgradeAbleTool {
     private ToolLevel level;
     private int farmingReachedToMaxLevel = 0;
 
@@ -40,7 +40,6 @@ public class Hoe extends Tool implements UpgradeAble {
         ToolLevel newHoeLevel = level.getNextLevel();
         if (newHoeLevel != null) {
             level = newHoeLevel;
-            Hoe newHoe = new Hoe(level);
             GameEventBus.INSTANCE.post(new UpgradeToolEvent(this));
         } else {
             System.out.println("you reached to the last level");

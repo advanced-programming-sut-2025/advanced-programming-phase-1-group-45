@@ -1,6 +1,6 @@
 package models.Tools;
 
-public interface UpgradeAble {
+public interface UpgradeAbleTool {
 
     public abstract void upgrade();
 

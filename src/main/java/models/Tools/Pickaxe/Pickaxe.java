@@ -7,10 +7,10 @@ import models.Events.UpgradeToolEvent;
 import models.Mining;
 import models.Tools.Tool;
 import models.Tools.ToolLevel;
-import models.Tools.UpgradeAble;
+import models.Tools.UpgradeAbleTool;
 import models.User;
 
-public class Pickaxe extends Tool implements UpgradeAble {
+public class Pickaxe extends Tool implements UpgradeAbleTool {
     private ToolLevel level;
     private int miningReachedLastLevel = 0;
 
@@ -40,7 +40,6 @@ public class Pickaxe extends Tool implements UpgradeAble {
         ToolLevel newPickaxeLevel = level.getNextLevel();
         if (newPickaxeLevel != null) {
             level = newPickaxeLevel;
-            Pickaxe newPickaxe = new Pickaxe(level);
             GameEventBus.INSTANCE.post(new UpgradeToolEvent(this));
         } else {
             System.out.println("you reached to the last level");

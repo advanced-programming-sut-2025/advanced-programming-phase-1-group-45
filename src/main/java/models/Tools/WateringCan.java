@@ -7,7 +7,7 @@ import models.Events.UpgradeToolEvent;
 import models.Farming;
 import models.User;
 
-public class WateringCan extends Tool implements UpgradeAble{
+public class WateringCan extends Tool implements UpgradeAbleTool {
     private ToolLevel level;
     private int farmingReachedLastLevel = 0;
 

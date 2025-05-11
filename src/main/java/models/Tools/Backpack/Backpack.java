@@ -5,6 +5,7 @@ import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Item;
 import models.Tools.Tool;
+import models.Tools.UpgradeAbleTool;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,8 +77,8 @@ public class Backpack {
     @Subscribe
     public void onToolUpgrade(UpgradeToolEvent event) {
         int toolIndex = tools.indexOf(event.getTool());
-        Tool oldTool = tools.get(toolIndex);
-        tools.get(toolIndex).upgrade();
+        UpgradeAbleTool oldTool = (UpgradeAbleTool) tools.get(toolIndex);
+        oldTool.upgrade();
         System.out.println(tools.get(toolIndex).getName() + " upgraded to " +
                 event.getTool().getLevel() + " level.");
     }
