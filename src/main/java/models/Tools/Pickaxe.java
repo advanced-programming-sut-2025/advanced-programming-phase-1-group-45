@@ -15,7 +15,7 @@ public class Pickaxe extends Tool implements UpgradeAbleTool {
     private int miningReachedLastLevel = 0;
 
     public Pickaxe(ToolLevel level) {
-        super(level.getName(), level.getEnergy());
+        super("Pickaxe", level.getEnergy());
         this.level = level;
         GameEventBus.INSTANCE.register(this);
     }
