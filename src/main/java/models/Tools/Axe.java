@@ -1,6 +1,7 @@
 package models.Tools;
 
 import com.google.common.eventbus.Subscribe;
+import models.Enums.Tile;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
@@ -18,13 +19,23 @@ public class Axe extends Tool implements UpgradeAbleTool {
     }
 
     @Override
-    public void useTool() {
-        if (User.getEnergy < level.getEnergy()) {
+    public void decreaseEnergy() {
+        int energy = level.getEnergy() - foragingReachedToMaxLevel;
+        if (User.getEnergy < energy) {
             throw new IllegalArgumentException("You do not have enough energy to use this tool.");
         }
-        //TODO
-        //shokm zadan
-        User.decreaseEnergy(level.getEnergy() - foragingReachedToMaxLevel);
+        User.decreaseEnergy(energy);
+    }
+
+    @Override
+    public void useTool(Tile targetTile) {
+        if (targetTile.getDescription().equalsIgnoreCase("tree")) {
+            targetTile.changeSymbol(Tile.PLAIN.getSymbol());
+            targetTile.changeDescription(Tile.PLAIN.getDescription());
+            System.out.println("The tree cut successfully.");
+        } else {
+            throw new IllegalArgumentException("You can not use this tool in this direction.");
+        }
     }
 
     @Override

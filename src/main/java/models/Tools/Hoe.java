@@ -1,13 +1,11 @@
-package models.Tools.Hoe;
+package models.Tools;
 
 import com.google.common.eventbus.Subscribe;
+import models.Enums.Tile;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Farming;
-import models.Tools.Tool;
-import models.Tools.ToolLevel;
-import models.Tools.UpgradeAbleTool;
 import models.User;
 
 public class Hoe extends Tool implements UpgradeAbleTool {
@@ -21,13 +19,22 @@ public class Hoe extends Tool implements UpgradeAbleTool {
     }
 
     @Override
-    public void useTool() {
-        if (User.getEnergy < level.getEnergy()) {
+    public void decreaseEnergy() {
+        int energy = level.getEnergy() - farmingReachedToMaxLevel;
+        if (User.getEnergy < energy) {
             throw new IllegalArgumentException("You do not have enough energy to use this tool.");
         }
-        //TODO
-        //shokm zadan
-        User.decreaseEnergy(level.getEnergy() - farmingReachedToMaxLevel);
+        User.decreaseEnergy(energy);
+    }
+
+    @Override
+    public void useTool(Tile targetTile) {
+        if (targetTile.getDescription().equalsIgnoreCase("Plain")
+                && !targetTile.isTilled()) {
+            targetTile.tillThisTileWithHoe();
+        } else {
+            throw new IllegalArgumentException("You can not use this tool in this direction.");
+        }
     }
 
     @Override

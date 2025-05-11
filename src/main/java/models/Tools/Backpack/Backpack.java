@@ -25,7 +25,7 @@ public class Backpack {
     }
 
     public void addItemAmount(Item item, int amount) {
-        if (backpackType.canAddItem(items.size())) {
+        if (backpackType.canAddItem(items.size() + tools.size())) {
             if (items.containsKey(item)) {
                 items.put(item, items.get(item) + amount);
             } else {
@@ -71,7 +71,9 @@ public class Backpack {
     }
 
     public void addTool(Tool tool) {
-        tools.add(tool);
+        if(backpackType.canAddItem(items.size() + tools.size())) {
+            tools.add(tool);
+        }
     }
 
     @Subscribe

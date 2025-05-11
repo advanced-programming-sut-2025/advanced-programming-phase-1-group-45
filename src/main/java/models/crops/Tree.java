@@ -1,4 +1,9 @@
 package models.crops;
 
-public class Tree {
+import models.Item;
+
+public class Tree extends Item {
+    public Tree(String itemName, Class<?> itemSuperClass) {
+        super(itemName, itemSuperClass);
+    }
 }

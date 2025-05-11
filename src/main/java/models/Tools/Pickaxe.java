@@ -1,11 +1,13 @@
 package models.Tools;
 
 import com.google.common.eventbus.Subscribe;
+import models.Enums.Tile;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Mining;
 import models.User;
+import models.crops.Stone;
 
 public class Pickaxe extends Tool implements UpgradeAbleTool {
     private ToolLevel level;
@@ -18,13 +20,34 @@ public class Pickaxe extends Tool implements UpgradeAbleTool {
     }
 
     @Override
-    public void useTool() {
-        if (User.getEnergy < level.getEnergy()) {
+    public void decreaseEnergy() {
+        int energy = level.getEnergy() - miningReachedLastLevel;
+        if (User.getEnergy < energy) {
             throw new IllegalArgumentException("You do not have enough energy to use this tool.");
         }
-        //TODO
-        //shokm zadan
-        User.decreaseEnergy(Math.max(level.getEnergy() - miningReachedLastLevel, 0));
+        User.decreaseEnergy(energy);
+    }
+
+    @Override
+    public void useTool(Tile targetTile) {
+        checkingTargetTile(targetTile);
+        if ((targetTile.getItem() instanceof Stone)&&
+
+                || targetTile.isTilled()) {
+            targetTile.tillThisTileWithHoe();
+        } else {
+            throw new IllegalArgumentException("You can not use this tool in this direction.");
+        }
+    }
+    protected void checkingTargetTile(Tile targetTile) {
+        if ((targetTile.getItem() instanceof Stone)){
+            Stone stone = (Stone) targetTile.getItem();
+
+        }
+        else if(targetTile.isTilled()){
+            targetTile.untilThisTileWithPickaxe();
+        }
+
     }
 
     @Override
