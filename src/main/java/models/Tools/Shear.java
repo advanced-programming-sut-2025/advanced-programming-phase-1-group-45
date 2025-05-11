@@ -3,8 +3,8 @@ package models.Tools;
 import models.User;
 
 public class Shear extends Tool{
-    public Shear(String itemName, int energy) {
-        super(itemName, energy);
+    public Shear(int energy) {
+        super("Shear", energy);
     }
 
     @Override

@@ -1,13 +1,10 @@
-package models.Tools.Pickaxe;
+package models.Tools;
 
 import com.google.common.eventbus.Subscribe;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Mining;
-import models.Tools.Tool;
-import models.Tools.ToolLevel;
-import models.Tools.UpgradeAbleTool;
 import models.User;
 
 public class Pickaxe extends Tool implements UpgradeAbleTool {

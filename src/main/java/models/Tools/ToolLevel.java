@@ -1,10 +1,6 @@
 package models.Tools;
 
-import com.google.common.eventbus.Subscribe;
-import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
-import models.Mining;
-import models.Tools.Pickaxe.PickaxeType;
 
 public enum ToolLevel {
     BASIC("Basic", 5),

@@ -12,7 +12,7 @@ public class Axe extends Tool implements UpgradeAbleTool {
     private int foragingReachedToMaxLevel = 0;
 
     public Axe(ToolLevel level) {
-        super(level.getName(), level.getEnergy());
+        super("Axe", level.getEnergy());
         this.level = level;
         GameEventBus.INSTANCE.register(this);
     }
@@ -46,7 +46,7 @@ public class Axe extends Tool implements UpgradeAbleTool {
     @Subscribe
     public void onReachedMaxLevel(AbilityReachedMaxLevel event) {
         if (event.ability() instanceof Foraging) {
-            foragingReachedToMaxLevel= 1;
+            foragingReachedToMaxLevel = 1;
         }
     }
 }

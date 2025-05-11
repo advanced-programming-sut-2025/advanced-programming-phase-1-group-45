@@ -1,5 +1,7 @@
 package models.Tools.Backpack;
 
+import models.Tools.UpgradeAbleTool;
+
 public enum BackpackType {
     BASIC("Basic", 12) {
         @Override

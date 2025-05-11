@@ -12,7 +12,7 @@ public class WateringCan extends Tool implements UpgradeAbleTool {
     private int farmingReachedLastLevel = 0;
 
     public WateringCan(ToolLevel level) {
-        super(level.getName(), level.getEnergy());
+        super("WateringCan", level.getEnergy());
         this.level = level;
         GameEventBus.INSTANCE.register(this);
     }

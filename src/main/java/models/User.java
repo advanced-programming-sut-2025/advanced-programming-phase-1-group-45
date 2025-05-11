@@ -6,10 +6,7 @@ import managers.TimeManager;
 import models.Events.GameEventBus;
 import models.Events.ToolChangedEvent;
 import models.Events.TurnChangedEvent;
-import models.Tools.Axe;
-import models.Tools.Hoe;
 import models.Tools.Tool;
-import java.lang.reflect.InvocationTargetException;
 
 import static java.lang.Class.forName;
 

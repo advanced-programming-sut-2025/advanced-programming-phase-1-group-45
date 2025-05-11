@@ -4,8 +4,8 @@ import models.User;
 
 public class Scythe extends Tool {
 
-    public Scythe(String itemName, int energy) {
-        super(itemName, energy);
+    public Scythe(int energy) {
+        super("Scythe", energy);
     }
 
     @Override

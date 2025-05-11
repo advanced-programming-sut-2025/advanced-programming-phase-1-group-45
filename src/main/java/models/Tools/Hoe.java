@@ -1,13 +1,10 @@
-package models.Tools.hoe;
+package models.Tools;
 
 import com.google.common.eventbus.Subscribe;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Farming;
-import models.Tools.Tool;
-import models.Tools.ToolLevel;
-import models.Tools.UpgradeAbleTool;
 import models.User;
 
 public class Hoe extends Tool implements UpgradeAbleTool {
