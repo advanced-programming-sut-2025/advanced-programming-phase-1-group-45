@@ -34,6 +34,7 @@ public class GameManager {
         if(users.size() < 1 || users.size() > 3){
             System.out.println("Number on users must be between 1 and 3");
         }
+
         users.add(0, currentUser);
         var s = new GameSession(users);
         for(var u: users){

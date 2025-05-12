@@ -1,6 +1,6 @@
 package controllers;
 
-import models.Backpack;
+import models.Tools.Backpack.Backpack;
 
 public class TradingController {
     public void request() {
@@ -13,8 +13,7 @@ public class TradingController {
         Backpack backpack;
     }
 
-    public boolean tradeResponse() {
-    }
+
 
     public void tradeHistory() {
     }

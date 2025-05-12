@@ -1,5 +1,7 @@
 package models;
 
+import models.Tools.Backpack.Backpack;
+
 public class Cooking {
     Backpack backpack;
     public void refrigerator(){}
@@ -13,8 +15,5 @@ public class Cooking {
         Backpack backpack = new Backpack();
         Energy energy = new Energy();
     }
-    //check it
-    private Energy buff(){
 
-    }
 }

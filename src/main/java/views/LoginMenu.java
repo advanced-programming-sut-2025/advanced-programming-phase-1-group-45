@@ -1,13 +1,13 @@
 package views;
 
 import controllers.MenuController;
-import models.User;
+import models.Player;
 
 public class LoginMenu implements Menu{
     @Override
     public void handleCommand(String command, MenuController controller){
         if(command.startsWith("login")){
-            User u = controller.getUserManager().login(command);
+            Player u = controller.getUserManager().login(command);
             if(u != null){
                 controller.setCurrentUser(u);
                 System.out.println("Login Successful, moving to main menu");

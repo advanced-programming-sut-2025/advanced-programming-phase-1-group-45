@@ -1,6 +1,4 @@
 package models;
-import models.Crop;
-import enums.Season;
 
 public class Farming implements Ability {
     public void plowing(){}
