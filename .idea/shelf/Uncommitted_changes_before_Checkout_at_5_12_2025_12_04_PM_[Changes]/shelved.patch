@@ -1,0 +1,60 @@
+Index: src/main/java/models/crops/Minerals.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models.crops;\r\n\r\nimport models.Item;\r\n\r\npublic class Stone extends Item {\r\n    public Stone(String itemName, Class<?> itemSuperClass) {\r\n        super(itemName, itemSuperClass);\r\n    }\r\n    public String getLevel(){\r\n        return\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/models/crops/Minerals.java b/src/main/java/models/crops/Minerals.java
+--- a/src/main/java/models/crops/Minerals.java	(revision eb544cd50f1a58b26e5df76665375d13f4d49b35)
++++ b/src/main/java/models/crops/Minerals.java	(date 1747002509144)
+@@ -2,11 +2,9 @@
+ 
+ import models.Item;
+ 
+-public class Stone extends Item {
+-    public Stone(String itemName, Class<?> itemSuperClass) {
++public class Minerals extends Item {
++    public Minerals(String itemName, Class<?> itemSuperClass) {
+         super(itemName, itemSuperClass);
+     }
+-    public String getLevel(){
+-        return
+-    }
++
+ }
+Index: src/main/java/models/Tools/Pickaxe.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models.Tools;\r\n\r\nimport com.google.common.eventbus.Subscribe;\r\nimport models.Enums.Tile;\r\nimport models.Events.AbilityReachedMaxLevel;\r\nimport models.Events.GameEventBus;\r\nimport models.Events.UpgradeToolEvent;\r\nimport models.Mining;\r\nimport models.User;\r\nimport models.crops.Stone;\r\n\r\npublic class Pickaxe extends Tool implements UpgradeAbleTool {\r\n    private ToolLevel level;\r\n    private int miningReachedLastLevel = 0;\r\n\r\n    public Pickaxe(ToolLevel level) {\r\n        super(\"Pickaxe\", level.getEnergy());\r\n        this.level = level;\r\n        GameEventBus.INSTANCE.register(this);\r\n    }\r\n\r\n    @Override\r\n    public void decreaseEnergy() {\r\n        int energy = level.getEnergy() - miningReachedLastLevel;\r\n        if (User.getEnergy < energy) {\r\n            throw new IllegalArgumentException(\"You do not have enough energy to use this tool.\");\r\n        }\r\n        User.decreaseEnergy(energy);\r\n    }\r\n\r\n    @Override\r\n    public void useTool(Tile targetTile) {\r\n        checkingTargetTile(targetTile);\r\n        if ((targetTile.getItem() instanceof Stone)&&\r\n\r\n                || targetTile.isTilled()) {\r\n            targetTile.tillThisTileWithHoe();\r\n        } else {\r\n            throw new IllegalArgumentException(\"You can not use this tool in this direction.\");\r\n        }\r\n    }\r\n    protected void checkingTargetTile(Tile targetTile) {\r\n        if ((targetTile.getItem() instanceof Stone)){\r\n            Stone stone = (Stone) targetTile.getItem();\r\n\r\n        }\r\n        else if(targetTile.isTilled()){\r\n            targetTile.untilThisTileWithPickaxe();\r\n        }\r\n\r\n    }\r\n\r\n    @Override\r\n    public ToolLevel getLevel() {\r\n        return level;\r\n    }\r\n\r\n    @Override\r\n    public void upgrade() {\r\n        ToolLevel newPickaxeLevel = level.getNextLevel();\r\n        if (newPickaxeLevel != null) {\r\n            level = newPickaxeLevel;\r\n            GameEventBus.INSTANCE.post(new UpgradeToolEvent(this));\r\n        } else {\r\n            System.out.println(\"you reached to the last level\");\r\n        }\r\n    }\r\n\r\n    @Subscribe\r\n    public void miningReachedLastLevel(AbilityReachedMaxLevel event) {\r\n        if (event.ability() instanceof Mining) {\r\n            miningReachedLastLevel = 1;\r\n        }\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/models/Tools/Pickaxe.java b/src/main/java/models/Tools/Pickaxe.java
+--- a/src/main/java/models/Tools/Pickaxe.java	(revision eb544cd50f1a58b26e5df76665375d13f4d49b35)
++++ b/src/main/java/models/Tools/Pickaxe.java	(date 1747002509131)
+@@ -7,7 +7,7 @@
+ import models.Events.UpgradeToolEvent;
+ import models.Mining;
+ import models.User;
+-import models.crops.Stone;
++import models.crops.Minerals;
+ 
+ public class Pickaxe extends Tool implements UpgradeAbleTool {
+     private ToolLevel level;
+@@ -31,7 +31,7 @@
+     @Override
+     public void useTool(Tile targetTile) {
+         checkingTargetTile(targetTile);
+-        if ((targetTile.getItem() instanceof Stone)&&
++        if ((targetTile.getItem() instanceof Minerals)&&
+ 
+                 || targetTile.isTilled()) {
+             targetTile.tillThisTileWithHoe();
+@@ -40,8 +40,8 @@
+         }
+     }
+     protected void checkingTargetTile(Tile targetTile) {
+-        if ((targetTile.getItem() instanceof Stone)){
+-            Stone stone = (Stone) targetTile.getItem();
++        if ((targetTile.getItem() instanceof Minerals)){
++            Minerals stone = (Minerals) targetTile.getItem();
+ 
+         }
+         else if(targetTile.isTilled()){

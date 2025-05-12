@@ -1,13 +1,11 @@
 package models;
 
-import models.Enums.PlantType;
 import models.Enums.Season;
-import models.Enums.TreeType;
 import models.Enums.Weather;
 
 public class PlantsAndTrees {
-    private static PlantType[] plantType;
-    private static TreeType[] treeType;
+  //  private static PlantType[] plantType;
+    //private static TreeType[] treeType;
     private String name;
     private Energy energy;
     private Season season;
