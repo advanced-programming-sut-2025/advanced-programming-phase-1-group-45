@@ -1,4 +1,4 @@
-package models.MapElements.Tile;
+package models.MapElements.Tile.TileFeatures;
 
 public abstract class canGrow {
     public boolean harvestAble;

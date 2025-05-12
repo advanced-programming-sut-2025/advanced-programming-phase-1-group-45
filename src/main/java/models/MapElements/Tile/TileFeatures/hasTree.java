@@ -1,5 +1,6 @@
-package models.MapElements.Tile;
+package models.MapElements.Tile.TileFeatures;
 
+import models.MapElements.Tile.Tile;
 import models.crops.Tree;
 
 public class hasTree extends canGrow implements TileFeature, UnWalkAble {

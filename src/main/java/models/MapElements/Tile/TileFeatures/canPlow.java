@@ -1,4 +1,4 @@
-package models.MapElements.Tile;
+package models.MapElements.Tile.TileFeatures;
 
 import com.google.common.eventbus.Subscribe;
 import models.Events.UseToolEvent;

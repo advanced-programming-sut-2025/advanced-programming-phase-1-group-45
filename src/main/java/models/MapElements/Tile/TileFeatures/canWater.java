@@ -1,8 +1,9 @@
-package models.MapElements.Tile;
+package models.MapElements.Tile.TileFeatures;
 
 import com.google.common.eventbus.Subscribe;
 import models.Enums.Weather;
 import models.Events.*;
+import models.MapElements.Tile.Tile;
 import models.Tools.Hoe;
 import models.Tools.WateringCan;
 
@@ -30,6 +31,7 @@ public class canWater implements TileFeature {
     public void water(UseToolEvent event) {
         if (event.tool().getClass().equals(WateringCan.class)) {
             this.isWater = true;
+            daysWithoutWater = 0;
         }
     }
 
@@ -37,7 +39,7 @@ public class canWater implements TileFeature {
     public void watering(WeatherChangedEvent event) {
         if (event.newWeather().equals(Weather.RAINY)) {
             this.isWater = true;
-
+            daysWithoutWater = 0;
         }
     }
 
