@@ -1,12 +1,19 @@
-package models;
-
-import models.Enums.FishType;
-
-public class Fishing implements Ability{
-    private FishType fishType;
-    @Override
-    public void level1(){}
-    public void level2(){}
-    public void level3(){}
-    public void level4(){}
-}
+//package models;
+//
+//import models.Enums.FishType;
+//import models.Enums.SkillType;
+//
+//public class Fishing {
+//    private final Player player;
+//
+//    public Fishing(Player player) {
+//        this.player = player;
+//    }
+//
+//    public void catchFish() {
+//        if (player.consumeEnergy(15)) {
+//            player.addSkillXp(SkillType.FISHING, 5);
+//            System.out.println("Fish caught! +5 Fishing XP");
+//        }
+//    }
+//}

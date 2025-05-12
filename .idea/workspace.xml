@@ -5,40 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time">
-      <change afterPath="$PROJECT_DIR$/src/main/java/models/Enums/SkillType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/models/Player.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/models/Skill.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_4_2025_11_00_PM_[Changes]1/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_4_2025_11_00_PM__Changes_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_4_2025_11_02_PM_[Changes]1/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_4_2025_11_02_PM__Changes_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_4_2025_11_03_PM_[Changes]1/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_4_2025_11_03_PM__Changes_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/controllers/TradingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controllers/TradingController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/managers/FriendshipManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/FriendshipManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/managers/PlayerTurnManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/PlayerTurnManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/managers/ShopManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/ShopManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/managers/TimeManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/TimeManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Animal.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Animal.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/managers/SkillManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/SkillManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Backpack.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Backpack.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/models/Cooking.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Cooking.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Crafting.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Crafting.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Enums/Shop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Enums/Shop.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Energy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Energy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Enums/SkillType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Enums/SkillType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Extraction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Extraction.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/models/Farming.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Farming.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Friendship.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Friendship.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/GameMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/GameMap.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/GreenHouse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/GreenHouse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Hoe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Hoe.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/NPC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/NPC.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Pickaxe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Pickaxe.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/PlantsAndTrees.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/PlantsAndTrees.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Fishing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Fishing.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Player.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/models/Processing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Processing.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/views/ProfileMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/views/ProfileMenu.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,29 +64,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main.executor": "Run",
-    "Maven.javafx-json-app [clean,install,-U].executor": "Run",
-    "Maven.javafx-json-app [clean].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "feature/mahshid",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/PARDAZE/advanced-programming-phase-1-group-45",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "reference.settings.project.maven.repository.indices",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.javafx-json-app [clean,install,-U].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.javafx-json-app [clean].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/mahshid&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/PARDAZE/advanced-programming-phase-1-group-45&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.repository.indices&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunAnythingCache">
     <option name="myCommands">
       <command value="mvn clean install -U" />

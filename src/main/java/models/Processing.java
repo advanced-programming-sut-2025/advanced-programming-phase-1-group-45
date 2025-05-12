@@ -6,6 +6,6 @@ import models.Enums.Machines;
 public class Processing {
     private Machines[] machines;
     //private GameTimeAndDate gameTimeAndDate;
-    Farming farming;
+    //Farming farming;
     //farming.harvest();
 }
