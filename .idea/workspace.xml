@@ -5,12 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_5_2025_12_29_PM_[Changes]1/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_5_2025_12_29_PM__Changes_1.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Foraging.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Foraging.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/CropInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/crops/CropInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/CropManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/crops/CropManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/User.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -135,7 +130,7 @@
       <workItem from="1746892244940" duration="9403000" />
       <workItem from="1746937223780" duration="3411000" />
       <workItem from="1746988154975" duration="7197000" />
-      <workItem from="1747078982622" duration="3959000" />
+      <workItem from="1747078982622" duration="4418000" />
     </task>
     <task id="LOCAL-00001" summary="time manager first">
       <option name="closed" value="true" />
