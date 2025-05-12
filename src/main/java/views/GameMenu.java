@@ -8,6 +8,7 @@ import models.Enums.Shop;
 import models.GameSession;
 import models.Enums.Tile;
 import models.GameMap;
+import java.util.*;
 
 public class GameMenu implements Menu{
     @Override
@@ -17,13 +18,17 @@ public class GameMenu implements Menu{
         ShopManager sm = controller.getShopManager();
         UserManager um = controller.getUserManager();
         if(command.startsWith("game new ")){
-            GameSession s = gm.createNewGame(command, me);
+            GameSession s = gm.createNewGame(command, me, controller);
             if(s != null){
                 controller.setCurrentSession(s);
                 System.out.println("New Game Created, now choose your map");
-            }
+            } else System.out.println("New Game Creation Failed, make sure to enter input correctly.");
         } else if(command.startsWith("game map")){
+            int size = Integer.parseInt(command.split(" ")[2]);
+            GameMap map = new GameMap(size, true);
+            //if 1,2,3 maps
             if(controller.getCurrentSession() != null && gm.selectMap(controller.getCurrentSession(), command)){
+                controller.getCurrentSession().setMap(map);
                 System.out.println("map selected");
             }
         } else if(command.equals("load game")){
@@ -75,27 +80,41 @@ public class GameMenu implements Menu{
                 }
             }
         }
-            if (command.equals("help reading map")){
-                GameMap.printMapLegend();
-            }
-             if(command.startsWith("walk -l")) {
-                GameMap.handleWalkCommand(command, controller);
-            }
-             if(command.startsWith("print map")) {
-                GameMap.handlePrintMap(command, controller);
-            }
-             if(command.startsWith("sell")){
-                um.handleSell(command, controller);
-            }
-             else if(command.equals("show all products")) {
-                 sm.getAllProducts(Shop.GENERAL_STORE);
-             }
-             else if(command.equals("show all available products")) {
-                 sm.getAvailableProducts(Shop.GENERAL_STORE);
-             }
-             else if(command.startsWith("purchase ")) {
-                 handlePurchaseCommand(command, sm, controller);
-             }
+        else if (command.equals("help reading map")){
+            GameMap.printMapLegend();
+        }
+        else if(command.equals("show current menu")){
+            System.out.println("game menu");
+        }
+        else if(command.equals("menu exit")){
+            System.out.println("moving to main menu");
+            controller.setCurrentMenu(new MainMenu());
+        }
+        else if(command.startsWith("walk -l")) {
+            GameMap.handleWalkCommand(command, controller);
+        }
+        else if(command.startsWith("print map")) {
+            //GameMap.handlePrintMap(command, controller);
+            Map<String, String> o = parseOptions(command.split("\\s+"));
+            int[] coords = handleCoords(o.get("-l"));
+            int x = coords[0];
+            int y = coords[1];
+            int s = Integer.parseInt(o.get("-s"));
+            controller.getCurrentSession().getMap().printMapArea(x, y, s);
+
+        }
+        else if(command.startsWith("sell")){
+            um.handleSell(command, controller);
+        }
+        else if(command.equals("show all products")) {
+            sm.getAllProducts(Shop.GENERAL_STORE);
+        }
+        else if(command.equals("show all available products")) {
+            sm.getAvailableProducts(Shop.GENERAL_STORE);
+        }
+        else if(command.startsWith("purchase ")) {
+            handlePurchaseCommand(command, sm, controller);
+        }else System.out.println("invalid command");
     }
 
     private void handlePurchaseCommand(String command, ShopManager sm, MenuController controller) {
@@ -121,4 +140,18 @@ public class GameMenu implements Menu{
             System.out.println("Invalid quantity format!");
         }
     }
+
+    private int[] handleCoords(String coords) {
+        String[] x = coords.split(",");
+        return new int[]{Integer.parseInt(x[0]), Integer.parseInt(x[1])};
     }
+    private Map<String, String> parseOptions(String[] options) {
+        Map<String, String> map = new HashMap<>();
+        for(int i = 1; i < options.length - 1; i++) {
+            if(options[i].startsWith("-")) {
+                map.put(options[i], options[i + 1]);
+            }
+        }
+        return map;
+    }
+}
