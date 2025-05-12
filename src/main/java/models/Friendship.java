@@ -1,7 +1,9 @@
 package models;
 
+import controllers.MenuController;
 import controllers.TradingController;
-import models.time.GameTimeAndDate;
+import managers.UserManager;
+//import models.time.GameTimeAndDate;
  import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
         private final List<Interaction> interactionHistory;
         private boolean isMarried;
         private final List<Gift> pendingGifts = new ArrayList<>();
+        private UserManager um;
 
         public enum InteractionType {
             TALK, TRADE, GIFT, HUG, BOUQUET, MARRIAGE
@@ -186,20 +189,40 @@ import java.util.stream.Collectors;
             checkLevelUp();
         }
 
-        public String sendGift(User sender, String item, int amount) {
-            if (!canInteractToday()) return "Daily interaction limit reached";
-            if (level < 1) return "Friendship level too low";
-            if (!sender.removeItem(item, amount)) return "Not enough items";
+        public void sendGift(String command, MenuController controller) {
+            String[] parts = command.split("\\s+");
+            String item = null;
+            int amount = 1;
+            String receiver = null;
+            User sender = controller.getCurrentUser();
+            for(int i = 0; i < parts.length - 1; i++) {
+                if(parts[i].equals("-u")) {receiver = parts[i + 1];}
+                if(parts[i].equals("-i")) {item = parts[i + 1];}
+                if(parts[i].equals("-a")) {amount = Integer.parseInt(parts[i + 1]);}
+            }
+            if(item == null || receiver == null || amount <= 0) {
+                System.out.println("invalid command");
+                return;
+            }
+            User receiverUser = um.getUser(receiver);
+            if(receiverUser == null) {
+                System.out.println("user not found");
+                return;
+            }
+            if(!controller.getCurrentSession().areNextToEachOther(sender.getUsername(), receiver)) {
+                System.out.println("You should be next to the gift receiver");
+                return;
+            }
+            if (!canInteractToday()) System.out.println("Daily interaction limit reached");
+            if (level < 1) System.out.println("Friendship level too low");
+            if (!sender.removeItem(item, amount)) System.out.println("Not enough items");
 
-            // Determine receiver based on sender
-            User receiver = sender.equals(player1) ? player2 : player1;
-
-            // Create gift with proper parameters
-            Gift gift = new Gift(sender, receiver, item, amount);
-            receiver.addItem(item, amount);
+            Gift gift = new Gift(sender, receiverUser, item, amount);
+            sender.addItem(item, -amount);
+            receiverUser.addItem(item, amount);
             pendingGifts.add(gift);
             addInteraction(InteractionType.GIFT, "Sent " + amount + " " + item);
-            return "Gift sent! ID: " + gift.getId();
+            System.out.println("Gift sent! ID: " + gift.getId());
         }
 
         public String rateGift(String giftId, int rating) {
@@ -218,7 +241,15 @@ import java.util.stream.Collectors;
             return "Gift rated! XP changed by " + xpChange;
         }
 
-        public void processHug() {
+        public void processHug(String command, MenuController controller) {
+            String[] parts = command.split("\\s+");
+            if(parts.length != 2) {
+                System.out.println("invalid command format");
+            }
+            String receiver = parts[1].substring(2);
+            if(controller.getCurrentSession().areNextToEachOther(controller.getCurrentUser().getUsername(), receiver)) {
+                System.out.println("You should be next to the user to hug");
+            }
             if(level >= 2 && validateProximity()) {
                 addInteraction(InteractionType.HUG, "Hugged");
                 this.xp += 60;
