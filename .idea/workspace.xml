@@ -4,19 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Enums/Tile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Enums/Tile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Axe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Axe.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Backpack/Backpack.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Backpack/Backpack.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Hoe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Hoe.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Pickaxe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Pickaxe.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Tool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Tool.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/ToolManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/ToolManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/Crop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/crops/Crop.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/Seed.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/crops/Seed.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/Tree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/crops/Tree.java" afterDir="false" />
-    </list>
+    <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -70,7 +58,7 @@
     "Maven.javafx-json-app [clean,install,-U].executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "#1 on fatemehBranch",
+    "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/ASUS/IdeaProjects/advanced-programming-phase-1-group-45",
