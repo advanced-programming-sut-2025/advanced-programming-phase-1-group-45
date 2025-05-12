@@ -18,7 +18,7 @@ public class User{
     private String securityAnswer = null;
     private double money = 0.0;
     private Map<String, Integer> inventory = new HashMap<>();
-    private double energy;
+    private Player currentPlayer;
 
     public User(String username, String passwordHash, String nickname, String email, String gender){
         this.username = username;
@@ -27,6 +27,7 @@ public class User{
         this.email = email;
         this.gender = gender;
         this.money = 0.0;
+        this.currentPlayer = new Player(200);
     }
     public String getUsername(){ return username; }
     public String getPasswordHash(){ return passwordHash; }
@@ -96,10 +97,6 @@ public class User{
         this.money = money;
     }
 
-    // Energy system
-    public void applyEnergyPenalty() {
-        this.energy *= 0.5;
-    }
     public void onTurnEnd() {
         gamesPlayed++;
         //TODO
@@ -111,4 +108,6 @@ public class User{
        System.out.println(this.username + "'s turn started");
         System.out.println(TimeManager.getInstance().getTimeString());
     }
+
+    public Player getPlayer() { return currentPlayer; }
 }
