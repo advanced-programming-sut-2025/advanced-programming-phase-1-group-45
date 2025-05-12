@@ -1,13 +1,11 @@
 package models;
 
-import models.Enums.PlantType;
 import models.Enums.Season;
-import models.Enums.TreeType;
 import models.Enums.Weather;
 
 public class PlantsAndTrees {
-    private static PlantType[] plantType;
-    private static TreeType[] treeType;
+  //  private static PlantType[] plantType;
+    //private static TreeType[] treeType;
     private String name;
     private Energy energy;
     private Season season;
@@ -21,6 +19,15 @@ public class PlantsAndTrees {
     private boolean eatable;
     private boolean hugeProduct;
     private String fruit;
+    private String coal;
 
+    public String harvestFruit() {
+        return fruit;
+    }
+    public String treeIsBurned(){
+        if(weather.lightning){
+            return coal;
+        }
+    }
     public void crowAttack(){}
 }

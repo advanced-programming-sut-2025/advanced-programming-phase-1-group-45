@@ -148,6 +148,7 @@ public class GameMap {
 
     public static void handleWalkCommand(String command, MenuController controller) {
         try {
+            String user = controller.getCurrentUser().getUsername();
             String[] parts = command.split(" ");
             String[] coords = parts[2].split(",");
             int x = Integer.parseInt(coords[0]);
@@ -181,10 +182,12 @@ public class GameMap {
             System.out.println("Energy needed: " + energyCost + ". Confirm? (Y/N)");
 
             //  تایید کاربر
+            Scanner scanner = null;
             String input = scanner.nextLine();
             if(input.equalsIgnoreCase("Y")) {
                 if(session.getEnergy() >= energyCost) {
                     session.setPlayerPosition(x, y);
+                    session.movePlayer(user,x ,y);
                     session.reduceEnergy(energyCost);
                     System.out.println("Moved successfully!");
                 } else {
