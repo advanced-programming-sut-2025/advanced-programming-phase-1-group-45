@@ -3,7 +3,7 @@ package models.crops;
 import models.Enums.Season;
 import models.Item;
 
-public class Crop extends Item {
+public class CropInfo extends Item {
     private final String name;
     private final String source;
     private final int[] stages;
@@ -16,11 +16,11 @@ public class Crop extends Item {
     private final Season[] season;
     private final boolean canBecomeGiant;
 
-    Crop(String name, String source, int[] stages,
-         int totalHarvestTime, boolean isOneTime, int regrowTime,
-         long baseSellPrice, boolean isEdible, int energy,
-         Season[] season, boolean canBecomeGiant) {
-        super("Crop", Crop.class);
+    CropInfo(String name, String source, int[] stages,
+             int totalHarvestTime, boolean isOneTime, int regrowTime,
+             long baseSellPrice, boolean isEdible, int energy,
+             Season[] season, boolean canBecomeGiant) {
+        super("Crop", CropInfo.class);
         this.name = name;
         this.source = source;
         this.stages = stages;
