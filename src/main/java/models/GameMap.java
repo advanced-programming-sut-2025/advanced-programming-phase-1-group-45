@@ -2,6 +2,7 @@ package models;
 import controllers.MenuController;
 import models.Enums.Tile;
 
+
 import java.util.*;
 
 public class GameMap {
@@ -41,7 +42,7 @@ public class GameMap {
         if(x < 0 || y < 0 || x >= size || y >= size){
             return ;
         }
-         grid[y][x] = tile;
+        grid[y][x] = tile;
     }
 
     private void fillPlain() {
@@ -148,7 +149,6 @@ public class GameMap {
 
     public static void handleWalkCommand(String command, MenuController controller) {
         try {
-            String user = controller.getCurrentUser().getUsername();
             String[] parts = command.split(" ");
             String[] coords = parts[2].split(",");
             int x = Integer.parseInt(coords[0]);
@@ -182,19 +182,17 @@ public class GameMap {
             System.out.println("Energy needed: " + energyCost + ". Confirm? (Y/N)");
 
             //  تایید کاربر
-            Scanner scanner = null;
-            String input = scanner.nextLine();
-            if(input.equalsIgnoreCase("Y")) {
+            // String input = Main.scanner.nextLine();
+           /* if(input.equalsIgnoreCase("Y")) {
                 if(session.getEnergy() >= energyCost) {
                     session.setPlayerPosition(x, y);
-                    session.movePlayer(user,x ,y);
                     session.reduceEnergy(energyCost);
                     System.out.println("Moved successfully!");
                 } else {
                     System.out.println("Insufficient energy! You fainted.");
                    // player.faint();
                 }
-            }
+            }*/
         } catch (Exception e) {
             System.out.println("Invalid command format! Usage: walk -l <x,y>");
         }
@@ -204,10 +202,10 @@ public class GameMap {
         GameSession session = controller.getCurrentSession();
         try {
             String[] parts = command.split(" ");
-            String[] coords = parts[2].split(",");
+            String[] coords = parts[3].split(",");
             int x = Integer.parseInt(coords[0]);
             int y = Integer.parseInt(coords[1]);
-            int size = Integer.parseInt(parts[4]);
+            int size = Integer.parseInt(parts[5]);
 
             session.getMap().printMapArea(x, y, size);
         } catch (Exception e) {
