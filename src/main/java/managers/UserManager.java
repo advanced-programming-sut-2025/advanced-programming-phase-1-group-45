@@ -22,7 +22,7 @@ public class UserManager {
 
     public UserManager() { load(); }
 
-    public boolean register(String cmd) {
+    public boolean register(String cmd, MenuController controller) {
         try {
             String[] p = cmd.split("\\s+");
             String u=null, pw=null, pwc=null, nick=null, email=null, gen=null;
@@ -48,6 +48,7 @@ public class UserManager {
             save();
             signingUser = users.get(u);
             System.out.println(signingUser.getSecurityQuestion());
+            controller.setCurrentUser(signingUser);
             save();
             return true;
         } catch(Exception ex) {
@@ -84,8 +85,8 @@ public class UserManager {
     }
     public boolean checkSecurityAnswer(String answer) {
         if (currentUser == null) return false;
-        String Ans = hash(answer.trim().toLowerCase());
-        return Ans.equals(currentUser.getSecurityAnswer());
+        String Ans = hash(answer.trim());
+        return answer.equals(currentUser.getSecurityAnswer());
     }
 
     public String resetPasswordRandom(String username) {
@@ -114,7 +115,7 @@ public class UserManager {
 
 
     public void completePasswordRecovery(String cmd) {
-        String answer = cmd.split("\\s+")[3];
+        String answer = cmd.split("\\s+")[2];
         if (checkSecurityAnswer(answer)){
             System.out.println("how do want to set new password?");}
         else{
@@ -171,7 +172,7 @@ public class UserManager {
         users.remove(old);
         users.put(newUsername, user);
         save();
-        System.out.println("your username changed to" + newUsername + "successfully.");
+        System.out.println("your username changed to " + newUsername + " successfully.");
         return true;
     }
 
@@ -206,7 +207,7 @@ public class UserManager {
     public boolean changePassword(User user, String oldPassword, String newPassword) {
         String oldHash = hash(oldPassword);
         if (!user.getPasswordHash().equals(oldHash)) {
-            System.out.println("incorrect password.");
+            System.out.println("your new password should be different.");
             return false;
         }
         if (newPassword.length() < 8
@@ -224,7 +225,11 @@ public class UserManager {
     }
 
     private void load() {
-        try {
+        try(FileReader reader = new FileReader("yourfile.json")) {
+            if (reader.read() == -1) { // Check if file is empty
+                System.out.println("Warning: JSON file is empty. No data loaded.");
+                return;
+            }
             if (Files.exists(storage)) {
                 List<User> list = gson.fromJson(Files.readString(storage),
                         new TypeToken<List<User>>(){}.getType());
@@ -252,7 +257,7 @@ public class UserManager {
     }
 
     public void setAnswer(String command){
-        String  answer = command.split("\\s+")[1];
+        String answer = command.split("\\s+")[1];
         signingUser.setSecurityAnswer(answer);
     }
 
