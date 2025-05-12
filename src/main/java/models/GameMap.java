@@ -187,7 +187,7 @@ public class GameMap {
             if(input.equalsIgnoreCase("Y")) {
                 if(session.getEnergy() >= energyCost) {
                     session.setPlayerPosition(x, y);
-                    session.movePlayer(user,x ,y);
+                    //session.movePlayer(user,x ,y);
                     session.reduceEnergy(energyCost);
                     System.out.println("Moved successfully!");
                 } else {

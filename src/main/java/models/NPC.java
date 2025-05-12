@@ -70,13 +70,13 @@ public class NPC {
         return LocalTime.now().isBefore(LocalTime.NOON);
     }
 
-    public String interact(Player player) {
-        if (isFirstInteractionToday()) {
-            friendshipPoints += 20;
-            updateLastInteraction();
-        }
-        return getDialogue();
-    }
+//    public String interact(Player player) {
+//        if (isFirstInteractionToday()) {
+//            friendshipPoints += 20;
+//            updateLastInteraction();
+//        }
+//        return getDialogue();
+//    }
 
     // Getters and setters
     public int getFriendshipPoints() {

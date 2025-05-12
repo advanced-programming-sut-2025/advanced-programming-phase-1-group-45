@@ -26,10 +26,10 @@ public class PlantsAndTrees {
     public String harvestFruit() {
         return fruit;
     }
-    public String treeIsBurned(){
-        if(weather.lightning){
-            return coal;
-        }
-    }
+//    public String treeIsBurned(){
+//        if(weather.lightning){
+//            return coal;
+//        }
+//    }
     public void crowAttack(){}
 }

@@ -153,7 +153,7 @@ public enum Shop {
 
     // Getter ها
     public String getManager() { return manager; }
-    public int getOpenHour() { return openHour; }
+    //public static int getOpenHour() { return openHour; }
     public int getCloseHour() { return closeHour; }
     public List<ShopItem> getItems() { return items; }
 }

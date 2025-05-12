@@ -46,16 +46,16 @@ public class ShopManager {
     public Map<String, Double> getAvailableProducts(Shop shop) {
         int hour = LocalTime.now().getHour();
         boolean open;
-        if(Shop.getOpenHour() <= hour && shop.getCloseHour() > hour){
-            open = true;
-        } else open = false;
-        if(!open) return Collections.emptyMap();
+//        if(Shop.getOpenHour() <= hour && shop.getCloseHour() > hour){
+//            open = true;
+//        } else open = false;
+        //if(!open) return Collections.emptyMap();
         Map<String, Double> Map = new LinkedHashMap<>();
-        Map<String, Integer> productsCount = stock.get(shop);
-        shop.getItems().forEach((item) -> {
-            int r = productsCount.getOrDefault(item, 0);
-            if( r > 0) Map.put(item.getName(), item.getPrice());
-        });
+        //Map<String, Integer> productsCount = stock.get(shop);
+//        shop.getItems().forEach((item) -> {
+//            int r = productsCount.getOrDefault(item, 0);
+//            if( r > 0) Map.put(item.getName(), item.getPrice());
+//        });
         return Map;
     }
 
@@ -66,17 +66,17 @@ public class ShopManager {
             return "product not available in this shop!";
         }
         if(count <= 0) return "count must be greater than 0!";
-        int remainder = stock.get(shop).get(item);
-        if(count >= remainder) {
-            return String.format("This shop only has %d %s", remainder, item);
-        }
+//        int remainder = stock.get(shop).get(item);
+//        if(count >= remainder) {
+//            return String.format("This shop only has %d %s", remainder, item);
+//        }
         double total = availableProducts.get(item) * count;
         if(user.getMoney() < total){
             return "you do not have enough money!";
         }
         user.addMoney(-total);
         user.addItem(item, count);
-        stock.get(shop).put(item, remainder - count);
+        //stock.get(shop).put(item, remainder - count);
         history.add(new ShopTransaction(username, shop, item, count, total, LocalTime.now()));
         save();
         return "Shopping successfully!";

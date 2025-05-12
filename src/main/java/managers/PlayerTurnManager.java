@@ -3,7 +3,7 @@ package managers;
 import com.google.common.eventbus.Subscribe;
 import models.Events.GameEventBus;
 import models.Events.TurnChangedEvent;
-import models.Events.TurnEndedEvent;
+//import models.Events.TurnEndedEvent;
 import models.User;
 import managers.TimeManager;
 
@@ -23,7 +23,7 @@ public class PlayerTurnManager {
     public void endTurn() {
         User player = players.get(currentTurn);
         player.onTurnEnd();
-        GameEventBus.INSTANCE.post(new TurnEndedEvent(player));
+        //GameEventBus.INSTANCE.post(new TurnEndedEvent(player));
         advanceToNextPlayer();
     }
 

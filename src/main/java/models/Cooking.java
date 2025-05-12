@@ -14,7 +14,7 @@ public class Cooking {
         Energy energy = new Energy();
     }
     //check it
-    private Energy buff(){
-
-    }
+//    private Energy buff(){
+//
+//    }
 }

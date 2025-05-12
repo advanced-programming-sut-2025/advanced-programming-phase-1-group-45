@@ -3,9 +3,9 @@ package models;
 import models.Enums.Weather;
 
 public class GreenHouse {
-    private Crop[][] cropGrid;
+    //private Crop[][] cropGrid;
     private boolean lightening;
-    Weather currentWeather = models.Weather.showWeather();
+    //Weather currentWeather = models.Weather.showWeather();
 
     public void greenHouseBuild() {
     }

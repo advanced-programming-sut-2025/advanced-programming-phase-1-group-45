@@ -1,6 +1,6 @@
 package models;
-import models.Crop;
-import enums.Season;
+
+import models.Enums.SkillType;
 
 public class Farming implements Ability {
     public void plowing(){}
@@ -15,4 +15,8 @@ public class Farming implements Ability {
     public void level2(){}
     public void level3(){}
     public void level4(){}
+
+    public void harvestCrop(Player player) {
+        player.addSkillXp(SkillType.FARMING, 5);
+    }
 }

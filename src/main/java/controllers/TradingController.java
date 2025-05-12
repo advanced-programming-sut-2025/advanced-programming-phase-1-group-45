@@ -13,8 +13,8 @@ public class TradingController {
         Backpack backpack;
     }
 
-    public boolean tradeResponse() {
-    }
+//    public boolean tradeResponse() {
+//    }
 
     public void tradeHistory() {
     }
