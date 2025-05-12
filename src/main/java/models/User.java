@@ -19,6 +19,7 @@ public class User{
     private double money = 0.0;
     private Map<String, Integer> inventory = new HashMap<>();
     private Player currentPlayer;
+    private String avatar = "@";
 
     public User(String username, String passwordHash, String nickname, String email, String gender){
         this.username = username;
@@ -28,6 +29,7 @@ public class User{
         this.gender = gender;
         this.money = 0.0;
         this.currentPlayer = new Player(200);
+        this.avatar = "@";
     }
     public String getUsername(){ return username; }
     public String getPasswordHash(){ return passwordHash; }
@@ -97,6 +99,13 @@ public class User{
         this.money = money;
     }
 
+    // Energy system
+
+    public void applyEnergyPenalty() {
+
+        this.energy *= 0.5;
+
+    } 
     public void onTurnEnd() {
         gamesPlayed++;
         //TODO
