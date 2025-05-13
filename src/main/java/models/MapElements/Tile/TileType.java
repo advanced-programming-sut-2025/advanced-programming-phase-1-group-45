@@ -6,8 +6,5 @@ public enum TileType {
     GREENHOUSE,
     COTTAGE,
     QUARRY,
-    TREE,
-    STONE,
-    FORAGING,
     SHIPPINGBIN;
 }

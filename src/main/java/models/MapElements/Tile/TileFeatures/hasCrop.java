@@ -4,19 +4,28 @@ import com.google.common.eventbus.Subscribe;
 import models.Events.DayWithoutWaterReach2;
 import models.Events.GameEventBus;
 import models.MapElements.Tile.Tile;
-import models.crops.CropGrowStrategy;
-import models.crops.CropInfo;
+import models.crops.Crop.CropGrow;
+import models.crops.Crop.CropInMap;
+import models.crops.Crop.CropInfo;
 
-public class hasCrop extends canGrow implements TileFeature, UnWalkAble {
-    private Tile tile;
-    private CropInfo cropInfo;
-    private boolean harvestAble;
-    private CropGrowStrategy cropGrowStrategy;
 
-    hasCrop(Tile tile, CropInfo cropInfo) {
+public class hasCrop implements TileFeature, UnWalkAble {
+    private final Tile tile;
+    private CropInMap crop;
+    private CropGrow cropGrowStrategy;
+
+    public CropInMap getCrop() {
+        return crop;
+    }
+
+    public CropGrow getCropGrowStrategy() {
+        return cropGrowStrategy;
+    }
+
+    hasCrop(Tile tile, CropInMap cropInMap) {
         this.tile = tile;
-        this.cropInfo = cropInfo;
-        CropGrowStrategy cropGrowStrategy = new CropGrowStrategy();
+        this.crop = cropInMap;
+        CropGrow cropGrowStrategy = new CropGrow();
         GameEventBus.INSTANCE.register(this);
     }
 
@@ -28,8 +37,5 @@ public class hasCrop extends canGrow implements TileFeature, UnWalkAble {
         }
     }
 
-    @Override
-    public void grow() {
 
-    }
 }

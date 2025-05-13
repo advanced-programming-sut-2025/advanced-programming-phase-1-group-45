@@ -1,11 +1,13 @@
-package models.crops;
+package models.crops.Crop;
 
 import models.Enums.Season;
 import models.Item;
+import models.crops.AllCropsLoader;
+import models.crops.Seed;
 
-public class CropInfo extends Item {
+public class CropInfo {
     private final String name;
-    private final String source;
+    private final Seed source;
     private final int[] stages;
     private final int totalHarvestTime;
     private final boolean isOneTime;
@@ -20,9 +22,8 @@ public class CropInfo extends Item {
              int totalHarvestTime, boolean isOneTime, int regrowTime,
              long baseSellPrice, boolean isEdible, int energy,
              Season[] season, boolean canBecomeGiant) {
-        super("Crop", CropInfo.class);
         this.name = name;
-        this.source = source;
+        this.source = AllCropsLoader.getInstance().findSeed(source);
         this.stages = stages;
         this.totalHarvestTime = totalHarvestTime;
         this.isOneTime = isOneTime;
@@ -36,7 +37,7 @@ public class CropInfo extends Item {
     public String getName() {
         return name;
     }
-    public String getSource() {
+    public Seed getSource() {
         return source;
     }
     public int[] getStages() {

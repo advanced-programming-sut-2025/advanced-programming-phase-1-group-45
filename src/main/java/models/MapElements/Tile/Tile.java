@@ -21,8 +21,11 @@ public class Tile {
         features.put(featureClass, feature);
     }
 
-    public <T extends TileFeature> Optional<T> getFeature(Class<T> featureClass) {
-        return Optional.ofNullable(featureClass.cast(features.get(featureClass)));
+    public <T extends TileFeature> T getFeature(Class<T> featureClass) {
+        if(features.containsKey(featureClass)) {
+            return featureClass.cast(features.get(featureClass));
+        }
+        return null;
     }
 
     public boolean hasFeature(Class<? extends TileFeature> featureClass) {

@@ -1,6 +1,10 @@
 package models;
 
+import com.google.common.eventbus.Subscribe;
 import managers.PlayerTurnManager;
+import models.Enums.Season;
+import models.Events.GameEventBus;
+import models.Events.SeasonChangedEvent;
 
 import java.util.*;
 import java.util.Map;
@@ -16,9 +20,19 @@ public class GameSession {
     private GameMap map;
     private int playerX, playerY;
     private int energy = 100;
+    private Season season = Season.SPRING;
+
 
     public GameSession(List<String> players) {
         this.players = new ArrayList<>(players);
+        GameEventBus.INSTANCE.register(this);
+    }
+    @Subscribe
+    public void changeSeason(SeasonChangedEvent event) {
+        season = event.newSeason();
+    }
+    public Season getSeason() {
+        return season;
     }
     public void nextTurn() {
         turn++;

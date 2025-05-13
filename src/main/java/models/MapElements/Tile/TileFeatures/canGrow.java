@@ -1,7 +1,9 @@
 package models.MapElements.Tile.TileFeatures;
 
 public abstract class canGrow {
-    public boolean harvestAble;
+    public abstract void advanceDayInStage();
 
-    public abstract void grow();
+    public abstract void advanceStage();
+
+    public abstract int getDaysInCurrentStage();
 }
