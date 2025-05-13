@@ -5,18 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time">
+      <change afterPath="$PROJECT_DIR$/src/main/java/models/fish/FishManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_5_2025_12_29_PM_[Changes]1/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_5_2025_12_29_PM__Changes_1.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/managers/SkillManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/SkillManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Backpack.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Backpack.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Cooking.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Cooking.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Energy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Energy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Enums/SkillType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Enums/SkillType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Extraction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Extraction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Farming.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Farming.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Fishing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Fishing.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Player.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Processing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Processing.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Crafting.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Crafting.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
