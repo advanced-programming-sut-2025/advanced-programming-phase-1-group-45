@@ -55,7 +55,7 @@ public class FishManager {
 
 
     public List<Fishes> getFishForSeason(String season) {
-        return seasonalFish.getOrDefault(season, new ArrayList<>());
+        return seasonalFish.get(season);
     }
 
     public List<Fishes> getLegendaryFish() {
