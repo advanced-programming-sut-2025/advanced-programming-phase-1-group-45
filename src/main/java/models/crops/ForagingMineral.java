@@ -1,4 +1,4 @@
 package models.crops;
 
-public class ForagingMinerals {
+public class ForagingMineral {
 }
