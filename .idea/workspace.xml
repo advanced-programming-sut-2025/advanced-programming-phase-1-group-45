@@ -5,21 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time">
-      <change afterPath="$PROJECT_DIR$/src/main/java/models/crops/Tree/TreeInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/GameSession.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/GameSession.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/Tile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/Tile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/canGrow.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/canGrow.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasCrop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasCrop.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasTree.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileType.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/CropGrowStrategy.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/CropInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/crops/Crop/CropInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/CropManager.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/Crops.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/crops/Crop/Crops.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/Seed.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/crops/Seed.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/Tree.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/Trees.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/crops/Tree/Trees.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingMinerals.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingMinerals.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/AllCropsLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/crops/AllCropsLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/crops/ForagingMineral.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/crops/ForagingMineral.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -153,6 +141,7 @@
       <workItem from="1747078982622" duration="6086000" />
       <workItem from="1747140572096" duration="3161000" />
       <workItem from="1747149097855" duration="5888000" />
+      <workItem from="1747162110542" duration="1634000" />
     </task>
     <task id="LOCAL-00001" summary="time manager first">
       <option name="closed" value="true" />
