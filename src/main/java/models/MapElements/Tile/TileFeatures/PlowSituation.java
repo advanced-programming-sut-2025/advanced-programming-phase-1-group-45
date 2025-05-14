@@ -4,7 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import models.Events.UseToolEvent;
 import models.Tools.Hoe;
 
-public class canPlow implements TileFeature {
+public class PlowSituation implements TileFeature {
     private boolean isPlowed = false;
 
     @Subscribe

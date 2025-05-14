@@ -1,8 +1,6 @@
 package models.Tools;
 
-import models.Enums.Tile;
 import models.Item;
-import org.checkerframework.checker.fenum.qual.Fenum;
 
 public abstract class Tool extends Item {
     protected String toolName;

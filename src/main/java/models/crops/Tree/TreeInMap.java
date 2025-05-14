@@ -7,10 +7,11 @@ public class TreeInMap extends canGrow {
     private boolean harvestAble = false;
     private final int[] growStages;
  //   private final Season[] seasons;
+    private boolean fertilized = false;
     int currentStage = 0;
     int daysInStage = 0;
 
-    TreeInMap(TreeInfo tree) {
+    public TreeInMap(TreeInfo tree) {
         this.tree = tree;
         growStages = tree.getStages();
     //    seasons = tree.getSeason();
@@ -22,6 +23,13 @@ public class TreeInMap extends canGrow {
 
     public boolean isHarvestAble() {
         return harvestAble;
+    }
+
+    public boolean isFertilized() {
+        return fertilized;
+    }
+    public void fertilize() {
+        fertilized = true;
     }
 
     @Override

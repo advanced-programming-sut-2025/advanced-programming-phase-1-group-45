@@ -4,8 +4,8 @@ import managers.TimeManager;
 
 import java.util.Arrays;
 
-public class CropGrow {
-    public void grow(CropInMap crop) {
+public class PlantGrow {
+    public void grow(PlantInMap crop) {
         if (Arrays.stream(crop.getSeason()).
                 noneMatch(season -> season == TimeManager.getInstance().getSeason())) {
             return;

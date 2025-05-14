@@ -1,10 +1,7 @@
 package models.crops.Tree;
 
 import models.Enums.Season;
-import models.GameSession;
-import models.crops.AllCropsLoader;
-import models.crops.Crop.CropInfo;
-import models.crops.Seed;
+import models.crops.Crop.PlantInfo;
 
 public class TreeInfo {
     private final String name;
@@ -18,22 +15,22 @@ public class TreeInfo {
                     int totalHarvestDay, String fruitName,
                     int fruitHarvestCycle, int fruitBasePrice, boolean fruitIsEdible,
                     int fruitEnergy, String[] seasons) {
-        this.source = source; //AllCropsLoader.getInstance().findSeed(fruitName);
+        this.source = source;
         this.name = name;
         this.stages = stages;
         this.totalHarvestDay = totalHarvestDay;
         this.fruit = new Fruit(fruitName, this, fruitHarvestCycle,
                 fruitBasePrice, fruitIsEdible, fruitEnergy);
-        this.season = CropInfo.extractSeasonsFromString(seasons);
+        this.season = PlantInfo.extractSeasonsFromString(seasons);
+    }
+
+    public String getSource() {
+        return source;
     }
 
     public String getName() {
         return name;
     }
-
-//    public Seed getSource() {
-//        return source;
-//    }
 
     public int[] getStages() {
         return stages;

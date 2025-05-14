@@ -1,14 +1,10 @@
 package models.crops.Crop;
 
 import models.Enums.Season;
-import models.Item;
 import models.crops.AllCropsLoader;
-import models.crops.Seed;
+import models.crops.PlantSeed;
 
-import java.util.Arrays;
-import java.util.List;
-
-public class CropInfo {
+public class PlantInfo {
     private final String name;
     private final String source;
     private final int[] stages;
@@ -21,12 +17,12 @@ public class CropInfo {
     private final Season[] season;
     private final boolean canBecomeGiant;
 
-    public CropInfo(String name, String source, int[] stages,
-                    int totalHarvestTime, boolean isOneTime, Integer regrowthTime,
-                    long baseSellPrice, boolean isEdible, int energy,
-                    String[] seasons, boolean canBecomeGiant) {
+    public PlantInfo(String name, String source, int[] stages,
+                     int totalHarvestTime, boolean isOneTime, Integer regrowthTime,
+                     long baseSellPrice, boolean isEdible, int energy,
+                     String[] seasons, boolean canBecomeGiant) {
         this.name = name;
-        this.source = source;//AllCropsLoader.getInstance().findSeed(source);
+        this.source = source;
         this.stages = stages;
         this.totalHarvestTime = totalHarvestTime;
         this.isOneTime = isOneTime;
@@ -36,6 +32,7 @@ public class CropInfo {
         this.energy = energy;
         this.season = extractSeasonsFromString(seasons);
         this.canBecomeGiant = canBecomeGiant;
+        AllCropsLoader.allPlantSeeds.add(new PlantSeed(this));
     }
 
     public String getName() {
@@ -85,7 +82,7 @@ public class CropInfo {
 
     public static Season[] extractSeasonsFromString(String[] seasons) {
         if (seasons.length == 1 && seasons[0].equalsIgnoreCase("special")) {
-            return new Season[] {
+            return new Season[]{
                     Season.SPRING, Season.SUMMER, Season.AUTUMN, Season.WINTER
             };
         }

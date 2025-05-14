@@ -10,7 +10,7 @@ import java.util.List;
 
 public class TreeReader {
     //  public static void main(String[] args) {
-    public static List<TreeInfo> readTrees() {
+    public static List<TreeInfo> load() {
         List<TreeInfo> trees = new ArrayList<>();
 
         try (JsonReader reader = Json.

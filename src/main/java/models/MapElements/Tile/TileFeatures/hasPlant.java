@@ -4,35 +4,34 @@ import com.google.common.eventbus.Subscribe;
 import models.Events.DayWithoutWaterReach2;
 import models.Events.GameEventBus;
 import models.MapElements.Tile.Tile;
-import models.crops.Crop.CropGrow;
-import models.crops.Crop.CropInMap;
-import models.crops.Crop.CropInfo;
+import models.crops.Crop.PlantGrow;
+import models.crops.Crop.PlantInMap;
 
 
-public class hasCrop implements TileFeature, UnWalkAble {
+public class hasPlant implements TileFeature, UnWalkAble {
     private final Tile tile;
-    private CropInMap crop;
-    private CropGrow cropGrowStrategy;
+    private PlantInMap crop;
+    private PlantGrow plantGrowStrategy;
 
-    public CropInMap getCrop() {
+    public PlantInMap getCrop() {
         return crop;
     }
 
-    public CropGrow getCropGrowStrategy() {
-        return cropGrowStrategy;
+    public PlantGrow getCropGrowStrategy() {
+        return plantGrowStrategy;
     }
 
-    hasCrop(Tile tile, CropInMap cropInMap) {
+    public hasPlant(Tile tile, PlantInMap plantInMap) {
         this.tile = tile;
-        this.crop = cropInMap;
-        CropGrow cropGrowStrategy = new CropGrow();
+        this.crop = plantInMap;
+        PlantGrow plantGrowStrategy = new PlantGrow();
         GameEventBus.INSTANCE.register(this);
     }
 
     @Subscribe
     public void removeCrop(DayWithoutWaterReach2 event) {
         if (this.tile.getX() == event.x() && this.tile.getY() == event.y()) {
-            tile.removeFeature(hasCrop.class);
+            tile.removeFeature(hasPlant.class);
             //make sure tile display changed after this
         }
     }

@@ -4,22 +4,21 @@ package models.crops.DataReaders.Readers;
 //import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.json.*;
-import models.crops.Crop.CropInfo;
+import models.crops.Crop.PlantInfo;
 
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class CropReader {
+public class PlantReader {
     //  public static void main(String[] args) {
-    public List<CropInfo> readFromJson() {
-        List<CropInfo> crops = new ArrayList<>();
+    public static List<PlantInfo> load() {
+        List<PlantInfo> crops = new ArrayList<>();
         try (
                 JsonReader reader = Json.
-                        createReader(new FileReader("src/main/java/models/crops/DataReaders/Data/Crops.json"))) {
+                        createReader(new FileReader("src/main/java/models/crops/DataReaders/Data/PlantsPlants.json"))) {
             JsonObject root = reader.readObject();
-            JsonArray cropsArray = root.getJsonArray("Crop");
+            JsonArray cropsArray = root.getJsonArray("Plants");
 
             for (JsonObject cropObj : cropsArray.getValuesAs(JsonObject.class)) {
                 String name = cropObj.getString("name");
@@ -52,7 +51,7 @@ public class CropReader {
                 int energy = 0;//cropObj.getInt("energy");
                 JsonValue energy1 = cropObj.get("energy");
                 if (energy1.getValueType() == JsonValue.ValueType.NUMBER) {
-                    JsonNumber energy2 = (JsonNumber) baseSellPrice1;
+                    JsonNumber energy2 = (JsonNumber) energy1;
                     energy = energy2.intValue();
                 }
 
@@ -66,7 +65,7 @@ public class CropReader {
                 boolean canBecomeGiant = cropObj.getBoolean("canBecomeGiant");
 
                 // Create CropInfo instance
-                CropInfo crop = new CropInfo(
+                PlantInfo crop = new PlantInfo(
                         name, source, stages, totalHarvestTime, isOneTime, regrowthTime,
                         baseSellPrice, isEdible, energy, seasons, canBecomeGiant
                 );

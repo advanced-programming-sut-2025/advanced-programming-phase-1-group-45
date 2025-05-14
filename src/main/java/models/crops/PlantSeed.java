@@ -1,21 +1,20 @@
 package models.crops;
 
 import models.Enums.Season;
-import models.Item;
+import models.crops.Crop.PlantInfo;
 
-public class Seed {
-    private String name;
-    private final Season season;
+public class PlantSeed {
+    private final String name;
+    private final PlantInfo plant;
 
-    Seed(String name, Season season) {
-        this.name = name;
-        this.season = season;
-    }
-
-    public Season getSeason() {
-        return season;
+    public PlantSeed(PlantInfo plant) {
+        this.plant = plant;
+        this.name = plant.getSource();
     }
     public String getName() {
         return name;
+    }
+    public PlantInfo getPlant() {
+        return plant;
     }
 }

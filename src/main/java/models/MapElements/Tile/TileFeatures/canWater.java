@@ -12,7 +12,7 @@ public class canWater implements TileFeature {
     private boolean isWater;
     private int daysWithoutWater;
 
-    canWater(Tile tile) {
+    public canWater(Tile tile) {
         this.tile = tile;
         daysWithoutWater = 0;
         isWater = false;

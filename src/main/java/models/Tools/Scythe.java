@@ -1,8 +1,5 @@
 package models.Tools;
 
-import models.Enums.Tile;
-import models.User;
-
 public class Scythe extends Tool {
 
     public Scythe(int energy) {

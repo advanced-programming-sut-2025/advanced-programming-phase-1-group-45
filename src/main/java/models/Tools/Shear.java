@@ -1,8 +1,5 @@
 package models.Tools;
 
-import models.Enums.Tile;
-import models.User;
-
 public class Shear extends Tool{
     public Shear(int energy) {
         super("Shear", energy);
