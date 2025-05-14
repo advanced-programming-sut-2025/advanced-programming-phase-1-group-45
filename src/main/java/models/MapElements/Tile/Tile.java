@@ -4,7 +4,6 @@ import models.MapElements.Tile.TileFeatures.TileFeature;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class Tile {
     private TileType tileType;

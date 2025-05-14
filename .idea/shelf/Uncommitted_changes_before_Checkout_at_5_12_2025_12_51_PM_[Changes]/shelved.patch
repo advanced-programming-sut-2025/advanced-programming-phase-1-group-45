@@ -1,0 +1,23 @@
+Index: src/main/java/models/crops/Minerals.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models.crops;\r\n\r\nimport models.Item;\r\n\r\npublic class Stone extends Item {\r\n    public Stone(String itemName, Class<?> itemSuperClass) {\r\n        super(itemName, itemSuperClass);\r\n    }\r\n    public String getLevel(){\r\n        return\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/java/models/crops/Minerals.java b/src/main/java/models/crops/Minerals.java
+--- a/src/main/java/models/crops/Minerals.java	(revision 4fac9bb6249dd5241a49eed2c3205b51f1694d05)
++++ b/src/main/java/models/crops/Minerals.java	(date 1747041649660)
+@@ -2,11 +2,9 @@
+ 
+ import models.Item;
+ 
+-public class Stone extends Item {
+-    public Stone(String itemName, Class<?> itemSuperClass) {
++public class Minerals extends Item {
++
++    public Minerals(String itemName, Class<?> itemSuperClass) {
+         super(itemName, itemSuperClass);
+     }
+-    public String getLevel(){
+-        return
+-    }
+ }

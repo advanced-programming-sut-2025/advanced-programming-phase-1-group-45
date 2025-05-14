@@ -4,9 +4,8 @@ import com.google.gson.reflect.TypeToken;
 import controllers.MenuController;
 import models.GameMap;
 import models.GameSession;
-import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileType;
-import models.UserInfo;
+import models.User;
 import java.io.*;
 import java.nio.file.*;
 import java.security.*;
@@ -14,15 +13,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class UserManager {
-    private final Map<String, UserInfo> users = new HashMap<>();
+    private final Map<String, User> users = new HashMap<>();
     private final Path storage = Paths.get("users.json");
     private final Gson gson = new Gson();
-    private UserInfo currentUser;
-    private UserInfo signingUser;
+    private User currentUser;
+    private User signingUser;
 
     public UserManager() { load(); }
 
-    public boolean register(String cmd) {
+    public boolean register(String cmd, MenuController controller) {
         try {
             String[] p = cmd.split("\\s+");
             String u=null, pw=null, pwc=null, nick=null, email=null, gen=null;
@@ -44,10 +43,11 @@ public class UserManager {
                 System.out.println("your password is not strong."); return false;
             }
             if (!pw.equals(pwc)) { System.out.println("make sure that you repeated your password correctly."); return false; }
-            users.put(u, new UserInfo(u, hash(pw), nick, email, gen));
+            users.put(u, new User(u, hash(pw), nick, email, gen));
             save();
             signingUser = users.get(u);
             System.out.println(signingUser.getSecurityQuestion());
+            controller.setCurrentUser(signingUser);
             save();
             return true;
         } catch(Exception ex) {
@@ -56,14 +56,14 @@ public class UserManager {
         }
     }
 
-    public UserInfo login(String cmd) {
+    public User login(String cmd) {
         String[] p = cmd.split("\\s+");
         String u=null, pw=null;
         for (int i=1; i<p.length; i++) {
             if (p[i].equals("-u")) u=p[++i];
             if (p[i].equals("-p")) pw=p[++i];
         }
-        UserInfo user = users.get(u);
+        User user = users.get(u);
         if (user==null || !user.getPasswordHash().equals(hash(pw))) {
             System.out.println("user name or password is incorrect.");
             return null;
@@ -84,12 +84,12 @@ public class UserManager {
     }
     public boolean checkSecurityAnswer(String answer) {
         if (currentUser == null) return false;
-        String Ans = hash(answer.trim().toLowerCase());
-        return Ans.equals(currentUser.getSecurityAnswer());
+        String Ans = hash(answer.trim());
+        return answer.equals(currentUser.getSecurityAnswer());
     }
 
     public String resetPasswordRandom(String username) {
-        UserInfo u = users.get(username);
+        User u = users.get(username);
         if (u == null) return null;
         String newPw = generateRandomPassword(12);
         u.setPasswordHash(hash(newPw));
@@ -98,7 +98,7 @@ public class UserManager {
     }
 
     public boolean resetPasswordManual(String username, String newPassword) {
-        UserInfo u = users.get(username);
+        User u = users.get(username);
         if (u == null) return false;
         if (newPassword.length() < 8
                 || !newPassword.matches(".*[A-Z].*")
@@ -114,7 +114,7 @@ public class UserManager {
 
 
     public void completePasswordRecovery(String cmd) {
-        String answer = cmd.split("\\s+")[3];
+        String answer = cmd.split("\\s+")[2];
         if (checkSecurityAnswer(answer)){
             System.out.println("how do want to set new password?");}
         else{
@@ -152,12 +152,12 @@ public class UserManager {
     }
 
 
-    public String getUserInfo(UserInfo u) {
+    public String getUserInfo(User u) {
         return String.format("username: %s\n nickname: %s\n max money: %.2f\n game played: %d",
                 u.getUsername(), u.getNickname(), u.getMaxMoney(), u.getGamesPlayed());
     }
 
-    public boolean changeUsername(UserInfo user, String newUsername) {
+    public boolean changeUsername(User user, String newUsername) {
         if (newUsername == null || !newUsername.matches("^[A-Za-z0-9]+$")) {
             System.out.println("invalid username");
             return false;
@@ -171,11 +171,11 @@ public class UserManager {
         users.remove(old);
         users.put(newUsername, user);
         save();
-        System.out.println("your username changed to" + newUsername + "successfully.");
+        System.out.println("your username changed to " + newUsername + " successfully.");
         return true;
     }
 
-    public boolean changeNickname(UserInfo user, String newNickname) {
+    public boolean changeNickname(User user, String newNickname) {
         if (newNickname == null || newNickname.isBlank()) {
             System.out.println("your nickname can't be empty");
             return false;
@@ -186,12 +186,12 @@ public class UserManager {
         return true;
     }
 
-    public boolean changeEmail(UserInfo user, String newEmail) {
+    public boolean changeEmail(User user, String newEmail) {
         if (newEmail == null || !newEmail.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             System.out.println("invalid email format");
             return false;
         }
-        for (UserInfo u : users.values()) {
+        for (User u : users.values()) {
             if (u.getEmail().equalsIgnoreCase(newEmail)) {
                 System.out.println("this email is already used.");
                 return false;
@@ -203,10 +203,10 @@ public class UserManager {
         return true;
     }
 
-    public boolean changePassword(UserInfo user, String oldPassword, String newPassword) {
+    public boolean changePassword(User user, String oldPassword, String newPassword) {
         String oldHash = hash(oldPassword);
         if (!user.getPasswordHash().equals(oldHash)) {
-            System.out.println("incorrect password.");
+            System.out.println("your new password should be different.");
             return false;
         }
         if (newPassword.length() < 8
@@ -224,11 +224,15 @@ public class UserManager {
     }
 
     private void load() {
-        try {
+        try(FileReader reader = new FileReader("yourfile.json")) {
+            if (reader.read() == -1) { // Check if file is empty
+                System.out.println("Warning: JSON file is empty. No data loaded.");
+                return;
+            }
             if (Files.exists(storage)) {
-                List<UserInfo> list = gson.fromJson(Files.readString(storage),
-                        new TypeToken<List<UserInfo>>(){}.getType());
-                for (UserInfo u : list) {
+                List<User> list = gson.fromJson(Files.readString(storage),
+                        new TypeToken<List<User>>(){}.getType());
+                for (User u : list) {
                     users.put(u.getUsername(), u);
                 }
             }
@@ -252,11 +256,11 @@ public class UserManager {
     }
 
     public void setAnswer(String command){
-        String  answer = command.split("\\s+")[1];
+        String answer = command.split("\\s+")[1];
         signingUser.setSecurityAnswer(answer);
     }
 
-    public UserInfo getUser(String username) {
+    public User getUser(String username) {
         return users.get(username);
     }
 
@@ -302,7 +306,7 @@ public class UserManager {
             int [][] directions = {{0, 1},{1, 0},{0, -1},{-1, 0}};
             for(int[] d : directions){
                 int dx = x + d[0], dy = y + d[1];
-                Tile neighbour = map.getTile(dx, dy);
+                models.MapElements.Tile.Tile neighbour = map.getTile(dx, dy);
                 if(neighbour.getTileType() == TileType.SHIPPINGBIN){return true;}
             }
             return false;

@@ -1,5 +1,6 @@
 package managers;
-import models.UserInfo;
+import controllers.MenuController;
+import models.User;
 import models.GameSession;
 import java.io.*;
 import java.util.*;
@@ -20,21 +21,27 @@ public class GameManager {
         }
         save();
     }
-    public GameSession loadLastSession(UserInfo u){
+    public GameSession loadLastSession(User u){
         List<GameSession> sessions = gameSessions.get(u.getUsername());
         if(sessions == null || sessions.isEmpty()) return null;
         return sessions.get(sessions.size()-1);
     }
-    public GameSession createNewGame(String command, String currentUser){
+    public GameSession createNewGame(String command, String currentUser, MenuController controller){
         var parts = new ArrayList<>(Arrays.asList(command.split("\\s+")));
         parts.remove(0);
         parts.remove(0);
         parts.remove(0);
         var users = parts;
         if(users.size() < 1 || users.size() > 3){
-            System.out.println("Number on users must be between 1 and 3");
+            System.out.println("Number of users must be between 1 and 3");
+            return null;
         }
-
+        for(String user: users) {
+            if(controller.getUserManager().getUser(user) == null){
+                System.out.println("User " + user + " does not exist, creating a new one");
+                return null;
+            }
+        }
         users.add(0, currentUser);
         var s = new GameSession(users);
         for(var u: users){
@@ -45,16 +52,20 @@ public class GameManager {
     }
     public boolean selectMap(GameSession session, String command){
         int m = Integer.parseInt(command.split("\\s+")[2]);
-        if(m < 1 || m > 3){
-            System.out.println("invalid map number");
-            return false;
-        }
+        //if(m < 1 || m > 3){
+        //System.out.println("invalid map number");
+        //return false;
+        //}
         session.setMapNumber(m);
         save();
         return true;
     }
     private void load(){
-        try{
+        try(FileReader reader = new FileReader("games.json")){
+            if (reader.read() == -1) { // Check if file is empty
+                System.out.println("Warning: JSON file is empty. No data loaded.");
+                return;
+            }
             if(Files.exists(storage)){
                 var type = new TypeToken<Map<String,List<GameSession>>>(){}.getType();
                 var m = gson.fromJson(Files.readString(storage), type);

@@ -1,5 +1,9 @@
 {
+<<<<<<<< HEAD:src/resource/Crops.json
+  "Crops": [
+========
   "Plants": [
+>>>>>>>> main:src/main/java/models/MapElements/crops/DataReaders/Data/Plants.json
     {
       "name": "Blue Jazz",
       "source": "Jazz Seeds",

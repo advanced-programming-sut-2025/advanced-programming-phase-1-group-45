@@ -1,8 +1,9 @@
 package models;
-import java.util.HashMap;
-import java.util.Map;
+
 import managers.SkillManager;
 
+import java.util.HashMap;
+import java.util.Map;
 
 public class Energy {
     private int maxEnergy;
@@ -58,7 +59,7 @@ public class Energy {
 
     public void restoreEnergyForNewDay(boolean collapsed) {
         if (collapsed) {
-            currentEnergy = (int) (maxEnergy * 0.75);
+            currentEnergy = (int)(maxEnergy * 0.75);
         } else {
             currentEnergy = maxEnergy;
         }
@@ -116,4 +117,3 @@ public class Energy {
         currentEnergy = Math.min(currentEnergy + amount, maxEnergy);
     }
 }
-

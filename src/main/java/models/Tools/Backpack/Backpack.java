@@ -3,7 +3,6 @@ package models.Tools.Backpack;
 import com.google.common.eventbus.Subscribe;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
-import models.Item;
 import models.Tools.Tool;
 import models.Tools.UpgradeAbleTool;
 

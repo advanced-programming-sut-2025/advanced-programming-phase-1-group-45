@@ -1,7 +1,5 @@
 package models.MapElements.Tile;
 
-import models.Item;
-
 public enum TileType {
     PLAIN(".", "floor"),
     LAKE("L", "lake"),
