@@ -145,7 +145,7 @@ public class Fishing {
     }
 
     private String determineFishQuality(int fishingSkill, double poleMultiplier, int fishCount) {
-        
+
         double qualityScore = ((fishingSkill * 2 + poleMultiplier) * Math.random()) / (7 - fishCount);
 
         if (qualityScore > 0.9) {
