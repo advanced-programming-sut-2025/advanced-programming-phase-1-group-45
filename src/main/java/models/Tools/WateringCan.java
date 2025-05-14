@@ -5,26 +5,37 @@ import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Farming;
-import models.User;
+import models.MapElements.Tile.Tile;
+import models.MapElements.Tile.TileFeatures.canWater;
+import models.Tools.ToolLevel.ToolLevel;
+import models.Tools.ToolLevel.WateringCanLevel;
 
 public class WateringCan extends Tool implements UpgradeAbleTool {
-    private ToolLevel level;
+    private WateringCanLevel level;
+    private int waterAmount = level.getWaterAmount();
     private int farmingReachedLastLevel = 0;
 
-    public WateringCan(ToolLevel level) {
+    public WateringCan(WateringCanLevel level) {
         super("WateringCan", level.getEnergy());
         this.level = level;
         GameEventBus.INSTANCE.register(this);
     }
 
-    @Override
     public void useTool() {
-        if (User.getEnergy < level.getEnergy()) {
-            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
-        }
-        //TODO
-        //shokm zadan
-        User.decreaseEnergy(Math.max(level.getEnergy() - farmingReachedLastLevel, 0));
+//        if (User.getEnergy < level.getEnergy()) {
+//            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
+//        }
+//        //TODO
+//        //shokm zadan
+//        User.decreaseEnergy(Math.max(level.getEnergy() - farmingReachedLastLevel, 0));
+    }
+
+    public void addWaterAmount(int amount) {
+        waterAmount += amount;
+    }
+
+    public int getWaterAmount() {
+        return waterAmount;
     }
 
     @Override
@@ -53,7 +64,7 @@ public class WateringCan extends Tool implements UpgradeAbleTool {
 
     @Override
     public void upgrade() {
-        ToolLevel newCanLevel = level.getNextLevel();
+        WateringCanLevel newCanLevel = level.getNextLevel();
         if (newCanLevel != null) {
             level = newCanLevel;
             WateringCan newCan = new WateringCan(level);
@@ -63,4 +74,22 @@ public class WateringCan extends Tool implements UpgradeAbleTool {
         }
     }
 
+    @Override
+    public void useTool(Tile targetTile) {
+        if (targetTile.hasFeature(canWater.class) && !targetTile.getFeature(canWater.class).isWateredToday()) {
+            targetTile.getFeature(canWater.class).water();
+            waterAmount--;
+        } else if (targetTile.hasFeature(canWater.class) &&
+                targetTile.getFeature(canWater.class).isWateredToday()) {
+            throw new IllegalStateException("This tile is already watered today");
+        } else {
+            throw new IllegalStateException("You can't use this tool in this tile");
+        }
+    }
+
+
+    @Override
+    public void decreaseEnergy() {
+
+    }
 }

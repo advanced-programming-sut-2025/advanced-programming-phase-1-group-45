@@ -1,6 +1,6 @@
 package models.Tools;
 
-import models.User;
+import models.MapElements.Tile.Tile;
 
 public class MilkPail extends Tool {
 
@@ -9,7 +9,12 @@ public class MilkPail extends Tool {
     }
 
     @Override
-    public void useTool() {
-        User.decreaseEnergy(4);
+    public void useTool(Tile targetTile) {
+
+    }
+
+    @Override
+    public void decreaseEnergy() {
+
     }
 }

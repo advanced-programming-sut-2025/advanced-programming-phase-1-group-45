@@ -1,12 +1,24 @@
 package models.Tools;
 
+import models.MapElements.Tile.Tile;
+import models.Tools.ToolLevel.FishingPoleLevel;
+
 public class FishingPole extends Tool {
-    public FishingPole(String itemName, int energy) {
-        super(itemName, energy);
+    private FishingPoleLevel level;
+    private int farmingReachedLastLevel = 0;
+
+    public FishingPole(FishingPoleLevel level) {
+        super("FishingPole", level.getEnergy());
+        this.level = level;
     }
 
     @Override
-    public void useTool() {
+    public void useTool(Tile targetTile) {
+
+    }
+
+    @Override
+    public void decreaseEnergy() {
 
     }
 }

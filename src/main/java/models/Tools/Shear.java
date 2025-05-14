@@ -1,14 +1,22 @@
 package models.Tools;
 
-import models.User;
-
 public class Shear extends Tool{
     public Shear(int energy) {
         super("Shear", energy);
     }
 
-    @Override
     public void useTool() {
-        User.decreaseEnergy(4);
+
+        //User.decreaseEnergy(4);
+    }
+
+    @Override
+    public void useTool(Tile targetTile) {
+
+    }
+
+    @Override
+    public void decreaseEnergy() {
+
     }
 }

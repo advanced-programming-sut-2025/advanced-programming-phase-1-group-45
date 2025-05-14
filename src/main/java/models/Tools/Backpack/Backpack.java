@@ -14,17 +14,17 @@ import java.util.List;
 public class Backpack {
 
     private BackpackType backpackType;
-    private HashMap<Item, Integer> items;
+    private HashMap<BackPackItem, Integer> items;
     private List<Tool> tools;
 
-    public Backpack(int capacity) {
+    public Backpack() {
         this.backpackType = BackpackType.BASIC;
         this.items = new HashMap<>();
         this.tools = new ArrayList<>();
         GameEventBus.INSTANCE.register(this);
     }
 
-    public void addItemAmount(Item item, int amount) {
+    public void addItemAmount(BackPackItem item, int amount) {
         if (backpackType.canAddItem(items.size() + tools.size())) {
             if (items.containsKey(item)) {
                 items.put(item, items.get(item) + amount);
@@ -36,7 +36,7 @@ public class Backpack {
         }
     }
 
-    public boolean removeItem(Item item, int amount) {
+    public boolean removeItem(BackPackItem item, int amount) {
         int current = items.getOrDefault(item, 0);
         if (current >= amount) {
             items.put(item, current - amount);
@@ -50,7 +50,7 @@ public class Backpack {
     }
 
     public int getNumberOfAnItem(String itemName) {
-        for (Item item : items.keySet()) {
+        for (BackPackItem item : items.keySet()) {
             if (item.getItemName().equals(itemName)) {
                 return items.get(item);
             }

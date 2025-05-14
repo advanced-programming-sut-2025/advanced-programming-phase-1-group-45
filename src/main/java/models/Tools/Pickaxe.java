@@ -1,13 +1,11 @@
 package models.Tools;
 
 import com.google.common.eventbus.Subscribe;
-import models.Enums.Tile;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Mining;
-import models.User;
-import models.crops.Stone;
+import models.Tools.ToolLevel.ToolLevel;
 
 public class Pickaxe extends Tool implements UpgradeAbleTool {
     private ToolLevel level;
@@ -21,32 +19,32 @@ public class Pickaxe extends Tool implements UpgradeAbleTool {
 
     @Override
     public void decreaseEnergy() {
-        int energy = level.getEnergy() - miningReachedLastLevel;
-        if (User.getEnergy < energy) {
-            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
-        }
-        User.decreaseEnergy(energy);
+//        int energy = level.getEnergy() - miningReachedLastLevel;
+//        if (User.getEnergy().getCurrentEnergy() < energy) {
+//            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
+//        }
+//        User.getEnergy().consumeEnergy(energy);
     }
 
     @Override
     public void useTool(Tile targetTile) {
-        checkingTargetTile(targetTile);
-        if ((targetTile.getItem() instanceof Stone)&&
-
-                || targetTile.isTilled()) {
-            targetTile.tillThisTileWithHoe();
-        } else {
-            throw new IllegalArgumentException("You can not use this tool in this direction.");
-        }
+//        checkingTargetTile(targetTile);
+//        if ((targetTile.getItem() instanceof Stone)&&
+//
+//                || targetTile.isTilled()) {
+//            targetTile.tillThisTileWithHoe();
+//        } else {
+//            throw new IllegalArgumentException("You can not use this tool in this direction.");
+//        }
     }
     protected void checkingTargetTile(Tile targetTile) {
-        if ((targetTile.getItem() instanceof Stone)){
-            Stone stone = (Stone) targetTile.getItem();
-
-        }
-        else if(targetTile.isTilled()){
-            targetTile.untilThisTileWithPickaxe();
-        }
+//        if ((targetTile.getItem() instanceof Stone)){
+//            Stone stone = (Stone) targetTile.getItem();
+//
+//        }
+//        else if(targetTile.isTilled()){
+//            targetTile.untilThisTileWithPickaxe();
+//        }
 
     }
 

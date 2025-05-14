@@ -1,20 +1,22 @@
-package models.Tools;
+package models.Tools.ToolLevel;
 
 import models.Events.GameEventBus;
 
-public enum ToolLevel {
-    BASIC("Basic", 5),
-    COPPER("Copper", 4),
-    IRON("Iron", 3),
-    GOLD("Gold", 2),
-    IRIDIUM("Iridium", 1);
+public enum WateringCanLevel {
+    BASIC("Basic", 40, 5),
+    COPPER("Copper", 55, 4),
+    IRON("Iron", 70, 4),
+    GOLD("Gold", 85, 2),
+    IRIDIUM("Iridium", 100, 1);
 
     private final String name;
+    private final int waterAmount;
     private final int energy;
     private int abilityReachedToLastLevel = 0;
 
-    ToolLevel(String name, int energy) {
+    WateringCanLevel(String name, int waterAmount, int energy) {
         this.name = name;
+        this.waterAmount = waterAmount;
         this.energy = energy;
         GameEventBus.INSTANCE.register(this);
     }
@@ -23,11 +25,15 @@ public enum ToolLevel {
         return name;
     }
 
-    public int getEnergy(){
+    public int getWaterAmount() {
+        return waterAmount;
+    }
+
+    public int getEnergy() {
         return energy;
     }
 
-    public ToolLevel getNextLevel() {
+    public WateringCanLevel getNextLevel() {
         return switch (this) {
             case BASIC -> COPPER;
             case COPPER -> IRON;
@@ -36,6 +42,4 @@ public enum ToolLevel {
             default -> null;
         };
     }
-
-
 }
