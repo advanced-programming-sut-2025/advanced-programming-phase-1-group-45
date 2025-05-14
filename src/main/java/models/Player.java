@@ -1,12 +1,19 @@
 package models;
 
+import models.Crafting.CraftManager;
+
+import java.util.List;
+
 public class Player {
-    private Energy energy;
+    public Energy energy;
     private boolean isCollapsed;
     private String equippedTool;
     private String backpackType;
     private int backpackCapacity;
     private String trashCanType;
+    public CraftManager craftManager;
+    public boolean isAtHome;
+    public User user;
 
     public Player(int initialEnergy) {
         this.energy = new Energy(initialEnergy);
@@ -15,7 +22,26 @@ public class Player {
         this.backpackType = "Basic Backpack";
         this.backpackCapacity = 12;
         this.trashCanType = "Basic Trash Can";
+        this.craftManager = new CraftManager();
+        this.isAtHome = false;
     }
+
+    public boolean craftItem(String recipeName) {
+        return craftManager.craftItem(recipeName, user);
+    }
+
+    public List<String> getLearnedCraftingRecipes() {
+        return craftManager.getLearnedRecipes();
+    }
+
+    public List<String> getCraftableRecipes() {
+        return craftManager.getCraftableRecipes(user);
+    }
+
+    public String getCraftingRecipeDetails(String recipeName) {
+        return craftManager.getRecipeDetails(recipeName);
+    }
+
 
     public String showEnergy() {
         return energy.showEnergy();
