@@ -1,4 +1,4 @@
-package models.MapElement.Tile.TileFeatures;
+package models.MapElements.Tile.TileFeatures;
 
 public class UnWalkAble implements TileFeature {
 }

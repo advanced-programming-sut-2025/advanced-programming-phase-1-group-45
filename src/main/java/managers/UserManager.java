@@ -2,16 +2,15 @@ package managers;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import controllers.MenuController;
-import models.Enums.Tile;
 import models.GameMap;
 import models.GameSession;
+import models.MapElements.Tile.TileType;
 import models.User;
 import java.io.*;
 import java.nio.file.*;
 import java.security.*;
 import java.util.*;
 import java.util.stream.Collectors;
-import managers.PriceManager;
 
 public class UserManager {
     private final Map<String, User> users = new HashMap<>();
@@ -307,8 +306,8 @@ public class UserManager {
             int [][] directions = {{0, 1},{1, 0},{0, -1},{-1, 0}};
             for(int[] d : directions){
                 int dx = x + d[0], dy = y + d[1];
-                Tile neighbour = map.getTile(dx, dy);
-                if(neighbour == Tile.SHIPPINGBIN){return true;}
+                models.MapElements.Tile.Tile neighbour = map.getTile(dx, dy);
+                if(neighbour.getTileType() == TileType.SHIPPINGBIN){return true;}
             }
             return false;
         }

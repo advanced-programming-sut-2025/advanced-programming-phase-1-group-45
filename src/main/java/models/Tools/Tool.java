@@ -1,6 +1,5 @@
 package models.Tools;
 
-import models.Item;
 import models.MapElements.Tile.Tile;
 import models.Tools.Backpack.BackPackItem;
 

@@ -1,4 +1,4 @@
-package models.MapElement.Tile.TileFeatures;
+package models.MapElements.Tile.TileFeatures;
 
 import models.MapElements.Tile.Tile;
 import models.MapElements.crops.ForagingCrop;

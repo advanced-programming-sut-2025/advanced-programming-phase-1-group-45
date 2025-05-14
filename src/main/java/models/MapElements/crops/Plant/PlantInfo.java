@@ -1,9 +1,8 @@
-package models.MapElement.crops.Plant;
+package models.MapElements.crops.Plant;
 
 import models.Enums.Season;
 import models.MapElements.crops.AllCropsLoader;
 import models.MapElements.crops.PlantSeed;
-import models.Tools.Backpack.BackpackType;
 
 public class PlantInfo {
     private final String name;

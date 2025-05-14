@@ -1,4 +1,4 @@
-package models.MapElement.crops.Plant;
+package models.MapElements.crops.Plant;
 
 import managers.TimeManager;
 

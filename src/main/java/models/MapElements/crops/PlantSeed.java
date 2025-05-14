@@ -1,4 +1,4 @@
-package models.MapElement.crops;
+package models.MapElements.crops;
 
 import models.MapElements.crops.Plant.PlantInfo;
 import models.Tools.Backpack.BackPackItem;

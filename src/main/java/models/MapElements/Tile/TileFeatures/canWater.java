@@ -1,12 +1,10 @@
-package models.MapElement.Tile.TileFeatures;
+package models.MapElements.Tile.TileFeatures;
 
 import com.google.common.eventbus.Subscribe;
 import controllers.WeatherController;
 import models.Enums.Weather;
 import models.Events.*;
 import models.MapElements.Tile.Tile;
-import models.Tools.Hoe;
-import models.Tools.WateringCan;
 
 public class canWater implements TileFeature {
     private final Tile tile;

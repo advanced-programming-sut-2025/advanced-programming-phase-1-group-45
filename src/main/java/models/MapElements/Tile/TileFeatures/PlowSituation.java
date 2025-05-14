@@ -1,8 +1,6 @@
-package models.MapElement.Tile.TileFeatures;
+package models.MapElements.Tile.TileFeatures;
 
-import com.google.common.eventbus.Subscribe;
 import models.Events.UseToolEvent;
-import models.Tools.Hoe;
 
 public class PlowSituation implements TileFeature {
     private boolean isPlowed = false;

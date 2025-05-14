@@ -1,4 +1,4 @@
-package models.MapElement.crops.DataReaders.Readers;
+package models.MapElements.crops.DataReaders.Readers;
 
 //import com.fasterxml.jackson.databind.JsonNode;
 //import com.fasterxml.jackson.databind.ObjectMapper;

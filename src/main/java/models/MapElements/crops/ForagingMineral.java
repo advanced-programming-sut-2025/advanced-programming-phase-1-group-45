@@ -1,4 +1,4 @@
-package models.MapElement.crops;
+package models.MapElements.crops;
 
 public class ForagingMineral {
     private String name;

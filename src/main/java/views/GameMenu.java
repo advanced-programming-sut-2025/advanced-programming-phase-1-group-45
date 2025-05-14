@@ -6,7 +6,6 @@ import managers.ShopManager;
 import managers.UserManager;
 import models.Enums.Shop;
 import models.GameSession;
-import models.Enums.Tile;
 import models.GameMap;
 import java.util.*;
 

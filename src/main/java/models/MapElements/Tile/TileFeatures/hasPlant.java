@@ -1,4 +1,4 @@
-package models.MapElement.Tile.TileFeatures;
+package models.MapElements.Tile.TileFeatures;
 
 import com.google.common.eventbus.Subscribe;
 import models.Events.DayWithoutWaterReach2;

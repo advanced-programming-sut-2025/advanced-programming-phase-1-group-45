@@ -1,6 +1,4 @@
-package models.MapElement.Tile;
-
-import models.Item;
+package models.MapElements.Tile;
 
 public enum TileType {
     PLAIN(".", "floor"),

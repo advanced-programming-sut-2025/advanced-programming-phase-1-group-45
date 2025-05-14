@@ -1,4 +1,4 @@
-package models.MapElement.crops.Plant;
+package models.MapElements.crops.Plant;
 
 import models.Enums.Season;
 import models.MapElements.Tile.TileFeatures.canGrow;

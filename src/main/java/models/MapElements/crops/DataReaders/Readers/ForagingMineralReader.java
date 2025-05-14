@@ -1,4 +1,4 @@
-package models.MapElement.crops.DataReaders.Readers;
+package models.MapElements.crops.DataReaders.Readers;
 
 import jakarta.json.*;
 import models.MapElements.crops.ForagingMineral;

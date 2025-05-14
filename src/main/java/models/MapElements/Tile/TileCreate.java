@@ -1,4 +1,4 @@
-package models.MapElement.Tile;
+package models.MapElements.Tile;
 
 import models.MapElements.Tile.TileFeatures.*;
 
