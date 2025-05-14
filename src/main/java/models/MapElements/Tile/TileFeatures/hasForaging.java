@@ -3,7 +3,7 @@ package models.MapElements.Tile.TileFeatures;
 
 import models.MapElements.Tile.Tile;
 
-public abstract class hasForaging implements TileFeature, UnWalkAble {
+public abstract class hasForaging implements TileFeature {
     private final Tile tile;
 
     hasForaging(Tile tile) {

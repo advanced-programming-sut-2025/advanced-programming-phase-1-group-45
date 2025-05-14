@@ -1,11 +1,13 @@
-package models.crops.Crop;
+package models.MapElements.crops.Plant;
 
 import models.Enums.Season;
 import models.MapElements.Tile.TileFeatures.canGrow;
 
 public class PlantInMap extends canGrow {
-    private PlantInfo crop;
+    private final PlantInfo crop;
     private boolean harvestAble = false;
+    private boolean completeGrow = false;
+    int daysInCycle = 0;
     private final int[] growStages;
     private final Season[] seasons;
     private boolean isFertilized = false;
@@ -40,10 +42,18 @@ public class PlantInMap extends canGrow {
 
     @Override
     public void advanceDayInStage() {
-        daysInStage++;
-        if (daysInStage == growStages[currentStage]) {
-            advanceStage();
-            daysInStage = 0;
+        if (!completeGrow || crop.isOneTime()) {
+            daysInStage++;
+            if (daysInStage == growStages[currentStage]) {
+                advanceStage();
+                daysInStage = 0;
+            }
+        } else {
+            daysInCycle++;
+            if (daysInCycle == crop.getRegrowthTime()) {
+                harvestAble = true;
+                daysInCycle = 0;
+            }
         }
     }
 
@@ -54,6 +64,7 @@ public class PlantInMap extends canGrow {
         }
         if (currentStage == growStages.length) {
             harvestAble = true;
+            completeGrow = true;
         }
     }
 

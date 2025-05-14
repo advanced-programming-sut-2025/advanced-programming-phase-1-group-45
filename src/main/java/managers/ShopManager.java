@@ -2,8 +2,7 @@ package managers;
 
 import com.google.gson.reflect.TypeToken;
 import models.Enums.Shop;
-import models.TradeRequest;
-import models.User;
+import models.UserInfo;
 import com.google.gson.*;
 import java.io.*;
 import java.time.LocalTime;
@@ -60,7 +59,7 @@ public class ShopManager {
     }
 
     public String purchase(String username, Shop shop, String item, int count) {
-        User user = um.getUser(username);
+        UserInfo user = um.getUser(username);
         Map<String, Double> availableProducts = getAvailableProducts(shop);
         if(!availableProducts.containsKey(item)) {
             return "product not available in this shop!";

@@ -1,7 +1,7 @@
-package models.crops.DataReaders.Readers;
+package models.MapElements.crops.DataReaders.Readers;
 
 import jakarta.json.*;
-import models.crops.ForagingCrop;
+import models.MapElements.crops.ForagingCrop;
 
 import java.io.FileReader;
 import java.util.ArrayList;

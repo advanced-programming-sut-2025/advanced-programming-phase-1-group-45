@@ -1,8 +1,7 @@
 package models.MapElements.Tile.TileFeatures;
 
 import models.MapElements.Tile.Tile;
-import models.crops.ForagingCrop;
-import models.crops.ForagingSeed;
+import models.MapElements.crops.ForagingSeed;
 
 public class hasForagingSeed extends hasForaging implements TileFeature {
     private ForagingSeed foragingSeed;

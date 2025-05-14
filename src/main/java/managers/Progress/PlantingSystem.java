@@ -2,11 +2,11 @@ package managers.Progress;
 
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.*;
-import models.crops.AllCropsLoader;
-import models.crops.Crop.PlantInMap;
-import models.crops.PlantSeed;
-import models.crops.Tree.TreeInMap;
-import models.crops.TreeSeed;
+import models.MapElements.crops.AllCropsLoader;
+import models.MapElements.crops.Plant.PlantInMap;
+import models.MapElements.crops.PlantSeed;
+import models.MapElements.crops.Tree.TreeInMap;
+import models.MapElements.crops.TreeSeed;
 
 public class PlantingSystem {
     public static void Plant(String seed, Tile tile) {

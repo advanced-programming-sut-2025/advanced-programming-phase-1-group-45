@@ -25,7 +25,10 @@ public class TileCreate {
                 return makeShippingBinTile();
             }
             case TREE -> {
-
+                return makeTreeTile();
+            }
+            case STONE -> {
+                return makeStoneTile();
             }
         }
         return null;
@@ -34,6 +37,7 @@ public class TileCreate {
     private static Tile makeLakeTile() {
         Tile tile = new Tile(TileType.LAKE);
         tile.addFeature(lakeTile.class, new lakeTile());
+        tile.addFeature(UnWalkAble.class, new UnWalkAble());
         return tile;
     }
 
@@ -47,33 +51,40 @@ public class TileCreate {
     private static Tile makeCottageTile() {
         Tile tile = new Tile(TileType.COTTAGE);
         tile.addFeature(buildingTile.class, new buildingTile());
+        tile.addFeature(UnWalkAble.class, new UnWalkAble());
         return tile;
     }
 
     private static Tile makeQuarryTile() {
         Tile tile = new Tile(TileType.QUARRY);
         tile.addFeature(buildingTile.class, new buildingTile());
+        tile.addFeature(UnWalkAble.class, new UnWalkAble());
         return tile;
     }
 
     private static Tile makeGreenHouseTile() {
         Tile tile = new Tile(TileType.GREENHOUSE);
         tile.addFeature(buildingTile.class, new buildingTile());
+        tile.addFeature(UnWalkAble.class, new UnWalkAble());
         return tile;
     }
 
     private static Tile makeShippingBinTile() {
         Tile tile = new Tile(TileType.SHIPPINGBIN);
         tile.addFeature(buildingTile.class, new buildingTile());
+        tile.addFeature(UnWalkAble.class, new UnWalkAble());
         return tile;
     }
     private static Tile makeTreeTile() {
         Tile tile = new Tile(TileType.TREE);
         tile.addFeature(TreeTile.class, new TreeTile());
+        tile.addFeature(UnWalkAble.class, new UnWalkAble());
         return tile;
     }
     private static Tile makeStoneTile() {
         Tile tile = new Tile(TileType.STONE);
         tile.addFeature(StoneTile.class, new StoneTile());
+        tile.addFeature(UnWalkAble.class, new UnWalkAble());
+        return tile;
     }
 }

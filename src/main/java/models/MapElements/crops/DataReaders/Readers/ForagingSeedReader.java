@@ -1,13 +1,10 @@
-package models.crops.DataReaders.Readers;
+package models.MapElements.crops.DataReaders.Readers;
 
 import jakarta.json.*;
-import models.crops.ForagingSeed;
-import models.crops.Tree.TreeInfo;
+import models.MapElements.crops.ForagingSeed;
 
-import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ForagingSeedReader {

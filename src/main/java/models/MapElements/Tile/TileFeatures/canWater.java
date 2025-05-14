@@ -1,6 +1,7 @@
 package models.MapElements.Tile.TileFeatures;
 
 import com.google.common.eventbus.Subscribe;
+import controllers.WeatherController;
 import models.Enums.Weather;
 import models.Events.*;
 import models.MapElements.Tile.Tile;
@@ -9,45 +10,40 @@ import models.Tools.WateringCan;
 
 public class canWater implements TileFeature {
     private final Tile tile;
-    private boolean isWater;
+    private boolean isWateredToday = false;
     private int daysWithoutWater;
 
     public canWater(Tile tile) {
         this.tile = tile;
         daysWithoutWater = 0;
-        isWater = false;
         GameEventBus.INSTANCE.register(this);
     }
 
     @Subscribe
     public void increaseDaysWithoutWater(DayChangedEvent event) {
-        daysWithoutWater++;
+        if(WeatherController.getInstance().getCurrentWeather().equals(Weather.RAINY)){
+            isWateredToday = true;
+            daysWithoutWater = 0;
+        } else {
+            isWateredToday = false;
+            daysWithoutWater++;
+        }
         if (daysWithoutWater == 2) {
             GameEventBus.INSTANCE.post(new DayWithoutWaterReach2(tile.getX(), tile.getY()));
-        }
-    }
-
-    @Subscribe
-    public void water(UseToolEvent event) {
-        if (event.tool().getClass().equals(WateringCan.class)) {
-            this.isWater = true;
             daysWithoutWater = 0;
         }
     }
 
-    @Subscribe
-    public void watering(WeatherChangedEvent event) {
-        if (event.newWeather().equals(Weather.RAINY)) {
-            this.isWater = true;
+    public void water() {
+            this.isWateredToday = true;
             daysWithoutWater = 0;
-        }
     }
 
-    public void unPlow() {
-        this.isWater = false;
+    public boolean isWateredToday() {
+        return isWateredToday;
     }
 
-    public boolean isPlowed() {
-        return this.isWater;
+    public void setWateredToday(boolean wateredToday) {
+        isWateredToday = wateredToday;
     }
 }

@@ -1,13 +1,15 @@
 package models.Tools;
 
 import models.Item;
+import models.MapElements.Tile.Tile;
+import models.Tools.Backpack.BackPackItem;
 
-public abstract class Tool extends Item {
+public abstract class Tool implements BackPackItem {
     protected String toolName;
     protected int energy;
 
     public Tool(String itemName, int energy) {
-        super(itemName, Tool.class);
+        this.toolName = itemName;
         this.energy = energy;
     }
 
@@ -22,4 +24,8 @@ public abstract class Tool extends Item {
     public int getEnergy() {
         return energy;
     }
+
+    @Override
+    public BackPackItem clone() {}
+
 }

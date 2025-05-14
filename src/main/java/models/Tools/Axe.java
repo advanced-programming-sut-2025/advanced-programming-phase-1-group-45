@@ -5,6 +5,8 @@ import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Foraging;
+import models.MapElements.Tile.Tile;
+import models.Tools.ToolLevel.ToolLevel;
 
 public class Axe extends Tool implements UpgradeAbleTool {
     private ToolLevel level;
@@ -15,6 +17,7 @@ public class Axe extends Tool implements UpgradeAbleTool {
         this.level = level;
         GameEventBus.INSTANCE.register(this);
     }
+
 
     @Override
     public void decreaseEnergy() {
@@ -27,7 +30,7 @@ public class Axe extends Tool implements UpgradeAbleTool {
 
     @Override
     public void useTool(Tile targetTile) {
-        if (targetTile.getDescription().equalsIgnoreCase("tree")) {
+        if (targetTile.getTileType().getDescription().equalsIgnoreCase("tree")) {
             targetTile.changeSymbol(Tile.PLAIN.getSymbol());
             targetTile.changeDescription(Tile.PLAIN.getDescription());
             System.out.println("The tree cut successfully.");

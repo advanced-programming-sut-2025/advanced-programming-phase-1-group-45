@@ -1,7 +1,6 @@
 package models.Events;
 
-import models.Enums.Season;
-import models.User;
+import models.UserInfo;
 
-public record ToolChangedEvent(String toolName, String timeAndSeason, User user) {
+public record ToolChangedEvent(String toolName, String timeAndSeason, UserInfo user) {
 }

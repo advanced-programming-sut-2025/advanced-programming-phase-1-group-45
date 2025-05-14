@@ -1,9 +1,9 @@
-package models.crops;
+package models.MapElements.crops;
 
-import models.Enums.Season;
-import models.crops.Crop.PlantInfo;
+import models.MapElements.crops.Plant.PlantInfo;
+import models.Tools.Backpack.BackPackItem;
 
-public class PlantSeed {
+public class PlantSeed extends BackPackItem {
     private final String name;
     private final PlantInfo plant;
 
@@ -11,10 +11,22 @@ public class PlantSeed {
         this.plant = plant;
         this.name = plant.getSource();
     }
+
     public String getName() {
         return name;
     }
+
     public PlantInfo getPlant() {
         return plant;
+    }
+
+    @Override
+    public String getItemName() {
+        return this.name;
+    }
+
+    @Override
+    public void saveInInventory() {
+        Player.getInventory().addItem(this);
     }
 }

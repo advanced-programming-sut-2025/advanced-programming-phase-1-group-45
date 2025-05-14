@@ -1,7 +1,6 @@
 package models;
 
 import controllers.MenuController;
-import controllers.TradingController;
 import managers.UserManager;
 //import models.time.GameTimeAndDate;
  import java.time.LocalDate;
@@ -13,8 +12,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
     public class Friendship {
-        private final User player1;
-        private final User player2;
+        private final UserInfo player1;
+        private final UserInfo player2;
         private int level;
         private int xp;
         private LocalDate lastInteractionDate;
@@ -39,7 +38,7 @@ import java.util.stream.Collectors;
             }
         }
 
-        public Friendship(User player1, User player2) {
+        public Friendship(UserInfo player1, UserInfo player2) {
             this.player1 = player1;
             this.player2 = player2;
             this.level = 0;
@@ -170,11 +169,11 @@ import java.util.stream.Collectors;
             return new ArrayList<>(interactionHistory);
         }
 
-        public User getPlayer1() {
+        public UserInfo getPlayer1() {
             return player1;
         }
 
-        public User getPlayer2() {
+        public UserInfo getPlayer2() {
             return player2;
         }
 
@@ -194,7 +193,7 @@ import java.util.stream.Collectors;
             String item = null;
             int amount = 1;
             String receiver = null;
-            User sender = controller.getCurrentUser();
+            UserInfo sender = controller.getCurrentUser();
             for(int i = 0; i < parts.length - 1; i++) {
                 if(parts[i].equals("-u")) {receiver = parts[i + 1];}
                 if(parts[i].equals("-i")) {item = parts[i + 1];}
@@ -204,7 +203,7 @@ import java.util.stream.Collectors;
                 System.out.println("invalid command");
                 return;
             }
-            User receiverUser = um.getUser(receiver);
+            UserInfo receiverUser = um.getUser(receiver);
             if(receiverUser == null) {
                 System.out.println("user not found");
                 return;
@@ -316,10 +315,10 @@ import java.util.stream.Collectors;
             private final int amount;
             private final LocalDateTime sentTime;
             private Integer rating;
-            private final User sender;
-            private final User receiver;
+            private final UserInfo sender;
+            private final UserInfo receiver;
 
-            public Gift(User sender, User receiver, String item, int amount) {
+            public Gift(UserInfo sender, UserInfo receiver, String item, int amount) {
                 this.id = UUID.randomUUID().toString();
                 this.sender = sender;
                 this.receiver = receiver;
@@ -334,8 +333,8 @@ import java.util.stream.Collectors;
             public String getItem() { return item; }
             public int getAmount() { return amount; }
             public Integer getRating() { return rating; }
-            public User getSender() { return sender; }
-            public User getReceiver() { return receiver; }
+            public UserInfo getSender() { return sender; }
+            public UserInfo getReceiver() { return receiver; }
         }
 
     }

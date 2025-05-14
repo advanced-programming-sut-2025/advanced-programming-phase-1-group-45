@@ -7,11 +7,8 @@ import models.Tools.Hoe;
 public class PlowSituation implements TileFeature {
     private boolean isPlowed = false;
 
-    @Subscribe
-    public void plow(UseToolEvent event) {
-        if (event.tool().getClass().equals(Hoe.class)) {
-            this.isPlowed = true;
-        }
+    public void plow() {
+        this.isPlowed = true;
     }
 
     public void unPlow() {

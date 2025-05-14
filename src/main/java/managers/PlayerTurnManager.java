@@ -4,16 +4,15 @@ import com.google.common.eventbus.Subscribe;
 import models.Events.GameEventBus;
 import models.Events.TurnChangedEvent;
 import models.Events.TurnEndedEvent;
-import models.User;
-import managers.TimeManager;
+import models.UserInfo;
 
 import java.util.List;
 
 public class PlayerTurnManager {
-    private List<User> players;
+    private List<UserInfo> players;
     private int currentTurn = 0;
 
-    public PlayerTurnManager(List<User> players) {
+    public PlayerTurnManager(List<UserInfo> players) {
         if (players != null) {
             this.players = players;
         }
@@ -21,7 +20,7 @@ public class PlayerTurnManager {
     }
 
     public void endTurn() {
-        User player = players.get(currentTurn);
+        UserInfo player = players.get(currentTurn);
         player.onTurnEnd();
         GameEventBus.INSTANCE.post(new TurnEndedEvent(player));
         advanceToNextPlayer();

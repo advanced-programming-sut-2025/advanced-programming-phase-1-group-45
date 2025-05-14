@@ -7,7 +7,7 @@ import managers.TimeManager;
 import models.Events.TurnChangedEvent;
 
 
-public class User {
+public class UserInfo {
     private String username;
     private String passwordHash;
     private String nickname;
@@ -25,7 +25,7 @@ public class User {
         return energy;
     }
 
-    public User(String username, String passwordHash, String nickname, String email, String gender) {
+    public UserInfo(String username, String passwordHash, String nickname, String email, String gender) {
         this.username = username;
         this.passwordHash = passwordHash;
         this.nickname = nickname;
@@ -129,18 +129,18 @@ public class User {
     //new additions
     private final Map<String, Friendship> friendships = new HashMap<>();
 
-    public void addFriend(User friend) {
+    public void addFriend(UserInfo friend) {
         String key = generateFriendshipKey(this, friend);
         if (!friendships.containsKey(key)) {
             friendships.put(key, new Friendship(this, friend));
         }
     }
 
-    public Friendship getFriendship(User friend) {
+    public Friendship getFriendship(UserInfo friend) {
         return friendships.get(generateFriendshipKey(this, friend));
     }
 
-    private static String generateFriendshipKey(User a, User b) {
+    private static String generateFriendshipKey(UserInfo a, UserInfo b) {
         return a.getUsername().compareTo(b.getUsername()) < 0 ?
                 a.getUsername() + "|" + b.getUsername() :
                 b.getUsername() + "|" + a.getUsername();

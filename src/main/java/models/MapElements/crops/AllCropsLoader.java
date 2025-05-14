@@ -1,9 +1,10 @@
-package models.crops;
+package models.MapElements.crops;
 
-import models.crops.Crop.PlantInfo;
+import models.MapElements.crops.Plant.PlantInfo;
+import models.MapElements.crops.DataReaders.Readers.*;
 import models.crops.DataReaders.Readers.*;
-import models.crops.Tree.Fruit;
-import models.crops.Tree.TreeInfo;
+import models.MapElements.crops.Tree.Fruit;
+import models.MapElements.crops.Tree.TreeInfo;
 
 import java.util.ArrayList;
 import java.util.List;

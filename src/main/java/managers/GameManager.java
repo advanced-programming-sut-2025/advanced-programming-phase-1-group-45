@@ -1,5 +1,5 @@
 package managers;
-import models.User;
+import models.UserInfo;
 import models.GameSession;
 import java.io.*;
 import java.util.*;
@@ -20,7 +20,7 @@ public class GameManager {
         }
         save();
     }
-    public GameSession loadLastSession(User u){
+    public GameSession loadLastSession(UserInfo u){
         List<GameSession> sessions = gameSessions.get(u.getUsername());
         if(sessions == null || sessions.isEmpty()) return null;
         return sessions.get(sessions.size()-1);

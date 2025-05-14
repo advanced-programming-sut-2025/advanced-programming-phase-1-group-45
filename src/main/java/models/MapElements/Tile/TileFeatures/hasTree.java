@@ -4,11 +4,10 @@ import com.google.common.eventbus.Subscribe;
 import models.Events.DayWithoutWaterReach2;
 import models.Events.GameEventBus;
 import models.MapElements.Tile.Tile;
-import models.crops.Crop.PlantGrow;
-import models.crops.Tree.TreeGrow;
-import models.crops.Tree.TreeInMap;
+import models.MapElements.crops.Tree.TreeGrow;
+import models.MapElements.crops.Tree.TreeInMap;
 
-public class hasTree implements TileFeature, UnWalkAble {
+public class hasTree implements TileFeature {
     private final Tile tile;
     private TreeInMap tree;
     private TreeGrow treeGrow;
@@ -17,6 +16,7 @@ public class hasTree implements TileFeature, UnWalkAble {
         this.tile = tile;
         this.tree = tree;
         treeGrow = new TreeGrow();
+        tile.setSymbol('T');
         GameEventBus.INSTANCE.register(this);
     }
     public TreeInMap getTree() {

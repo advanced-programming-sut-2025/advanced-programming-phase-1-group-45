@@ -4,7 +4,7 @@ import managers.GameManager;
 import managers.ShopManager;
 import managers.UserManager;
 import models.GiftLogEntry;
-import models.User;
+import models.UserInfo;
 import models.GameSession;
 import views.Menu;
 import views.StartMenu;
@@ -18,7 +18,7 @@ public class MenuController {
     private GameManager gameManager = new GameManager();
     private UserManager userManager = new UserManager();
     private ShopManager shopManager = new ShopManager(userManager);
-    private User currentUser;
+    private UserInfo currentUser;
     private GameSession currentSession;
     private String pendingRecoveryUsername;
     private List<GiftLogEntry> giftLogs = new ArrayList<>();
@@ -40,11 +40,11 @@ public class MenuController {
     public ShopManager getShopManager() { return shopManager; }
     public UserManager getUserManager() { return userManager; }
     public GameManager getGameManager() { return gameManager; }
-    public User getCurrentUser() { return currentUser; }
+    public UserInfo getCurrentUser() { return currentUser; }
     public GameSession getCurrentSession() { return currentSession; }
     public String getPendingRecoveryUsername() { return pendingRecoveryUsername; }
 
-    public void setCurrentUser(User u) { this.currentUser = u; }
+    public void setCurrentUser(UserInfo u) { this.currentUser = u; }
     public void setCurrentMenu(Menu menu) { this.currentMenu = menu; }
     public void setCurrentSession(GameSession s) { this.currentSession = s; }
     public void setPendingRecoveryUsername(String s) { this.pendingRecoveryUsername = s; }

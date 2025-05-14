@@ -1,8 +1,9 @@
-package models.crops;
+package models.MapElements.crops;
 
-import models.crops.Tree.TreeInfo;
+import models.MapElements.crops.Tree.TreeInfo;
+import models.Tools.Backpack.BackPackItem;
 
-public class TreeSeed {
+public class TreeSeed extends BackPackItem {
     private final String name;
     private final TreeInfo tree;
 
@@ -17,5 +18,15 @@ public class TreeSeed {
 
     public TreeInfo getTree() {
         return tree;
+    }
+
+    @Override
+    public String getItemName() {
+        return this.name;
+    }
+
+    @Override
+    public void saveInInventory() {
+        Player.getInventory().addItem(this);
     }
 }

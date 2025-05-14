@@ -1,8 +1,8 @@
-package models.crops.Tree;
+package models.MapElements.crops.Tree;
 
-import models.crops.AllCropsLoader;
+import models.Tools.Backpack.BackPackItem;
 
-public class Fruit {
+public class Fruit implements BackPackItem {
     private final String name;
     private final TreeInfo tree;
     private final int harvestCycle;
@@ -43,5 +43,15 @@ public class Fruit {
 
     public int getEnergy() {
         return energy;
+    }
+
+    @Override
+    public String getItemName() {
+        return this.name;
+    }
+
+    @Override
+    public void saveInInventory() {
+        Player.getInventory().addItem(this);
     }
 }

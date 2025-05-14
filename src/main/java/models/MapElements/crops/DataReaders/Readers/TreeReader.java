@@ -1,11 +1,10 @@
-package models.crops.DataReaders.Readers;
+package models.MapElements.crops.DataReaders.Readers;
 
 import jakarta.json.*;
-import models.crops.Tree.TreeInfo;
+import models.MapElements.crops.Tree.TreeInfo;
 
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class TreeReader {

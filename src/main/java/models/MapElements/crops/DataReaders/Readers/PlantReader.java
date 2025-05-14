@@ -1,10 +1,10 @@
-package models.crops.DataReaders.Readers;
+package models.MapElements.crops.DataReaders.Readers;
 
 //import com.fasterxml.jackson.databind.JsonNode;
 //import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.json.*;
-import models.crops.Crop.PlantInfo;
+import models.MapElements.crops.Plant.PlantInfo;
 
 import java.io.FileReader;
 import java.util.ArrayList;

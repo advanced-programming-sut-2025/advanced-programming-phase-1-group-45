@@ -7,8 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import models.TradeRequest;
-import models.User;
-import managers.UserManager;
+import models.UserInfo;
 
 public class TradeManager {
     private final Map<String, List<TradeRequest>> trades = new HashMap<>();
@@ -23,8 +22,8 @@ public class TradeManager {
 
     public String creatTrades(String fromUser, String toUser, String typeStr, String amountStr, String priceStr,
                               String item, String targetItem, String targetAmountStr) {
-        User sender = um.getUser(fromUser);
-        User receiver = um.getUser(toUser);
+        UserInfo sender = um.getUser(fromUser);
+        UserInfo receiver = um.getUser(toUser);
         if(receiver == null) return "targetUser " + toUser + " not found!";
         TradeRequest.Type type;
         try{
@@ -87,8 +86,8 @@ public class TradeManager {
         for (TradeRequest t : list) {
             if (t.getId().equals(id) && t.getStatus() == TradeRequest.Status.PENDING){
                 if (accept){
-                    User sender = um.getUser(t.getFromUser());
-                    User receiver = um.getUser(t.getToUser());
+                    UserInfo sender = um.getUser(t.getFromUser());
+                    UserInfo receiver = um.getUser(t.getToUser());
                     if (t.getType() == TradeRequest.Type.OFFER){
                         double total = t.getAmount() * t.getPrice();
                         if (receiver.getMoney() < total)

@@ -2,9 +2,8 @@ package managers;
 
 import controllers.MenuController;
 import models.*;
-import models.User;
+import models.UserInfo;
 
-import java.sql.SQLOutput;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -83,7 +82,7 @@ public class FriendshipManager {
         }
         String receiver = parts[1];
         String message = parts[3];
-        User receiverUser = um.getUser(receiver);
+        UserInfo receiverUser = um.getUser(receiver);
         if(receiverUser == null){
             System.out.println("user not found");
         }
@@ -101,7 +100,7 @@ public class FriendshipManager {
         String item = null;
         int amount = 1;
         String receiver = null;
-        User sender = controller.getCurrentUser();
+        UserInfo sender = controller.getCurrentUser();
         for(int i = 0; i < parts.length - 1; i++) {
             if(parts[i].equals("-u")) {receiver = parts[i + 1];}
             if(parts[i].equals("-i")) {item = parts[i + 1];}
@@ -118,7 +117,7 @@ public class FriendshipManager {
             System.out.println("invalid command");
             return;
         }
-        User receiverUser = um.getUser(receiver);
+        UserInfo receiverUser = um.getUser(receiver);
         if(receiverUser == null) {
             System.out.println("user not found");
             return;

@@ -1,7 +1,4 @@
-import controllers.MenuController;
-import models.crops.AllCropsLoader;
-
-import java.util.Scanner;
+import models.MapElements.crops.AllCropsLoader;
 
 public class Main {
     public static void main(String[] args) {

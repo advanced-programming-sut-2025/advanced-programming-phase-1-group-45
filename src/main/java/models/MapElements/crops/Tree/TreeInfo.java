@@ -1,7 +1,7 @@
-package models.crops.Tree;
+package models.MapElements.crops.Tree;
 
 import models.Enums.Season;
-import models.crops.Crop.PlantInfo;
+import models.MapElements.crops.Plant.PlantInfo;
 
 public class TreeInfo {
     private final String name;
