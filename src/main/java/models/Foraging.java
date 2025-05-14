@@ -4,7 +4,7 @@ import models.Enums.Season;
 
 public class Foraging {
     Season season;
-    Tool[] tools;
+//    Tool[] tools;
    // PlantsAndTrees[] plantsAndTrees;
 
 }

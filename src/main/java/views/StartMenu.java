@@ -10,7 +10,7 @@ public class StartMenu implements Menu{
                 controller.setCurrentMenu(new SignUpMenu());
                 break;
             case "menu enter login":
-                controller.setCurrentMenu(new LoginMenu());
+              //  controller.setCurrentMenu(new LoginMenu());
                 break;
             case "show current menu":
                 System.out.println("welcome");

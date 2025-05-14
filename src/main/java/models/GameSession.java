@@ -41,7 +41,7 @@ public class GameSession {
     public int getMapNumber() {return mapNumber;}
     public int getTurn(){return turn;}
     public List<String> getPlayers(){return players;}
-    public static String getCurrentPlayer(){return players.get(turn%players.size());}
+   // public static String getCurrentPlayer(){return players.get(turn%players.size());}
     public boolean isVoteInProgress(){return voteInProgress;}
     public void setMap(GameMap map) {
         this.map = map;

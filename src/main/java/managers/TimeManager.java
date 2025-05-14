@@ -42,7 +42,7 @@ public class TimeManager {
     private void advanceDay() {
         day++;
         totalDaysPlayed++;
-        GameEventBus.INSTANCE.post(new DayChangedEvent(hour, day, season));
+        GameEventBus.INSTANCE.post(new DayChangedEvent(day, season));
         if (day == 28) {
             advanceSeason();
         }

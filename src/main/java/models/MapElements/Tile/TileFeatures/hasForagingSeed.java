@@ -4,16 +4,16 @@ import models.MapElements.Tile.Tile;
 import models.crops.ForagingCrop;
 import models.crops.ForagingSeed;
 
-public class hasForagingSeed implements TileFeature, hasForaging {
+public class hasForagingSeed extends hasForaging implements TileFeature {
     private ForagingSeed foragingSeed;
     private final Tile tile;
 
     hasForagingSeed(ForagingSeed foragingSeed, Tile tile) {
+        super(tile);
         this.foragingSeed = foragingSeed;
         this.tile = tile;
     }
 
-    @Override
     public void collectForagingElement() {
 
     }

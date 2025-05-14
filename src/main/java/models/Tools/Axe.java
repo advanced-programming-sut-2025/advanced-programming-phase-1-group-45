@@ -20,11 +20,11 @@ public class Axe extends Tool implements UpgradeAbleTool {
 
     @Override
     public void decreaseEnergy() {
-        int energy = level.getEnergy() - foragingReachedToMaxLevel;
-        if (User.getEnergy().getCurrentEnergy() < energy) {
-            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
-        }
-        User.getEnergy().consumeEnergy(energy);
+//        int energy = level.getEnergy() - foragingReachedToMaxLevel;
+//        if (User.getEnergy().getCurrentEnergy() < energy) {
+//            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
+//        }
+//        User.getEnergy().consumeEnergy(energy);
     }
 
     @Override

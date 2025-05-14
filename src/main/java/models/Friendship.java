@@ -209,10 +209,10 @@ import java.util.stream.Collectors;
                 System.out.println("user not found");
                 return;
             }
-            if(!controller.getCurrentSession().areNextToEachOther(sender.getUsername(), receiver)) {
-                System.out.println("You should be next to the gift receiver");
-                return;
-            }
+//            if(!controller.getCurrentSession().areNextToEachOther(sender.getUsername(), receiver)) {
+//                System.out.println("You should be next to the gift receiver");
+//                return;
+//            }
             if (!canInteractToday()) System.out.println("Daily interaction limit reached");
             if (level < 1) System.out.println("Friendship level too low");
             if (!sender.removeItem(item, amount)) System.out.println("Not enough items");
@@ -247,9 +247,9 @@ import java.util.stream.Collectors;
                 System.out.println("invalid command format");
             }
             String receiver = parts[1].substring(2);
-            if(controller.getCurrentSession().areNextToEachOther(controller.getCurrentUser().getUsername(), receiver)) {
-                System.out.println("You should be next to the user to hug");
-            }
+//            if(controller.getCurrentSession().areNextToEachOther(controller.getCurrentUser().getUsername(), receiver)) {
+//                System.out.println("You should be next to the user to hug");
+//            }
             if(level >= 2 && validateProximity()) {
                 addInteraction(InteractionType.HUG, "Hugged");
                 this.xp += 60;

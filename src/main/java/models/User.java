@@ -166,7 +166,7 @@ public class User {
 
     // Energy system
     public void applyEnergyPenalty() {
-        this.energy *= 0.5;
+       // this.energy *= 0.5;
     }
 
     public void onTurnEnd() {

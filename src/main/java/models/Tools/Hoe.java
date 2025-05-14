@@ -20,11 +20,11 @@ public class Hoe extends Tool implements UpgradeAbleTool {
 
     @Override
     public void decreaseEnergy() {
-        int energy = level.getEnergy() - farmingReachedToMaxLevel;
-        if (User.getEnergy().getCurrentEnergy() < energy) {
-            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
-        }
-        User.getEnergy().consumeEnergy(energy);
+//        int energy = level.getEnergy() - farmingReachedToMaxLevel;
+//        if (User.getEnergy().getCurrentEnergy() < energy) {
+//            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
+//        }
+//        User.getEnergy().consumeEnergy(energy);
     }
 
     @Override

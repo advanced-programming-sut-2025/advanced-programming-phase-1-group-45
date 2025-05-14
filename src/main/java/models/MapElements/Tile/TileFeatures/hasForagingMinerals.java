@@ -3,16 +3,16 @@ package models.MapElements.Tile.TileFeatures;
 import models.MapElements.Tile.Tile;
 import models.crops.ForagingMineral;
 
-public class hasForagingMinerals implements TileFeature, hasForaging {
+public class hasForagingMinerals extends hasForaging implements TileFeature {
     private ForagingMineral foragingMinerals;
     private final Tile tile;
 
     hasForagingMinerals(ForagingMineral foragingMinerals, Tile tile) {
+        super(tile);
         this.foragingMinerals = foragingMinerals;
         this.tile = tile;
     }
 
-    @Override
     public void collectForagingElement() {
 
     }

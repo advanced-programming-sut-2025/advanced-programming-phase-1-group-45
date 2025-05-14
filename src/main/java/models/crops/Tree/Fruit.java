@@ -18,7 +18,7 @@ public class Fruit {
         this.BaseSellPrice = BaseSellPrice;
         this.isEdible = isEdible;
         this.energy = energy;
-        AllCropsLoader.getInstance().addFruit(this);
+        //AllCropsLoader.getInstance().addFruit(this);
     }
 
     public String getName() {

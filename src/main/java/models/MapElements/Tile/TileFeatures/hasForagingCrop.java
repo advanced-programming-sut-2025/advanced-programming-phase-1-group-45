@@ -11,7 +11,6 @@ public class hasForagingCrop extends hasForaging implements TileFeature {
         this.foragingCrop = foragingCrop;
     }
 
-    @Override
     public void collectForagingElement() {
         super.collectForagingElement(this.getClass());
     }

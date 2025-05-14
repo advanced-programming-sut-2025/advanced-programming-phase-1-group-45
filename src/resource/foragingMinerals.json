@@ -1,0 +1,89 @@
+{
+  "foragingMinerals": [
+    {
+      "name": "Quartz",
+      "description": "A clear crystal commonly found in caves and mines.",
+      "sellPrice": 25
+    },
+    {
+      "name": "Earth Crystal",
+      "description": "A resinous substance found near the surface.",
+      "sellPrice": 50
+    },
+    {
+      "name": "Frozen Tear",
+      "description": "A crystal fabled to be the frozen tears of a yeti.",
+      "sellPrice": 75
+    },
+    {
+      "name": "Fire Quartz",
+      "description": "A glowing red crystal commonly found near hot lava.",
+      "sellPrice": 100
+    },
+    {
+      "name": "Emerald",
+      "description": "A precious stone with a brilliant green color.",
+      "sellPrice": 250
+    },
+    {
+      "name": "Aquamarine",
+      "description": "A shimmery blue-green gem.",
+      "sellPrice": 180
+    },
+    {
+      "name": "Ruby",
+      "description": "A precious stone that is sought after for its rich color and beautiful luster.",
+      "sellPrice": 250
+    },
+    {
+      "name": "Amethyst",
+      "description": "A purple variant of quartz.",
+      "sellPrice": 100
+    },
+    {
+      "name": "Topaz",
+      "description": "Fairly common but still prized for its beauty.",
+      "sellPrice": 80
+    },
+    {
+      "name": "Jade",
+      "description": "A pale green ornamental stone.",
+      "sellPrice": 200
+    },
+    {
+      "name": "Diamond",
+      "description": "A rare and valuable gem.",
+      "sellPrice": 750
+    },
+    {
+      "name": "Prismatic Shard",
+      "description": "A very rare and powerful substance with unknown origins.",
+      "sellPrice": 2000
+    },
+    {
+      "name": "Copper",
+      "description": "A common ore that can be smelted into bars.",
+      "sellPrice": 5
+    },
+    {
+      "name": "Iron",
+      "description": "A fairly common ore that can be smelted into bars.",
+      "sellPrice": 10
+    },
+    {
+      "name": "Gold",
+      "description": "A precious ore that can be smelted into bars.",
+      "sellPrice": 25
+    },
+    {
+      "name": "Iridium",
+      "description": "An exotic ore with many curious properties. Can be smelted into bars.",
+      "sellPrice": 100
+    },
+    {
+      "name": "Coal",
+      "description": "A combustible rock that is useful for crafting and smelting.",
+      "sellPrice": 15
+    }
+  ]
+}

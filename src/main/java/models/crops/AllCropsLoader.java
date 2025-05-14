@@ -2,12 +2,11 @@ package models.crops;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.sun.source.tree.Tree;
 import models.crops.Crop.CropInfo;
 import models.crops.Tree.Fruit;
 import models.crops.Tree.TreeInfo;
 
-import java.io.FileReader;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,7 @@ public class AllCropsLoader {
     private static final Gson gson = new Gson();
     String baseAddress = "src/main/java/models/crops/";
 
-    public void initialize() {
+    public AllCropsLoader() {
         allSeeds = new ArrayList<>();
         allForagingCrops = new ArrayList<>();
         allForagingMinerals = new ArrayList<>();
@@ -32,11 +31,12 @@ public class AllCropsLoader {
         allCrops = new ArrayList<>();
         allTrees = new ArrayList<>();
         allFruits = new ArrayList<>();
-        loadForagingCrops();
-        loadForagingMinerals();
-        loadForagingSeeds();
+//        loadSeeds();
+//        loadForagingCrops();
+//        loadForagingMinerals();
+//        loadForagingSeeds();
         loadCrops();
-        loadTrees();
+//        loadTrees();
     }
 
     public void loadForagingCrops() {
@@ -44,8 +44,9 @@ public class AllCropsLoader {
         try (FileReader fr = new FileReader(filePath)) {
             Type forageCropsList = new TypeToken<ArrayList<ForagingCrop>>() {
             }.getType();
-            allForagingCrops = gson.fromJson(fr, forageCropsList);
+            allForagingCrops = AllCropsLoader.gson.fromJson(fr, forageCropsList);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Error loading foragingCrops.json: " + e.getMessage());
         }
     }
@@ -55,8 +56,9 @@ public class AllCropsLoader {
         try (FileReader fr = new FileReader(filePath)) {
             Type forageCropsList = new TypeToken<ArrayList<ForagingMineral>>() {
             }.getType();
-            allForagingMinerals = gson.fromJson(fr, forageCropsList);
+            allForagingMinerals = AllCropsLoader.gson.fromJson(fr, forageCropsList);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Error loading foragingMinerals.json: " + e.getMessage());
         }
     }
@@ -66,7 +68,7 @@ public class AllCropsLoader {
         try (FileReader fr = new FileReader(filePath)) {
             Type forageCropsList = new TypeToken<ArrayList<ForagingSeed>>() {
             }.getType();
-            allForagingSeeds = gson.fromJson(fr, forageCropsList);
+            allForagingSeeds = AllCropsLoader.gson.fromJson(fr, forageCropsList);
         } catch (Exception e) {
             System.out.println("Error loading foragingSeeds.json: " + e.getMessage());
         }
@@ -77,28 +79,47 @@ public class AllCropsLoader {
         try (FileReader fr = new FileReader(filePath)) {
             Type forageCropsList = new TypeToken<ArrayList<TreeInfo>>() {
             }.getType();
-            allTrees = gson.fromJson(fr, forageCropsList);
+            allTrees = AllCropsLoader.gson.fromJson(fr, forageCropsList);
         } catch (Exception e) {
             System.out.println("Error loading trees.json: " + e.getMessage());
         }
     }
+    /*
+            final Path storage = Paths.get("Crops.json");
+    try {
+            if (Files.exists(storage)) {
+                // اگر JSON ساختار ریشه دارد:
+                var wrapperType = new TypeToken<CropWrapper>() {}.getType();
+                CropWrapper wrapper = AllCropsLoader.instance.gson.fromJson(Files.readString(storage), wrapperType);
+                allCrops = wrapper.getCrops();
+
+                // اگر JSON مستقیم آرایه است:
+                // var type = new TypeToken<List<CropInfo>>() {}.getType();
+                // allCrops = gson.fromJson(Files.readString(storage), type);
+            }
+        } catch (IOException e) {
+            System.err.println("خطا در خواندن فایل Crops.json:");
+            e.printStackTrace();
+        }
+     */
 
     public void loadCrops() {
-        String filePath = baseAddress + "Crop/Crops.json";
-        try (FileReader fr = new FileReader(filePath)) {
-            Type forageCropsList = new TypeToken<ArrayList<CropInfo>>() {
-            }.getType();
-            allCrops = gson.fromJson(fr, forageCropsList);
+        try(InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Crops.json");
+            InputStreamReader reader = new InputStreamReader(inputStream)){
+            Type copyList = new TypeToken<List<CropInfo>>() {}.getType();
+            allCrops = gson.fromJson(reader, copyList);
         } catch (Exception e) {
             System.out.println("Error loading Crops.json: " + e.getMessage());
+            e.printStackTrace();
+            allCrops = new ArrayList<>();
         }
     }
     public void loadSeeds() {
-        String filePath = baseAddress + "Seeds.json";
+        String filePath = baseAddress + "foragingSeeds.json";
         try (FileReader fr = new FileReader(filePath)) {
             Type forageCropsList = new TypeToken<ArrayList<Seed>>() {
             }.getType();
-            allSeeds = gson.fromJson(fr, forageCropsList);
+            allSeeds = AllCropsLoader.gson.fromJson(fr, forageCropsList);
         } catch (Exception e) {
             System.out.println("Error loading Seeds.json: " + e.getMessage());
         }
@@ -113,9 +134,9 @@ public class AllCropsLoader {
         return null;
     }
 
-    public static AllCropsLoader getInstance() {
-        return instance;
-    }
+//    public static AllCropsLoader getInstance() {
+//        return instance;
+//    }
 
     public void addFruit(Fruit fruit) {
         allFruits.add(fruit);

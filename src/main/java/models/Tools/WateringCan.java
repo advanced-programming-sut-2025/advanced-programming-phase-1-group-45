@@ -1,6 +1,7 @@
 package models.Tools;
 
 import com.google.common.eventbus.Subscribe;
+import models.Enums.Tile;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
@@ -17,14 +18,13 @@ public class WateringCan extends Tool implements UpgradeAbleTool {
         GameEventBus.INSTANCE.register(this);
     }
 
-    @Override
     public void useTool() {
-        if (User.getEnergy < level.getEnergy()) {
-            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
-        }
-        //TODO
-        //shokm zadan
-        User.decreaseEnergy(Math.max(level.getEnergy() - farmingReachedLastLevel, 0));
+//        if (User.getEnergy < level.getEnergy()) {
+//            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
+//        }
+//        //TODO
+//        //shokm zadan
+//        User.decreaseEnergy(Math.max(level.getEnergy() - farmingReachedLastLevel, 0));
     }
 
     @Override
@@ -63,4 +63,13 @@ public class WateringCan extends Tool implements UpgradeAbleTool {
         }
     }
 
+    @Override
+    public void useTool(Tile targetTile) {
+
+    }
+
+    @Override
+    public void decreaseEnergy() {
+
+    }
 }
