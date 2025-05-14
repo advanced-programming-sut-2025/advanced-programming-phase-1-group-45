@@ -5,17 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time">
-      <change afterPath="$PROJECT_DIR$/src/main/java/models/Animal/AnimalType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/models/Crafting/CraftManager.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/models/Crafting/RecipeOfCrafting.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/views/Orders.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Animal.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Barn.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Barn.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Crafting.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Energy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Energy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Player.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/models/fish/Fishing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/fish/Fishing.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Crafting/CraftManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Crafting/CraftManager.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
