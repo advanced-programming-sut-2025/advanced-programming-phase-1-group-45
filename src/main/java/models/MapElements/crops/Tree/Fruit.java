@@ -51,7 +51,7 @@ public class Fruit implements BackPackItem {
     }
 
     @Override
-    public void saveInInventory() {
-        Player.getInventory().addItem(this);
+    public void saveInInventory(int amount) {
+        Player.getInventory().addItem(this, amount);
     }
 }

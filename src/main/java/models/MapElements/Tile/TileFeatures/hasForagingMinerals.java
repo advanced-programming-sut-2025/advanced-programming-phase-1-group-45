@@ -4,16 +4,17 @@ import models.MapElements.Tile.Tile;
 import models.MapElements.crops.ForagingMineral;
 
 public class hasForagingMinerals extends hasForaging implements TileFeature {
-    private ForagingMineral foragingMinerals;
-    private final Tile tile;
+    private final ForagingMineral mineral;
 
-    hasForagingMinerals(ForagingMineral foragingMinerals, Tile tile) {
+    public hasForagingMinerals(ForagingMineral foragingMinerals, Tile tile) {
         super(tile);
-        this.foragingMinerals = foragingMinerals;
-        this.tile = tile;
+        this.mineral = foragingMinerals;
+        tile.setSymbol('+');
     }
 
     public void collectForagingElement() {
-
+        mineral.saveInInventory(1);
+        super.getTile().removeFeature(hasForaging.class);
+        super.getTile().setSymbol('Q');
     }
 }

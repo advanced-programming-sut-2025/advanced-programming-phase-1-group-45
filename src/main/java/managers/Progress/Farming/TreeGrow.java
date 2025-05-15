@@ -1,6 +1,7 @@
-package models.MapElements.crops.Tree;
+package managers.Progress.Farming;
 
 import managers.TimeManager;
+import models.MapElements.crops.Tree.TreeInMap;
 
 import java.util.Arrays;
 

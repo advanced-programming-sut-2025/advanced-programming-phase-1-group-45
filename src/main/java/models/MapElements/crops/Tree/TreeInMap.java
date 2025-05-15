@@ -1,8 +1,8 @@
 package models.MapElements.crops.Tree;
 
-import models.MapElements.Tile.TileFeatures.canGrow;
+import models.MapElements.Tile.TileFeatures.TileFeature;
 
-public class TreeInMap extends canGrow {
+public class TreeInMap implements TileFeature {
     private final TreeInfo tree;
     private boolean completeGrow = false;
     private boolean harvestAble = false;

@@ -1,4 +1,4 @@
-package managers;
+package managers.Progress.Farming;
 
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.hasPlant;

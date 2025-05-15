@@ -1,10 +1,12 @@
 package models.MapElements.crops.Plant;
 
 import models.Enums.Season;
+import models.GameSession;
 import models.MapElements.crops.AllCropsLoader;
 import models.MapElements.crops.PlantSeed;
+import models.Tools.Backpack.BackPackItem;
 
-public class PlantInfo {
+public class PlantInfo implements BackPackItem {
     private final String name;
     private final String source;
     private final int[] stages;
@@ -91,5 +93,15 @@ public class PlantInfo {
             seasonArray[i] = Season.valueOf(seasons[i].toUpperCase());
         }
         return seasonArray;
+    }
+
+    @Override
+    public String getItemName() {
+        return name;
+    }
+
+    @Override
+    public void saveInInventory(int amount) {
+        GameSession.getCurrentPlayer().getInventory().addItem(this, amount);
     }
 }

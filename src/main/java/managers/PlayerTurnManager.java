@@ -1,6 +1,8 @@
 package managers;
 
 import com.google.common.eventbus.Subscribe;
+import controllers.WeatherController;
+import models.Enums.Weather;
 import models.Events.GameEventBus;
 import models.Events.TurnChangedEvent;
 import models.Events.TurnEndedEvent;

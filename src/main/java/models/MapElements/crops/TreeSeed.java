@@ -3,7 +3,7 @@ package models.MapElements.crops;
 import models.MapElements.crops.Tree.TreeInfo;
 import models.Tools.Backpack.BackPackItem;
 
-public class TreeSeed extends BackPackItem {
+public class TreeSeed implements BackPackItem {
     private final String name;
     private final TreeInfo tree;
 

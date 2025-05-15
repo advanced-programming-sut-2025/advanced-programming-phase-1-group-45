@@ -41,6 +41,10 @@ public class GameMap {
         grid[y][x].setY(y);
     }
 
+    public Tile[][] getMap() {
+        return grid;
+    }
+
     public Tile getTile(int x, int y) {
         if (x < 0 || y < 0 || x >= size || y >= size) {
             return null;

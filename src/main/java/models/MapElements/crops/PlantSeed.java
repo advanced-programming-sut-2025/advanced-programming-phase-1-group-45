@@ -3,7 +3,7 @@ package models.MapElements.crops;
 import models.MapElements.crops.Plant.PlantInfo;
 import models.Tools.Backpack.BackPackItem;
 
-public class PlantSeed extends BackPackItem {
+public class PlantSeed implements BackPackItem {
     private final String name;
     private final PlantInfo plant;
 

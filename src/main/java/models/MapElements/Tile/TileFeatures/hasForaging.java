@@ -15,6 +15,10 @@ public abstract class hasForaging implements TileFeature {
         tile.removeFeature(hasForaging.class);
     }
 
+    public Tile getTile() {
+        return tile;
+    }
+
     //TODO
     //add to inventory
     //increase foraging ability

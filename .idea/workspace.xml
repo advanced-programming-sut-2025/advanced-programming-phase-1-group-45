@@ -4,7 +4,46 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time" />
+    <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time">
+      <change afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/ForagingManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/managers/GrowManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/Farming/GrowManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/managers/PlayerTurnManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/PlayerTurnManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/managers/Progress/Farming.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/Farming/FarmingManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/managers/Progress/Foraging.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/managers/Progress/PlantingSystem.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Enums/Direction.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Enums/Direction.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/GameMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/GameMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/Tile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/Tile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileCreate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileCreate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/canGrow.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/canPlant.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/isEmpty.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForaging.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForaging.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingCrop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingCrop.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingMinerals.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingMinerals.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingSeed.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingSeed.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasPlant.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasPlant.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasTree.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/lakeTile.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/AllCropsLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/AllCropsLoader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingCrop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingCrop.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingMineral.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingMineral.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingSeed.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingSeed.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantGrow.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/Farming/PlantGrow.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/PlantSeed.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/PlantSeed.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/Fruit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/Fruit.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeGrow.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/Farming/TreeGrow.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/TreeSeed.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/TreeSeed.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Player.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Backpack/BackPackItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Backpack/BackPackItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Backpack/Backpack.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Backpack/Backpack.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Tool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Tool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/ToolManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/ToolManager.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -52,33 +91,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.Main.executor": "Run",
-    "Maven.javafx-json-app [clean,install,-U].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "fatemehBranch",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/ASUS/IdeaProjects/advanced-programming-phase-1-group-45/src/main/java/managers",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.javafx-json-app [clean,install,-U].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;extract.method.default.visibility&quot;: &quot;private&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;fatemehBranch&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/ASUS/IdeaProjects/advanced-programming-phase-1-group-45/src/main/java/managers&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\ASUS\IdeaProjects\advanced-programming-phase-1-group-45\src\main\java\managers" />
       <recent name="C:\Users\ASUS\IdeaProjects\advanced-programming-phase-1-group-45\src\main\java\models" />
       <recent name="C:\Users\ASUS\IdeaProjects\advanced-programming-phase-1-group-45\src\main\java\models\MapElement" />
       <recent name="C:\Users\ASUS\IdeaProjects\advanced-programming-phase-1-group-45\src\main\java\models\MapElement\Tile" />
+    </key>
+    <key name="MoveInnerDialog.RECENTS_KEY">
+      <recent name="managers.Progress" />
+      <recent name="" />
+      <recent name="managers.Progress.Farming" />
     </key>
   </component>
   <component name="RunAnythingCache">
@@ -136,6 +181,7 @@
       <workItem from="1746892244940" duration="9403000" />
       <workItem from="1746937223780" duration="3411000" />
       <workItem from="1746988154975" duration="7197000" />
+      <workItem from="1747288285758" duration="11612000" />
     </task>
     <task id="LOCAL-00001" summary="time manager first">
       <option name="closed" value="true" />
