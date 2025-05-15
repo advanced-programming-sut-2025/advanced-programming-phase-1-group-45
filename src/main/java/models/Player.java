@@ -1,5 +1,7 @@
 package models;
 
+import models.Animal.AnimalManager;
+import models.Animal.ProductInfo;
 import models.Crafting.CraftManager;
 import models.Tools.Backpack.Backpack;
 
@@ -7,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static models.User.addItem;
 
 
 public class Player {
@@ -20,6 +24,7 @@ public class Player {
     public boolean isAtHome;
     public User user;
     public static Map<String, ArtisanMachine> artisanMachines = new HashMap<>();
+    private static AnimalManager animalManager;
 
     public Player(int initialEnergy) {
         this.energy = new Energy(initialEnergy);
@@ -30,6 +35,7 @@ public class Player {
         this.trashCanType = "Basic Trash Can";
         this.craftManager = new CraftManager();
         this.isAtHome = false;
+        this.animalManager = new AnimalManager();
     }
 
     public boolean craftItem(String recipeName) {
@@ -213,5 +219,88 @@ public class Player {
         }
 
         return result;
+    }
+
+
+
+    public String createAnimalBuilding(String buildingName, String type, String level, int x, int y) {
+        return animalManager.createBuilding(buildingName, type, level, x, y);
+    }
+
+    public boolean upgradeAnimalBuilding(String buildingName) {
+        return animalManager.upgradeBuilding(buildingName);
+    }
+
+    public String getBuildingInfo(String buildingName) {
+        return animalManager.getBuildingInfo(buildingName);
+    }
+
+    public static List<String> getBuildingsList() {
+        return animalManager.getBuildingsList();
+    }
+
+    // متدهای مربوط به حیوانات
+    public String addAnimal(String name, String type, String buildingName) {
+        return animalManager.addAnimal(name, type, buildingName);
+    }
+
+    public boolean petAnimal(String name) {
+        return animalManager.petAnimal(name);
+    }
+
+    public static ProductInfo collectAnimalProduct(String name, String toolName) {
+        ProductInfo product = animalManager.collectProduct(name, toolName);
+        if (product != null) {
+            // اضافه کردن محصول به inventory
+            addItem(product.getQuality() + " " + product.getProductName(), 1);
+        }
+        return product;
+    }
+
+    public static boolean feedAnimal(String name) {
+        // بررسی وجود یونجه در inventory
+        if (getInventoryCount("Hay") <= 0) {
+            return false;
+        }
+
+        if (animalManager.feedHay(name)) {
+            // کم کردن یونجه از inventory
+            addItem("Hay", -1);
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean shepherdAnimal(String name, int x, int y, boolean toOutside) {
+        return animalManager.shepherdAnimal(name, x, y, toOutside);
+    }
+
+    public static int sellAnimal(String name) {
+        return animalManager.sellAnimal(name);
+    }
+
+    public boolean setAnimalFriendship(String name, int amount) {
+        return animalManager.setFriendship(name, amount);
+    }
+
+    public void updateAnimals() {
+        animalManager.onDayEnd();
+    }
+
+    public static List<String> getAnimalsList() {
+        return animalManager.getAnimalsList();
+    }
+
+    public static List<String> getAnimalsWithProduce() {
+        return animalManager.getAnimalsWithProduce();
+    }
+
+    public static String getAnimalInfo(String name) {
+        return animalManager.getAnimalInfo(name);
+    }
+
+    public List<String> getAvailableBuildingsForAnimalType(String animalType) {
+        return animalManager.getAvailableBuildingsForAnimalType(animalType);
     }
 }
