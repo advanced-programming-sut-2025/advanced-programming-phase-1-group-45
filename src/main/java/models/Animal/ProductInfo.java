@@ -2,8 +2,8 @@ package models.Animal;
 
 public class ProductInfo {
 
-    private String productName;
-    private String quality;
+    public String productName;
+    public String quality;
 
     public ProductInfo(String productName, String quality) {
         this.productName = productName;
@@ -23,7 +23,7 @@ public class ProductInfo {
         return quality + " " + productName;
     }
 
-    // محاسبه قیمت محصول بر اساس کیفیت
+   
     public int getPrice() {
         int basePrice = getBasePrice(productName);
         double multiplier;
@@ -45,7 +45,7 @@ public class ProductInfo {
         return (int)(basePrice * multiplier);
     }
 
-    // قیمت پایه محصولات
+    
     private int getBasePrice(String productName) {
         switch (productName) {
             case "Milk":
@@ -75,3 +75,4 @@ public class ProductInfo {
         }
     }
 }
+
