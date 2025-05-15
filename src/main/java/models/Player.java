@@ -1,5 +1,7 @@
 package models;
 
+import models.Tools.Tool;
+
 public class Player {
     private Energy energy;
     private boolean isCollapsed;
@@ -7,6 +9,7 @@ public class Player {
     private String backpackType;
     private int backpackCapacity;
     private String trashCanType;
+    private Tool defaultTool;
 
     public Player(int initialEnergy) {
         this.energy = new Energy(initialEnergy);
@@ -105,5 +108,12 @@ public class Player {
 
     public String getTrashCanType() {
         return trashCanType;
+    }
+
+    public Tool getDefaultTool() {
+        return defaultTool;
+    }
+    public void setDefaultTool(Tool defaultTool) {
+        this.defaultTool = defaultTool;
     }
 }

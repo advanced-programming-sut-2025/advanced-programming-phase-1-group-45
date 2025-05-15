@@ -14,7 +14,7 @@ public class Backpack {
 
     private BackpackType backpackType;
     private HashMap<BackPackItem, Integer> items;
-    private List<Tool> tools;
+    public List<Tool> tools;
 
     public Backpack() {
         this.backpackType = BackpackType.BASIC;
@@ -46,6 +46,14 @@ public class Backpack {
 
     public boolean hasItem(String item) {
         return getNumberOfAnItem(item) > 0;
+    }
+    public boolean hasTool(String tool) {
+        for (Tool tool1 : tools) {
+            if (tool1.getName().equals(tool)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getNumberOfAnItem(String itemName) {

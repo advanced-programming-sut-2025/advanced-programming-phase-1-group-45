@@ -1,4 +1,4 @@
-package models.Tools;
+package models.Enums;
 
 public enum Direction {
 
