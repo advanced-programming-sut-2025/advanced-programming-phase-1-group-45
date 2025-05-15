@@ -1,8 +1,13 @@
 package models;
 
 import models.Crafting.CraftManager;
+import models.Tools.Backpack.Backpack;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 public class Player {
     public Energy energy;
@@ -14,6 +19,7 @@ public class Player {
     public CraftManager craftManager;
     public boolean isAtHome;
     public User user;
+    public static Map<String, ArtisanMachine> artisanMachines = new HashMap<>();
 
     public Player(int initialEnergy) {
         this.energy = new Energy(initialEnergy);
@@ -131,5 +137,81 @@ public class Player {
 
     public String getTrashCanType() {
         return trashCanType;
+    }
+
+
+    public boolean addArtisanMachine(String machineName, String machineType) {
+        if (artisanMachines.containsKey(machineName)) {
+            return false;
+        }
+
+        artisanMachines.put(machineName, new ArtisanMachine(machineType));
+        return true;
+    }
+
+
+    public static boolean useArtisanMachine(String machineName, String inputItem) {
+        if (!artisanMachines.containsKey(machineName)) {
+            return false;
+        }
+
+
+        if (getInventoryCount(inputItem) <= 0) {
+            return false;
+        }
+
+
+        ArtisanMachine machine = artisanMachines.get(machineName);
+        if (machine.startProcessing(inputItem)) {
+            Backpack.addItemAmount(inputItem, -1);
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public static String getArtisanProduct(String machineName) {
+        if (!artisanMachines.containsKey(machineName)) {
+            return null;
+        }
+
+        ArtisanMachine machine = artisanMachines.get(machineName);
+        String product = machine.getProduct();
+
+        if (product != null) {
+            Backpack.addItemAmount(product, 1);
+        }
+
+        return product;
+    }
+
+
+    public void updateArtisanMachines(int hours) {
+        for (ArtisanMachine machine : artisanMachines.values()) {
+            machine.updateTime(hours);
+        }
+    }
+
+
+    public static String getArtisanMachineStatus(String machineName) {
+        if (!artisanMachines.containsKey(machineName)) {
+            return "Machine not found: " + machineName;
+        }
+
+        return artisanMachines.get(machineName).getStatus();
+    }
+
+
+    public static List<String> listArtisanMachines() {
+        List<String> result = new ArrayList<>();
+
+        for (Map.Entry<String, ArtisanMachine> entry : artisanMachines.entrySet()) {
+            String machineName = entry.getKey();
+            ArtisanMachine machine = entry.getValue();
+            result.add(machineName + " - " + machine.getStatus());
+        }
+
+        return result;
     }
 }
