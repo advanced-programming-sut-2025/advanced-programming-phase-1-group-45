@@ -4,7 +4,7 @@ import models.User;
 
 import java.util.List;
 
-public class Orders {
+public class Order {
 
     public void showCraftingRecipes(User user) {
         List<String> recipes = user.getPlayer().getLearnedCraftingRecipes();
