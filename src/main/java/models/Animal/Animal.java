@@ -23,7 +23,6 @@ public class Animal {
         this.produceCollected = true;
     }
 
-
     public String getName() {
         return name;
     }
@@ -44,14 +43,13 @@ public class Animal {
         return wasFedToday;
     }
 
-    public  boolean isWasOutsideToday() {
+    public boolean isWasOutsideToday() {
         return wasOutsideToday;
     }
 
     public boolean isProduceCollected() {
         return produceCollected;
     }
-
 
     public void pet() {
         if (!wasPettedToday) {
@@ -64,34 +62,31 @@ public class Animal {
         capFriendship();
     }
 
-
     public ProductInfo collectProduct() {
         if (produceCollected) {
             System.out.println("Product is collected");
+            return null;
         }
 
         if (!wasFedToday) {
             System.out.println("No food, no product");
+            return null;
         }
 
         produceCollected = true;
         friendship += 5;
         capFriendship();
 
-
         String product = getBaseProduct();
-
 
         if (canProduceSpecialProduct() && shouldProduceSpecial()) {
             product = getSpecialProduct();
         }
 
-
         String quality = determineProductQuality();
 
         return new ProductInfo(product, quality);
     }
-
 
     private boolean canProduceSpecialProduct() {
         return friendship >= 100 &&
@@ -99,12 +94,10 @@ public class Animal {
                         type.equals("Sheep") || type.equals("Duck"));
     }
 
-
     private boolean shouldProduceSpecial() {
         double chance = (friendship / 1500.0) + (random.nextDouble() * 0.5 + 0.5);
         return chance > 1.0;
     }
-
 
     public void feedHay() {
         if (!wasFedToday) {
@@ -114,7 +107,6 @@ public class Animal {
             System.out.println(name + " has already been fed today.");
         }
     }
-
 
     public void goOutside() {
         wasOutsideToday = true;
@@ -126,12 +118,10 @@ public class Animal {
         System.out.println(name + " went outside and ate fresh grass.");
     }
 
-
     public void goInside() {
         wasOutsideToday = false;
         System.out.println(name + " went inside.");
     }
-
 
     private String getBaseProduct() {
         switch (type) {
@@ -154,7 +144,6 @@ public class Animal {
         }
     }
 
-
     private String getSpecialProduct() {
         switch (type) {
             case "Cow":
@@ -169,7 +158,6 @@ public class Animal {
                 return getBaseProduct();
         }
     }
-
 
     private String determineProductQuality() {
         double qualityValue = (random.nextDouble() * 0.5 + 0.5) * (friendship / 1000.0);
@@ -205,7 +193,6 @@ public class Animal {
         capFriendship();
     }
 
-    // محدود کردن میزان دوستی بین 0 و 1000
     private void capFriendship() {
         if (friendship > 1000) {
             friendship = 1000;
@@ -214,13 +201,11 @@ public class Animal {
         }
     }
 
-    // تنظیم سطح دوستی (چیت کد)
     public void setFriendship(int value) {
         friendship = value;
         capFriendship();
     }
 
-    // گرفتن اطلاعات نمایشی حیوان
     public String getInfo() {
         StringBuilder info = new StringBuilder();
         info.append("Name: ").append(name).append("\n");
