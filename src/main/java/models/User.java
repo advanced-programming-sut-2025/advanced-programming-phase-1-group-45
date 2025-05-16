@@ -17,10 +17,11 @@ public class User {
     private int gamesPlayed = 0;
     private String securityQuestion = "What is your grandma's name? ";
     private String securityAnswer = null;
-    private double money = 0.0;
+    private double money;
     private Map<String, Integer> inventory = new HashMap<>();
-    public Player currentPlayer;
+    private Player currentPlayer;
     private String avatar = "@";
+     private String currentShop = null;
 
     public User(String username, String passwordHash, String nickname, String email, String gender) {
         this.username = username;
@@ -28,7 +29,7 @@ public class User {
         this.nickname = nickname;
         this.email = email;
         this.gender = gender;
-        this.money = 0.0;
+        this.money = 1000.0;
         this.currentPlayer = new Player(200);
         this.currentPlayer.user = this; // اضافه کردن ارجاع به User
         this.avatar = "@";
@@ -45,6 +46,7 @@ public class User {
     public String getSecurityAnswer() { return securityAnswer; }
     public double getMoney() { return money; }
     public int getInventoryCount(String item) { return inventory.getOrDefault(item, 0); }
+    public String getCurrentShop(){ return currentShop; }
 
     public void addMoney(double delta) {
         this.money += delta;
