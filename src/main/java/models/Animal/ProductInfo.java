@@ -23,7 +23,6 @@ public class ProductInfo {
         return quality + " " + productName;
     }
 
-   
     public int getPrice() {
         int basePrice = getBasePrice(productName);
         double multiplier;
@@ -45,7 +44,6 @@ public class ProductInfo {
         return (int)(basePrice * multiplier);
     }
 
-    
     private int getBasePrice(String productName) {
         switch (productName) {
             case "Milk":
