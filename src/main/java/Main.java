@@ -6,7 +6,8 @@ public class Main {
         MenuController controller = new MenuController();
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("========");
+         System.out.println("=================================================");
+        System.out.println("             Stardew valley                      ");
 
         while(true) {
             System.out.print("\n> ");
