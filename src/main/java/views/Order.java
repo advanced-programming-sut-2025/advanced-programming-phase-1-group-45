@@ -7,10 +7,15 @@ import models.User;
 import java.util.List;
 
 public class Order {
+    private User currentUser;
 
-    public void showCraftingRecipes(User user) {
-        List<String> recipes = user.getPlayer().getLearnedCraftingRecipes();
-        List<String> craftable = user.getPlayer().getCraftableRecipes();
+    public Order(User user) {
+        this.currentUser = user;
+    }
+
+    public void showCraftingRecipes() {
+        List<String> recipes = currentUser.getPlayer().getLearnedCraftingRecipes();
+        List<String> craftable = currentUser.getPlayer().getCraftableRecipes();
 
         System.out.println("=== Crafting Recipes ===");
         for (String recipe : recipes) {
@@ -19,24 +24,20 @@ public class Order {
         }
     }
 
-
-    public void showCraftingRecipeDetails(User user, String recipeName) {
-        String details = user.getPlayer().getCraftingRecipeDetails(recipeName);
+    public void showCraftingRecipeDetails(String recipeName) {
+        String details = currentUser.getPlayer().getCraftingRecipeDetails(recipeName);
         System.out.println(details);
     }
 
-
-    public void craftItem(User user, String recipeName) {
-        if (user.getPlayer().craftItem(recipeName)) {
+    public void craftItem(String recipeName) {
+        if (currentUser.getPlayer().craftItem(recipeName)) {
             System.out.println("Successfully crafted " + recipeName);
         } else {
             System.out.println("Failed to craft " + recipeName);
         }
     }
 
-
     public void handleArtisanUse(String[] args) {
-
         if (args.length < 3) {
             System.out.println("Usage: artisan use <machine_name> <item_name>");
             return;
@@ -45,23 +46,21 @@ public class Order {
         String machineName = args[1];
         String itemName = args[2];
 
-        if (Player.useArtisanMachine(machineName, itemName)) {
+        if (currentUser.getPlayer().useArtisanMachine(machineName, itemName)) {
             System.out.println("Started processing " + itemName + " in " + machineName);
         } else {
             System.out.println("Failed to use " + machineName);
         }
     }
 
-
     public void handleArtisanGet(String[] args) {
-
         if (args.length < 2) {
             System.out.println("Usage: artisan get <machine_name>");
             return;
         }
 
         String machineName = args[1];
-        String product = Player.getArtisanProduct(machineName);
+        String product = currentUser.getPlayer().getArtisanProduct(machineName);
 
         if (product != null) {
             System.out.println("Harvested " + product + " from " + machineName);
@@ -70,22 +69,18 @@ public class Order {
         }
     }
 
-
     public void handleArtisanStatus(String[] args) {
-        // artisan status <machine_name>
         if (args.length < 2) {
             System.out.println("Usage: artisan status <machine_name>");
             return;
         }
 
         String machineName = args[1];
-        System.out.println(Player.getArtisanMachineStatus(machineName));
+        System.out.println(currentUser.getPlayer().getArtisanMachineStatus(machineName));
     }
 
-
-    public void handleArtisanList(String[] args) {
-
-        List<String> machines =Player.listArtisanMachines();
+    public void handleArtisanList() {
+        List<String> machines = currentUser.getPlayer().listArtisanMachines();
 
         if (machines.isEmpty()) {
             System.out.println("You don't have any artisan machines.");
@@ -98,7 +93,6 @@ public class Order {
     }
 
     public void handleBuildAnimalHouse(String[] args) {
-        // build -a <building_name> -t <type> -l <level> -x <x> -y <y>
         if (args.length < 9) {
             System.out.println("Usage: build -a <building_name> -t <type> -l <level> -x <x> -y <y>");
             return;
@@ -117,17 +111,16 @@ public class Order {
             return;
         }
 
-        if (currentUser.createAnimalBuilding(buildingName, type, level, x, y)) {
+        String result = currentUser.getPlayer().createAnimalBuilding(buildingName, type, level, x, y);
+        if (result.equals("Build successfully")) {
             currentUser.addMoney(-cost);
             System.out.println("Successfully built " + type + " named " + buildingName);
         } else {
-            System.out.println("Failed to build " + type);
+            System.out.println(result);
         }
     }
 
-    // ارتقای ساختمان دامداری
     public void handleUpgradeAnimalHouse(String[] args) {
-        // upgrade -a <building_name>
         if (args.length < 2) {
             System.out.println("Usage: upgrade -a <building_name>");
             return;
@@ -136,17 +129,16 @@ public class Order {
         String buildingName = args[2];
 
         // بررسی وجود ساختمان
-        String buildingInfo = currentUser.getBuildingInfo(buildingName);
+        String buildingInfo = currentUser.getPlayer().getBuildingInfo(buildingName);
         if (buildingInfo.equals("Building not found")) {
             System.out.println("Building not found: " + buildingName);
             return;
         }
 
         // استخراج نوع و سطح فعلی ساختمان
-        String type = ""; // "Coop" یا "Barn"
-        String currentLevel = ""; // "Regular" یا "Big"
+        String type = "";
+        String currentLevel = "";
 
-        // این بخش باید با توجه به ساختار واقعی buildingInfo تنظیم شود
         if (buildingInfo.contains("Type: Coop")) {
             type = "Coop";
         } else {
@@ -171,7 +163,7 @@ public class Order {
             return;
         }
 
-        if (currentUser.upgradeAnimalBuilding(buildingName)) {
+        if (currentUser.getPlayer().upgradeAnimalBuilding(buildingName)) {
             currentUser.addMoney(-cost);
             System.out.println("Successfully upgraded " + buildingName);
         } else {
@@ -179,9 +171,7 @@ public class Order {
         }
     }
 
-    // خرید حیوان
     public void handleBuyAnimal(String[] args) {
-        // buy animal -a <animal_type> -n <name> -b <building_name>
         if (args.length < 6) {
             System.out.println("Usage: buy animal -a <animal_type> -n <name> -b <building_name>");
             return;
@@ -200,17 +190,16 @@ public class Order {
             return;
         }
 
-        if (currentUser.addAnimal(animalName, animalType, buildingName)) {
+        String result = currentUser.getPlayer().addAnimal(animalName, animalType, buildingName);
+        if (result.equals("Add is successfully")) {
             currentUser.addMoney(-cost);
             System.out.println("Successfully bought " + animalType + " named " + animalName);
         } else {
-            System.out.println("Failed to buy animal. Check building capacity and type compatibility.");
+            System.out.println(result);
         }
     }
 
-    // نوازش حیوان
     public void handlePetAnimal(String[] args) {
-        // pet -n <name>
         if (args.length < 2) {
             System.out.println("Usage: pet -n <name>");
             return;
@@ -218,16 +207,14 @@ public class Order {
 
         String animalName = args[2];
 
-        if (currentUser.petAnimal(animalName)) {
+        if (currentUser.getPlayer().petAnimal(animalName)) {
             System.out.println("You pet " + animalName + ".");
         } else {
             System.out.println("Animal not found: " + animalName);
         }
     }
 
-    // جمع‌آوری محصول حیوان
     public void handleCollectProduce(String[] args) {
-        // collect produce -n <name> -t <tool_name>
         if (args.length < 4) {
             System.out.println("Usage: collect produce -n <name> -t <tool_name>");
             return;
@@ -237,12 +224,12 @@ public class Order {
         String toolName = args[5];
 
         // بررسی وجود ابزار در inventory
-        if (!toolName.equals("") && Player.getInventoryCount(toolName) <= 0) {
+        if (!toolName.equals("") && currentUser.getInventoryCount(toolName) <= 0) {
             System.out.println("You don't have " + toolName);
             return;
         }
 
-        ProductInfo product = Player.collectAnimalProduct(animalName, toolName);
+        ProductInfo product = currentUser.getPlayer().collectAnimalProduct(animalName, toolName);
 
         if (product != null) {
             System.out.println("Collected " + product.toString() + " from " + animalName);
@@ -251,9 +238,7 @@ public class Order {
         }
     }
 
-    // تغذیه حیوان
     public void handleFeedAnimal(String[] args) {
-        // feed hay -n <name>
         if (args.length < 3) {
             System.out.println("Usage: feed hay -n <name>");
             return;
@@ -261,7 +246,7 @@ public class Order {
 
         String animalName = args[3];
 
-        if (Player.feedAnimal(animalName)) {
+        if (currentUser.getPlayer().feedAnimal(animalName)) {
             System.out.println("Fed " + animalName + " with hay.");
         } else {
             System.out.println("Failed to feed " + animalName + ". Make sure you have hay in your inventory.");
@@ -269,7 +254,6 @@ public class Order {
     }
 
     public void handleShepherdAnimal(String[] args) {
-        // shepherd animals -n <name> -l <x> <y> [--inside]
         if (args.length < 6) {
             System.out.println("Usage: shepherd animals -n <name> -l <x> <y> [--inside]");
             return;
@@ -280,7 +264,7 @@ public class Order {
         int y = Integer.parseInt(args[6]);
         boolean toInside = args.length >= 8 && args[7].equals("--inside");
 
-        if (Player.shepherdAnimal(animalName, x, y, !toInside)) {
+        if (currentUser.getPlayer().shepherdAnimal(animalName, x, y, !toInside)) {
             if (toInside) {
                 System.out.println(animalName + " went inside.");
             } else {
@@ -291,9 +275,7 @@ public class Order {
         }
     }
 
-    // فروش حیوان
     public void handleSellAnimal(String[] args) {
-        // sell animal -n <name>
         if (args.length < 3) {
             System.out.println("Usage: sell animal -n <name>");
             return;
@@ -301,20 +283,18 @@ public class Order {
 
         String animalName = args[3];
 
-        int sellPrice = Player.sellAnimal(animalName);
+        int sellPrice = currentUser.getPlayer().sellAnimal(animalName);
 
         if (sellPrice > 0) {
-            Player.addMoney(sellPrice);
+            currentUser.addMoney(sellPrice);
             System.out.println("Sold " + animalName + " for " + sellPrice + " gold.");
         } else {
             System.out.println("Animal not found: " + animalName);
         }
     }
 
-    // نمایش لیست حیوانات
-    public void handleListAnimals(String[] args) {
-        // animals
-        List<String> animalsList = currentUser.getAnimalsList();
+    public void handleListAnimals() {
+        List<String> animalsList = currentUser.getPlayer().getAnimalsList();
 
         if (animalsList.isEmpty()) {
             System.out.println("You don't have any animals.");
@@ -326,10 +306,8 @@ public class Order {
         }
     }
 
-    // نمایش لیست حیوانات با محصول جمع‌آوری نشده
-    public void handleListProduces(String[] args) {
-        // produces
-        List<String> animalsWithProduce = currentUser.getAnimalsWithProduce();
+    public void handleListProduces() {
+        List<String> animalsWithProduce = currentUser.getPlayer().getAnimalsWithProduce();
 
         if (animalsWithProduce.isEmpty()) {
             System.out.println("No animals have products to collect.");
@@ -341,9 +319,7 @@ public class Order {
         }
     }
 
-    // نمایش اطلاعات حیوان
     public void handleShowAnimal(String[] args) {
-        // animal info -n <name>
         if (args.length < 3) {
             System.out.println("Usage: animal info -n <name>");
             return;
@@ -351,14 +327,12 @@ public class Order {
 
         String animalName = args[3];
 
-        String animalInfo = Player.getAnimalInfo(animalName);
+        String animalInfo = currentUser.getPlayer().getAnimalInfo(animalName);
         System.out.println(animalInfo);
     }
 
-    // نمایش لیست ساختمان‌های دامداری
-    public void handleListBuildings(String[] args) {
-        // buildings
-        List<String> buildingsList = Player.getBuildingsList();
+    public void handleListBuildings() {
+        List<String> buildingsList = currentUser.getPlayer().getBuildingsList();
 
         if (buildingsList.isEmpty()) {
             System.out.println("You don't have any animal buildings.");
@@ -370,9 +344,7 @@ public class Order {
         }
     }
 
-    // نمایش اطلاعات ساختمان دامداری
     public void handleShowBuilding(String[] args) {
-        // building info -n <name>
         if (args.length < 3) {
             System.out.println("Usage: building info -n <name>");
             return;
@@ -380,13 +352,11 @@ public class Order {
 
         String buildingName = args[3];
 
-        String buildingInfo = currentUser.getBuildingInfo(buildingName);
+        String buildingInfo = currentUser.getPlayer().getBuildingInfo(buildingName);
         System.out.println(buildingInfo);
     }
 
-    // تنظیم سطح دوستی حیوان (چیت کد)
     public void handleSetFriendship(String[] args) {
-        // cheat set friendship -n <animal name> -c <amount>
         if (args.length < 6) {
             System.out.println("Usage: cheat set friendship -n <animal name> -c <amount>");
             return;
@@ -395,60 +365,79 @@ public class Order {
         String animalName = args[4];
         int amount = Integer.parseInt(args[6]);
 
-        if (currentUser.setAnimalFriendship(animalName, amount)) {
+        if (currentUser.getPlayer().setAnimalFriendship(animalName, amount)) {
             System.out.println("Set " + animalName + "'s friendship to " + amount);
         } else {
             System.out.println("Animal not found: " + animalName);
         }
     }
 
-    // محاسبه هزینه ساخت ساختمان
     private int getBuildingCost(String type, String level) {
         if (type.equals("Coop")) {
             switch (level) {
-                case "Regular": return 4000;
-                case "Big": return 10000;
-                case "Deluxe": return 20000;
-                default: return 4000;
+                case "Regular":
+                    return 4000;
+                case "Big":
+                    return 10000;
+                case "Deluxe":
+                    return 20000;
+                default:
+                    return 4000;
             }
         } else { // Barn
             switch (level) {
-                case "Regular": return 6000;
-                case "Big": return 12000;
-                case "Deluxe": return 25000;
-                default: return 6000;
+                case "Regular":
+                    return 6000;
+                case "Big":
+                    return 12000;
+                case "Deluxe":
+                    return 25000;
+                default:
+                    return 6000;
             }
         }
     }
 
-    // محاسبه هزینه ارتقای ساختمان
     private int getUpgradeCost(String type, String currentLevel) {
         if (type.equals("Coop")) {
             switch (currentLevel) {
-                case "Regular": return 10000; // ارتقا به Big
-                case "Big": return 20000; // ارتقا به Deluxe
-                default: return 0;
+                case "Regular":
+                    return 10000; // ارتقا به Big
+                case "Big":
+                    return 20000; // ارتقا به Deluxe
+                default:
+                    return 0;
             }
         } else { // Barn
             switch (currentLevel) {
-                case "Regular": return 12000; // ارتقا به Big
-                case "Big": return 25000; // ارتقا به Deluxe
-                default: return 0;
+                case "Regular":
+                    return 12000; // ارتقا به Big
+                case "Big":
+                    return 25000; // ارتقا به Deluxe
+                default:
+                    return 0;
             }
         }
     }
 
-    // محاسبه قیمت خرید حیوان
     private int getAnimalCost(String animalType) {
         switch (animalType) {
-            case "Chicken": return 800;
-            case "Duck": return 1200;
-            case "Rabbit": return 4000;
-            case "Cow": return 1500;
-            case "Goat": return 4000;
-            case "Sheep": return 8000;
-            case "Pig": return 16000;
-            default: return 1000;
+            case "Chicken":
+                return 800;
+            case "Duck":
+                return 1200;
+            case "Rabbit":
+                return 4000;
+            case "Cow":
+                return 1500;
+            case "Goat":
+                return 4000;
+            case "Sheep":
+                return 8000;
+            case "Pig":
+                return 16000;
+            default:
+                return 1000;
         }
     }
 }
