@@ -120,10 +120,5 @@ public class Energy {
     public void reduceByHalf() {
         this.currentEnergy *= 0.5;
     }
-}
 
-
-    public void addEnergy(int amount) {
-        currentEnergy = Math.min(currentEnergy + amount, maxEnergy);
-    }
 }
