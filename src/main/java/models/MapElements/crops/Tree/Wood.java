@@ -5,9 +5,11 @@ import models.Tools.Backpack.BackPackItem;
 
 public class Wood implements BackPackItem {
     private final TreeInfo tree;
+    private boolean isForaging = false;
 
-    public Wood(TreeInfo tree) {
+    public Wood(TreeInfo tree, boolean isForaging) {
         this.tree = tree;
+        this.isForaging = isForaging;
     }
 
     public TreeInfo getTree() {

@@ -7,6 +7,7 @@ import models.Events.SeasonChangedEvent;
 import models.MapElements.Tile.Tile;
 import managers.Progress.Farming.TreeGrow;
 import models.MapElements.crops.Tree.TreeInMap;
+import models.MapElements.crops.Tree.Wood;
 
 import java.util.Arrays;
 
@@ -14,12 +15,14 @@ public class hasTree implements TileFeature {
     private final Tile tile;
     private TreeInMap tree;
     private TreeGrow treeGrow;
+    private Wood wood;
 
     public hasTree(Tile tile, TreeInMap tree) {
         this.tile = tile;
         this.tree = tree;
         treeGrow = new TreeGrow();
-        tile.setSymbol('T');
+        this.wood = new Wood(tree.getTreeInfo(), false);
+        tile.setSymbol('t');
         GameEventBus.INSTANCE.register(this);
     }
 
@@ -53,5 +56,16 @@ public class hasTree implements TileFeature {
         tile.addFeature(isEmpty.class, new isEmpty());
         tile.removeFeature(canWater.class);
         tile.setSymbol('.');
+    }
+
+    public void harvest() {
+        if (tree.isHarvestAble()) {
+            tree.harvest();
+        }
+    }
+
+    public void chopTree() {
+        wood.saveInInventory(1);
+        removeThisFeature();
     }
 }

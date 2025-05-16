@@ -37,7 +37,6 @@ public class TreeInMap implements TileFeature {
         return completeGrow;
     }
 
-    @Override
     public void advanceDayInStage() {
         if (!completeGrow) {
             daysInStage++;
@@ -45,7 +44,7 @@ public class TreeInMap implements TileFeature {
                 advanceStage();
                 daysInStage = 0;
             }
-        } else {
+        } else if(!harvestAble) {
             daysInCycle++;
             if (daysInCycle == tree.getFruit().getHarvestCycle()){
                 harvestAble = true;
@@ -54,7 +53,6 @@ public class TreeInMap implements TileFeature {
         }
     }
 
-    @Override
     public void advanceStage() {
         if (currentStage < growStages.length) {
             currentStage++;
@@ -65,8 +63,14 @@ public class TreeInMap implements TileFeature {
         }
     }
 
-    @Override
+
     public int getDaysInCurrentStage() {
         return growStages[currentStage];
+    }
+
+    public void harvest() {
+        tree.getFruit().saveInInventory(1);
+        harvestAble = false;
+        daysInCycle = 0;
     }
 }

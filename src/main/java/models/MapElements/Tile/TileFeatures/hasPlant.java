@@ -27,7 +27,7 @@ public class hasPlant implements TileFeature {
     public hasPlant(Tile tile, PlantInMap plantInMap) {
         this.tile = tile;
         this.plant = plantInMap;
-        tile.setSymbol('P');
+        tile.setSymbol('p');
         tile.addFeature(canWater.class, new canWater(tile));
         PlantGrow plantGrowStrategy = new PlantGrow();
         GameEventBus.INSTANCE.register(this);

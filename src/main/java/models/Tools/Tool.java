@@ -14,7 +14,6 @@ public abstract class Tool implements BackPackItem {
     }
 
     public abstract void useTool(Tile targetTile);
-    public abstract void decreaseEnergy();
 
 
     public String getName() {

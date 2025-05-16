@@ -5,6 +5,7 @@ import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Farming;
+import models.GameSession;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.canWater;
 import models.Tools.ToolLevel.ToolLevel;
@@ -21,14 +22,6 @@ public class WateringCan extends Tool implements UpgradeAbleTool {
         GameEventBus.INSTANCE.register(this);
     }
 
-    public void useTool() {
-//        if (User.getEnergy < level.getEnergy()) {
-//            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
-//        }
-//        //TODO
-//        //shokm zadan
-//        User.decreaseEnergy(Math.max(level.getEnergy() - farmingReachedLastLevel, 0));
-    }
 
     public void addWaterAmount(int amount) {
         waterAmount += amount;
@@ -76,7 +69,14 @@ public class WateringCan extends Tool implements UpgradeAbleTool {
 
     @Override
     public void useTool(Tile targetTile) {
+        if (waterAmount == 0) {
+            throw new IllegalStateException("you have not enough water.");
+        } else if (!GameSession.getCurrentPlayer().getEnergy().
+                consumeEnergy(level.getEnergy() - farmingReachedLastLevel)) {
+            throw new IllegalStateException("You have not enough Energy to use this tool.");
+        }
         if (targetTile.hasFeature(canWater.class) && !targetTile.getFeature(canWater.class).isWateredToday()) {
+            decreaseEnergy();
             targetTile.getFeature(canWater.class).water();
             waterAmount--;
         } else if (targetTile.hasFeature(canWater.class) &&
@@ -85,11 +85,5 @@ public class WateringCan extends Tool implements UpgradeAbleTool {
         } else {
             throw new IllegalStateException("You can't use this tool in this tile");
         }
-    }
-
-
-    @Override
-    public void decreaseEnergy() {
-
     }
 }

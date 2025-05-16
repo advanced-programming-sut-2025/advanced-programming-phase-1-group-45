@@ -113,7 +113,7 @@ public class GameMenu implements Menu{
         }
         else if(command.startsWith("purchase ")) {
             handlePurchaseCommand(command, sm, controller);
-        }else System.out.println("invalid command");
+        } else System.out.println("invalid command");
     }
 
     private void handlePurchaseCommand(String command, ShopManager sm, MenuController controller) {

@@ -12,7 +12,7 @@ public class ForagingTree {
     public ForagingTree(TreeInfo tree) {
         this.tree = tree;
         tree.setForaging(true);
-        wood = new Wood(tree);
+        wood = new Wood(tree, true);
     }
 
     public Wood getWood() {
