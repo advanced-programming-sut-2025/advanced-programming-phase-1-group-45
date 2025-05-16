@@ -69,6 +69,7 @@ public class User {
     public void setMaxMoney(double maxMoney) { this.maxMoney = maxMoney; }
     public void setSecurityQuestion(String securityQuestion) { this.securityQuestion = securityQuestion; }
     public void setSecurityAnswer(String securityAnswer) { this.securityAnswer = securityAnswer; }
+    public void setCurrentShop(String currentShop){ this.currentShop = currentShop; }
 
     // Friendships
     private final Map<String, Friendship> friendships = new HashMap<>();
