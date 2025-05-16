@@ -59,7 +59,7 @@ public class Energy {
 
     public void restoreEnergyForNewDay(boolean collapsed) {
         if (collapsed) {
-            currentEnergy = (int) (maxEnergy * 0.75);
+            currentEnergy = (int)(maxEnergy * 0.75);
         } else {
             currentEnergy = maxEnergy;
         }
@@ -113,14 +113,12 @@ public class Energy {
         return isUnlimited;
     }
 
+    public void addEnergy(int amount) {
+        currentEnergy = Math.min(currentEnergy + amount, maxEnergy);
+    }
 
     public void reduceByHalf() {
         this.currentEnergy *= 0.5;
-    }
-
-
-    public void addEnergy(int amount) {
-        currentEnergy = Math.min(currentEnergy + amount, maxEnergy);
     }
 
 }
