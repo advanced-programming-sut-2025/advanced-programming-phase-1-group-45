@@ -8,7 +8,8 @@ public enum TileType {
     QUARRY("Q", "quarry"),
     TREE("T", "tree"),
     STONE("S", "stone"),
-    SHIPPINGBIN("s", "shippingbin");
+    SHIPPINGBIN("s", "shippingbin"),
+    PLAYER("@", "player");
     private char symbol;
     private String description;
 
