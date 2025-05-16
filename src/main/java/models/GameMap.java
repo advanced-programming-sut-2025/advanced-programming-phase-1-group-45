@@ -30,15 +30,15 @@ public class GameMap {
         }
     }
 
-    private void placeRandom(Tile t, Random rand) {
+ private void placeRandom(Tile t, Random rand) {
         int x, y;
         do {
             x = rand.nextInt(size);
             y = rand.nextInt(size);
         } while (grid[y][x].getTileType() != TileType.PLAIN);
         grid[y][x] = t;
-        grid[y][x].setX(x);
-        grid[y][x].setY(y);
+        grid[y][x].setX(y);
+        grid[y][x].setY(x);
     }
 
     public Tile getTile(int x, int y) {
@@ -57,16 +57,16 @@ public class GameMap {
             return;
         }
         grid[y][x] = tile;
-        grid[y][x].setX(x);
-        grid[y][x].setY(y);
+        grid[y][x].setX(y);
+        grid[y][x].setY(x);
     }
 
     private void fillPlain() {
-        for (int y = 0; y < size; y++) {
-            for (int x = 0; x < size; x++) {
-                grid[y][x] = TileCreate.create(TileType.PLAIN);
-                grid[y][x].setX(x);
-                grid[y][x].setY(y);
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                grid[x][y] = TileCreate.create(TileType.PLAIN);
+                grid[x][y].setX(x);
+                grid[x][y].setY(y);
             }
         }
     }
