@@ -3,7 +3,7 @@ package models.Animal;
 import models.Building;
 import models.GameMap;
 import models.MapElements.Tile.Tile;
-
+import models.MapElements.Tile.TileFeatures.IsEmpty;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +14,7 @@ public class AnimalManager {
     public Map<String, Animal> animals;
     public Map<String, String> animalBuildings;
     public Map<String, Building> buildings;
+    private GameMap gameMap;
 
     public AnimalManager() {
         animals = new HashMap<>();
@@ -21,24 +22,28 @@ public class AnimalManager {
         buildings = new HashMap<>();
     }
 
+    public void setGameMap(GameMap map) {
+        this.gameMap = map;
+    }
 
     public String createBuilding(String buildingName, String type, String level, int x, int y) {
         if (buildings.containsKey(buildingName)) {
             return "This name is already taken ";
         }
-        Tile tile = GameMap.getTile(x,y);
 
+        if (gameMap == null) {
+            return "No game map available";
+        }
 
+        Tile tile = gameMap.getTile(x, y);
 
-        if(tile != null) {
+        if (tile != null && tile.hasFeature(IsEmpty.class)) {
             buildings.put(buildingName, new Building(type, level, x, y));
             return "Build successfully";
-        }
-        else (tile.hasFeature(isEmpty.class) != null){
+        } else {
             return "No space for building";
         }
     }
-
 
     public boolean upgradeBuilding(String buildingName) {
         Building building = buildings.get(buildingName);
@@ -48,7 +53,6 @@ public class AnimalManager {
 
         return building.upgrade();
     }
-
 
     public String addAnimal(String name, String type, String buildingName) {
         if (animals.containsKey(name)) {
@@ -60,16 +64,13 @@ public class AnimalManager {
             return "No building";
         }
 
-
         if (!building.canHouseAnimalType(type)) {
             return "This Building is not for that animal";
         }
 
-
         if (!building.canAddAnimal()) {
             return "Building is full";
         }
-
 
         Animal animal = new Animal(name, type);
         animals.put(name, animal);
@@ -78,7 +79,6 @@ public class AnimalManager {
 
         return "Add is successfully";
     }
-
 
     public boolean petAnimal(String name) {
         Animal animal = animals.get(name);
@@ -90,24 +90,21 @@ public class AnimalManager {
         return true;
     }
 
-
     public ProductInfo collectProduct(String name, String toolName) {
         Animal animal = animals.get(name);
         if (animal == null) {
             return null;
         }
 
-
-        if (!isCorrectToolForAnimal(animal.getType(), toolName)) {
+        if (!isCorrectToolForAnimal(animal, toolName)) {
             return null;
         }
 
         return animal.collectProduct();
     }
 
-
-    private boolean isCorrectToolForAnimal(String animalType, String toolName) {
-
+    private boolean isCorrectToolForAnimal(Animal animal, String toolName) {
+        String animalType = animal.getType();
 
         switch (animalType) {
             case "Cow":
@@ -120,13 +117,11 @@ public class AnimalManager {
             case "Rabbit":
                 return true;
             case "Pig":
-
-               //return Animal.isWasOutsideToday(); // خوک‌ها فقط وقتی بیرون باشند دنبال قارچ می‌گردند
+                return animal.isWasOutsideToday();
             default:
                 return false;
         }
     }
-
 
     public boolean feedHay(String name) {
         Animal animal = animals.get(name);
@@ -137,7 +132,6 @@ public class AnimalManager {
         animal.feedHay();
         return true;
     }
-
 
     public boolean shepherdAnimal(String name, int x, int y, boolean toOutside) {
         Animal animal = animals.get(name);
@@ -154,17 +148,14 @@ public class AnimalManager {
         return true;
     }
 
-
     public int sellAnimal(String name) {
         Animal animal = animals.get(name);
         if (animal == null) {
             return 0;
         }
 
-
         int basePrice = getBasePrice(animal.getType());
         int sellPrice = (int)(basePrice * (0.3 + (animal.getFriendship() / 1000.0)));
-
 
         String buildingName = animalBuildings.get(name);
         if (buildingName != null) {
@@ -174,13 +165,11 @@ public class AnimalManager {
             }
         }
 
-
         animals.remove(name);
         animalBuildings.remove(name);
 
         return sellPrice;
     }
-
 
     public boolean setFriendship(String name, int amount) {
         Animal animal = animals.get(name);
@@ -192,13 +181,11 @@ public class AnimalManager {
         return true;
     }
 
-
     public void onDayEnd() {
         for (Animal animal : animals.values()) {
             animal.onDayEnd();
         }
     }
-
 
     public List<String> getAnimalsList() {
         List<String> animalList = new ArrayList<>();
@@ -210,7 +197,6 @@ public class AnimalManager {
 
         return animalList;
     }
-
 
     public List<String> getAnimalsWithProduce() {
         List<String> animalList = new ArrayList<>();
@@ -225,7 +211,6 @@ public class AnimalManager {
         return animalList;
     }
 
-
     public String getAnimalInfo(String name) {
         Animal animal = animals.get(name);
         if (animal == null) {
@@ -235,7 +220,6 @@ public class AnimalManager {
         return animal.getInfo();
     }
 
-
     public String getBuildingInfo(String buildingName) {
         Building building = buildings.get(buildingName);
         if (building == null) {
@@ -244,7 +228,6 @@ public class AnimalManager {
 
         return building.getInfo();
     }
-
 
     public List<String> getBuildingsList() {
         List<String> buildingList = new ArrayList<>();
@@ -259,7 +242,6 @@ public class AnimalManager {
         return buildingList;
     }
 
-
     public List<String> getAvailableBuildingsForAnimalType(String animalType) {
         List<String> availableBuildings = new ArrayList<>();
 
@@ -272,7 +254,6 @@ public class AnimalManager {
 
         return availableBuildings;
     }
-
 
     private int getBasePrice(String animalType) {
         switch (animalType) {
