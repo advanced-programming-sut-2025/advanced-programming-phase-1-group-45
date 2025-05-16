@@ -10,12 +10,13 @@ import models.MapElements.crops.Plant.PlantInfo;
 import models.MapElements.crops.PlantSeed;
 import models.MapElements.crops.Tree.TreeInMap;
 import models.MapElements.crops.TreeSeed;
+import models.Player;
 
 import java.util.HashMap;
 import java.util.List;
 
 public class PlantingSystem {
-    public static void Plant(String seed, Tile tile) {
+    public static void Plant(String seed, Tile tile, Player player) {
         if (!tile.hasFeature(isEmpty.class)) {
             throw new IllegalStateException("You can not plant in this tile. Choose another tile.");
         } else if (tile.hasFeature(PlowSituation.class) && !tile.getFeature(PlowSituation.class).isPlowed()) {
@@ -23,32 +24,34 @@ public class PlantingSystem {
         }
         TreeSeed seed1 = AllCropsLoader.getInstance().findTreeSeedByName(seed);
         if (seed1 != null) {
-            PlantingSystem.PlantATree(seed1, tile);
+            PlantingSystem.PlantATree(seed1, tile, player);
         } else {
             PlantSeed seed2 = AllCropsLoader.getInstance().findPlantSeedByName(seed);
-            PlantAPlant(seed2, tile);
+            PlantAPlant(seed2, tile, player);
         }
     }
 
-    private static void PlantATree(TreeSeed seed, Tile tile) {
-        if (!GameSession.getCurrentPlayer().getInventory().hasItem(seed)) {
+    private static void PlantATree(TreeSeed seed, Tile tile, Player player) {
+        if (!player.getBackpack().hasItem(seed.getName())) {
             throw new IllegalStateException("You don't have this seed in your inventory.");
         }
         hasTree tree = new hasTree(tile, new TreeInMap(seed.getTree()));
         tile.addFeature(tree.getClass(), tree);
         tile.addFeature(canWater.class, new canWater(tile));
         tile.removeFeature(isEmpty.class);
+        tile.addFeature(UnWalkAble.class, new UnWalkAble());
         tile.getFeature(PlowSituation.class).unPlow();
     }
 
-    private static void PlantAPlant(PlantSeed seed, Tile tile) {
-        if (!GameSession.getCurrentPlayer().getInventory().hasItem(seed)) {
+    private static void PlantAPlant(PlantSeed seed, Tile tile, Player player) {
+        if (!player.getBackpack().hasItem(seed.getName())) {
             throw new IllegalStateException("You don't have this seed in your inventory.");
         }
         hasPlant plant = new hasPlant(tile, new PlantInMap(seed.getPlant()));
         tile.addFeature(plant.getClass(), plant);
         tile.addFeature(canWater.class, new canWater(tile));
         tile.removeFeature(isEmpty.class);
+        tile.addFeature(UnWalkAble.class, new UnWalkAble());
         tile.getFeature(PlowSituation.class).unPlow();
 
 //        if (seed.getPlant().isCanBecomeGiant()) {

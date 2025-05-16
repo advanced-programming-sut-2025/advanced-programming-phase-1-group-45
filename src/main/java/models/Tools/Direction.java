@@ -1,5 +1,8 @@
 package models.Tools;
 
+import models.MapElements.Tile.Tile;
+import models.Player;
+
 public enum Direction {
 
     EAST(1, 0),
@@ -35,4 +38,5 @@ public enum Direction {
         }
         return null;
     }
+
 }

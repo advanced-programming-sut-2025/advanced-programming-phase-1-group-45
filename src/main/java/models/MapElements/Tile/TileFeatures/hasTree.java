@@ -59,9 +59,9 @@ public class hasTree implements TileFeature {
         tile.setSymbol('.');
     }
 
-    public void harvest() {
+    public void harvest(Player player) {
         if (tree.isHarvestAble()) {
-            tree.harvest();
+            tree.harvest(player);
         }
     }
 

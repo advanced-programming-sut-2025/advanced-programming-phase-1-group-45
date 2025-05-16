@@ -1,5 +1,6 @@
 package managers;
 
+import models.GameMap;
 import models.GameSession;
 import models.MapElements.Tile.Tile;
 import models.Player;
@@ -10,9 +11,11 @@ import models.Tools.UpgradeAbleTool;
 import java.util.List;
 
 public class ToolManager {
-    private GameSession gameSession;
-    public ToolManager(GameSession gs) {
-        this.gameSession = gs;
+    private Player player;
+    private GameSession session;
+    public ToolManager(GameSession gs, Player player) {
+        this.player = player;
+        this.session = gs;
     }
     public void toolEquip(String toolName, Player player) {
       player.equipTool(toolName);
@@ -49,7 +52,7 @@ public class ToolManager {
 //        Tile currentTile = GameMap.getTile(x, y);
         Tool tool = findTool(player.getCurrentTool(), player);
         try {
-            tool.useTool();
+            tool.useTool(player);
         } catch (IllegalArgumentException exception) {
             //the player has not enough energy to use this tool
             System.out.println(exception.getMessage());
@@ -63,7 +66,7 @@ public class ToolManager {
             return;
         }
         try {
-            tool.useTool(targetTile);
+            tool.useTool(targetTile, player);
         } catch (IllegalArgumentException exception) {
             System.out.println(exception.getMessage());
         }
@@ -80,10 +83,10 @@ public class ToolManager {
         return currentTool;
     }
 
-    public Tile findTargetTile(String direction) {
+    public Tile findTargetTile(String direction, Player player) {
         int newX = Direction.findDirection(direction).getX();
         int newY = Direction.findDirection(direction).getY();
-        Tile targetTile = null;//GameMap.getTile(newX, newY);
+        Tile targetTile = this.session.getMap().getTile(newX, newY);
         return targetTile;
     }
 }

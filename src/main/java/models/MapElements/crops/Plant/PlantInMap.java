@@ -2,6 +2,7 @@ package models.MapElements.crops.Plant;
 
 import models.Enums.Season;
 import models.MapElements.Tile.TileFeatures.TileFeature;
+import models.Player;
 import models.Tools.Backpack.BackPackItem;
 
 public class PlantInMap {
@@ -21,6 +22,14 @@ public class PlantInMap {
         seasons = crop.getSeason();
     }
 
+    public int daysRemainToCompleteGrow() {
+        int days = 0;
+        for (int i = currentStage; i < growStages.length; i++) {
+            days += growStages[i];
+        }
+        days -= daysInStage;
+        return days;
+    }
     public PlantInfo getCropInfo() {
         return crop;
     }
@@ -71,7 +80,7 @@ public class PlantInMap {
         return growStages[currentStage];
     }
 
-    public void harvest() {
-        crop.saveInInventory(1);
+    public void harvest(Player player) {
+        crop.saveInInventory(1, player);
     }
 }

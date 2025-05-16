@@ -9,6 +9,8 @@ import models.Enums.Command;
 import models.Enums.Shop;
 import models.GameSession;
 import models.GameMap;
+import models.MapElements.Tile.Tile;
+import models.MapElements.crops.AllCropsLoader;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -137,7 +139,37 @@ public class GameMenu implements Menu {
             System.out.println("Weather changed to " + WeatherController.getInstance().getCurrentWeather());
         } else if (command.startsWith("tools ")) {
             handleToolsCommand(command, gs, controller);
-        } else System.out.println("invalid command");
+        } else if ((matcher = Command.craftInfo.getMatcher(command)) != null) {
+            AllCropsLoader.getInstance().printCraftInfo(matcher.group(1));
+        } else if ((matcher = Command.plantSeed.getMatcher(command)) != null) {
+            if (gs.getToolManager().findTargetTile(matcher.group("direction"), controller.getCurrentUser().getPlayer()).
+                    equals(gs.getMap().getTile(gs.getPlayerX(), gs.getPlayerY()))) {
+                System.out.println("You can not use any tool int this tile");
+                return;
+            }
+            controller.getCurrentUser().getPlayer().getFarmingManager().plant(matcher.group(1),
+                    gs.getToolManager().findTargetTile(matcher.group("direction"),
+                            controller.getCurrentUser().getPlayer()));
+        } else if ((matcher = Command.showPlant.getMatcher(command)) != null) {
+             Tile tile = gs.getToolManager().findTargetTile(matcher.group("direction"),
+                     controller.getCurrentUser().getPlayer());
+             if (tile == null) {
+                 System.out.println("Tile is out of bounds");
+                 return;
+             }
+            controller.getCurrentUser().getPlayer().getFarmingManager().showPlant(tile);
+        }
+        else if((matcher = Command.fertilize.getMatcher(command)) != null) {
+            Tile tile = gs.getToolManager().findTargetTile(matcher.group(2), controller.getCurrentUser().getPlayer());
+            if (tile == null) {
+                System.out.println("Tile is out of bounds");
+                return;
+            }
+            controller.getCurrentUser().getPlayer().getFarmingManager().fertilize(matcher.group(1), tile);
+        } else if(command.equals("howmuch water")) {
+            System.out.println(controller.getCurrentUser().getPlayer().getBackpack().getWateringCan().getWaterAmount());
+        }
+        else System.out.println("invalid command");
     }
 
     private void handlePurchaseCommand(String command, ShopManager sm, MenuController controller) {
@@ -183,9 +215,9 @@ public class GameMenu implements Menu {
         Matcher matcher;
         if ((matcher = Command.ToolEquip.getMatcher(command)) != null) {
             gs.getToolManager().toolEquip(matcher.group("toolName"), controller.getCurrentUser().getPlayer());
-        } else if((matcher = Command.toolShowCurrent.getMatcher(command)) != null) {
+        } else if ((matcher = Command.toolShowCurrent.getMatcher(command)) != null) {
             System.out.println(gs.getToolManager().toolShowCurrent(controller.getCurrentUser().getPlayer()));
-        } else if((matcher = Command.toolsShow.getMatcher(command)) != null) {
+        } else if ((matcher = Command.toolsShow.getMatcher(command)) != null) {
             gs.getToolManager().showAllToolsAvailable(controller.getCurrentUser().getPlayer());
         } else if ((matcher = Command.toolsUpgrade.getMatcher(command)) != null) {
             gs.shopMenu().handleCommand(command);

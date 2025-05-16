@@ -5,6 +5,7 @@ import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Tools.Tool;
 import models.Tools.UpgradeAbleTool;
+import models.Tools.WateringCan;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,15 @@ public class Backpack {
         } else {
             throw new IllegalArgumentException("Backpack is full");
         }
+    }
+
+    public WateringCan getWateringCan() {
+        for (Tool tool : tools) {
+            if (tool instanceof WateringCan) {
+                return (WateringCan) tool;
+            }
+        }
+        return null;
     }
 
     public List<Tool> getTools() {

@@ -1,6 +1,7 @@
 package managers.Progress.Farming;
 
 import managers.TimeManager;
+import models.MapElements.crops.ForagingTree;
 import models.MapElements.crops.Tree.TreeInMap;
 
 import java.util.Arrays;
@@ -14,5 +15,8 @@ public class TreeGrow {
         if (!tree.isHarvestAble()) {
             tree.advanceDayInStage();
         }
+    }
+    public void grow(ForagingTree foraging) {
+        foraging.advanceDayInStage();
     }
 }

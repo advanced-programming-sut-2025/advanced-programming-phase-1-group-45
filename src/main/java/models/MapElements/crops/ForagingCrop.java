@@ -7,6 +7,8 @@ import models.Player;
 import models.Tools.Backpack.BackPackItem;
 import models.Tools.Backpack.Backpack;
 
+import java.util.Arrays;
+
 public class ForagingCrop extends BackPackItem {
     private String name;
     private Season[] seasons;
@@ -39,5 +41,15 @@ public class ForagingCrop extends BackPackItem {
     @Override
     public void saveInInventory(int amount, Player player) {
         player.getBackpack().addItemAmount(this, amount);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Name: " + name + "  * foraging crop *\n");
+        sb.append("Seasons: " + Arrays.toString(seasons) + "\n");
+        sb.append("SellPrice: " + sellPrice + "\n");
+        sb.append("Energy: " + energy + "\n");
+        return sb.toString();
     }
 }

@@ -12,6 +12,7 @@ import models.MapElements.crops.AllCropsLoader;
 import models.MapElements.crops.ForagingCrop;
 import models.MapElements.crops.ForagingMineral;
 import models.MapElements.crops.ForagingSeed;
+import models.Player;
 
 import java.util.*;
 
@@ -19,11 +20,13 @@ public class ForagingManager {
     private final double chance = 0.01;
     private int numOfNewTile;
     private Tile[][] grid;
+    private Player player;
 
-    ForagingManager() {
+    public ForagingManager(Player player) {
+        this.player = player;
         GameEventBus.INSTANCE.register(this);
-        numOfNewTile = chance * GameMap.getSize() * GameMap.getSize();
-        grid = GameMap.getMap();
+        numOfNewTile = (int) (chance * player.getGameMap().getSize() * player.getGameMap().getSize());
+        grid = player.getGameMap().getMap();
     }
 
     @Subscribe
@@ -36,10 +39,12 @@ public class ForagingManager {
             Tile tile = newTiles.get(i);
             tile.addFeature(hasForaging.class,
                     new hasForagingCrop(getRandomForagingCrop(), tile));
+            tile.setSymbol('#');
         }
         if (!newTiles.isEmpty()) {
             Tile tile = newTiles.get(newTiles.size() - 1);
             tile.addFeature(hasForaging.class, new hasForagingSeed(getForagingTreeSeed(), tile));
+            tile.setSymbol('0');
         }
     }
 

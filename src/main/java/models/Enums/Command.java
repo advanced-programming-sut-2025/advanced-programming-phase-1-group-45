@@ -19,7 +19,11 @@ public enum Command {
     toolShowCurrent("^\\s*tools\\s+show\\s+current\\s*$"),
     toolsShow("^\\s*tools\\s+show\\s+available\\s*$"),
     toolsUpgrade("^\\s*tools\\s+upgrade\\s+(?<toolName>\\S+)\\s*$"),
-    toolUse("^\\s*tools\\s+use\\s+-d\\s+(?<direction>\\S+)\\s*$");
+    toolUse("^\\s*tools\\s+use\\s+-d\\s+(?<direction>\\S+)\\s*$"),
+    craftInfo("^\\s*craftinfo\\s+-n\\s+(?<craftName>\\S+)\\s*$"),
+    plantSeed("^\\s*plant\\s+-s\\s+(?<seed>\\S+)\\s+-d\\s+(?<direction>\\S+)\\s*$"),
+    showPlant("^showplant\\s+-l\\s+(?<x>\\d+),\\s+(?<y>\\d+)\\s*$"),
+    fertilize("^\\s*fertilize\\s+-f\\s+(?<fertilizerName>\\S+)\\s+(?<direction>\\S+)\\s*$"),;
 
     private final String pattern;
 

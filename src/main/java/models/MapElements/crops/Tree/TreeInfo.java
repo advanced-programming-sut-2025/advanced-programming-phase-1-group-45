@@ -7,6 +7,8 @@ import models.MapElements.crops.Plant.PlantInfo;
 import models.MapElements.crops.TreeSeed;
 import models.Tools.Backpack.BackPackItem;
 
+import java.util.Arrays;
+
 public class TreeInfo {
     private final String name;
     private final String source;
@@ -60,6 +62,18 @@ public class TreeInfo {
 
     public Season[] getSeason() {
         return season;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Name: " + name + "\n");
+        sb.append("Source: ").append(source).append("\n");
+        sb.append("Stages: ").append(Arrays.toString(stages)).append("\n");
+        sb.append("TotalHarvestDay: " + totalHarvestDay + "\n");
+        sb.append("Fruit: " + fruit + "\n");
+        sb.append("Seasons: " + Arrays.toString(season) + "\n");
+        return sb.toString();
     }
 
 }

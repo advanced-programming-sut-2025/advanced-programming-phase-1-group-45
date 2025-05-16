@@ -1,10 +1,12 @@
 package models.MapElements.crops.Tree;
 
 import models.MapElements.Tile.TileFeatures.TileFeature;
+import models.Player;
 
 public class TreeInMap implements TileFeature {
     private final TreeInfo tree;
     private boolean completeGrow = false;
+    private boolean isForaging;
     private boolean harvestAble = false;
     private final int[] growStages;
     private boolean fertilized = false;
@@ -63,13 +65,22 @@ public class TreeInMap implements TileFeature {
         }
     }
 
+    public int daysRemainToCompleteGrow() {
+        int days = 0;
+        for (int i = currentStage; i < growStages.length; i++) {
+            days += growStages[i];
+        }
+        days -= daysInStage;
+        return days;
+    }
+
 
     public int getDaysInCurrentStage() {
         return growStages[currentStage];
     }
 
-    public void harvest() {
-        tree.getFruit().saveInInventory(1);
+    public void harvest(Player player) {
+        tree.getFruit().saveInInventory(1, player);
         harvestAble = false;
         daysInCycle = 0;
     }

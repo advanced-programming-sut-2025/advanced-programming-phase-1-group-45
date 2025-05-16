@@ -7,6 +7,8 @@ import models.MapElements.crops.PlantSeed;
 import models.Player;
 import models.Tools.Backpack.BackPackItem;
 
+import java.util.Arrays;
+
 public class PlantInfo extends BackPackItem {
     private final String name;
     private final String source;
@@ -104,5 +106,20 @@ public class PlantInfo extends BackPackItem {
     @Override
     public void saveInInventory(int amount, Player player) {
         player.getBackpack().addItemAmount(this, amount);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Name: " + name + "\n").append("Source: " + source + "\n")
+                .append("Stages: " + Arrays.toString(stages) + "\n").
+                append("TotalHarvestTime: " + totalHarvestTime + "\n").append("OneTime: " + isOneTime + "\n");
+        if (!isOneTime) {
+            sb.append("RegrowthTime: " + regrowthTime + "\n");
+        }
+        sb.append("BaseSellPrice: " + baseSellPrice + "\n").append("IsEdible: " + isEdible + "\n")
+                .append("Energy: " + energy + "\n").append(Arrays.toString(season)).append("\n")
+                .append("canBecomeGiant: " + canBecomeGiant + "\n");
+        return sb.toString();
     }
 }

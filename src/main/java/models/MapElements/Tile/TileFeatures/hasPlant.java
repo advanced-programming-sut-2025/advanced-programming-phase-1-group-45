@@ -7,6 +7,7 @@ import models.Events.GameEventBus;
 import models.Events.SeasonChangedEvent;
 import models.MapElements.Tile.Tile;
 import models.MapElements.crops.Plant.PlantInMap;
+import models.Player;
 
 import java.util.Arrays;
 
@@ -58,8 +59,8 @@ public class hasPlant implements TileFeature {
         tile.setSymbol('.');
     }
 
-    private void harvestCrop() {
-        plant.harvest();
+    private void harvestCrop(Player player) {
+        plant.harvest(player);
     }
 }
 

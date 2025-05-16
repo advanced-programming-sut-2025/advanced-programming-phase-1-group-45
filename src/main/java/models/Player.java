@@ -1,8 +1,12 @@
 package models;
 
+import managers.Progress.Farming.FarmingManager;
+import managers.Progress.ForagingManager;
+import managers.ToolManager;
 import models.Animal.AnimalManager;
 import models.Animal.ProductInfo;
 import models.Crafting.CraftManager;
+import models.MapElements.Tile.Tile;
 import models.Tools.Backpack.Backpack;
 
 import java.util.ArrayList;
@@ -15,16 +19,21 @@ public class Player {
     private boolean isCollapsed;
     private String equippedTool;
     private Backpack backpack;
+    private GameMap gameMap;
     private String backpackType;
     private int backpackCapacity;
     private String trashCanType;
     public CraftManager craftManager;
     public boolean isAtHome;
     public User user;
+    private GameMap map;
     private Map<String, ArtisanMachine> artisanMachines;
     private AnimalManager animalManager;
+    private FarmingManager farmingManager = new FarmingManager(this);
+    private ForagingManager foragingManager = new ForagingManager(this);
 
-    public Player(int initialEnergy) {
+    public Player(int initialEnergy, GameMap gameMap) {
+        this.map = gameMap;
         backpack = new Backpack();
         this.energy = new Energy(initialEnergy);
         this.isCollapsed = false;
@@ -38,6 +47,9 @@ public class Player {
         this.artisanMachines = new HashMap<>();
     }
 
+    public GameMap getGameMap() {
+        return gameMap;
+    }
     public boolean craftItem(String recipeName) {
         return craftManager.craftItem(recipeName, user);
     }
@@ -334,5 +346,13 @@ public class Player {
 
     public Backpack getBackpack() {
         return backpack;
+    }
+
+    public FarmingManager getFarmingManager() {
+        return farmingManager;
+    }
+
+    public void setFarmingManager(FarmingManager farmingManager) {
+        this.farmingManager = farmingManager;
     }
 }

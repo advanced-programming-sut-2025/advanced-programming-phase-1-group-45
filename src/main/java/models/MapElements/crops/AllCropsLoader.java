@@ -69,5 +69,38 @@ public class AllCropsLoader {
         }
         return null;
     }
+
+    public String printCraftInfo(String craftName) {
+        if (allPlants.stream().anyMatch(plant -> plant.getName().equals(craftName))) {
+            PlantInfo plant = null;
+            for (var plant2 : allPlants) {
+                if (plant2.getName().equals(craftName)) {
+                    plant = plant2;
+                    break;
+                }
+            }
+            return plant.toString();
+        }
+        else if (allTrees.stream().anyMatch(tree -> tree.getName().equals(craftName))) {
+            TreeInfo tree = null;
+            for (var tree2 : allTrees) {
+                if (tree2.getName().equals(craftName)) {
+                    tree = tree2;
+                    break;
+                }
+            }
+            return tree.toString();
+        } else if(allForagingCrops.stream().anyMatch(foragingCrop -> foragingCrop.getName().equals(craftName))) {
+            ForagingCrop foragingCrop = null;
+            for (var foragingCrop2 : allForagingCrops) {
+                if (foragingCrop2.getName().equals(craftName)) {
+                    foragingCrop = foragingCrop2;
+                    break;
+                }
+            }
+            return foragingCrop.toString();
+        }
+        return "This craft does not exist";
+    }
 }
 
