@@ -1,6 +1,6 @@
 package models.Tools.Backpack;
 
-public interface BackPackItem {
-    public String getItemName();
-    public void saveInInventory(int amount);
+public abstract class BackPackItem {
+    public absstract String getItemName();
+    public abstract void saveInInventory(int amount);
 }

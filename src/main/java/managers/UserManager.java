@@ -44,11 +44,11 @@ public class UserManager {
             }
             if (!pw.equals(pwc)) { System.out.println("make sure that you repeated your password correctly."); return false; }
             users.put(u, new User(u, hash(pw), nick, email, gen));
-            save();
+            //save();
             signingUser = users.get(u);
             System.out.println(signingUser.getSecurityQuestion());
             controller.setCurrentUser(signingUser);
-            save();
+            //save();
             return true;
         } catch(Exception ex) {
             System.out.println("error.");
@@ -239,10 +239,16 @@ public class UserManager {
         } catch(IOException ignored) {}
     }
 
-    private void save() {
+    /*private void save() {
         try (Writer w = Files.newBufferedWriter(storage)) {
             gson.toJson(new ArrayList<>(users.values()), w);
         } catch(IOException ignored) {}
+    }*/
+    private void save(){
+        try(Writer w = Files.newBufferedWriter(storage)){
+            gson.toJson(users, w);
+        } catch (IOException ignored) {
+        }
     }
 
     private String hash(String pw) {
@@ -269,19 +275,36 @@ public class UserManager {
         GameSession session = controller.getCurrentSession();
         GameMap map = session.getMap();
         String[] parts = command.split("\\s+");
-        String product = parts[1];
-        int count;
-        if(parts.length < 2) {
+        String product = "";
+        PriceManager pm = new PriceManager();
+        int count = 1;
+        int x = 0;
+        Double base = null;
+        if(parts.length < 3) {
             count = 1;
-        } else count = Integer.parseInt(parts[-1]);
-        if(count <= 0){
-            System.out.println("count must be greater than 0");
-            return;
+        } else {
+            for(int i = 0; i < parts.length; i++) {
+                if(parts[i].equals("-n")) {
+                    x = i;
+                    count = Integer.parseInt(parts[++i]);
+                    if (count <= 0) {
+                        System.out.println("count must be greater than 0");
+                        return;
+                    }
+                }
+            }
+            for(int i = 1; i < x; i++) {
+                product += parts[i];
+                product += " ";
+            }
+            product = product.trim();
         }
-        Double base = PriceManager.getBasePrice(product);
+        try{ base = pm.getBasePrice(product);
         if(base == null) {
             System.out.println("This product is not for sell");
             return;
+        }} catch (Exception e){
+            System.out.println("base price error");
         }
         int have = controller.getCurrentUser().getPlayer().getBackpack().getNumberOfAnItem((product));
         if(have < count){

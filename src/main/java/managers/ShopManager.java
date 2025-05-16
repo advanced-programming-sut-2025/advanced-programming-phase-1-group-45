@@ -37,48 +37,53 @@ public class ShopManager {
         } catch(IOException ignored) {}
     }
 
-    public Map<String, Double> getAllProducts(Shop shop) {
-       Map<String, Double> products = getAllProducts(shop);
-       products.forEach((item, price) -> System.out.printf("%s : %.2f $\n", item, price));
+    public List<Shop.ShopItem> getAllProducts(Shop shop) {
+       List<Shop.ShopItem> products = shop.getItems();
+       //products.forEach((products.name, products.price) -> System.out.printf("%s : %d $\n",name, price));
+       for(Shop.ShopItem item : products) {
+           System.out.printf("%s : %.2f $\n", item.getName(), item.getPrice());
+       }
        return products;
     }
 
     public Map<String, Double> getAvailableProducts(Shop shop) {
         int hour = LocalTime.now().getHour();
         boolean open;
-        if(Shop.getOpenHour() <= hour && shop.getCloseHour() > hour){
-            open = true;
-        } else open = false;
-        if(!open) return Collections.emptyMap();
-        Map<String, Double> Map = new LinkedHashMap<>();
-        Map<String, Integer> productsCount = stock.get(shop);
+        //if(Shop.getOpenHour() <= hour && shop.getCloseHour() > hour){
+         //   open = true;
+      //  } else open = false;
+        //if(!open) return Collections.emptyMap();
+        Map<String, Double> map = new LinkedHashMap<>();
+        Map<String, Integer> productsCount = shop.getStock();
         shop.getItems().forEach((item) -> {
-            int r = productsCount.getOrDefault(item, 0);
-            if( r > 0) Map.put(item.getName(), item.getPrice());
+            int r = productsCount.getOrDefault(item.getName(), 0);
+            if( r > 0) map.put(item.getName(), item.getPrice());
         });
-        return Map;
+        return map;
+
     }
 
-    public String purchase(String username, Shop shop, String item, int count) {
-        User user = um.getUser(username);
+    public String purchase(User user, Shop shop, String item, int count) {
         Map<String, Double> availableProducts = getAvailableProducts(shop);
+        //List<Shop.ShopItem> items = getAllProducts(shop);
         if(!availableProducts.containsKey(item)) {
             return "product not available in this shop!";
         }
         if(count <= 0) return "count must be greater than 0!";
-        int remainder = stock.get(shop).get(item);
-        if(count >= remainder) {
+        int remainder = shop.getStock().get(item);
+        if(count > remainder) {
             return String.format("This shop only has %d %s", remainder, item);
         }
+      //  }
         double total = availableProducts.get(item) * count;
         if(user.getMoney() < total){
             return "you do not have enough money!";
         }
         user.addMoney(-total);
         user.addItem(item, count);
-        stock.get(shop).put(item, remainder - count);
-        history.add(new ShopTransaction(username, shop, item, count, total, LocalTime.now()));
-        save();
+        shop.getStock().put(item, remainder - count);
+        history.add(new ShopTransaction(user.getUsername(), shop, item, count, total, LocalTime.now()));
+        //save();
         return "Shopping successfully!";
     }
 
