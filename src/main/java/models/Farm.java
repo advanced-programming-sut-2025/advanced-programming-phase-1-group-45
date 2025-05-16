@@ -33,8 +33,8 @@ public class Farm {
         for (int i = 0; i < count; i++) {
             int x, y;
             do {
-                x = rnd.nextInt(n);
-                y = rnd.nextInt(n);
+                x = new Random().nextInt(n);
+                y = new Random().nextInt(n);
             } while (map.getTile(x, y).getTileType() != TileType.PLAIN);
             map.setTile(x, y, TileCreate.create(tile));
         }
