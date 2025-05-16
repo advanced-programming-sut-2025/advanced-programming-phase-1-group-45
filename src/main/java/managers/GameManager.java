@@ -43,6 +43,10 @@ public class GameManager {
             }
         }
         users.add(0, currentUser);
+         HashMap<String, User> players = new HashMap<>();
+        for (String user : users) {
+            players.put(user, controller.getUserManager().getUser(user));
+        }
         var s = new GameSession(users);
         for(var u: users){
             gameSessions.computeIfAbsent(u, k -> new ArrayList<>()).add(s);
