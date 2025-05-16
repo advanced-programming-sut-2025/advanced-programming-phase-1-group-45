@@ -330,8 +330,3 @@ public class Player {
         energy.addEnergy(amount);
     }
 }
-
-    public List<String> getAvailableBuildingsForAnimalType(String animalType) {
-        return animalManager.getAvailableBuildingsForAnimalType(animalType);
-    }
-}
