@@ -58,23 +58,53 @@ public class ShopMenu implements Menu{
     }
     private void handlePurchaseCommand(String command, ShopManager sm, MenuController controller, Shop shop) {
         try {
-            String[] parts = command.split(" -n ");
-            if(parts.length != 2) {
-                System.out.println("Invalid format! Use: purchase <product_name> -n <count>");
+            String purchasePart = command.substring("purchase ".length()).trim();
+
+            String productName;
+            int count;
+
+            if (purchasePart.contains(" -n ")) {
+                // حالت استفاده از -n
+                String[] parts = purchasePart.split(" -n ", 2);
+                productName = parts[0].trim();
+                count = Integer.parseInt(parts[1].trim());
+            } else {
+                // حالت بدون -n (تعداد در انتهای دستور)
+                String[] tokens = purchasePart.split("\\s+");
+
+                if (tokens.length < 1) {
+                    System.out.println("invalid command format");
+                    return;
+                }
+
+                try {
+                    count = Integer.parseInt(tokens[tokens.length - 1]);
+                    productName = purchasePart.substring(0, purchasePart.lastIndexOf(tokens[tokens.length - 1])).trim();
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                    System.out.println("add count of goods");
+                    return;
+                }
+            }
+
+            if (count <= 0) {
+                System.out.println("count must be greater than zero");
                 return;
             }
 
-            String productName = parts[0].replace("purchase ", "").trim();
-            int count = Integer.parseInt(parts[1].trim());
             String result = sm.purchase(
-                    controller.getCurrentUser().getUsername(),
-                    shop, // Replace with actual shop instance
+                    controller.getCurrentUser(),
+                    shop,
                     productName,
                     count
-            ); System.out.println(result);
+            );
+            System.out.println(result);
 
-        } catch(NumberFormatException e) {
-            System.out.println("Invalid quantity format!");
+        } catch (NumberFormatException e) {
+            System.out.println("invalid count format");
+        } catch (StringIndexOutOfBoundsException e) {
+            System.out.println("invalid command format");
+        } catch (Exception e) {
+            System.out.println("error: " + e.getMessage());
         }
     }
 }
