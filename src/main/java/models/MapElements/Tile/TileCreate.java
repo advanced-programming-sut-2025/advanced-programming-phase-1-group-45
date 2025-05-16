@@ -36,7 +36,7 @@ public class TileCreate {
 
     private static Tile makeLakeTile() {
         Tile tile = new Tile(TileType.LAKE);
-        tile.addFeature(lakeTile.class, new lakeTile());
+        //  tile.addFeature(lakeTile.class, new lakeTile());
         tile.addFeature(UnWalkAble.class, new UnWalkAble());
         return tile;
     }
@@ -44,7 +44,8 @@ public class TileCreate {
     private static Tile makePlainTile() {
         Tile tile = new Tile(TileType.PLAIN);
         tile.addFeature(PlowSituation.class, new PlowSituation());
-        tile.addFeature(canPlant.class, new canPlant());
+        tile.addFeature(isEmpty.class, new isEmpty());
+        tile.setSymbol('.');
         return tile;
     }
 
@@ -52,6 +53,7 @@ public class TileCreate {
         Tile tile = new Tile(TileType.COTTAGE);
         tile.addFeature(buildingTile.class, new buildingTile());
         tile.addFeature(UnWalkAble.class, new UnWalkAble());
+        tile.setSymbol('C');
         return tile;
     }
 
@@ -59,6 +61,7 @@ public class TileCreate {
         Tile tile = new Tile(TileType.QUARRY);
         tile.addFeature(buildingTile.class, new buildingTile());
         tile.addFeature(UnWalkAble.class, new UnWalkAble());
+        tile.setSymbol('Q');
         return tile;
     }
 
@@ -66,6 +69,7 @@ public class TileCreate {
         Tile tile = new Tile(TileType.GREENHOUSE);
         tile.addFeature(buildingTile.class, new buildingTile());
         tile.addFeature(UnWalkAble.class, new UnWalkAble());
+        tile.setSymbol('G');
         return tile;
     }
 
@@ -73,18 +77,21 @@ public class TileCreate {
         Tile tile = new Tile(TileType.SHIPPINGBIN);
         tile.addFeature(buildingTile.class, new buildingTile());
         tile.addFeature(UnWalkAble.class, new UnWalkAble());
+        tile.setSymbol('S');
         return tile;
     }
     private static Tile makeTreeTile() {
         Tile tile = new Tile(TileType.TREE);
         tile.addFeature(TreeTile.class, new TreeTile());
         tile.addFeature(UnWalkAble.class, new UnWalkAble());
+        tile.setSymbol('T');
         return tile;
     }
     private static Tile makeStoneTile() {
         Tile tile = new Tile(TileType.STONE);
         tile.addFeature(StoneTile.class, new StoneTile());
         tile.addFeature(UnWalkAble.class, new UnWalkAble());
+        tile.setSymbol('s');
         return tile;
     }
 }

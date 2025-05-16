@@ -1,5 +1,6 @@
 package models.Tools;
 
+import models.GameSession;
 import models.MapElements.Tile.Tile;
 import models.Tools.Backpack.BackPackItem;
 
@@ -13,7 +14,6 @@ public abstract class Tool implements BackPackItem {
     }
 
     public abstract void useTool(Tile targetTile);
-    public abstract void decreaseEnergy();
 
 
     public String getName() {
@@ -25,6 +25,13 @@ public abstract class Tool implements BackPackItem {
     }
 
     @Override
-    public BackPackItem clone() {}
+    public String getItemName() {
+        return this.toolName;
+    }
 
+    @Override
+    public void saveInInventory(int amount) {
+        GameSession.getCurrentPlayer().getInventory().addTool(this);
+    }
 }
+

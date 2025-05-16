@@ -6,6 +6,9 @@ import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Foraging;
 import models.MapElements.Tile.Tile;
+import models.MapElements.Tile.TileFeatures.hasForaging;
+import models.MapElements.Tile.TileFeatures.hasForagingSeed;
+import models.MapElements.Tile.TileFeatures.hasTree;
 import models.Tools.ToolLevel.ToolLevel;
 
 public class Axe extends Tool implements UpgradeAbleTool {
@@ -20,21 +23,15 @@ public class Axe extends Tool implements UpgradeAbleTool {
 
 
     @Override
-    public void decreaseEnergy() {
-//        int energy = level.getEnergy() - foragingReachedToMaxLevel;
-//        if (User.getEnergy().getCurrentEnergy() < energy) {
-//            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
-//        }
-//        User.getEnergy().consumeEnergy(energy);
-    }
-
-    @Override
     public void useTool(Tile targetTile) {
-        if (targetTile.getTileType().getDescription().equalsIgnoreCase("tree")) {
+        if (targetTile.hasFeature(hasTree.class) ||
+                (targetTile.hasFeature(hasForaging.class) &&
+                        (targetTile.getFeature(hasForaging.class) instanceof hasForagingSeed)))
+        {
             targetTile.changeSymbol(Tile.PLAIN.getSymbol());
             targetTile.changeDescription(Tile.PLAIN.getDescription());
             System.out.println("The tree cut successfully.");
-        } else {
+        } else{
             throw new IllegalArgumentException("You can not use this tool in this direction.");
         }
     }

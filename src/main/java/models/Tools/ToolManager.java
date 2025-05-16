@@ -1,5 +1,7 @@
 package models.Tools;
 
+import models.MapElements.Tile.Tile;
+
 public class ToolManager {
     public void toolEquip(String toolName) {
       //  GameSession.getCurrentPlayer().equipTool(toolName);

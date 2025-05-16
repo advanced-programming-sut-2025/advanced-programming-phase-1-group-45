@@ -1,8 +1,8 @@
 package models.MapElements.crops.Tree;
 
-import models.MapElements.Tile.TileFeatures.canGrow;
+import models.MapElements.Tile.TileFeatures.TileFeature;
 
-public class TreeInMap extends canGrow {
+public class TreeInMap implements TileFeature {
     private final TreeInfo tree;
     private boolean completeGrow = false;
     private boolean harvestAble = false;
@@ -37,7 +37,6 @@ public class TreeInMap extends canGrow {
         return completeGrow;
     }
 
-    @Override
     public void advanceDayInStage() {
         if (!completeGrow) {
             daysInStage++;
@@ -45,7 +44,7 @@ public class TreeInMap extends canGrow {
                 advanceStage();
                 daysInStage = 0;
             }
-        } else {
+        } else if(!harvestAble) {
             daysInCycle++;
             if (daysInCycle == tree.getFruit().getHarvestCycle()){
                 harvestAble = true;
@@ -54,7 +53,6 @@ public class TreeInMap extends canGrow {
         }
     }
 
-    @Override
     public void advanceStage() {
         if (currentStage < growStages.length) {
             currentStage++;
@@ -65,8 +63,15 @@ public class TreeInMap extends canGrow {
         }
     }
 
-    @Override
+
     public int getDaysInCurrentStage() {
         return growStages[currentStage];
     }
+
+    public void harvest() {
+        tree.getFruit().saveInInventory(1);
+        harvestAble = false;
+        daysInCycle = 0;
+    }
 }
+
