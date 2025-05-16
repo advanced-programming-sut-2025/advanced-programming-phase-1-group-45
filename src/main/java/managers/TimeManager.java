@@ -1,20 +1,21 @@
 package managers;
 
 import controllers.WeatherController;
+import models.Enums.DayOfWeek;
 import models.Events.*;
 import models.Enums.Season;
 
 public class TimeManager {
-    private static final TimeManager instance = new TimeManager();
+    private static TimeManager instance;
     private int hour = 9;
     private int day = 1;
     private Season season = Season.SPRING;
+    private DayOfWeek dayOfWeek = DayOfWeek.Saturday;
     private int turnsTaken = 1;
     private int totalDaysPlayed = 0;
-    private static final WeatherController weatherController = new WeatherController();
 
-    private TimeManager() {
-        this.season = Season.SPRING;
+    public TimeManager() {
+        instance = this;
     }
 
     public static TimeManager getInstance() {
@@ -39,16 +40,27 @@ public class TimeManager {
         }
     }
 
-    private void advanceDay() {
+    public void advanceDay() {
         day++;
         totalDaysPlayed++;
-        GameEventBus.INSTANCE.post(new DayChangedEvent(hour, day, season));
+        GameEventBus.INSTANCE.post(new DayChangedEvent(day, season));
+        if (day % 4 == 0) {
+            advanceDayOfWeek();
+        }
         if (day == 28) {
             advanceSeason();
         }
     }
 
-    private void advanceSeason() {
+    private void advanceDayOfWeek(){
+        dayOfWeek = dayOfWeek.next();
+    }
+
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public void advanceSeason() {
         Season previousSeason = season;
         season = season.next();
         day = 1;
@@ -59,12 +71,20 @@ public class TimeManager {
         return totalDaysPlayed;
     }
 
-    public String getTimeString() {
+    public String getDateAndTimeString() {
         return String.format("Day %d , %02d:00 - %s",
                 day, hour, season.toString());
     }
 
+    public int getDay() {
+        return day;
+    }
+
     public Season getSeason() {
         return this.season;
+    }
+
+    public String getTimeString() {
+        return String.format("%02d", hour);
     }
 }
