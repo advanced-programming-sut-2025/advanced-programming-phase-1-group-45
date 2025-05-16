@@ -116,7 +116,7 @@ public class GameMenu implements Menu {
             System.out.println(gs.getTimeManager().getDay() + " of " + gs.getTimeManager().getSeason().toString());
         } else if ((matcher = Command.dateTime.getMatcher(command)) != null) {
             System.out.println(gs.getTimeManager().getDateAndTimeString());
-        } else if ((matcher = Command.dayOfWeek.getMatcher(command)) != null) {
+        } else if ((matcher = Command.DayOfWeek.getMatcher(command)) != null) {
             System.out.println(gs.getTimeManager().getDayOfWeek());
         } else if ((matcher = Command.CheatTime.getMatcher(command)) != null) {
             for (int i = 0; i < Integer.parseInt(matcher.group("hour")); i++) {
@@ -136,9 +136,8 @@ public class GameMenu implements Menu {
             WeatherController.getInstance().setCurrentWeather(matcher.group(1));
             System.out.println("Weather changed to " + WeatherController.getInstance().getCurrentWeather());
         } else if (command.startsWith("tools ")) {
-            handleToolsCommand(command, gs);
-        }
-        else System.out.println("invalid command");
+            handleToolsCommand(command, gs, controller);
+        } else System.out.println("invalid command");
     }
 
     private void handlePurchaseCommand(String command, ShopManager sm, MenuController controller) {
@@ -182,8 +181,14 @@ public class GameMenu implements Menu {
 
     private void handleToolsCommand(String command, GameSession gs, MenuController controller) {
         Matcher matcher;
-        if ((matcher = Command.toolsEquip.getMatcher(command)) != null) {
-            gs.getToolManager().toolEquip(matcher.group("toolName"), controller.getCurrentUser());
+        if ((matcher = Command.ToolEquip.getMatcher(command)) != null) {
+            gs.getToolManager().toolEquip(matcher.group("toolName"), controller.getCurrentUser().getPlayer());
+        } else if((matcher = Command.toolShowCurrent.getMatcher(command)) != null) {
+            System.out.println(gs.getToolManager().toolShowCurrent(controller.getCurrentUser().getPlayer()));
+        } else if((matcher = Command.toolsShow.getMatcher(command)) != null) {
+            gs.getToolManager().showAllToolsAvailable(controller.getCurrentUser().getPlayer());
+        } else if ((matcher = Command.toolsUpgrade.getMatcher(command)) != null) {
+            gs.getToolManager().toolUpgrade(matcher.group("toolName"), controller.getCurrentUser().getPlayer());
         }
     }
 }

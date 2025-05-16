@@ -12,9 +12,9 @@ public class PriceManager {
         baseSellPrice.put("Gold Ore", 75.0);
         baseSellPrice.put("Coal", 150.0);
         //upgrade tools
-        baseSellPrice.put("Copper Tool", 2000.0);
-        baseSellPrice.put("Gold Tool", 10000.0);
-        baseSellPrice.put("Iridium Tool", 25000.0);
+        baseSellPrice.put("copper Tool", 2000.0);
+        baseSellPrice.put("gold Tool", 10000.0);
+        baseSellPrice.put("iridium Tool", 25000.0);
         baseSellPrice.put("Copper Trash Can", 1000.0);
         baseSellPrice.put("Steel Trash Can", 2500.0);
         baseSellPrice.put("Gold Trash Can", 5000.0);

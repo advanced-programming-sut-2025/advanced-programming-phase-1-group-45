@@ -14,6 +14,7 @@ public class Player {
     public Energy energy;
     private boolean isCollapsed;
     private String equippedTool;
+    private Backpack backpack;
     private String backpackType;
     private int backpackCapacity;
     private String trashCanType;
@@ -24,11 +25,12 @@ public class Player {
     private AnimalManager animalManager;
 
     public Player(int initialEnergy) {
+        backpack = new Backpack();
         this.energy = new Energy(initialEnergy);
         this.isCollapsed = false;
         this.equippedTool = null;
-        this.backpackType = "Basic Backpack";
-        this.backpackCapacity = 12;
+        this.backpackType = backpack.getName() + " backpack";
+        this.backpackCapacity = backpack.getCapacity();
         this.trashCanType = "Basic Trash Can";
         this.craftManager = new CraftManager();
         this.isAtHome = false;
@@ -123,7 +125,7 @@ public class Player {
     }
 
     public int getBackpackCapacity() {
-        return backpackCapacity;
+        return backpack.getCapacity();
     }
 
     public boolean isCollapsed() {
@@ -135,7 +137,7 @@ public class Player {
     }
 
     public String getBackpackType() {
-        return backpackType;
+        return backpack.getName() + " backpack";
     }
 
     public String getTrashCanType() {
@@ -328,5 +330,9 @@ public class Player {
 
     public void addEnergy(int amount) {
         energy.addEnergy(amount);
+    }
+
+    public Backpack getBackpack() {
+        return backpack;
     }
 }

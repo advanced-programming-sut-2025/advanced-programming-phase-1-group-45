@@ -4,10 +4,10 @@ import com.google.common.eventbus.Subscribe;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
-import models.Mining;
+import models.MapElements.Tile.Tile;
 import models.Tools.ToolLevel.ToolLevel;
 
-public class Pickaxe extends Tool implements UpgradeAbleTool {
+public class Pickaxe extends UpgradeAbleTool {
     private ToolLevel level;
     private int miningReachedLastLevel = 0;
 
@@ -17,7 +17,6 @@ public class Pickaxe extends Tool implements UpgradeAbleTool {
         GameEventBus.INSTANCE.register(this);
     }
 
-    @Override
     public void decreaseEnergy() {
 //        int energy = level.getEnergy() - miningReachedLastLevel;
 //        if (User.getEnergy().getCurrentEnergy() < energy) {
@@ -63,11 +62,12 @@ public class Pickaxe extends Tool implements UpgradeAbleTool {
             System.out.println("you reached to the last level");
         }
     }
+//
+//    @Subscribe
+//    public void miningReachedLastLevel(AbilityReachedMaxLevel event) {
+//        if (event.ability() instanceof Mining) {
+//            miningReachedLastLevel = 1;
+//        }
+//    }
 
-    @Subscribe
-    public void miningReachedLastLevel(AbilityReachedMaxLevel event) {
-        if (event.ability() instanceof Mining) {
-            miningReachedLastLevel = 1;
-        }
-    }
 }

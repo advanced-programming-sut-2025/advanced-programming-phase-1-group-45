@@ -35,6 +35,10 @@ public class Backpack {
         }
     }
 
+    public List<Tool> getTools() {
+        return tools;
+    }
+
     public boolean removeItem(BackPackItem item, int amount) {
         int current = items.getOrDefault(item, 0);
         if (current >= amount) {

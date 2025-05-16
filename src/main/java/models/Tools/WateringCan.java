@@ -11,7 +11,7 @@ import models.MapElements.Tile.TileFeatures.canWater;
 import models.Tools.ToolLevel.ToolLevel;
 import models.Tools.ToolLevel.WateringCanLevel;
 
-public class WateringCan extends Tool implements UpgradeAbleTool {
+public class WateringCan extends UpgradeAbleTool {
     private WateringCanLevel level;
     private int waterAmount = level.getWaterAmount();
     private int farmingReachedLastLevel = 0;

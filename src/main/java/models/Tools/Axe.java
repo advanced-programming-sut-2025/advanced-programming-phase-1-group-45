@@ -11,7 +11,7 @@ import models.MapElements.Tile.TileFeatures.hasForagingSeed;
 import models.MapElements.Tile.TileFeatures.hasTree;
 import models.Tools.ToolLevel.ToolLevel;
 
-public class Axe extends Tool implements UpgradeAbleTool {
+public class Axe extends UpgradeAbleTool {
     private ToolLevel level;
     private int foragingReachedToMaxLevel = 0;
 

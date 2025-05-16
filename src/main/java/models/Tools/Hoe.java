@@ -9,7 +9,7 @@ import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.PlowSituation;
 import models.Tools.ToolLevel.ToolLevel;
 
-public class Hoe extends Tool implements UpgradeAbleTool {
+public class Hoe extends UpgradeAbleTool {
     private ToolLevel level;
     private int farmingReachedToMaxLevel = 0;
 
@@ -43,12 +43,15 @@ public class Hoe extends Tool implements UpgradeAbleTool {
         return level;
     }
 
+    public ToolLevel getNewToolLevel() {
+        return level.getNextLevel();
+    }
+
     @Override
     public void upgrade() {
         ToolLevel newHoeLevel = level.getNextLevel();
         if (newHoeLevel != null) {
             level = newHoeLevel;
-            GameEventBus.INSTANCE.post(new UpgradeToolEvent(this));
         } else {
             System.out.println("you reached to the last level");
         }

@@ -283,7 +283,7 @@ public class UserManager {
             System.out.println("This product is not for sell");
             return;
         }
-        int have = controller.getCurrentUser().getInventoryCount(product);
+        int have = controller.getCurrentUser().getPlayer().getBackpack().getNumberOfAnItem((product));
         if(have < count){
             System.out.println("You don't have enough products to sell");
             return;

@@ -1,28 +1,46 @@
-package models.Tools;
+package managers;
 
+import models.GameSession;
 import models.MapElements.Tile.Tile;
+import models.Player;
+import models.Tools.Direction;
+import models.Tools.Tool;
+import models.Tools.UpgradeAbleTool;
+
+import java.util.List;
 
 public class ToolManager {
-    public void toolEquip(String toolName) {
-      //  GameSession.getCurrentPlayer().equipTool(toolName);
+    private GameSession gameSession;
+    public ToolManager(GameSession gs) {
+        this.gameSession = gs;
+    }
+    public void toolEquip(String toolName, Player player) {
+      player.equipTool(toolName);
     }
 
-    public void toolShowCurrent() {
-//        Class<?> currentTool = GameSession.getCurrentPlayer().getCurrentTool();
-//        if (currentTool.getSuperclass() == Tool.class) {
-//            System.out.println(currentTool.getSimpleName());
-//        }
+    public String toolShowCurrent(Player player) {
+        return player.getCurrentTool();
     }
 
-    public void showAllToolsAvailable() {
-//        List<Tool> toolInventory = GameSession.getCurrentPlayer().getTools();
-//        for (Tool tool : toolInventory) {
-//            if (tool instanceof UpgradeAbleTool) {
-//                System.out.println(tool.getName() + " level: " + ((UpgradeAbleTool) tool).getLevel());
-//            } else {
-//                System.out.println(tool.getName());
-//            }
-//        }
+    public void showAllToolsAvailable(Player player) {
+        List<Tool> toolInventory = player.getBackpack().getTools();
+        for (Tool tool : toolInventory) {
+            if (tool instanceof UpgradeAbleTool) {
+                System.out.println(tool.getName() + " level: " + ((UpgradeAbleTool) tool).getLevel());
+            } else {
+                System.out.println(tool.getName());
+            }
+        }
+    }
+
+    public void toolUpgrade(String toolName, Player player) {
+         if(!(findTool(toolName, player) instanceof UpgradeAbleTool)){
+            System.out.println("This tool is not upgradable!");
+        }
+        else {
+            UpgradeAbleTool tool = (UpgradeAbleTool) findTool(toolName, player);
+            tool.upgrade();
+        }
     }
 
     public void useTool(String toolName, String direction) {
@@ -55,18 +73,18 @@ public class ToolManager {
         }
     }
 
-    private Tool findTool(String toolName) {
+    public Tool findTool(String toolName, Player player) {
         Tool currentTool = null;
-//        for (Tool tool : User.Inventory.tools) {
-//            if (tool.getName().equals(toolName)) {
-//                currentTool = tool;
-//                break;
-//            }
-//        }
+        for (Tool tool : player.getBackpack().getTools()) {
+            if (tool.getName().equals(toolName)) {
+                currentTool = tool;
+                break;
+            }
+        }
         return currentTool;
     }
 
-    private Tile findTargetTile(String direction) {
+    public Tile findTargetTile(String direction) {
         int newX = Direction.findDirection(direction).getX();
         int newY = Direction.findDirection(direction).getY();
         Tile targetTile = null;//GameMap.getTile(newX, newY);
