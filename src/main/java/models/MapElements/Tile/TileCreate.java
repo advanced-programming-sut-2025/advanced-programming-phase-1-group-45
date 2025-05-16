@@ -38,6 +38,7 @@ public class TileCreate {
         Tile tile = new Tile(TileType.LAKE);
         //  tile.addFeature(lakeTile.class, new lakeTile());
         tile.addFeature(UnWalkAble.class, new UnWalkAble());
+        tile.setSymbol('W');
         return tile;
     }
 
