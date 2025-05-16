@@ -30,7 +30,13 @@ public class GameMenu implements Menu{
                 controller.getCurrentSession().setMap(map);
                 System.out.println("map selected");
             }
-        } else if(command.equals("load game")){
+        }else if(command.startsWith("enter shop")){
+            String shop = command.split(" ")[2].toUpperCase();
+            controller.getCurrentUser().setCurrentShop(shop);
+            System.out.println("You now entered in " + shop);
+            controller.setCurrentMenu(new ShopMenu());
+        }
+        else if(command.equals("load game")){
             GameSession s= gm.loadLastSession(controller.getCurrentUser());
             if(s != null){
                 controller.setCurrentSession(s);
@@ -99,45 +105,21 @@ public class GameMenu implements Menu{
             int x = coords[0];
             int y = coords[1];
             int s = Integer.parseInt(o.get("-s"));
-            controller.getCurrentSession().getMap().printMapArea(x, y, s);
+            try{controller.getCurrentSession().getMap().printMapArea(x, y, s);}
+            catch(Exception e){
+                System.out.println("error printing map, you need to load map first.");
+            }
 
         }
         else if(command.startsWith("sell")){
             um.handleSell(command, controller);
         }
-        else if(command.equals("show all products")) {
-            sm.getAllProducts(Shop.GENERAL_STORE);
+       else if(command.startsWith("cheat add")){
+            int dollars = Integer.parseInt(command.split(" ")[2]);
+            controller.getCurrentUser().addMoney(dollars);
+            System.out.println("cheat added, your current money is " + controller.getCurrentUser().getMoney());
         }
-        else if(command.equals("show all available products")) {
-            sm.getAvailableProducts(Shop.GENERAL_STORE);
-        }
-        else if(command.startsWith("purchase ")) {
-            handlePurchaseCommand(command, sm, controller);
-        }else System.out.println("invalid command");
-    }
-
-    private void handlePurchaseCommand(String command, ShopManager sm, MenuController controller) {
-        try {
-            String[] parts = command.split(" -n ");
-            if(parts.length != 2) {
-                System.out.println("Invalid format! Use: purchase <product_name> -n <count>");
-                return;
-            }
-
-            String productName = parts[0].replace("purchase ", "").trim();
-            int count = Integer.parseInt(parts[1].trim());
-
-            String result = sm.purchase(
-                    controller.getCurrentUser().getUsername(),
-                    Shop.GENERAL_STORE, // Replace with actual shop instance
-                    productName,
-                    count
-            );
-
-            System.out.println(result);
-        } catch(NumberFormatException e) {
-            System.out.println("Invalid quantity format!");
-        }
+        else System.out.println("invalid command");
     }
 
     private int[] handleCoords(String coords) {
