@@ -10,9 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static models.User.addItem;
-
-
 public class Player {
     public Energy energy;
     private boolean isCollapsed;
@@ -23,8 +20,8 @@ public class Player {
     public CraftManager craftManager;
     public boolean isAtHome;
     public User user;
-    public static Map<String, ArtisanMachine> artisanMachines = new HashMap<>();
-    private static AnimalManager animalManager;
+    private Map<String, ArtisanMachine> artisanMachines;
+    private AnimalManager animalManager;
 
     public Player(int initialEnergy) {
         this.energy = new Energy(initialEnergy);
@@ -36,6 +33,7 @@ public class Player {
         this.craftManager = new CraftManager();
         this.isAtHome = false;
         this.animalManager = new AnimalManager();
+        this.artisanMachines = new HashMap<>();
     }
 
     public boolean craftItem(String recipeName) {
@@ -53,7 +51,6 @@ public class Player {
     public String getCraftingRecipeDetails(String recipeName) {
         return craftManager.getRecipeDetails(recipeName);
     }
-
 
     public String showEnergy() {
         return energy.showEnergy();
@@ -145,7 +142,7 @@ public class Player {
         return trashCanType;
     }
 
-
+    // Artisan Machines
     public boolean addArtisanMachine(String machineName, String machineType) {
         if (artisanMachines.containsKey(machineName)) {
             return false;
@@ -155,29 +152,25 @@ public class Player {
         return true;
     }
 
-
-    public static boolean useArtisanMachine(String machineName, String inputItem) {
+    public boolean useArtisanMachine(String machineName, String inputItem) {
         if (!artisanMachines.containsKey(machineName)) {
             return false;
         }
 
-
-        if (getInventoryCount(inputItem) <= 0) {
+        if (user.getInventoryCount(inputItem) <= 0) {
             return false;
         }
 
-
         ArtisanMachine machine = artisanMachines.get(machineName);
         if (machine.startProcessing(inputItem)) {
-            Backpack.addItemAmount(inputItem, -1);
+            user.addItem(inputItem, -1);
             return true;
         }
 
         return false;
     }
 
-
-    public static String getArtisanProduct(String machineName) {
+    public String getArtisanProduct(String machineName) {
         if (!artisanMachines.containsKey(machineName)) {
             return null;
         }
@@ -186,12 +179,11 @@ public class Player {
         String product = machine.getProduct();
 
         if (product != null) {
-            Backpack.addItemAmount(product, 1);
+            user.addItem(product, 1);
         }
 
         return product;
     }
-
 
     public void updateArtisanMachines(int hours) {
         for (ArtisanMachine machine : artisanMachines.values()) {
@@ -199,8 +191,7 @@ public class Player {
         }
     }
 
-
-    public static String getArtisanMachineStatus(String machineName) {
+    public String getArtisanMachineStatus(String machineName) {
         if (!artisanMachines.containsKey(machineName)) {
             return "Machine not found: " + machineName;
         }
@@ -208,8 +199,7 @@ public class Player {
         return artisanMachines.get(machineName).getStatus();
     }
 
-
-    public static List<String> listArtisanMachines() {
+    public List<String> listArtisanMachines() {
         List<String> result = new ArrayList<>();
 
         for (Map.Entry<String, ArtisanMachine> entry : artisanMachines.entrySet()) {
@@ -221,7 +211,10 @@ public class Player {
         return result;
     }
 
-
+    // Animal Management
+    public void setGameMap(GameMap map) {
+        animalManager.setGameMap(map);
+    }
 
     public String createAnimalBuilding(String buildingName, String type, String level, int x, int y) {
         return animalManager.createBuilding(buildingName, type, level, x, y);
@@ -235,11 +228,10 @@ public class Player {
         return animalManager.getBuildingInfo(buildingName);
     }
 
-    public static List<String> getBuildingsList() {
+    public List<String> getBuildingsList() {
         return animalManager.getBuildingsList();
     }
 
-    // متدهای مربوط به حیوانات
     public String addAnimal(String name, String type, String buildingName) {
         return animalManager.addAnimal(name, type, buildingName);
     }
@@ -248,35 +240,32 @@ public class Player {
         return animalManager.petAnimal(name);
     }
 
-    public static ProductInfo collectAnimalProduct(String name, String toolName) {
+    public ProductInfo collectAnimalProduct(String name, String toolName) {
         ProductInfo product = animalManager.collectProduct(name, toolName);
         if (product != null) {
-            // اضافه کردن محصول به inventory
-            addItem(product.getQuality() + " " + product.getProductName(), 1);
+            user.addItem(product.getQuality() + " " + product.getProductName(), 1);
         }
         return product;
     }
 
-    public static boolean feedAnimal(String name) {
-        // بررسی وجود یونجه در inventory
-        if (getInventoryCount("Hay") <= 0) {
+    public boolean feedAnimal(String name) {
+        if (user.getInventoryCount("Hay") <= 0) {
             return false;
         }
 
         if (animalManager.feedHay(name)) {
-            // کم کردن یونجه از inventory
-            addItem("Hay", -1);
+            user.addItem("Hay", -1);
             return true;
         }
 
         return false;
     }
 
-    public static boolean shepherdAnimal(String name, int x, int y, boolean toOutside) {
+    public boolean shepherdAnimal(String name, int x, int y, boolean toOutside) {
         return animalManager.shepherdAnimal(name, x, y, toOutside);
     }
 
-    public static int sellAnimal(String name) {
+    public int sellAnimal(String name) {
         return animalManager.sellAnimal(name);
     }
 
@@ -288,17 +277,59 @@ public class Player {
         animalManager.onDayEnd();
     }
 
-    public static List<String> getAnimalsList() {
+    public List<String> getAnimalsList() {
         return animalManager.getAnimalsList();
     }
 
-    public static List<String> getAnimalsWithProduce() {
+    public List<String> getAnimalsWithProduce() {
         return animalManager.getAnimalsWithProduce();
     }
 
-    public static String getAnimalInfo(String name) {
+    public String getAnimalInfo(String name) {
         return animalManager.getAnimalInfo(name);
     }
+
+    public List<String> getAvailableBuildingsForAnimalType(String animalType) {
+        return animalManager.getAvailableBuildingsForAnimalType(animalType);
+    }
+
+    // Skill XP methods
+    public void increaseFarmingXP(int amount) {
+        energy.increaseFarmingXP(amount);
+    }
+
+    public void increaseExtractionXP(int amount) {
+        energy.increaseExtractionXP(amount);
+    }
+
+    public void increaseEcoTourismXP(int amount) {
+        energy.increaseEcoTourismXP(amount);
+    }
+
+    public void increaseFishingXP(int amount) {
+        energy.increaseFishingXP(amount);
+    }
+
+    public int getFarmingLevel() {
+        return energy.getFarmingLevel();
+    }
+
+    public int getExtractionLevel() {
+        return energy.getExtractionLevel();
+    }
+
+    public int getEcoTourismLevel() {
+        return energy.getEcoTourismLevel();
+    }
+
+    public int getFishingLevel() {
+        return energy.getFishingLevel();
+    }
+
+    public void addEnergy(int amount) {
+        energy.addEnergy(amount);
+    }
+}
 
     public List<String> getAvailableBuildingsForAnimalType(String animalType) {
         return animalManager.getAvailableBuildingsForAnimalType(animalType);
