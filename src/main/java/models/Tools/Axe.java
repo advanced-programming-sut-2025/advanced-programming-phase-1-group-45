@@ -1,10 +1,10 @@
 package models.Tools;
 
 import com.google.common.eventbus.Subscribe;
+import managers.Progress.ForagingManager;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
-import models.Foraging;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.hasForaging;
 import models.MapElements.Tile.TileFeatures.hasForagingSeed;
@@ -63,7 +63,7 @@ public class Axe extends UpgradeAbleTool {
 
     @Subscribe
     public void onReachedMaxLevel(AbilityReachedMaxLevel event) {
-        if (event.ability() instanceof Foraging) {
+        if (event.ability() instanceof ForagingManager) {
             foragingReachedToMaxLevel = 1;
         }
     }

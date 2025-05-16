@@ -1,10 +1,9 @@
 package models.Tools;
 
 import com.google.common.eventbus.Subscribe;
+import managers.Progress.Farming.FarmingManager;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
-import models.Events.UpgradeToolEvent;
-import models.Farming;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.PlowSituation;
 import models.Player;
@@ -60,7 +59,7 @@ public class Hoe extends UpgradeAbleTool {
 
     @Subscribe
     public void onReachedMaxLevel(AbilityReachedMaxLevel event) {
-        if (event.ability() instanceof Farming) {
+        if (event.ability() instanceof FarmingManager) {
             farmingReachedToMaxLevel = 1;
         }
     }
