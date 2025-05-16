@@ -5,7 +5,6 @@ import models.Events.GameEventBus;
 import models.Events.TurnChangedEvent;
 import models.Events.TurnEndedEvent;
 import models.User;
-import managers.TimeManager;
 
 import java.util.List;
 
@@ -27,6 +26,10 @@ public class PlayerTurnManager {
         advanceToNextPlayer();
     }
 
+    public int getCurrentTurn() {
+        return currentTurn + 1;
+    }
+
     private void advanceToNextPlayer() {
         currentTurn = (currentTurn + 1) % players.size();
         TimeManager.getInstance().nextTurn();
@@ -37,3 +40,4 @@ public class PlayerTurnManager {
         players.get(currentTurn).onNewTurn(event);
     }
 }
+
