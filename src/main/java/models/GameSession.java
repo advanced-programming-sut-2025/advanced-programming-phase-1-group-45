@@ -1,11 +1,24 @@
 package models;
 
+import com.google.common.eventbus.Subscribe;
+import controllers.WeatherController;
+import managers.PlayerTurnManager;
+import managers.TimeManager;
+import managers.ToolManager;
+import models.Enums.Season;
+import models.Events.GameEventBus;
+import models.Events.SeasonChangedEvent;
+
 import java.util.*;
 import java.util.Map;
 
 public class GameSession {
-    private List<String> players;
+    private static List<String> players;
     private int mapNumber = 0;
+    private PlayerTurnManager turnManager;
+    private TimeManager timeManager = new TimeManager();
+    private ToolManager toolManager = new ToolManager(this);
+    private WeatherController weatherController;
     private int turn = 0;
     private boolean voteInProgress = false;
     private String voteStarter;
@@ -13,48 +26,125 @@ public class GameSession {
     private GameMap map;
     private int playerX, playerY;
     private int energy = 100;
+    private Season season = Season.SPRING;
 
-    public GameSession(List<String> players) {
-        this.players = new ArrayList<>(players);
+    public GameSession(HashMap<String, User> players) {
+        this.players = new ArrayList<>(players.keySet());
+        List<User> users = new ArrayList<>();
+        for (String player : players.keySet()) {
+            users.add(players.get(player));
+        }
+        turnManager = new PlayerTurnManager(users);
+        GameEventBus.INSTANCE.register(this);
     }
-    public void nextTurn() {turn++;}
-    public void setMapNumber(int mapNumber) {this.mapNumber = mapNumber;}
-    public int getMapNumber() {return mapNumber;}
-    public int getTurn(){return turn;}
-    public List<String> getPlayers(){return players;}
-    public String getCurrentPlayer(){return players.get(turn%players.size());}
-    public boolean isVoteInProgress(){return voteInProgress;}
+
+    @Subscribe
+    public void changeSeason(SeasonChangedEvent event) {
+        season = event.newSeason();
+    }
+
+    public Season getSeason() {
+        return season;
+    }
+
+    public void nextTurn() {
+        turnManager.endTurn();
+    }
+
+    public void setMapNumber(int mapNumber) {
+        this.mapNumber = mapNumber;
+    }
+
+    public int getMapNumber() {
+        return mapNumber;
+    }
+
+    public int getTurn() {
+        return turnManager.getCurrentTurn();
+    }
+
+    public List<String> getPlayers() {
+        return players;
+    }
+
+    // public static String getCurrentPlayer(){return players.get(turn%players.size());}
+    public boolean isVoteInProgress() {
+        return voteInProgress;
+    }
+
     public void setMap(GameMap map) {
         this.map = map;
-        int mid = map.getSize()/2;
+        int mid = map.getSize() / 2;
         this.playerX = mid;
         this.playerY = mid;
     }
-    public GameMap getMap(){return map;}
-    public int getPlayerX(){return playerX;}
-    public int getPlayerY(){return playerY;}
-    public void setPlayerPosition(int x, int y){this.playerX = x;this.playerY = y;}
-    public int getEnergy(){return energy;}
-    public void reduceEnergy(int amount){energy -= amount;}
 
-    public void startVote(String starter){
+    public GameMap getMap() {
+        return map;
+    }
+
+    public int getPlayerX() {
+        return playerX;
+    }
+
+    public int getPlayerY() {
+        return playerY;
+    }
+
+    public void setPlayerPosition(int x, int y) {
+        this.playerX = x;
+        this.playerY = y;
+    }
+
+    public int getEnergy() {
+        return energy;
+    }
+
+    public void reduceEnergy(int amount) {
+        energy -= amount;
+    }
+
+    public void startVote(String starter) {
         voteInProgress = true;
         voteStarter = starter;
         votes.clear();
         votes.put(starter, true);
     }
-    public boolean hasVoted(String user){return votes.containsKey(user);}
-    public void recordVote(String user, boolean yes){votes.put(user, yes);}
-    public boolean allVoted(){return votes.size() == players.size();}
-    public boolean isVoteSuccessful(){
-        for(boolean v : votes.values()){
-            if(!v) return false;
+
+    public boolean hasVoted(String user) {
+        return votes.containsKey(user);
+    }
+
+    public void recordVote(String user, boolean yes) {
+        votes.put(user, yes);
+    }
+
+    public boolean allVoted() {
+        return votes.size() == players.size();
+    }
+
+    public boolean isVoteSuccessful() {
+        for (boolean v : votes.values()) {
+            if (!v) return false;
         }
         return true;
     }
-    public void clearVote(){
+
+    public void clearVote() {
         voteInProgress = false;
         voteStarter = null;
         votes.clear();
+    }
+
+    public TimeManager getTimeManager() {
+        return timeManager;
+    }
+
+    public void setTimeManager(TimeManager timeManager) {
+        this.timeManager = timeManager;
+    }
+
+    public ToolManager getToolManager() {
+        return toolManager;
     }
 }
