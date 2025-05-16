@@ -1,4 +1,5 @@
 package models.Enums;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,20 @@ public enum Shop {
             "Clint",
             9,
             16,
+            new HashMap<String, Integer>() {{
+                put("Copper Ore", 10);
+                put("Iron Ore", 10);
+                put("Coal", -1);
+                put("Gold Ore", -1);
+                put("Copper Tool", 1);
+                put("Steel Tool", 1);
+                put("Gold Tool", 1);
+                put("Iridium Tool", 1);
+                put("Copper Trash Can", 1);
+                put("Steel Trash Can", 1);
+                put("Gold Trash Can", 1);
+                put("Iridium Trash Can", 1);
+            }},
             new ShopItem("Copper Ore", "A common ore that can be smelted into bars", 75, -1, null),
             new ShopItem("Iron Ore", "A fairly common ore that can be smelted into bars", 150, -1, null),
             new ShopItem("Coal", "A combustible rock useful for crafting and smelting", 150, -1, null),
@@ -25,6 +40,14 @@ public enum Shop {
             "Morris",
             9,
             23,
+            new HashMap<String, Integer>() {{
+                put("Blueberry Seeds", 10);  // From initial HashMap
+                put("Cranberry Seeds", -1);  // From ShopItem list
+                put("Melon Seeds", -1);      // From ShopItem list
+                put("Quality Fertilizer", -1);
+                put("Speed-Gro", -1);
+                put("Sprinkler", 5);         // Note: "Sprinkler" is misspelled in your ShopItem (corrected here)
+            }},
             new ShopItem("Blueberry Seeds", "Seasonal fruit seeds", 80, -1, null),
             new ShopItem("Cranberry Seeds", "Autumn crop seeds", 120, -1, null),
             new ShopItem("Melon Seeds", "Summer fruit seeds", 80, -1, null),
@@ -37,6 +60,14 @@ public enum Shop {
             "Pierre",
             9,
             17,
+            new HashMap<String, Integer>() {{
+                put("Backpack Upgrade", 1);
+                put("Parsnip Seeds", -1);
+                put("Kale Seeds", -1);
+                put("Garlic Seeds", -1);
+                put("Rice", -1);
+                put("Sugar", -1);
+            }},
             new ShopItem("Backpack Upgrade", "Increase inventory capacity", 2000, 1, null),
             new ShopItem("Parsnip Seeds", "Spring crop seeds", 20, -1, null),
             new ShopItem("Kale Seeds", "Fast-growing greens", 50, -1, null),
@@ -49,6 +80,14 @@ public enum Shop {
             "Robin",
             9,
             20,
+            new HashMap<String, Integer>() {{
+                put("Wood", -1);
+                put("Stone", -1);
+                put("Hardwood", -1);
+                put("Barn Kit", 1);
+                put("Coop Kit", 1);
+                put("Silo", 1);
+            }},
             new ShopItem("Wood", "Basic building material", 50, -1, null),
             new ShopItem("Stone", "Versatile building stone", 60, -1, null),
             new ShopItem("Hardwood", "Premium building material", 150, -1, null),
@@ -61,6 +100,14 @@ public enum Shop {
             "Willy",
             9,
             17,
+            new HashMap<String, Integer>() {{
+                put("Bamboo Pole", 1);
+                put("Fiberglass Rod", 1);
+                put("Iridium Rod", 1);
+                put("Bait", -1);
+                put("Tackle Box", 1);
+                put("Crab Pot", 5);
+            }},
             new ShopItem("Bamboo Pole", "Beginner fishing rod", 500, 1, null),
             new ShopItem("Fiberglass Rod", "Upgraded fishing rod", 1800, 1, null),
             new ShopItem("Iridium Rod", "Professional fishing rod", 7500, 1, null),
@@ -73,6 +120,14 @@ public enum Shop {
             "Marnie",
             9,
             16,
+            new HashMap<String, Integer>() {{
+                put("Chicken", 5);
+                put("Duck", 3);
+                put("Cow", 3);
+                put("Goat", 2);
+                put("Hay", -1);
+                put("Cheese Press", 1);
+            }},
             new ShopItem("Chicken", "White laying hen", 800, 5, null),
             new ShopItem("Duck", "Quacking waterfowl", 1200, 3, null),
             new ShopItem("Cow", "Milking cow", 1500, 3, null),
@@ -85,6 +140,14 @@ public enum Shop {
             "Gus",
             12,
             24,
+            new HashMap<String, Integer>() {{
+                put("Stardrop Special", 1);
+                put("Pizza", -1);
+                put("Salad", -1);
+                put("Bread", -1);
+                put("Coffee", -1);
+                put("Recipe: Survival", 1);
+            }},
             new ShopItem("Stardrop Special", "Signature cocktail", 2000, 1, null),
             new ShopItem("Pizza", "Classic cheese pizza", 600, -1, null),
             new ShopItem("Salad", "Fresh garden salad", 220, -1, null),
@@ -97,17 +160,19 @@ public enum Shop {
     private final int openHour;
     private final int closeHour;
     private final List<ShopItem> items;
-   // private Map<String, itemInfo> inventory;
+    private Map<String, Integer> stock;
+    private Map<String, Double> inventory;
 
-    Shop(String manager, int openHour, int closeHour, ShopItem... items) {
+    Shop(String manager, int openHour, int closeHour, Map<String, Integer> stock, ShopItem... items) {
         this.manager = manager;
         this.openHour = openHour;
         this.closeHour = closeHour;
         this.items = List.of(items);
-        //this.inventory = inventory;
+        this.inventory = inventory;
+        this.stock = stock;
     }
 
-    /*public Map<String, itemInfo> getInventory(){return inventory;}
+    public Map<String, Double> getInventory(){return inventory;}
     public static class itemInfo {
         public final Double price;
         public final Double dailyStock;
@@ -116,7 +181,7 @@ public enum Shop {
             this.price = price;
             this.dailyStock = dailyStock;
         }
-    }*/
+    }
     public static class ShopItem {
         // مواد اولیه پایه
         public static final ShopItem COPPER_BAR = new ShopItem("Copper Bar", "", 0, 0, null);
@@ -129,12 +194,12 @@ public enum Shop {
 
         private final String name;
         private final String description;
-        private final int price;
+        private final double price;
         private final int stockLimit;
 
         private final Map<ShopItem, Integer> requiredMaterials;
 
-        public ShopItem(String name, String description, int price, int stockLimit,
+        public ShopItem(String name, String description, double price, int stockLimit,
                         Map<ShopItem, Integer> requiredMaterials) {
             this.name = name;
             this.description = description;
@@ -156,4 +221,5 @@ public enum Shop {
     public int getOpenHour() { return openHour; }
     public int getCloseHour() { return closeHour; }
     public List<ShopItem> getItems() { return items; }
+    public Map<String, Integer> getStock() {return stock;}
 }
