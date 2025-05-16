@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Building {
-    private String type; // "Coop" یا "Barn"
-    private String level; // "Regular", "Big", "Deluxe"
+    private String type;
+    private String level;
     private int x;
     private int y;
     private int width;
@@ -19,23 +19,18 @@ public class Building {
         this.x = x;
         this.y = y;
 
-        // تنظیم ابعاد بر اساس نوع ساختمان
         if (type.equals("Coop")) {
             this.width = 7;
             this.height = 4;
-        } else { // Barn
+        } else {
             this.width = 7;
             this.height = 6;
         }
 
-        // تنظیم ظرفیت بر اساس سطح
         setCapacityByLevel();
-
-        // مقداردهی اولیه لیست حیوانات
         animals = new ArrayList<>();
     }
 
-    // تنظیم ظرفیت بر اساس سطح
     private void setCapacityByLevel() {
         if (type.equals("Coop")) {
             switch (level) {
@@ -49,7 +44,7 @@ public class Building {
                     capacity = 12;
                     break;
             }
-        } else { // Barn
+        } else {
             switch (level) {
                 case "Regular":
                     capacity = 4;
@@ -64,12 +59,10 @@ public class Building {
         }
     }
 
-    // بررسی ام‌کان اضافه کردن حیوان
     public boolean canAddAnimal() {
         return animals.size() < capacity;
     }
 
-    // اضافه کردن حیوان
     public boolean addAnimal(String animalName) {
         if (!canAddAnimal()) {
             return false;
@@ -79,12 +72,10 @@ public class Building {
         return true;
     }
 
-    // حذف حیوان
     public boolean removeAnimal(String animalName) {
         return animals.remove(animalName);
     }
 
-    // ارتقای ساختمان
     public boolean upgrade() {
         if (level.equals("Regular")) {
             level = "Big";
@@ -95,22 +86,20 @@ public class Building {
             setCapacityByLevel();
             return true;
         }
-        return false; // ساختمان در بالاترین سطح است
+        return false;
     }
 
-    // بررسی اینکه آیا مختصات داخل ساختمان است
     public boolean isCoordinateInside(int checkX, int checkY) {
         return checkX >= x && checkX < x + width &&
                 checkY >= y && checkY < y + height;
     }
 
-    // بررسی اینکه آیا ساختمان می‌تواند این نوع حیوان را نگهداری کند
     public boolean canHouseAnimalType(String animalType) {
         if (type.equals("Coop")) {
             return animalType.equals("Chicken") ||
                     animalType.equals("Duck") ||
                     (level.equals("Big") || level.equals("Deluxe")) && animalType.equals("Rabbit");
-        } else { // Barn
+        } else {
             if (animalType.equals("Cow")) {
                 return true;
             } else if ((level.equals("Big") || level.equals("Deluxe")) &&
@@ -123,7 +112,6 @@ public class Building {
         }
     }
 
-    // اطلاعات ساختمان
     public String getInfo() {
         StringBuilder info = new StringBuilder();
         info.append("Type: ").append(type).append("\n");
@@ -143,7 +131,6 @@ public class Building {
         return info.toString();
     }
 
-    // گترها
     public String getType() {
         return type;
     }
