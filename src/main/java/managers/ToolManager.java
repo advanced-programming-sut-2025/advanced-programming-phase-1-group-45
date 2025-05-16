@@ -43,17 +43,13 @@ public class ToolManager {
         }
     }
 
-    public void useTool(String toolName, String direction) {
+    public void useTool(String direction, Player player) {
 //        int currentX = User.getX();
 //        int currentY = User.getY();
 //        Tile currentTile = GameMap.getTile(x, y);
-        Tool tool = findTool(toolName);
-        if (tool == null) {
-            System.out.println("You do not have " + toolName + " in your backpack.");
-            return;
-        }
+        Tool tool = findTool(player.getCurrentTool(), player);
         try {
-            tool.decreaseEnergy();
+            tool.useTool();
         } catch (IllegalArgumentException exception) {
             //the player has not enough energy to use this tool
             System.out.println(exception.getMessage());

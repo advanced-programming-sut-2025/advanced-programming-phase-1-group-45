@@ -17,6 +17,11 @@ public class Tile {
         features = new HashMap<>();
     }
 
+    public void setTileType(TileType type) {
+        this.tileType = type;
+        setSymbol(tileType.getSymbol());
+    }
+
     public char getSymbol() {
         return symbol;
     }

@@ -1,6 +1,7 @@
 package models.MapElements.crops;
 
 import models.MapElements.crops.Plant.PlantInfo;
+import models.Player;
 import models.Tools.Backpack.BackPackItem;
 
 public class PlantSeed extends BackPackItem {
@@ -26,7 +27,7 @@ public class PlantSeed extends BackPackItem {
     }
 
     @Override
-    public void saveInInventory(int amount) {
-        Player.getInventory().addItem(this);
+    public void saveInInventory(int amount, Player player) {
+        player.getBackpack().addItemAmount(this, amount);
     }
 }

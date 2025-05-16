@@ -152,7 +152,7 @@ public class GameMenu implements Menu {
             int count = Integer.parseInt(parts[1].trim());
 
             String result = sm.purchase(
-                    controller.getCurrentUser().getUsername(),
+                    controller.getCurrentUser(),
                     Shop.GENERAL_STORE, // Replace with actual shop instance
                     productName,
                     count
@@ -188,7 +188,9 @@ public class GameMenu implements Menu {
         } else if((matcher = Command.toolsShow.getMatcher(command)) != null) {
             gs.getToolManager().showAllToolsAvailable(controller.getCurrentUser().getPlayer());
         } else if ((matcher = Command.toolsUpgrade.getMatcher(command)) != null) {
-            gs.getToolManager().toolUpgrade(matcher.group("toolName"), controller.getCurrentUser().getPlayer());
+            gs.shopMenu().handleCommand(command);
+        } else if ((matcher = Command.toolUse.getMatcher(command)) != null) {
+            gs.getToolManager().useTool(matcher.group("direction"), controller.getCurrentUser().getPlayer());
         }
     }
 }

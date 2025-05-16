@@ -1,6 +1,8 @@
 package models.Tools;
 
 import models.MapElements.Tile.Tile;
+import models.MapElements.crops.Plant.PlantInfo;
+import models.Player;
 import models.Tools.ToolLevel.FishingPoleLevel;
 
 public class FishingPole extends Tool {
@@ -13,11 +15,10 @@ public class FishingPole extends Tool {
     }
 
     @Override
-    public void useTool(Tile targetTile) {
+    public void useTool(Tile targetTile, Player player) {
 
     }
 
-    @Override
     public void decreaseEnergy() {
 
     }

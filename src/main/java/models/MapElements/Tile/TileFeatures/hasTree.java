@@ -8,6 +8,7 @@ import models.MapElements.Tile.Tile;
 import managers.Progress.Farming.TreeGrow;
 import models.MapElements.crops.Tree.TreeInMap;
 import models.MapElements.crops.Tree.Wood;
+import models.Player;
 
 import java.util.Arrays;
 
@@ -64,8 +65,8 @@ public class hasTree implements TileFeature {
         }
     }
 
-    public void chopTree() {
-        wood.saveInInventory(1);
+    public void chopTree(Player player) {
+        wood.saveInInventory(1, player);
         removeThisFeature();
     }
 }

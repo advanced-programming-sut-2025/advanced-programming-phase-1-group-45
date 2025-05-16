@@ -9,6 +9,8 @@ import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.hasForaging;
 import models.MapElements.Tile.TileFeatures.hasForagingSeed;
 import models.MapElements.Tile.TileFeatures.hasTree;
+import models.MapElements.Tile.TileType;
+import models.Player;
 import models.Tools.ToolLevel.ToolLevel;
 
 public class Axe extends UpgradeAbleTool {
@@ -23,16 +25,23 @@ public class Axe extends UpgradeAbleTool {
 
 
     @Override
-    public void useTool(Tile targetTile) {
+    public void useTool(Tile targetTile, Player player) {
+        player.getEnergy().consumeEnergy(level.getEnergy());
         if (targetTile.hasFeature(hasTree.class) ||
                 (targetTile.hasFeature(hasForaging.class) &&
-                        (targetTile.getFeature(hasForaging.class) instanceof hasForagingSeed)))
-        {
-            targetTile.changeSymbol(Tile.PLAIN.getSymbol());
-            targetTile.changeDescription(Tile.PLAIN.getDescription());
+                        (targetTile.getFeature(hasForaging.class) instanceof hasForagingSeed))) {
+            hasTree hasTree = targetTile.getFeature(hasTree.class);
+            if (hasTree != null) {
+                hasTree.chopTree(player);
+            }
+            else {
+                hasForagingSeed hasForagingSeed = (hasForagingSeed) targetTile.getFeature(hasForaging.class);
+                hasForagingSeed.chopTree(player);
+            }
+            targetTile.setTileType(TileType.PLAIN);
             System.out.println("The tree cut successfully.");
-        } else{
-            throw new IllegalArgumentException("You can not use this tool in this direction.");
+        } else {
+            System.out.println("You can not use this tool in this direction.");
         }
     }
 

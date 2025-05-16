@@ -2,6 +2,7 @@ package models.MapElements.Tile.TileFeatures;
 
 import models.MapElements.Tile.Tile;
 import models.MapElements.crops.ForagingMineral;
+import models.Player;
 
 public class hasForagingMinerals extends hasForaging implements TileFeature {
     private final ForagingMineral mineral;
@@ -12,8 +13,8 @@ public class hasForagingMinerals extends hasForaging implements TileFeature {
         tile.setSymbol('+');
     }
 
-    public void collectForagingElement() {
-        mineral.saveInInventory(1);
+    public void collectForagingElement(Player player) {
+        mineral.saveInInventory(1, player);
         super.getTile().removeFeature(hasForaging.class);
         super.getTile().setSymbol('Q');
     }

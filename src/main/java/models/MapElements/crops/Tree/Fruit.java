@@ -1,8 +1,9 @@
 package models.MapElements.crops.Tree;
 
+import models.Player;
 import models.Tools.Backpack.BackPackItem;
 
-public class Fruit implements BackPackItem {
+public class Fruit extends BackPackItem {
     private final String name;
     private final TreeInfo tree;
     private final int harvestCycle;
@@ -51,7 +52,7 @@ public class Fruit implements BackPackItem {
     }
 
     @Override
-    public void saveInInventory(int amount) {
-        Player.getInventory().addItem(this, amount);
+    public void saveInInventory(int amount, Player player) {
+        player.getBackpack().addItemAmount(this, amount);
     }
 }

@@ -4,7 +4,14 @@ import com.google.common.eventbus.Subscribe;
 import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
+import models.MapElements.Stone;
 import models.MapElements.Tile.Tile;
+import models.MapElements.Tile.TileCreate;
+import models.MapElements.Tile.TileFeatures.hasForaging;
+import models.MapElements.Tile.TileFeatures.hasForagingMinerals;
+import models.MapElements.Tile.TileType;
+import models.MapElements.crops.Plant.PlantInfo;
+import models.Player;
 import models.Tools.ToolLevel.ToolLevel;
 
 public class Pickaxe extends UpgradeAbleTool {
@@ -17,35 +24,35 @@ public class Pickaxe extends UpgradeAbleTool {
         GameEventBus.INSTANCE.register(this);
     }
 
-    public void decreaseEnergy() {
-//        int energy = level.getEnergy() - miningReachedLastLevel;
-//        if (User.getEnergy().getCurrentEnergy() < energy) {
-//            throw new IllegalArgumentException("You do not have enough energy to use this tool.");
-//        }
-//        User.getEnergy().consumeEnergy(energy);
+    public void decreaseEnergy(Player player) {
+        int energy = level.getEnergy() - miningReachedLastLevel;
+        if (player.getEnergy().getCurrentEnergy() < energy) {
+            System.out.println("You do not have enough energy to use this tool.");
+            return;
+        }
+        player.getEnergy().consumeEnergy(energy);
     }
 
     @Override
-    public void useTool(Tile targetTile) {
-//        checkingTargetTile(targetTile);
-//        if ((targetTile.getItem() instanceof Stone)&&
-//
-//                || targetTile.isTilled()) {
-//            targetTile.tillThisTileWithHoe();
-//        } else {
-//            throw new IllegalArgumentException("You can not use this tool in this direction.");
-//        }
+    public void useTool(Tile targetTile, Player player) {
+        decreaseEnergy(player);
+        if (targetTile.getTileType().equals(TileType.STONE)) {
+                targetTile = TileCreate.create(TileType.PLAIN);
+                targetTile.setSymbol('.');
+                new Stone().saveInInventory(1, player);
+                decreaseEnergy(player);
+        } else if (targetTile.getTileType().equals(TileType.QUARRY) &&
+        targetTile.hasFeature(hasForaging.class) &&
+                (targetTile.getFeature(hasForaging.class) instanceof hasForagingMinerals)) {
+            hasForagingMinerals hasMineral = (hasForagingMinerals) targetTile.getFeature(hasForaging.class);
+            hasMineral.collectForagingElement(player);
+        }
+        else{
+            System.out.println("You can not use this tool in this direction.");
+            return;
+        }
     }
-    protected void checkingTargetTile(Tile targetTile) {
-//        if ((targetTile.getItem() instanceof Stone)){
-//            Stone stone = (Stone) targetTile.getItem();
-//
-//        }
-//        else if(targetTile.isTilled()){
-//            targetTile.untilThisTileWithPickaxe();
-//        }
 
-    }
 
     @Override
     public ToolLevel getLevel() {
@@ -61,6 +68,11 @@ public class Pickaxe extends UpgradeAbleTool {
         } else {
             System.out.println("you reached to the last level");
         }
+    }
+
+    @Override
+    public void saveInInventory(int amount, Player player) {
+
     }
 //
 //    @Subscribe

@@ -5,9 +5,9 @@ import models.Events.AbilityReachedMaxLevel;
 import models.Events.GameEventBus;
 import models.Events.UpgradeToolEvent;
 import models.Farming;
-import models.GameSession;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.canWater;
+import models.Player;
 import models.Tools.ToolLevel.ToolLevel;
 import models.Tools.ToolLevel.WateringCanLevel;
 
@@ -33,7 +33,7 @@ public class WateringCan extends UpgradeAbleTool {
 
     @Override
     public ToolLevel getLevel() {
-        return level;
+        return ToolLevel.valueOf(level.getName());
     }
 
 
@@ -68,23 +68,26 @@ public class WateringCan extends UpgradeAbleTool {
     }
 
     @Override
-    public void useTool(Tile targetTile) {
+    public void useTool(Tile targetTile, Player player) {
         if (waterAmount == 0) {
-            throw new IllegalStateException("you have not enough water.");
-        } else if (!GameSession.getCurrentPlayer().getEnergy().
-                consumeEnergy(level.getEnergy() - farmingReachedLastLevel)) {
-            throw new IllegalStateException("You have not enough Energy to use this tool.");
+            System.out.println("you have not enough water.");
+            return;
+        } else if (!(player.getEnergy().
+                getCurrentEnergy() >= (level.getEnergy() - farmingReachedLastLevel))) {
+            System.out.println("You have not enough Energy to use this tool.");
+            return;
         }
         if (targetTile.hasFeature(canWater.class) && !targetTile.getFeature(canWater.class).isWateredToday()) {
-            decreaseEnergy();
             targetTile.getFeature(canWater.class).water();
+            player.getEnergy().consumeEnergy(level.getEnergy() - farmingReachedLastLevel);
             waterAmount--;
         } else if (targetTile.hasFeature(canWater.class) &&
                 targetTile.getFeature(canWater.class).isWateredToday()) {
-            throw new IllegalStateException("This tile is already watered today");
+           System.out.println("This tile is already watered today");
         } else {
-            throw new IllegalStateException("You can't use this tool in this tile");
+           System.out.println("You can't use this tool in this tile");
         }
     }
+
 }
 

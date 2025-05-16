@@ -7,6 +7,7 @@ import models.Events.UpgradeToolEvent;
 import models.Farming;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.PlowSituation;
+import models.Player;
 import models.Tools.ToolLevel.ToolLevel;
 
 public class Hoe extends UpgradeAbleTool {
@@ -19,7 +20,6 @@ public class Hoe extends UpgradeAbleTool {
         GameEventBus.INSTANCE.register(this);
     }
 
-    @Override
     public void decreaseEnergy() {
 //        int energy = level.getEnergy() - farmingReachedToMaxLevel;
 //        if (User.getEnergy().getCurrentEnergy() < energy) {
@@ -28,13 +28,14 @@ public class Hoe extends UpgradeAbleTool {
 //        User.getEnergy().consumeEnergy(energy);
     }
 
-    @Override
-    public void useTool(Tile targetTile) {
+    public void useTool(Tile targetTile, Player player) {
+        player.getEnergy().consumeEnergy(level.getEnergy());
         if (targetTile.getTileType().getDescription().equalsIgnoreCase("Plain")
                 && !targetTile.getFeature(PlowSituation.class).isPlowed()) {
             targetTile.getFeature(PlowSituation.class).plow();
         } else {
-            throw new IllegalArgumentException("You can not use this tool in this direction.");
+            System.out.println("You can not use this tool in this direction.");
+            return;
         }
     }
 

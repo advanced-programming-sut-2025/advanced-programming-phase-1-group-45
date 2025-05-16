@@ -3,9 +3,10 @@ package models.MapElements.crops;
 import models.Enums.Season;
 import models.GameSession;
 import models.MapElements.crops.Plant.PlantInfo;
+import models.Player;
 import models.Tools.Backpack.BackPackItem;
 
-public class ForagingSeed implements BackPackItem {
+public class ForagingSeed extends BackPackItem {
     private final String name;
     private final Season[] seasons;
 
@@ -28,7 +29,7 @@ public class ForagingSeed implements BackPackItem {
     }
 
     @Override
-    public void saveInInventory(int amount) {
-        GameSession.getCurrentPlayer().getInventory().addItem(this, amount);
+    public void saveInInventory(int amount, Player player) {
+        player.getBackpack().addItemAmount(this, amount);
     }
 }
