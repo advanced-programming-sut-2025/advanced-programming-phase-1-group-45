@@ -41,10 +41,6 @@ public class GameMap {
         grid[y][x].setY(y);
     }
 
-    public Tile[][] getMap() {
-        return grid;
-    }
-
     public Tile getTile(int x, int y) {
         if (x < 0 || y < 0 || x >= size || y >= size) {
             return null;
@@ -205,7 +201,7 @@ public class GameMap {
             System.out.println("Energy needed: " + energyCost + ". Confirm? (Y/N)");
 
             //  تایید کاربر
-            Scanner scanner = null;
+            Scanner scanner = new Scanner(System.in);
             String input = scanner.nextLine();
             if (input.equalsIgnoreCase("Y")) {
                 if (session.getEnergy() >= energyCost) {
@@ -238,4 +234,3 @@ public class GameMap {
         }
     }
 }
-

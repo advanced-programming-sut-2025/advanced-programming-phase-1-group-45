@@ -26,7 +26,7 @@ public class Axe extends Tool implements UpgradeAbleTool {
     public void useTool(Tile targetTile) {
         if (targetTile.hasFeature(hasTree.class) ||
                 (targetTile.hasFeature(hasForaging.class) &&
-                (targetTile.getFeature(hasForaging.class) instanceof hasForagingSeed)))
+                        (targetTile.getFeature(hasForaging.class) instanceof hasForagingSeed)))
         {
             targetTile.changeSymbol(Tile.PLAIN.getSymbol());
             targetTile.changeDescription(Tile.PLAIN.getDescription());

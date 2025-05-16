@@ -1,6 +1,5 @@
 package models.MapElements.Tile.TileFeatures;
 
-import models.Events.UseToolEvent;
 
 public class PlowSituation implements TileFeature {
     private boolean isPlowed = false;

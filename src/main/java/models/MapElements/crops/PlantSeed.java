@@ -26,7 +26,7 @@ public class PlantSeed implements BackPackItem {
     }
 
     @Override
-    public void saveInInventory() {
+    public void saveInInventory(int amount) {
         Player.getInventory().addItem(this);
     }
 }

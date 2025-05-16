@@ -36,3 +36,4 @@ public class ForagingMineral implements BackPackItem {
         GameSession.getCurrentPlayer().getInventory().addItem(this, amount);
     }
 }
+

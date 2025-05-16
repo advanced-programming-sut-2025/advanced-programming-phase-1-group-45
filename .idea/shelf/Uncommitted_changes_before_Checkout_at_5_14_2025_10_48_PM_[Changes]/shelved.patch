@@ -1,0 +1,85 @@
+Index: src/main/java/models/Player.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models;\r\n\r\npublic class Player {\r\n    private Energy energy;\r\n    private boolean isCollapsed;\r\n    private String equippedTool;\r\n    private String backpackType;\r\n    private int backpackCapacity;\r\n    private String trashCanType;\r\n\r\n    public Player(int initialEnergy) {\r\n        this.energy = new Energy(initialEnergy);\r\n        this.isCollapsed = false;\r\n        this.equippedTool = null;\r\n        this.backpackType = \"Basic Backpack\";\r\n        this.backpackCapacity = 12;\r\n        this.trashCanType = \"Basic Trash Can\";\r\n    }\r\n\r\n    public String showEnergy() {\r\n        return energy.showEnergy();\r\n    }\r\n\r\n    public boolean consumeEnergy(int amount) {\r\n        boolean success = energy.consumeEnergy(amount);\r\n        if (!success && amount > 0) {\r\n            collapse();\r\n        }\r\n        return success;\r\n    }\r\n\r\n    public void setEnergy(int value) {\r\n        energy.setEnergy(value);\r\n    }\r\n\r\n    public void setUnlimitedEnergy() {\r\n        energy.setUnlimitedEnergy();\r\n    }\r\n\r\n    public void collapse() {\r\n        isCollapsed = true;\r\n        energy.collapse();\r\n        System.out.println(\"You've collapsed due to exhaustion!\");\r\n    }\r\n\r\n    public void restoreEnergyForNewDay() {\r\n        energy.restoreEnergyForNewDay(isCollapsed);\r\n        isCollapsed = false;\r\n    }\r\n\r\n    public void equipTool(String toolName) {\r\n        this.equippedTool = toolName;\r\n    }\r\n\r\n    public String getCurrentTool() {\r\n        return equippedTool;\r\n    }\r\n\r\n    public void upgradeBackpack(String newType) {\r\n        this.backpackType = newType;\r\n        switch (newType) {\r\n            case \"Large Backpack\":\r\n                this.backpackCapacity = 24;\r\n                break;\r\n            case \"Deluxe Backpack\":\r\n                this.backpackCapacity = Integer.MAX_VALUE;\r\n                break;\r\n        }\r\n    }\r\n\r\n    public void upgradeTrashCan(String newType) {\r\n        this.trashCanType = newType;\r\n    }\r\n\r\n    public double getTrashCanReturnRate() {\r\n        switch (trashCanType) {\r\n            case \"Copper Trash Can\":\r\n                return 0.15;\r\n            case \"Iron Trash Can\":\r\n                return 0.30;\r\n            case \"Gold Trash Can\":\r\n                return 0.45;\r\n            case \"Iridium Trash Can\":\r\n                return 0.60;\r\n            default:\r\n                return 0.0;\r\n        }\r\n    }\r\n\r\n    public int getBackpackCapacity() {\r\n        return backpackCapacity;\r\n    }\r\n\r\n    public boolean isCollapsed() {\r\n        return isCollapsed;\r\n    }\r\n\r\n    public Energy getEnergy() {\r\n        return energy;\r\n    }\r\n\r\n    public String getBackpackType() {\r\n        return backpackType;\r\n    }\r\n\r\n    public String getTrashCanType() {\r\n        return trashCanType;\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/Player.java b/src/main/java/models/Player.java
+--- a/src/main/java/models/Player.java	(revision 4db9aad44555fb75e07bb4d0ff0f60fd44f4fadb)
++++ b/src/main/java/models/Player.java	(date 1747250253744)
+@@ -1,19 +1,19 @@
+ package models;
+ 
++import javafx.scene.layout.Background;
++import models.Tools.Backpack.Backpack;
++
+ public class Player {
+     private Energy energy;
+     private boolean isCollapsed;
+     private String equippedTool;
+-    private String backpackType;
+-    private int backpackCapacity;
++    private Backpack backpack = new Backpack();
+     private String trashCanType;
+ 
+     public Player(int initialEnergy) {
+         this.energy = new Energy(initialEnergy);
+         this.isCollapsed = false;
+         this.equippedTool = null;
+-        this.backpackType = "Basic Backpack";
+-        this.backpackCapacity = 12;
+         this.trashCanType = "Basic Trash Can";
+     }
+ 
+@@ -56,17 +56,17 @@
+         return equippedTool;
+     }
+ 
+-    public void upgradeBackpack(String newType) {
+-        this.backpackType = newType;
+-        switch (newType) {
+-            case "Large Backpack":
+-                this.backpackCapacity = 24;
+-                break;
+-            case "Deluxe Backpack":
+-                this.backpackCapacity = Integer.MAX_VALUE;
+-                break;
+-        }
+-    }
++//    public void upgradeBackpack(String newType) {
++//        this.backpackType = newType;
++//        switch (newType) {
++//            case "Large Backpack":
++//                this.backpackCapacity = 24;
++//                break;
++//            case "Deluxe Backpack":
++//                this.backpackCapacity = Integer.MAX_VALUE;
++//                break;
++//        }
++//    }
+ 
+     public void upgradeTrashCan(String newType) {
+         this.trashCanType = newType;
+@@ -87,8 +87,8 @@
+         }
+     }
+ 
+-    public int getBackpackCapacity() {
+-        return backpackCapacity;
++    public Backpack getBackPack() {
++        return backpack;
+     }
+ 
+     public boolean isCollapsed() {
+@@ -99,10 +99,6 @@
+         return energy;
+     }
+ 
+-    public String getBackpackType() {
+-        return backpackType;
+-    }
+-
+     public String getTrashCanType() {
+         return trashCanType;
+     }

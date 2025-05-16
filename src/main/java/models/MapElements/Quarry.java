@@ -1,7 +1,6 @@
 package models.MapElements;
 
 import com.google.common.eventbus.Subscribe;
-import javafx.scene.paint.RadialGradient;
 import models.Events.DayChangedEvent;
 import models.Events.GameEventBus;
 import models.MapElements.Tile.Tile;

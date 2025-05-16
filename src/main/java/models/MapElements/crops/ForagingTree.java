@@ -1,7 +1,5 @@
 package models.MapElements.crops;
 
-import com.sun.source.tree.Tree;
-import models.MapElements.crops.Tree.TreeInMap;
 import models.MapElements.crops.Tree.TreeInfo;
 import models.MapElements.crops.Tree.Wood;
 

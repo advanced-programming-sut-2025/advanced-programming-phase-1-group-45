@@ -36,7 +36,7 @@ public class TileCreate {
 
     private static Tile makeLakeTile() {
         Tile tile = new Tile(TileType.LAKE);
-      //  tile.addFeature(lakeTile.class, new lakeTile());
+        //  tile.addFeature(lakeTile.class, new lakeTile());
         tile.addFeature(UnWalkAble.class, new UnWalkAble());
         return tile;
     }

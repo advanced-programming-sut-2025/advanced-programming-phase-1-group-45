@@ -62,3 +62,4 @@ public class hasPlant implements TileFeature {
         plant.harvest();
     }
 }
+

@@ -30,7 +30,8 @@ public abstract class Tool implements BackPackItem {
     }
 
     @Override
-    public void saveInInventory() {
+    public void saveInInventory(int amount) {
         GameSession.getCurrentPlayer().getInventory().addTool(this);
     }
 }
+
