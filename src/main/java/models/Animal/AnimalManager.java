@@ -3,7 +3,7 @@ package models.Animal;
 import models.Building;
 import models.GameMap;
 import models.MapElements.Tile.Tile;
-import models.MapElements.Tile.TileFeatures.IsEmpty;
+import models.MapElements.Tile.TileFeatures.isEmpty;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +37,7 @@ public class AnimalManager {
 
         Tile tile = gameMap.getTile(x, y);
 
-        if (tile != null && tile.hasFeature(IsEmpty.class)) {
+        if (tile != null && tile.hasFeature(isEmpty.class)) {
             buildings.put(buildingName, new Building(type, level, x, y));
             return "Build successfully";
         } else {

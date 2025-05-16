@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time" />
+    <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_5_2025_12_29_PM_[Changes]1/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_5_5_2025_12_29_PM__Changes_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_rebase__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controllers/TradingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controllers/TradingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Animal/AnimalManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Animal/AnimalManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Processing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Processing.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -151,6 +160,7 @@
       <workItem from="1746937223780" duration="3411000" />
       <workItem from="1746988154975" duration="7197000" />
       <workItem from="1747288285758" duration="14355000" />
+      <workItem from="1747404102773" duration="646000" />
     </task>
     <task id="LOCAL-00001" summary="time manager first">
       <option name="closed" value="true" />
