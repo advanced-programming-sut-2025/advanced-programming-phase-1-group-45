@@ -69,12 +69,12 @@ public class Energy {
         skills.get("Farming").increaseExperience(amount);
     }
 
-    public void increaseMiningXP(int amount) {
-        skills.get("Mining").increaseExperience(amount);
+    public void increaseExtractionXP(int amount) {
+        skills.get("Extraction").increaseExperience(amount);
     }
 
-    public void increaseForagingXP(int amount) {
-        skills.get("Foraging").increaseExperience(amount);
+    public void increaseEcoTourismXP(int amount) {
+        skills.get("EcoTourism").increaseExperience(amount);
     }
 
     public void increaseFishingXP(int amount) {
@@ -85,12 +85,12 @@ public class Energy {
         return skills.get("Farming").getLevel();
     }
 
-    public int getMiningLevel() {
-        return skills.get("Mining").getLevel();
+    public int getExtractionLevel() {
+        return skills.get("Extraction").getLevel();
     }
 
-    public int getForagingLevel() {
-        return skills.get("Foraging").getLevel();
+    public int getEcoTourismLevel() {
+        return skills.get("EcoTourism").getLevel();
     }
 
     public int getFishingLevel() {
@@ -112,6 +112,16 @@ public class Energy {
     public boolean isUnlimited() {
         return isUnlimited;
     }
+
+    public void addEnergy(int amount) {
+        currentEnergy = Math.min(currentEnergy + amount, maxEnergy);
+    }
+
+    public void reduceByHalf() {
+        this.currentEnergy *= 0.5;
+    }
+}
+
 
     public void addEnergy(int amount) {
         currentEnergy = Math.min(currentEnergy + amount, maxEnergy);

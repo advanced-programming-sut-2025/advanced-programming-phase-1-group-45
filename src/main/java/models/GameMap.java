@@ -1,57 +1,76 @@
 package models;
-import controllers.MenuController;
-import models.Enums.Tile;
 
+import controllers.MenuController;
+import models.MapElements.Tile.Tile;
+import models.MapElements.Tile.TileCreate;
+import models.MapElements.Tile.TileFeatures.UnWalkAble;
+import models.MapElements.Tile.TileType;
 
 import java.util.*;
 
 public class GameMap {
     private int size;
     private Tile[][] grid;
+
     public GameMap(int size, boolean random) {
         this.size = size;
         grid = new Tile[size][size];
-        if(random) generateRandomMap();
+        if (random) generateRandomMap();
         else fillPlain();
     }
+
     private void generateRandomMap() {
         Random rand = new Random();
         fillPlain();
-        for (Tile t : new Tile[]{Tile.LAKE, Tile.GREENHOUSE, Tile.COTTAGE, Tile.QUARRY}){
+        for (Tile t : new Tile[]{TileCreate.create(TileType.LAKE),
+                TileCreate.create(TileType.GREENHOUSE),
+                TileCreate.create(TileType.COTTAGE),
+                TileCreate.create(TileType.QUARRY)}) {
             placeRandom(t, rand);
         }
     }
+
     private void placeRandom(Tile t, Random rand) {
         int x, y;
-        do{
+        do {
             x = rand.nextInt(size);
             y = rand.nextInt(size);
-        } while (grid[y][x] != Tile.PLAIN);
+        } while (grid[y][x].getTileType() != TileType.PLAIN);
         grid[y][x] = t;
+        grid[y][x].setX(x);
+        grid[y][x].setY(y);
     }
+
     public Tile getTile(int x, int y) {
-        if(x < 0 || y < 0 || x >= size || y >= size){
+        if (x < 0 || y < 0 || x >= size || y >= size) {
             return null;
         }
         return grid[y][x];
     }
 
-    public int getSize() {return size;}
+    public int getSize() {
+        return size;
+    }
 
     public void setTile(int x, int y, Tile tile) {
-        if(x < 0 || y < 0 || x >= size || y >= size){
-            return ;
+        if (x < 0 || y < 0 || x >= size || y >= size) {
+            return;
         }
         grid[y][x] = tile;
+        grid[y][x].setX(x);
+        grid[y][x].setY(y);
     }
 
     private void fillPlain() {
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
-                grid[y][x] = Tile.PLAIN;
+                grid[y][x] = TileCreate.create(TileType.PLAIN);
+                grid[y][x].setX(x);
+                grid[y][x].setY(y);
             }
         }
     }
+
     public static List<int[]> findPath(GameMap map, int startX, int startY, int endX, int endY) {
         // پیاده‌سازی الگوریتم BFS
         Queue<int[]> queue = new LinkedList<>();
@@ -61,15 +80,15 @@ public class GameMap {
         queue.add(new int[]{startX, startY});
         visited[startY][startX] = true;
 
-        while(!queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             int[] current = queue.poll();
-            if(current[0] == endX && current[1] == endY) {
+            if (current[0] == endX && current[1] == endY) {
                 return reconstructPath(parent, current);
             }
 
-            for(int[] neighbor : map.getNeighbors(current[0], current[1])) {
+            for (int[] neighbor : map.getNeighbors(current[0], current[1])) {
                 String key = neighbor[0] + "," + neighbor[1];
-                if(!visited[neighbor[1]][neighbor[0]]) {
+                if (!visited[neighbor[1]][neighbor[0]]) {
                     visited[neighbor[1]][neighbor[0]] = true;
                     parent.put(key, current);
                     queue.add(neighbor);
@@ -82,7 +101,7 @@ public class GameMap {
     private static List<int[]> reconstructPath(Map<String, int[]> parent, int[] end) {
         List<int[]> path = new ArrayList<>();
         int[] current = end;
-        while(current != null) {
+        while (current != null) {
             path.add(current);
             current = parent.get(current[0] + "," + current[1]);
         }
@@ -96,7 +115,7 @@ public class GameMap {
 
     public static void printMapLegend() {
         System.out.println("\nMap Symbols Legend:");
-        for(Tile tile : Tile.values()) {
+        for (TileType tile : TileType.values()) {
             System.out.printf("%-2s : %-15s (%s)%n",
                     tile.getSymbol(),
                     tile.name(),
@@ -110,20 +129,19 @@ public class GameMap {
     public boolean isTilePassable(int x, int y) {
         Tile tile = getTile(x, y);
         return tile != null &&
-                tile != Tile.LAKE &&
-                tile != Tile.STONE;
+                tile.hasFeature(UnWalkAble.class);
     }
 
     // 2. یافتن همسایه‌های مجاز
     public List<int[]> getNeighbors(int x, int y) {
         List<int[]> neighbors = new ArrayList<>();
-        int[][] directions = {{-1,0}, {1,0}, {0,-1}, {0,1},
-                {-1,-1}, {-1,1}, {1,-1}, {1,1}};
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1},
+                {-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 
-        for(int[] dir : directions) {
+        for (int[] dir : directions) {
             int nx = x + dir[0];
             int ny = y + dir[1];
-            if(isTilePassable(nx, ny)) {
+            if (isTilePassable(nx, ny)) {
                 neighbors.add(new int[]{nx, ny});
             }
         }
@@ -135,11 +153,11 @@ public class GameMap {
         int half = size / 2;
         int startX = Math.max(0, centerX - half);
         int startY = Math.max(0, centerY - half);
-        int endX = Math.min(size-1, centerX + half);
-        int endY = Math.min(size-1, centerY + half);
+        int endX = Math.min(size - 1, centerX + half);
+        int endY = Math.min(size - 1, centerY + half);
 
-        for(int y = startY; y <= endY; y++) {
-            for(int x = startX; x <= endX; x++) {
+        for (int y = startY; y <= endY; y++) {
+            for (int x = startX; x <= endX; x++) {
                 Tile tile = getTile(x, y);
                 System.out.print(tile.getSymbol() + " ");
             }
@@ -149,6 +167,7 @@ public class GameMap {
 
     public static void handleWalkCommand(String command, MenuController controller) {
         try {
+            String user = controller.getCurrentUser().getUsername();
             String[] parts = command.split(" ");
             String[] coords = parts[2].split(",");
             int x = Integer.parseInt(coords[0]);
@@ -158,7 +177,7 @@ public class GameMap {
 
 
             // بررسی وجود خانه مقصد
-            if(!map.isTilePassable(x, y)) {
+            if (!map.isTilePassable(x, y)) {
                 System.out.println("Destination is blocked!");
                 return;
             }
@@ -172,7 +191,7 @@ public class GameMap {
                     y
             );
 
-            if(path.isEmpty()) {
+            if (path.isEmpty()) {
                 System.out.println("No path found!");
                 return;
             }
@@ -182,17 +201,19 @@ public class GameMap {
             System.out.println("Energy needed: " + energyCost + ". Confirm? (Y/N)");
 
             //  تایید کاربر
-            // String input = Main.scanner.nextLine();
-           /* if(input.equalsIgnoreCase("Y")) {
-                if(session.getEnergy() >= energyCost) {
+            Scanner scanner = new Scanner(System.in);
+            String input = scanner.nextLine();
+            if (input.equalsIgnoreCase("Y")) {
+                if (session.getEnergy() >= energyCost) {
                     session.setPlayerPosition(x, y);
+                    //    session.movePlayer(user,x ,y);
                     session.reduceEnergy(energyCost);
                     System.out.println("Moved successfully!");
                 } else {
                     System.out.println("Insufficient energy! You fainted.");
-                   // player.faint();
+                    // player.faint();
                 }
-            }*/
+            }
         } catch (Exception e) {
             System.out.println("Invalid command format! Usage: walk -l <x,y>");
         }
@@ -202,10 +223,10 @@ public class GameMap {
         GameSession session = controller.getCurrentSession();
         try {
             String[] parts = command.split(" ");
-            String[] coords = parts[3].split(",");
+            String[] coords = parts[2].split(",");
             int x = Integer.parseInt(coords[0]);
             int y = Integer.parseInt(coords[1]);
-            int size = Integer.parseInt(parts[5]);
+            int size = Integer.parseInt(parts[4]);
 
             session.getMap().printMapArea(x, y, size);
         } catch (Exception e) {
