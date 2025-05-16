@@ -1,75 +1,42 @@
-package models.Tools;
+package managers;
 
-import models.MapElements.Tile.Tile;
+import com.google.common.eventbus.Subscribe;
+import models.Events.GameEventBus;
+import models.Events.TurnChangedEvent;
+import models.Events.TurnEndedEvent;
+import models.User;
 
-public class ToolManager {
-    public void toolEquip(String toolName) {
-      //  GameSession.getCurrentPlayer().equipTool(toolName);
-    }
+import java.util.List;
 
-    public void toolShowCurrent() {
-//        Class<?> currentTool = GameSession.getCurrentPlayer().getCurrentTool();
-//        if (currentTool.getSuperclass() == Tool.class) {
-//            System.out.println(currentTool.getSimpleName());
-//        }
-    }
+public class PlayerTurnManager {
+    private List<User> players;
+    private int currentTurn = 0;
 
-    public void showAllToolsAvailable() {
-//        List<Tool> toolInventory = GameSession.getCurrentPlayer().getTools();
-//        for (Tool tool : toolInventory) {
-//            if (tool instanceof UpgradeAbleTool) {
-//                System.out.println(tool.getName() + " level: " + ((UpgradeAbleTool) tool).getLevel());
-//            } else {
-//                System.out.println(tool.getName());
-//            }
-//        }
-    }
-
-    public void useTool(String toolName, String direction) {
-//        int currentX = User.getX();
-//        int currentY = User.getY();
-//        Tile currentTile = GameMap.getTile(x, y);
-        Tool tool = findTool(toolName);
-        if (tool == null) {
-            System.out.println("You do not have " + toolName + " in your backpack.");
-            return;
+    public PlayerTurnManager(List<User> players) {
+        if (players != null) {
+            this.players = players;
         }
-        try {
-            tool.decreaseEnergy();
-        } catch (IllegalArgumentException exception) {
-            //the player has not enough energy to use this tool
-            System.out.println(exception.getMessage());
-            return;
-        }
-
-        Tile targetTile = findTargetTile(direction);
-
-        if (targetTile == null) {
-            System.out.println("Target tile is out of bounds");
-            return;
-        }
-        try {
-            tool.useTool(targetTile);
-        } catch (IllegalArgumentException exception) {
-            System.out.println(exception.getMessage());
-        }
+        GameEventBus.INSTANCE.register(this);
     }
 
-    private Tool findTool(String toolName) {
-        Tool currentTool = null;
-//        for (Tool tool : User.Inventory.tools) {
-//            if (tool.getName().equals(toolName)) {
-//                currentTool = tool;
-//                break;
-//            }
-//        }
-        return currentTool;
+    public void endTurn() {
+        User player = players.get(currentTurn);
+        player.onTurnEnd();
+        GameEventBus.INSTANCE.post(new TurnEndedEvent(player));
+        advanceToNextPlayer();
     }
 
-    private Tile findTargetTile(String direction) {
-        int newX = Direction.findDirection(direction).getX();
-        int newY = Direction.findDirection(direction).getY();
-        Tile targetTile = null;//GameMap.getTile(newX, newY);
-        return targetTile;
+    public int getCurrentTurn() {
+        return currentTurn + 1;
+    }
+
+    private void advanceToNextPlayer() {
+        currentTurn = (currentTurn + 1) % players.size();
+        TimeManager.getInstance().nextTurn();
+    }
+
+    @Subscribe
+    private void onTimeAdvanced(TurnChangedEvent event) {
+        players.get(currentTurn).onNewTurn(event);
     }
 }
