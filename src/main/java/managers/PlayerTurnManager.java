@@ -40,4 +40,3 @@ public class PlayerTurnManager {
         players.get(currentTurn).onNewTurn(event);
     }
 }
-
