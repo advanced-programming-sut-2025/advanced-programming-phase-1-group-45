@@ -1,0 +1,967 @@
+Index: src/main/java/views/GameMenu.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package views;\r\n\r\nimport managers.GameManager;\r\nimport controllers.MenuController;\r\nimport managers.ShopManager;\r\nimport managers.UserManager;\r\nimport models.Enums.Shop;\r\nimport models.GameSession;\r\nimport models.GameMap;\r\nimport java.util.*;\r\n\r\npublic class GameMenu implements Menu{\r\n    @Override\r\n    public void handleCommand(String command, MenuController controller) {\r\n        GameManager gm = controller.getGameManager();\r\n        String me = controller.getCurrentUser().getUsername(); //current player\r\n        ShopManager sm = controller.getShopManager();\r\n        UserManager um = controller.getUserManager();\r\n        if(command.startsWith(\"game new \")){\r\n            GameSession s = gm.createNewGame(command, me, controller);\r\n            if(s != null){\r\n                controller.setCurrentSession(s);\r\n                System.out.println(\"New Game Created, now choose your map\");\r\n            } else System.out.println(\"New Game Creation Failed, make sure to enter input correctly.\");\r\n        } else if(command.startsWith(\"game map\")){\r\n            int size = Integer.parseInt(command.split(\" \")[2]);\r\n            GameMap map = new GameMap(size, true);\r\n            //if 1,2,3 maps\r\n            if(controller.getCurrentSession() != null && gm.selectMap(controller.getCurrentSession(), command)){\r\n                controller.getCurrentSession().setMap(map);\r\n                System.out.println(\"map selected\");\r\n            }\r\n        } else if(command.equals(\"load game\")){\r\n            GameSession s= gm.loadLastSession(controller.getCurrentUser());\r\n            if(s != null){\r\n                controller.setCurrentSession(s);\r\n                System.out.println(\"the last game loaded\");\r\n            } else System.out.println(\"no game exists\");\r\n        } else if(command.equals(\"next turn\")){\r\n            GameSession s = controller.getCurrentSession();\r\n            if(s != null){\r\n                s.nextTurn();\r\n                System.out.println(\"it's \" + s.getTurn() + \" turn!\");\r\n            }\r\n        } else if(command.equals(\"exit game\")){\r\n            GameSession s = controller.getCurrentSession();\r\n            if(!me.equals(s.getPlayers().get(0))){\r\n                System.out.println(\"only the creator can exit the game\");\r\n            } else {\r\n                controller.getGameManager().saveSession(s);\r\n\r\n                controller.setCurrentSession(null);\r\n                System.out.println(\"exiting the game\");\r\n            }\r\n        } else if(command.equals(\"force terminate\")){\r\n            GameSession s = controller.getCurrentSession();\r\n            s.startVote(me);\r\n            System.out.println(\"voting terminated\");\r\n        } else if(command.startsWith(\"vote\")) {\r\n            GameSession s = controller.getCurrentSession();\r\n            if (!s.isVoteInProgress()) {\r\n                System.out.println(\"no active voting\");\r\n            } else if (s.hasVoted(me)) {\r\n                System.out.println(\"you already voted\");\r\n            } else {\r\n                boolean yes = command.equals(\"vote yes\");\r\n                s.recordVote(me, yes);\r\n                System.out.println(\"vote submitted\");\r\n                if (s.allVoted()) {\r\n                    if (s.isVoteSuccessful()) {\r\n                        controller.getGameManager().endSession(s);\r\n                        System.out.println(\"All votes were positive ,ending the game\");\r\n                        controller.setCurrentSession(null);\r\n                        controller.setCurrentMenu(new MainMenu());\r\n                    } else {\r\n                        s.clearVote();\r\n                        System.out.println(\"there is at least one negative vote, continuing the game\");\r\n                    }\r\n                }\r\n            }\r\n        }\r\n        else if (command.equals(\"help reading map\")){\r\n            GameMap.printMapLegend();\r\n        }\r\n        else if(command.equals(\"show current menu\")){\r\n            System.out.println(\"game menu\");\r\n        }\r\n        else if(command.equals(\"menu exit\")){\r\n            System.out.println(\"moving to main menu\");\r\n            controller.setCurrentMenu(new MainMenu());\r\n        }\r\n        else if(command.startsWith(\"walk -l\")) {\r\n            GameMap.handleWalkCommand(command, controller);\r\n        }\r\n        else if(command.startsWith(\"print map\")) {\r\n            //GameMap.handlePrintMap(command, controller);\r\n            Map<String, String> o = parseOptions(command.split(\"\\\\s+\"));\r\n            int[] coords = handleCoords(o.get(\"-l\"));\r\n            int x = coords[0];\r\n            int y = coords[1];\r\n            int s = Integer.parseInt(o.get(\"-s\"));\r\n            controller.getCurrentSession().getMap().printMapArea(x, y, s);\r\n\r\n        }\r\n        else if(command.startsWith(\"sell\")){\r\n            um.handleSell(command, controller);\r\n        }\r\n        else if(command.equals(\"show all products\")) {\r\n            sm.getAllProducts(Shop.GENERAL_STORE);\r\n        }\r\n        else if(command.equals(\"show all available products\")) {\r\n            sm.getAvailableProducts(Shop.GENERAL_STORE);\r\n        }\r\n        else if(command.startsWith(\"purchase \")) {\r\n            handlePurchaseCommand(command, sm, controller);\r\n        } else System.out.println(\"invalid command\");\r\n    }\r\n\r\n    private void handlePurchaseCommand(String command, ShopManager sm, MenuController controller) {\r\n        try {\r\n            String[] parts = command.split(\" -n \");\r\n            if(parts.length != 2) {\r\n                System.out.println(\"Invalid format! Use: purchase <product_name> -n <count>\");\r\n                return;\r\n            }\r\n\r\n            String productName = parts[0].replace(\"purchase \", \"\").trim();\r\n            int count = Integer.parseInt(parts[1].trim());\r\n\r\n            String result = sm.purchase(\r\n                    controller.getCurrentUser().getUsername(),\r\n                    Shop.GENERAL_STORE, // Replace with actual shop instance\r\n                    productName,\r\n                    count\r\n            );\r\n\r\n            System.out.println(result);\r\n        } catch(NumberFormatException e) {\r\n            System.out.println(\"Invalid quantity format!\");\r\n        }\r\n    }\r\n\r\n    private int[] handleCoords(String coords) {\r\n        String[] x = coords.split(\",\");\r\n        return new int[]{Integer.parseInt(x[0]), Integer.parseInt(x[1])};\r\n    }\r\n    private Map<String, String> parseOptions(String[] options) {\r\n        Map<String, String> map = new HashMap<>();\r\n        for(int i = 1; i < options.length - 1; i++) {\r\n            if(options[i].startsWith(\"-\")) {\r\n                map.put(options[i], options[i + 1]);\r\n            }\r\n        }\r\n        return map;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/views/GameMenu.java b/src/main/java/views/GameMenu.java
+--- a/src/main/java/views/GameMenu.java	(revision 91e1f435cea535c47e2f010a56d338567ce5a4ec)
++++ b/src/main/java/views/GameMenu.java	(date 1747461837486)
+@@ -1,50 +1,60 @@
+ package views;
+ 
++import controllers.WeatherController;
+ import managers.GameManager;
+ import controllers.MenuController;
+ import managers.ShopManager;
+ import managers.UserManager;
++import models.Animal.ProductInfo;
++import models.Enums.Command;
+ import models.Enums.Shop;
+ import models.GameSession;
+ import models.GameMap;
++import models.MapElements.Tile.Tile;
++import models.MapElements.Tile.TileType;
++import models.MapElements.crops.AllCropsLoader;
++
+ import java.util.*;
++import java.util.regex.Matcher;
+ 
+-public class GameMenu implements Menu{
++public class GameMenu implements Menu {
+     @Override
+     public void handleCommand(String command, MenuController controller) {
+         GameManager gm = controller.getGameManager();
+         String me = controller.getCurrentUser().getUsername(); //current player
+         ShopManager sm = controller.getShopManager();
+         UserManager um = controller.getUserManager();
+-        if(command.startsWith("game new ")){
++        GameSession gs = controller.getCurrentSession();
++        Matcher matcher;
++        if (command.startsWith("game new ")) {
+             GameSession s = gm.createNewGame(command, me, controller);
+-            if(s != null){
++            if (s != null) {
+                 controller.setCurrentSession(s);
+                 System.out.println("New Game Created, now choose your map");
+             } else System.out.println("New Game Creation Failed, make sure to enter input correctly.");
+-        } else if(command.startsWith("game map")){
++        } else if (command.startsWith("game map")) {
+             int size = Integer.parseInt(command.split(" ")[2]);
+             GameMap map = new GameMap(size, true);
+             //if 1,2,3 maps
+-            if(controller.getCurrentSession() != null && gm.selectMap(controller.getCurrentSession(), command)){
++            if (controller.getCurrentSession() != null && gm.selectMap(controller.getCurrentSession(), command)) {
+                 controller.getCurrentSession().setMap(map);
+                 System.out.println("map selected");
+             }
+-        } else if(command.equals("load game")){
+-            GameSession s= gm.loadLastSession(controller.getCurrentUser());
+-            if(s != null){
++        } else if (command.equals("load game")) {
++            GameSession s = gm.loadLastSession(controller.getCurrentUser());
++            if (s != null) {
+                 controller.setCurrentSession(s);
+                 System.out.println("the last game loaded");
+             } else System.out.println("no game exists");
+-        } else if(command.equals("next turn")){
++        } else if (command.equals("next turn")) {
+             GameSession s = controller.getCurrentSession();
+-            if(s != null){
++            if (s != null) {
+                 s.nextTurn();
+                 System.out.println("it's " + s.getTurn() + " turn!");
+             }
+-        } else if(command.equals("exit game")){
++        } else if (command.equals("exit game")) {
+             GameSession s = controller.getCurrentSession();
+-            if(!me.equals(s.getPlayers().get(0))){
++            if (!me.equals(s.getPlayers().get(0))) {
+                 System.out.println("only the creator can exit the game");
+             } else {
+                 controller.getGameManager().saveSession(s);
+@@ -52,11 +62,11 @@
+                 controller.setCurrentSession(null);
+                 System.out.println("exiting the game");
+             }
+-        } else if(command.equals("force terminate")){
++        } else if (command.equals("force terminate")) {
+             GameSession s = controller.getCurrentSession();
+             s.startVote(me);
+             System.out.println("voting terminated");
+-        } else if(command.startsWith("vote")) {
++        } else if (command.startsWith("vote")) {
+             GameSession s = controller.getCurrentSession();
+             if (!s.isVoteInProgress()) {
+                 System.out.println("no active voting");
+@@ -78,21 +88,16 @@
+                     }
+                 }
+             }
+-        }
+-        else if (command.equals("help reading map")){
++        } else if (command.equals("help reading map")) {
+             GameMap.printMapLegend();
+-        }
+-        else if(command.equals("show current menu")){
++        } else if (command.equals("show current menu")) {
+             System.out.println("game menu");
+-        }
+-        else if(command.equals("menu exit")){
++        } else if (command.equals("menu exit")) {
+             System.out.println("moving to main menu");
+             controller.setCurrentMenu(new MainMenu());
+-        }
+-        else if(command.startsWith("walk -l")) {
++        } else if (command.startsWith("walk -l")) {
+             GameMap.handleWalkCommand(command, controller);
+-        }
+-        else if(command.startsWith("print map")) {
++        } else if (command.startsWith("print map")) {
+             //GameMap.handlePrintMap(command, controller);
+             Map<String, String> o = parseOptions(command.split("\\s+"));
+             int[] coords = handleCoords(o.get("-l"));
+@@ -101,25 +106,361 @@
+             int s = Integer.parseInt(o.get("-s"));
+             controller.getCurrentSession().getMap().printMapArea(x, y, s);
+ 
+-        }
+-        else if(command.startsWith("sell")){
++        } else if (command.startsWith("sell")) {
+             um.handleSell(command, controller);
+-        }
+-        else if(command.equals("show all products")) {
++        } else if (command.equals("show all products")) {
+             sm.getAllProducts(Shop.GENERAL_STORE);
+-        }
+-        else if(command.equals("show all available products")) {
++        } else if (command.equals("show all available products")) {
+             sm.getAvailableProducts(Shop.GENERAL_STORE);
+-        }
+-        else if(command.startsWith("purchase ")) {
++        } else if (command.startsWith("purchase ")) {
+             handlePurchaseCommand(command, sm, controller);
+-        } else System.out.println("invalid command");
++        } else if ((matcher = Command.TIME.getMatcher(command)) != null) {
++            System.out.println(gs.getTimeManager().getTimeString());
++        } else if ((matcher = Command.DATE.getMatcher(command)) != null) {
++            System.out.println(gs.getTimeManager().getDay() + " of " + gs.getTimeManager().getSeason().toString());
++        } else if ((matcher = Command.dateTime.getMatcher(command)) != null) {
++            System.out.println(gs.getTimeManager().getDateAndTimeString());
++        } else if ((matcher = Command.DayOfWeek.getMatcher(command)) != null) {
++            System.out.println(gs.getTimeManager().getDayOfWeek());
++        } else if ((matcher = Command.CheatTime.getMatcher(command)) != null) {
++            for (int i = 0; i < Integer.parseInt(matcher.group("hour")); i++) {
++                gs.getTimeManager().advanceHour();
++            }
++        } else if ((matcher = Command.CheatDate.getMatcher(command)) != null) {
++            for (int i = 0; i < Integer.parseInt(matcher.group("day")); i++) {
++                gs.getTimeManager().advanceDay();
++            }
++        } else if ((matcher = Command.Season.getMatcher(command)) != null) {
++            System.out.println(gs.getTimeManager().getSeason().toString());
++        } else if ((matcher = Command.Weather.getMatcher(command)) != null) {
++            System.out.println(WeatherController.getInstance().getCurrentWeather());
++        } else if ((matcher = Command.WeatherForecast.getMatcher(command)) != null) {
++            System.out.println(WeatherController.getInstance().getForecastWeather());
++        } else if ((matcher = Command.CheatWeather.getMatcher(command)) != null) {
++            WeatherController.getInstance().setCurrentWeather(matcher.group(1));
++            System.out.println("Weather changed to " + WeatherController.getInstance().getCurrentWeather());
++        } else if (command.startsWith("tools ")) {
++            handleToolsCommand(command, gs, controller);
++        } else if ((matcher = Command.craftInfo.getMatcher(command)) != null) {
++            AllCropsLoader.getInstance().printCraftInfo(matcher.group(1));
++        } else if ((matcher = Command.plantSeed.getMatcher(command)) != null) {
++            if (gs.getToolManager().findTargetTile(matcher.group("direction"), controller.getCurrentUser().getPlayer()).
++                    equals(gs.getMap().getTile(gs.getPlayerX(), gs.getPlayerY()))) {
++                System.out.println("You can not use any tool int this tile");
++                return;
++            }
++            controller.getCurrentUser().getPlayer().getFarmingManager().plant(matcher.group(1),
++                    gs.getToolManager().findTargetTile(matcher.group("direction"),
++                            controller.getCurrentUser().getPlayer()));
++        } else if ((matcher = Command.showPlant.getMatcher(command)) != null) {
++             Tile tile = gs.getToolManager().findTargetTile(matcher.group("direction"),
++                     controller.getCurrentUser().getPlayer());
++             if (tile == null) {
++                 System.out.println("Tile is out of bounds");
++                 return;
++             }
++            controller.getCurrentUser().getPlayer().getFarmingManager().showPlant(tile);
++        }
++        else if((matcher = Command.fertilize.getMatcher(command)) != null) {
++            Tile tile = gs.getToolManager().findTargetTile(matcher.group(2), controller.getCurrentUser().getPlayer());
++            if (tile == null) {
++                System.out.println("Tile is out of bounds");
++                return;
++            }
++            controller.getCurrentUser().getPlayer().getFarmingManager().fertilize(matcher.group(1), tile);
++        } else if(command.equals("howmuch water")) {
++            System.out.println(controller.getCurrentUser().getPlayer().getBackpack().getWateringCan().getWaterAmount());
++        }
++        else if (command.startsWith("artisan use ")) {
++            String[] parts = command.substring(12).split(" ");
++            if (parts.length < 2) {
++                System.out.println("Usage: artisan use <artisan_name> <item_name>");
++                return;
++            }
++
++            String artisanName = parts[0];
++            String itemName = parts[1];
++
++            if (controller.getCurrentUser().getInventoryCount(itemName) <= 0) {
++                System.out.println("You don't have any " + itemName + " in your inventory!");
++                return;
++            }
++
++            boolean success = controller.getCurrentUser().getPlayer().useArtisanMachine(artisanName, itemName);
++            if (success) {
++                System.out.println("Started processing " + itemName + " in " + artisanName);
++            } else {
++                System.out.println("Failed to use " + artisanName + ". Make sure the machine exists and can process this item.");
++            }
++        }
++        else if (command.startsWith("artisan get ")) {
++            String artisanName = command.substring(12);
++
++            String product = controller.getCurrentUser().getPlayer().getArtisanProduct(artisanName);
++            if (product != null) {
++                System.out.println("Collected " + product + " from " + artisanName);
++            } else {
++                System.out.println("No product ready to collect from " + artisanName + " or machine not found.");
++            }
++        }
++
++        else if (command.startsWith("pet -n ")) {
++            String animalName = command.substring(6);
++            boolean success = controller.getCurrentUser().getPlayer().petAnimal(animalName);
++            if (success) {
++                System.out.println("You pet " + animalName + ".");
++            } else {
++                System.out.println("Failed to pet " + animalName + ". Animal not found.");
++            }
++        }
++        else if (command.startsWith("feed hay -n ")) {
++            String animalName = command.substring(11);
++
++            if (controller.getCurrentUser().getInventoryCount("Hay") <= 0) {
++                System.out.println("You don't have any hay in your inventory!");
++                return;
++            }
++
++            boolean success = controller.getCurrentUser().getPlayer().feedAnimal(animalName);
++            if (success) {
++                System.out.println("You fed " + animalName + " with hay.");
++            } else {
++                System.out.println("Failed to feed " + animalName + ". Animal not found or already fed today.");
++            }
++        }
++        else if (command.startsWith("shepherd animals -n ")) {
++            String[] parts = command.split(" -l ");
++            if (parts.length != 2) {
++                System.out.println("Usage: shepherd animals -n <animal name> -l <x,y>");
++                return;
++            }
++
++            String animalName = parts[0].substring(20);
++            String[] coords = parts[1].split(" ");
++            int x = Integer.parseInt(coords[0]);
++            int y = Integer.parseInt(coords[1]);
++
++            boolean toOutside = true;
++            if (coords.length > 2 && coords[2].equals("--inside")) {
++                toOutside = false;
++            }
++
++            boolean success = controller.getCurrentUser().getPlayer().shepherdAnimal(animalName, x, y, toOutside);
++            if (success) {
++                if (toOutside) {
++                    System.out.println(animalName + " went outside to (" + x + ", " + y + ").");
++                } else {
++                    System.out.println(animalName + " went inside.");
++                }
++            } else {
++                System.out.println("Failed to shepherd " + animalName + ".");
++            }
++        }
++        else if (command.equals("animals")) {
++            List<String> animals = controller.getCurrentUser().getPlayer().getAnimalsList();
++            if (animals.isEmpty()) {
++                System.out.println("You don't have any animals.");
++            } else {
++                System.out.println("=== Your Animals ===");
++                for (String animal : animals) {
++                    System.out.println(animal);
++                }
++            }
++        }
++        else if (command.equals("produces")) {
++            List<String> produces = controller.getCurrentUser().getPlayer().getAnimalsWithProduce();
++            if (produces.isEmpty()) {
++                System.out.println("No animals have products to collect.");
++            } else {
++                System.out.println("=== Animals With Products to Collect ===");
++                for (String animal : produces) {
++                    System.out.println(animal);
++                }
++            }
++        }
++        else if (command.startsWith("collect produce -n ")) {
++            String animalName = command.substring(19);
++
++            String toolName = "";
++
++            String animalInfo = controller.getCurrentUser().getPlayer().getAnimalInfo(animalName);
++            if (animalInfo.contains("Cow") || animalInfo.contains("Goat")) {
++                toolName = "Milk Pail";
++            } else if (animalInfo.contains("Sheep")) {
++                toolName = "Shears";
++            }
++
++            if (!toolName.isEmpty() && controller.getCurrentUser().getInventoryCount(toolName) <= 0) {
++                System.out.println("You need a " + toolName + " to collect from this animal!");
++                return;
++            }
++
++            ProductInfo product = controller.getCurrentUser().getPlayer().collectAnimalProduct(animalName, toolName);
++            if (product != null) {
++                System.out.println("Collected " + product.toString() + " from " + animalName);
++            } else {
++                System.out.println("Failed to collect product from " + animalName);
++            }
++        }
++
++        else if (command.startsWith("crafting show recipes")) {
++            List<String> recipes = controller.getCurrentUser().getPlayer().getLearnedCraftingRecipes();
++            System.out.println("=== Available Crafting Recipes ===");
++            for (String recipe : recipes) {
++                System.out.println("- " + recipe);
++            }
++        }
++        else if (command.startsWith("crafting craft ")) {
++            String recipeName = command.substring(15);
++            boolean success = controller.getCurrentUser().getPlayer().craftItem(recipeName);
++            if (success) {
++                System.out.println("Successfully crafted " + recipeName);
++            } else {
++                System.out.println("Failed to craft " + recipeName + ". Make sure you have the required materials and energy.");
++            }
++        }
++        else if (command.startsWith("craftinfo -n ")) {
++            String craftName = command.substring(13);
++            // اینجا باید به کلاس AllCropsLoader دسترسی داشته باشید
++            // AllCropsLoader.getInstance().printCraftInfo(craftName);
++            System.out.println("Craft information for " + craftName + ":");
++            // اطلاعات مربوط به محصول را چاپ کنید
++        }
++
++        else if (command.startsWith("cooking refrigerator ")) {
++            String[] parts = command.substring(20).split(" ");
++            if (parts.length < 2) {
++                System.out.println("Usage: cooking refrigerator [put/pick] <item>");
++                return;
++            }
++
++            String action = parts[0];
++            String itemName = parts[1];
++
++            if (!controller.getCurrentUser().getPlayer().isAtHome) {
++                System.out.println("You must be at home to use the refrigerator!");
++                return;
++            }
++
++            if (action.equals("put")) {
++                if (controller.getCurrentUser().getInventoryCount(itemName) <= 0) {
++                    System.out.println("You don't have any " + itemName + " in your inventory!");
++                    return;
++                }
++
++                controller.getCurrentUser().getPlayer().addToRefrigerator(itemName, 1);
++                System.out.println("Added " + itemName + " to refrigerator");
++            } else if (action.equals("pick")) {
++                boolean success = controller.getCurrentUser().getPlayer().removeFromRefrigerator(itemName, 1);
++                if (success) {
++                    System.out.println("Picked " + itemName + " from refrigerator");
++                } else {
++                    System.out.println("Failed to pick " + itemName + " from refrigerator");
++                }
++            } else {
++                System.out.println("Invalid action! Use 'put' or 'pick'");
++            }
++        }
++        else if (command.equals("cooking show recipes")) {
++            List<String> recipes = controller.getCurrentUser().getPlayer().getLearnedCookingRecipes();
++            System.out.println("=== Available Cooking Recipes ===");
++            for (String recipe : recipes) {
++                System.out.println("- " + recipe);
++            }
++        }
++        else if (command.startsWith("cooking prepare ")) {
++            String recipeName = command.substring(16);
++
++            if (!controller.getCurrentUser().getPlayer().isAtHome) {
++                System.out.println("You must be at home to cook!");
++                return;
++            }
++
++            boolean success = controller.getCurrentUser().getPlayer().cookRecipe(recipeName, true); 
++            if (success) {
++                System.out.println("Successfully cooked " + recipeName);
++            } else {
++                System.out.println("Failed to cook " + recipeName + ". Make sure you have the required ingredients and energy.");
++            }
++        }
++        else if (command.startsWith("eat ")) {
++            String foodName = command.substring(4);
++
++            if (controller.getCurrentUser().getInventoryCount(foodName) <= 0) {
++                System.out.println("You don't have any " + foodName + " in your inventory!");
++                return;
++            }
++
++            boolean success = controller.getCurrentUser().getPlayer().eatFood(foodName);
++            if (success) {
++                System.out.println("You ate " + foodName);
++            } else {
++                System.out.println("Failed to eat " + foodName);
++            }
++        }
++
++
++//        else if (command.startsWith("fishing -p ")) {
++//            String fishingPole = command.substring(11);
++//
++//            if (controller.getCurrentUser().getInventoryCount(fishingPole) <= 0) {
++//                System.out.println("You don't have a " + fishingPole + " in your inventory!");
++//                return;
++//            }
++//
++//            // بررسی نزدیکی به آب
++//            boolean nearWater = false;
++//            int playerX = session.getPlayerX();
++//            int playerY = session.getPlayerY();
++//
++//            // بررسی کاشی‌های اطراف برای وجود آب
++//            for (int dx = -1; dx <= 1; dx++) {
++//                for (int dy = -1; dy <= 1; dy++) {
++//                    Tile tile = session.getMap().getTile(playerX + dx, playerY + dy);
++//                    if (tile != null && tile.getTileType() == TileType.LAKE) {
++//                        nearWater = true;
++//                        break;
++//                    }
++//                }
++//                if (nearWater) break;
++//            }
++//
++//            if (!nearWater) {
++//                System.out.println("You need to be near water to fish!");
++//                return;
++//            }
++//
++//            // ایجاد نمونه‌های مورد نیاز برای ماهیگیری
++//            models.fish.FishManager fishManager = new models.fish.FishManager();
++//            models.fish.Fishing fishing = new models.fish.Fishing(fishManager);
++//
++//            // تعیین فصل و آب و هوا
++//            String season = session.getTimeManager().getSeason().toString();
++//            String weather = WeatherController.getInstance().getCurrentWeather();
++//
++//            // ماهیگیری
++//            List<models.fish.FishCatch> catches = fishing.goFishing(fishingPole, season, weather, controller.getCurrentUser().getPlayer().getEnergy());
++//
++//            if (catches.isEmpty()) {
++//                System.out.println("You didn't catch any fish!");
++//            } else {
++//                System.out.println("You caught " + catches.size() + " fish:");
++//                for (models.fish.FishCatch fishCatch : catches) {
++//                    System.out.println("- " + fishCatch.toString());
++//                    // اضافه کردن ماهی به انبار
++//                    controller.getCurrentUser().addItem(fishCatch.getQuality() + " " + fishCatch.getFishName(), 1);
++//                }
++//            }
++//        }
++
++
++        else System.out.println("invalid command");
+     }
+ 
+     private void handlePurchaseCommand(String command, ShopManager sm, MenuController controller) {
+         try {
+             String[] parts = command.split(" -n ");
+-            if(parts.length != 2) {
++            if (parts.length != 2) {
+                 System.out.println("Invalid format! Use: purchase <product_name> -n <count>");
+                 return;
+             }
+@@ -128,14 +469,14 @@
+             int count = Integer.parseInt(parts[1].trim());
+ 
+             String result = sm.purchase(
+-                    controller.getCurrentUser().getUsername(),
++                    controller.getCurrentUser(),
+                     Shop.GENERAL_STORE, // Replace with actual shop instance
+                     productName,
+                     count
+             );
+ 
+             System.out.println(result);
+-        } catch(NumberFormatException e) {
++        } catch (NumberFormatException e) {
+             System.out.println("Invalid quantity format!");
+         }
+     }
+@@ -144,13 +485,30 @@
+         String[] x = coords.split(",");
+         return new int[]{Integer.parseInt(x[0]), Integer.parseInt(x[1])};
+     }
++
+     private Map<String, String> parseOptions(String[] options) {
+         Map<String, String> map = new HashMap<>();
+-        for(int i = 1; i < options.length - 1; i++) {
+-            if(options[i].startsWith("-")) {
++        for (int i = 1; i < options.length - 1; i++) {
++            if (options[i].startsWith("-")) {
+                 map.put(options[i], options[i + 1]);
+             }
+         }
+         return map;
+     }
++
++    private void handleToolsCommand(String command, GameSession gs, MenuController controller) {
++        Matcher matcher;
++        if ((matcher = Command.ToolEquip.getMatcher(command)) != null) {
++            gs.getToolManager().toolEquip(matcher.group("toolName"), controller.getCurrentUser().getPlayer());
++        } else if ((matcher = Command.toolShowCurrent.getMatcher(command)) != null) {
++            System.out.println(gs.getToolManager().toolShowCurrent(controller.getCurrentUser().getPlayer()));
++        } else if ((matcher = Command.toolsShow.getMatcher(command)) != null) {
++            gs.getToolManager().showAllToolsAvailable(controller.getCurrentUser().getPlayer());
++        } else if ((matcher = Command.toolsUpgrade.getMatcher(command)) != null) {
++            //gs.shopMenu().handleCommand(command);
++        } else if ((matcher = Command.toolUse.getMatcher(command)) != null) {
++            gs.getToolManager().useTool(matcher.group("direction"), controller.getCurrentUser().getPlayer());
++        }
++    }
+ }
++
+Index: src/main/java/models/GameSession.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models;\r\n\r\nimport com.google.common.eventbus.Subscribe;\r\nimport managers.PlayerTurnManager;\r\nimport models.Enums.Season;\r\nimport models.Events.GameEventBus;\r\nimport models.Events.SeasonChangedEvent;\r\n\r\nimport java.util.*;\r\nimport java.util.Map;\r\n\r\npublic class GameSession {\r\n    private static List<String> players;\r\n    private int mapNumber = 0;\r\n    private PlayerTurnManager playerTurnManager;\r\n    private int turn = 0;\r\n    private boolean voteInProgress = false;\r\n    private String voteStarter;\r\n    private Map<String, Boolean> votes = new LinkedHashMap<>();\r\n    private GameMap map;\r\n    private int playerX, playerY;\r\n    private int energy = 100;\r\n    private Season season = Season.SPRING;\r\n\r\n\r\n    public GameSession(List<String> players) {\r\n        this.players = new ArrayList<>(players);\r\n        GameEventBus.INSTANCE.register(this);\r\n    }\r\n    @Subscribe\r\n    public void changeSeason(SeasonChangedEvent event) {\r\n        season = event.newSeason();\r\n    }\r\n    public Season getSeason() {\r\n        return season;\r\n    }\r\n    public void nextTurn() {\r\n        turn++;\r\n    }\r\n    public void setMapNumber(int mapNumber) {this.mapNumber = mapNumber;}\r\n    public int getMapNumber() {return mapNumber;}\r\n    public int getTurn(){return turn;}\r\n    public List<String> getPlayers(){return players;}\r\n   // public static String getCurrentPlayer(){return players.get(turn%players.size());}\r\n    public boolean isVoteInProgress(){return voteInProgress;}\r\n    public void setMap(GameMap map) {\r\n        this.map = map;\r\n        int mid = map.getSize()/2;\r\n        this.playerX = mid;\r\n        this.playerY = mid;\r\n    }\r\n    public GameMap getMap(){return map;}\r\n    public int getPlayerX(){return playerX;}\r\n    public int getPlayerY(){return playerY;}\r\n    public void setPlayerPosition(int x, int y){this.playerX = x;this.playerY = y;}\r\n    public int getEnergy(){return energy;}\r\n    public void reduceEnergy(int amount){energy -= amount;}\r\n\r\n    public void startVote(String starter){\r\n        voteInProgress = true;\r\n        voteStarter = starter;\r\n        votes.clear();\r\n        votes.put(starter, true);\r\n    }\r\n    public boolean hasVoted(String user){return votes.containsKey(user);}\r\n    public void recordVote(String user, boolean yes){votes.put(user, yes);}\r\n    public boolean allVoted(){return votes.size() == players.size();}\r\n    public boolean isVoteSuccessful(){\r\n        for(boolean v : votes.values()){\r\n            if(!v) return false;\r\n        }\r\n        return true;\r\n    }\r\n    public void clearVote(){\r\n        voteInProgress = false;\r\n        voteStarter = null;\r\n        votes.clear();\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/GameSession.java b/src/main/java/models/GameSession.java
+--- a/src/main/java/models/GameSession.java	(revision 91e1f435cea535c47e2f010a56d338567ce5a4ec)
++++ b/src/main/java/models/GameSession.java	(date 1747461844563)
+@@ -1,7 +1,10 @@
+ package models;
+ 
+ import com.google.common.eventbus.Subscribe;
++import controllers.WeatherController;
+ import managers.PlayerTurnManager;
++import managers.TimeManager;
++import managers.ToolManager;
+ import models.Enums.Season;
+ import models.Events.GameEventBus;
+ import models.Events.SeasonChangedEvent;
+@@ -11,69 +14,138 @@
+ 
+ public class GameSession {
+     private static List<String> players;
++    List<User> users = new ArrayList<>();
+     private int mapNumber = 0;
+-    private PlayerTurnManager playerTurnManager;
++    private PlayerTurnManager turnManager;
++    private TimeManager timeManager = new TimeManager();
++    private WeatherController weatherController;
+     private int turn = 0;
+     private boolean voteInProgress = false;
+     private String voteStarter;
+     private Map<String, Boolean> votes = new LinkedHashMap<>();
+     private GameMap map;
++    private ToolManager toolManager ;
+     private int playerX, playerY;
+     private int energy = 100;
+     private Season season = Season.SPRING;
+ 
+-
+-    public GameSession(List<String> players) {
+-        this.players = new ArrayList<>(players);
++    public GameSession(HashMap<String, User> players) {
++        this.players = new ArrayList<>(players.keySet());
++        for (String player : players.keySet()) {
++            users.add(players.get(player));
++        }
++        turnManager = new PlayerTurnManager(users);
++        toolManager = new ToolManager(this, users.get(this.getTurn() - 1).getPlayer());
+         GameEventBus.INSTANCE.register(this);
+     }
++
+     @Subscribe
+     public void changeSeason(SeasonChangedEvent event) {
+         season = event.newSeason();
+     }
++
+     public Season getSeason() {
+         return season;
+     }
++
+     public void nextTurn() {
+-        turn++;
++        turnManager.endTurn();
++    }
++
++    public void setMapNumber(int mapNumber) {
++        this.mapNumber = mapNumber;
++    }
++
++    public int getMapNumber() {
++        return mapNumber;
++    }
++
++    public int getTurn() {
++        return turnManager.getCurrentTurn();
+     }
+-    public void setMapNumber(int mapNumber) {this.mapNumber = mapNumber;}
+-    public int getMapNumber() {return mapNumber;}
+-    public int getTurn(){return turn;}
+-    public List<String> getPlayers(){return players;}
+-   // public static String getCurrentPlayer(){return players.get(turn%players.size());}
+-    public boolean isVoteInProgress(){return voteInProgress;}
++
++    public List<String> getPlayers() {
++        return players;
++    }
++
++    // public static String getCurrentPlayer(){return players.get(turn%players.size());}
++    public boolean isVoteInProgress() {
++        return voteInProgress;
++    }
++
+     public void setMap(GameMap map) {
+         this.map = map;
+-        int mid = map.getSize()/2;
++        int mid = map.getSize() / 2;
+         this.playerX = mid;
+         this.playerY = mid;
+     }
+-    public GameMap getMap(){return map;}
+-    public int getPlayerX(){return playerX;}
+-    public int getPlayerY(){return playerY;}
+-    public void setPlayerPosition(int x, int y){this.playerX = x;this.playerY = y;}
+-    public int getEnergy(){return energy;}
+-    public void reduceEnergy(int amount){energy -= amount;}
++
++    public GameMap getMap() {
++        return map;
++    }
++
++    public int getPlayerX() {
++        return playerX;
++    }
++
++    public int getPlayerY() {
++        return playerY;
++    }
++
++    public void setPlayerPosition(int x, int y) {
++        this.playerX = x;
++        this.playerY = y;
++    }
++
++    public int getEnergy() {
++        return energy;
++    }
++
++    public void reduceEnergy(int amount) {
++        energy -= amount;
++    }
+ 
+-    public void startVote(String starter){
++    public void startVote(String starter) {
+         voteInProgress = true;
+         voteStarter = starter;
+         votes.clear();
+         votes.put(starter, true);
+     }
+-    public boolean hasVoted(String user){return votes.containsKey(user);}
+-    public void recordVote(String user, boolean yes){votes.put(user, yes);}
+-    public boolean allVoted(){return votes.size() == players.size();}
+-    public boolean isVoteSuccessful(){
+-        for(boolean v : votes.values()){
+-            if(!v) return false;
++
++    public boolean hasVoted(String user) {
++        return votes.containsKey(user);
++    }
++
++    public void recordVote(String user, boolean yes) {
++        votes.put(user, yes);
++    }
++
++    public boolean allVoted() {
++        return votes.size() == players.size();
++    }
++
++    public boolean isVoteSuccessful() {
++        for (boolean v : votes.values()) {
++            if (!v) return false;
+         }
+         return true;
+     }
+-    public void clearVote(){
++
++    public void clearVote() {
+         voteInProgress = false;
+         voteStarter = null;
+         votes.clear();
+     }
++
++    public TimeManager getTimeManager() {
++        return timeManager;
++    }
++
++    public void setTimeManager(TimeManager timeManager) {
++        this.timeManager = timeManager;
++    }
++
++    public ToolManager getToolManager() {
++        return toolManager;
++    }
+ }
+Index: src/main/java/models/Player.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package models;\r\n\r\nimport models.Animal.AnimalManager;\r\nimport models.Animal.ProductInfo;\r\nimport models.Crafting.CraftManager;\r\nimport models.Tools.Backpack.Backpack;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.HashMap;\r\nimport java.util.List;\r\nimport java.util.Map;\r\n\r\npublic class Player {\r\n    public Energy energy;\r\n    private boolean isCollapsed;\r\n    private String equippedTool;\r\n    private String backpackType;\r\n    private int backpackCapacity;\r\n    private String trashCanType;\r\n    public CraftManager craftManager;\r\n    public boolean isAtHome;\r\n    public User user;\r\n    private Map<String, ArtisanMachine> artisanMachines;\r\n    private AnimalManager animalManager;\r\n\r\n    public Player(int initialEnergy) {\r\n        this.energy = new Energy(initialEnergy);\r\n        this.isCollapsed = false;\r\n        this.equippedTool = null;\r\n        this.backpackType = \"Basic Backpack\";\r\n        this.backpackCapacity = 12;\r\n        this.trashCanType = \"Basic Trash Can\";\r\n        this.craftManager = new CraftManager();\r\n        this.isAtHome = false;\r\n        this.animalManager = new AnimalManager();\r\n        this.artisanMachines = new HashMap<>();\r\n    }\r\n\r\n    public boolean craftItem(String recipeName) {\r\n        return craftManager.craftItem(recipeName, user);\r\n    }\r\n\r\n    public List<String> getLearnedCraftingRecipes() {\r\n        return craftManager.getLearnedRecipes();\r\n    }\r\n\r\n    public List<String> getCraftableRecipes() {\r\n        return craftManager.getCraftableRecipes(user);\r\n    }\r\n\r\n    public String getCraftingRecipeDetails(String recipeName) {\r\n        return craftManager.getRecipeDetails(recipeName);\r\n    }\r\n\r\n    public String showEnergy() {\r\n        return energy.showEnergy();\r\n    }\r\n\r\n    public boolean consumeEnergy(int amount) {\r\n        boolean success = energy.consumeEnergy(amount);\r\n        if (!success && amount > 0) {\r\n            collapse();\r\n        }\r\n        return success;\r\n    }\r\n\r\n    public void setEnergy(int value) {\r\n        energy.setEnergy(value);\r\n    }\r\n\r\n    public void setUnlimitedEnergy() {\r\n        energy.setUnlimitedEnergy();\r\n    }\r\n\r\n    public void collapse() {\r\n        isCollapsed = true;\r\n        energy.collapse();\r\n        System.out.println(\"You've collapsed due to exhaustion!\");\r\n    }\r\n\r\n    public void restoreEnergyForNewDay() {\r\n        energy.restoreEnergyForNewDay(isCollapsed);\r\n        isCollapsed = false;\r\n    }\r\n\r\n    public void equipTool(String toolName) {\r\n        this.equippedTool = toolName;\r\n    }\r\n\r\n    public String getCurrentTool() {\r\n        return equippedTool;\r\n    }\r\n\r\n    public void upgradeBackpack(String newType) {\r\n        this.backpackType = newType;\r\n        switch (newType) {\r\n            case \"Large Backpack\":\r\n                this.backpackCapacity = 24;\r\n                break;\r\n            case \"Deluxe Backpack\":\r\n                this.backpackCapacity = Integer.MAX_VALUE;\r\n                break;\r\n        }\r\n    }\r\n\r\n    public void upgradeTrashCan(String newType) {\r\n        this.trashCanType = newType;\r\n    }\r\n\r\n    public double getTrashCanReturnRate() {\r\n        switch (trashCanType) {\r\n            case \"Copper Trash Can\":\r\n                return 0.15;\r\n            case \"Iron Trash Can\":\r\n                return 0.30;\r\n            case \"Gold Trash Can\":\r\n                return 0.45;\r\n            case \"Iridium Trash Can\":\r\n                return 0.60;\r\n            default:\r\n                return 0.0;\r\n        }\r\n    }\r\n\r\n    public int getBackpackCapacity() {\r\n        return backpackCapacity;\r\n    }\r\n\r\n    public boolean isCollapsed() {\r\n        return isCollapsed;\r\n    }\r\n\r\n    public Energy getEnergy() {\r\n        return energy;\r\n    }\r\n\r\n    public String getBackpackType() {\r\n        return backpackType;\r\n    }\r\n\r\n    public String getTrashCanType() {\r\n        return trashCanType;\r\n    }\r\n\r\n    // Artisan Machines\r\n    public boolean addArtisanMachine(String machineName, String machineType) {\r\n        if (artisanMachines.containsKey(machineName)) {\r\n            return false;\r\n        }\r\n\r\n        artisanMachines.put(machineName, new ArtisanMachine(machineType));\r\n        return true;\r\n    }\r\n\r\n    public boolean useArtisanMachine(String machineName, String inputItem) {\r\n        if (!artisanMachines.containsKey(machineName)) {\r\n            return false;\r\n        }\r\n\r\n        if (user.getInventoryCount(inputItem) <= 0) {\r\n            return false;\r\n        }\r\n\r\n        ArtisanMachine machine = artisanMachines.get(machineName);\r\n        if (machine.startProcessing(inputItem)) {\r\n            user.addItem(inputItem, -1);\r\n            return true;\r\n        }\r\n\r\n        return false;\r\n    }\r\n\r\n    public String getArtisanProduct(String machineName) {\r\n        if (!artisanMachines.containsKey(machineName)) {\r\n            return null;\r\n        }\r\n\r\n        ArtisanMachine machine = artisanMachines.get(machineName);\r\n        String product = machine.getProduct();\r\n\r\n        if (product != null) {\r\n            user.addItem(product, 1);\r\n        }\r\n\r\n        return product;\r\n    }\r\n\r\n    public void updateArtisanMachines(int hours) {\r\n        for (ArtisanMachine machine : artisanMachines.values()) {\r\n            machine.updateTime(hours);\r\n        }\r\n    }\r\n\r\n    public String getArtisanMachineStatus(String machineName) {\r\n        if (!artisanMachines.containsKey(machineName)) {\r\n            return \"Machine not found: \" + machineName;\r\n        }\r\n\r\n        return artisanMachines.get(machineName).getStatus();\r\n    }\r\n\r\n    public List<String> listArtisanMachines() {\r\n        List<String> result = new ArrayList<>();\r\n\r\n        for (Map.Entry<String, ArtisanMachine> entry : artisanMachines.entrySet()) {\r\n            String machineName = entry.getKey();\r\n            ArtisanMachine machine = entry.getValue();\r\n            result.add(machineName + \" - \" + machine.getStatus());\r\n        }\r\n\r\n        return result;\r\n    }\r\n\r\n    // Animal Management\r\n    public void setGameMap(GameMap map) {\r\n        animalManager.setGameMap(map);\r\n    }\r\n\r\n    public String createAnimalBuilding(String buildingName, String type, String level, int x, int y) {\r\n        return animalManager.createBuilding(buildingName, type, level, x, y);\r\n    }\r\n\r\n    public boolean upgradeAnimalBuilding(String buildingName) {\r\n        return animalManager.upgradeBuilding(buildingName);\r\n    }\r\n\r\n    public String getBuildingInfo(String buildingName) {\r\n        return animalManager.getBuildingInfo(buildingName);\r\n    }\r\n\r\n    public List<String> getBuildingsList() {\r\n        return animalManager.getBuildingsList();\r\n    }\r\n\r\n    public String addAnimal(String name, String type, String buildingName) {\r\n        return animalManager.addAnimal(name, type, buildingName);\r\n    }\r\n\r\n    public boolean petAnimal(String name) {\r\n        return animalManager.petAnimal(name);\r\n    }\r\n\r\n    public ProductInfo collectAnimalProduct(String name, String toolName) {\r\n        ProductInfo product = animalManager.collectProduct(name, toolName);\r\n        if (product != null) {\r\n            user.addItem(product.getQuality() + \" \" + product.getProductName(), 1);\r\n        }\r\n        return product;\r\n    }\r\n\r\n    public boolean feedAnimal(String name) {\r\n        if (user.getInventoryCount(\"Hay\") <= 0) {\r\n            return false;\r\n        }\r\n\r\n        if (animalManager.feedHay(name)) {\r\n            user.addItem(\"Hay\", -1);\r\n            return true;\r\n        }\r\n\r\n        return false;\r\n    }\r\n\r\n    public boolean shepherdAnimal(String name, int x, int y, boolean toOutside) {\r\n        return animalManager.shepherdAnimal(name, x, y, toOutside);\r\n    }\r\n\r\n    public int sellAnimal(String name) {\r\n        return animalManager.sellAnimal(name);\r\n    }\r\n\r\n    public boolean setAnimalFriendship(String name, int amount) {\r\n        return animalManager.setFriendship(name, amount);\r\n    }\r\n\r\n    public void updateAnimals() {\r\n        animalManager.onDayEnd();\r\n    }\r\n\r\n    public List<String> getAnimalsList() {\r\n        return animalManager.getAnimalsList();\r\n    }\r\n\r\n    public List<String> getAnimalsWithProduce() {\r\n        return animalManager.getAnimalsWithProduce();\r\n    }\r\n\r\n    public String getAnimalInfo(String name) {\r\n        return animalManager.getAnimalInfo(name);\r\n    }\r\n\r\n    public List<String> getAvailableBuildingsForAnimalType(String animalType) {\r\n        return animalManager.getAvailableBuildingsForAnimalType(animalType);\r\n    }\r\n\r\n    // Skill XP methods\r\n    public void increaseFarmingXP(int amount) {\r\n        energy.increaseFarmingXP(amount);\r\n    }\r\n\r\n    public void increaseExtractionXP(int amount) {\r\n        energy.increaseExtractionXP(amount);\r\n    }\r\n\r\n    public void increaseEcoTourismXP(int amount) {\r\n        energy.increaseEcoTourismXP(amount);\r\n    }\r\n\r\n    public void increaseFishingXP(int amount) {\r\n        energy.increaseFishingXP(amount);\r\n    }\r\n\r\n    public int getFarmingLevel() {\r\n        return energy.getFarmingLevel();\r\n    }\r\n\r\n    public int getExtractionLevel() {\r\n        return energy.getExtractionLevel();\r\n    }\r\n\r\n    public int getEcoTourismLevel() {\r\n        return energy.getEcoTourismLevel();\r\n    }\r\n\r\n    public int getFishingLevel() {\r\n        return energy.getFishingLevel();\r\n    }\r\n\r\n    public void addEnergy(int amount) {\r\n        energy.addEnergy(amount);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/models/Player.java b/src/main/java/models/Player.java
+--- a/src/main/java/models/Player.java	(revision 91e1f435cea535c47e2f010a56d338567ce5a4ec)
++++ b/src/main/java/models/Player.java	(date 1747461841885)
+@@ -1,8 +1,13 @@
+ package models;
+ 
++import managers.Progress.Farming.FarmingManager;
++import managers.Progress.ForagingManager;
++import managers.ToolManager;
+ import models.Animal.AnimalManager;
+ import models.Animal.ProductInfo;
++import models.Cooking.CookingManager;
+ import models.Crafting.CraftManager;
++import models.MapElements.Tile.Tile;
+ import models.Tools.Backpack.Backpack;
+ 
+ import java.util.ArrayList;
+@@ -14,28 +19,42 @@
+     public Energy energy;
+     private boolean isCollapsed;
+     private String equippedTool;
++    private Backpack backpack;
++    private GameMap gameMap;
+     private String backpackType;
+     private int backpackCapacity;
+     private String trashCanType;
+     public CraftManager craftManager;
+     public boolean isAtHome;
+     public User user;
++    private GameMap map;
+     private Map<String, ArtisanMachine> artisanMachines;
+     private AnimalManager animalManager;
++    private FarmingManager farmingManager = new FarmingManager(this);
++    private ForagingManager foragingManager = new ForagingManager(this);
++    public CookingManager cookingManager;
+ 
+-    public Player(int initialEnergy) {
++    public Player(int initialEnergy, GameMap gameMap) {
++        this.map = gameMap;
++        backpack = new Backpack();
+         this.energy = new Energy(initialEnergy);
+         this.isCollapsed = false;
+         this.equippedTool = null;
+-        this.backpackType = "Basic Backpack";
+-        this.backpackCapacity = 12;
++        this.backpackType = backpack.getName() + " backpack";
++        this.backpackCapacity = backpack.getCapacity();
+         this.trashCanType = "Basic Trash Can";
+         this.craftManager = new CraftManager();
++        this.cookingManager = new CookingManager();
+         this.isAtHome = false;
+         this.animalManager = new AnimalManager();
+         this.artisanMachines = new HashMap<>();
++        this.farmingManager = new FarmingManager(this);
++        this.foragingManager = new ForagingManager(this);
+     }
+ 
++    public GameMap getGameMap() {
++        return gameMap;
++    }
+     public boolean craftItem(String recipeName) {
+         return craftManager.craftItem(recipeName, user);
+     }
+@@ -123,7 +142,7 @@
+     }
+ 
+     public int getBackpackCapacity() {
+-        return backpackCapacity;
++        return backpack.getCapacity();
+     }
+ 
+     public boolean isCollapsed() {
+@@ -135,7 +154,7 @@
+     }
+ 
+     public String getBackpackType() {
+-        return backpackType;
++        return backpack.getName() + " backpack";
+     }
+ 
+     public String getTrashCanType() {
+@@ -329,4 +348,76 @@
+     public void addEnergy(int amount) {
+         energy.addEnergy(amount);
+     }
++
++    public Backpack getBackpack() {
++        return backpack;
++    }
++
++    public FarmingManager getFarmingManager() {
++        return farmingManager;
++    }
++
++    public void setFarmingManager(FarmingManager farmingManager) {
++        this.farmingManager = farmingManager;
++    }
++
++    public boolean cookRecipe(String recipeName, boolean useRefrigerator) {
++        if (!isAtHome) {
++            return false;
++        }
++
++        return cookingManager.cookRecipe(recipeName, user, useRefrigerator);
++    }
++
++    public List<String> getLearnedCookingRecipes() {
++        return cookingManager.getLearnedRecipes();
++    }
++
++    public List<String> getCookableRecipes(boolean useRefrigerator) {
++        return cookingManager.getCookableRecipes(user, useRefrigerator);
++    }
++
++    public String getCookingRecipeDetails(String recipeName) {
++        return cookingManager.getRecipeDetails(recipeName);
++    }
++
++    public boolean learnCookingRecipe(String recipeName) {
++        return cookingManager.learnRecipe(recipeName);
++    }
++
++    public boolean eatFood(String foodName) {
++        return cookingManager.eatFood(foodName, user);
++    }
++
++    public void addToRefrigerator(String item, int quantity) {
++        if (!isAtHome) {
++            return;
++        }
++
++        if (user.getInventoryCount(item) >= quantity) {
++            cookingManager.addToRefrigerator(item, quantity);
++            user.addItem(item, -quantity);
++        }
++    }
++
++    public boolean removeFromRefrigerator(String item, int quantity) {
++        if (!isAtHome) {
++            return false;
++        }
++
++        if (cookingManager.removeFromRefrigerator(item, quantity)) {
++            user.addItem(item, quantity);
++            return true;
++        }
++
++        return false;
++    }
++
++    public Map<String, Integer> getRefrigeratorContents() {
++        if (!isAtHome) {
++            return new HashMap<>();
++        }
++
++        return cookingManager.getRefrigeratorContents();
++    }
+ }
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"0993c2ad-0c74-4831-ad51-b6cb070c3088\" name=\"Changes\" comment=\"update time\">\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/managers/Progress/Farming/GrowManager.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/managers/Progress/ForagingManager.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/models/Events/DayWithoutWaterReach2.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Quarry.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingTree.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/Wood.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/controllers/WeatherController.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/controllers/WeatherController.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/managers/Progress/Farming.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/managers/Progress/Farming/FarmingManager.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/managers/Progress/Foraging.java\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/managers/Progress/PlantingSystem.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/managers/Progress/Farming/PlantingSystem.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileCreate.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileCreate.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/PlowSituation.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/PlowSituation.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/canGrow.java\" beforeDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForaging.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForaging.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingCrop.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingCrop.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingMinerals.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingMinerals.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingSeed.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingSeed.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasPlant.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasPlant.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasTree.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasTree.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/lakeTile.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/isEmpty.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/AllCropsLoader.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/AllCropsLoader.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingCrop.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingCrop.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingMineral.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingMineral.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingSeed.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingSeed.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantGrow.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/managers/Progress/Farming/PlantGrow.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInMap.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInMap.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInfo.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInfo.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/PlantSeed.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/PlantSeed.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/Fruit.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/Fruit.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeGrow.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/managers/Progress/Farming/TreeGrow.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInMap.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInMap.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInfo.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInfo.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/TreeSeed.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/MapElements/crops/TreeSeed.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/Tools/Axe.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/Tools/Axe.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/Tools/Backpack/BackPackItem.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/Tools/Backpack/BackPackItem.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/Tools/Hoe.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/Tools/Hoe.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/Tools/Scythe.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/Tools/Scythe.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/Tools/Tool.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/Tools/Tool.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/src/main/java/models/Tools/ToolManager.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/src/main/java/models/Tools/ToolManager.java\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Interface\" />\r\n        <option value=\"Record\" />\r\n        <option value=\"Enum\" />\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Rebase.Settings\">\r\n    <option name=\"NEW_BASE\" value=\"main\" />\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_BRANCH_BY_REPOSITORY\">\r\n      <map>\r\n        <entry key=\"$PROJECT_DIR$\" value=\"fatemehBranch\" />\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;fateme4626&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/advanced-programming-sut-2025/advanced-programming-phase-1-group-45.git&quot;,\r\n    &quot;accountId&quot;: &quot;220a72aa-0ecb-412f-a62a-a98659e69220&quot;\r\n  }\r\n}</component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 4\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"2wMyJfjBNyrwEjDKjdJJVpQRyF0\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;Application.Main.executor&quot;: &quot;Run&quot;,\r\n    &quot;Maven.javafx-json-app [clean,install,-U].executor&quot;: &quot;Run&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,\r\n    &quot;extract.method.default.visibility&quot;: &quot;private&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;main&quot;,\r\n    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,\r\n    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,\r\n    &quot;last_opened_file_path&quot;: &quot;C:/Users/ASUS/IdeaProjects/advanced-programming-phase-1-group-45/src/main/java/managers/Progress&quot;,\r\n    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,\r\n    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,\r\n    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,\r\n    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,\r\n    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,\r\n    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,\r\n    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;\r\n  }\r\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\ASUS\\IdeaProjects\\advanced-programming-phase-1-group-45\\src\\main\\java\\managers\\Progress\" />\r\n      <recent name=\"C:\\Users\\ASUS\\IdeaProjects\\advanced-programming-phase-1-group-45\\src\\main\\java\\managers\" />\r\n      <recent name=\"C:\\Users\\ASUS\\IdeaProjects\\advanced-programming-phase-1-group-45\\src\\main\\java\\models\" />\r\n      <recent name=\"C:\\Users\\ASUS\\IdeaProjects\\advanced-programming-phase-1-group-45\\src\\main\\java\\models\\MapElement\" />\r\n      <recent name=\"C:\\Users\\ASUS\\IdeaProjects\\advanced-programming-phase-1-group-45\\src\\main\\java\\models\\MapElement\\Tile\" />\r\n    </key>\r\n    <key name=\"MoveInnerDialog.RECENTS_KEY\">\r\n      <recent name=\"managers.Progress\" />\r\n      <recent name=\"\" />\r\n      <recent name=\"managers.Progress.Farming\" />\r\n    </key>\r\n    <key name=\"CopyClassDialog.RECENTS_KEY\">\r\n      <recent name=\"models.MapElements.crops\" />\r\n      <recent name=\"models.MapElements.crops.Tree\" />\r\n      <recent name=\"models.MapElements\" />\r\n      <recent name=\"models.MapElements.Tile.TileFeatures\" />\r\n      <recent name=\"models.Events\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunAnythingCache\">\r\n    <option name=\"myCommands\">\r\n      <command value=\"mvn clean install -U\" />\r\n    </option>\r\n  </component>\r\n  <component name=\"RunManager\">\r\n    <configuration default=\"true\" type=\"JetRunConfigurationType\">\r\n      <module name=\"advanced-programming-phase-1-group-45\" />\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration default=\"true\" type=\"KotlinStandaloneScriptRunConfigurationType\">\r\n      <module name=\"advanced-programming-phase-1-group-45\" />\r\n      <option name=\"filePath\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.24978.46\" />\r\n        <option value=\"bundled-js-predefined-d6986cc7102b-76f8388c3a79-JavaScript-IU-243.24978.46\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"0993c2ad-0c74-4831-ad51-b6cb070c3088\" name=\"Changes\" comment=\"\" />\r\n      <created>1745865666402</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1745865666402</updated>\r\n      <workItem from=\"1745865667755\" duration=\"1066000\" />\r\n      <workItem from=\"1746103080258\" duration=\"2581000\" />\r\n      <workItem from=\"1746114868247\" duration=\"136000\" />\r\n      <workItem from=\"1746115057064\" duration=\"10000\" />\r\n      <workItem from=\"1746116478448\" duration=\"7255000\" />\r\n      <workItem from=\"1746168876227\" duration=\"7239000\" />\r\n      <workItem from=\"1746179100585\" duration=\"753000\" />\r\n      <workItem from=\"1746190116118\" duration=\"1622000\" />\r\n      <workItem from=\"1746192007982\" duration=\"687000\" />\r\n      <workItem from=\"1746192855794\" duration=\"4437000\" />\r\n      <workItem from=\"1746203024997\" duration=\"1489000\" />\r\n      <workItem from=\"1746206348096\" duration=\"55000\" />\r\n      <workItem from=\"1746379176538\" duration=\"1966000\" />\r\n      <workItem from=\"1746382699214\" duration=\"2265000\" />\r\n      <workItem from=\"1746385095329\" duration=\"948000\" />\r\n      <workItem from=\"1746435640722\" duration=\"307000\" />\r\n      <workItem from=\"1746535565571\" duration=\"610000\" />\r\n      <workItem from=\"1746795670219\" duration=\"8950000\" />\r\n      <workItem from=\"1746892244940\" duration=\"9403000\" />\r\n      <workItem from=\"1746937223780\" duration=\"3411000\" />\r\n      <workItem from=\"1746988154975\" duration=\"7197000\" />\r\n      <workItem from=\"1747288285758\" duration=\"14355000\" />\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"time manager first\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1746122612646</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1746122612646</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"update time\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1746173060739</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1746173060739</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"3\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"OPEN_GENERIC_TABS\">\r\n      <map>\r\n        <entry key=\"8866e24b-17cd-4bd9-934f-380b906a7fd4\" value=\"TOOL_WINDOW\" />\r\n      </map>\r\n    </option>\r\n    <option name=\"RECENT_FILTERS\">\r\n      <map>\r\n        <entry key=\"Branch\">\r\n          <value>\r\n            <list>\r\n              <RecentGroup>\r\n                <option name=\"FILTER_VALUES\">\r\n                  <option value=\"origin/main\" />\r\n                </option>\r\n              </RecentGroup>\r\n              <RecentGroup>\r\n                <option name=\"FILTER_VALUES\">\r\n                  <option value=\"HEAD\" />\r\n                </option>\r\n              </RecentGroup>\r\n              <RecentGroup>\r\n                <option name=\"FILTER_VALUES\">\r\n                  <option value=\"main\" />\r\n                </option>\r\n              </RecentGroup>\r\n            </list>\r\n          </value>\r\n        </entry>\r\n        <entry key=\"User\">\r\n          <value>\r\n            <list>\r\n              <RecentGroup>\r\n                <option name=\"FILTER_VALUES\">\r\n                  <option value=\"*\" />\r\n                </option>\r\n              </RecentGroup>\r\n            </list>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"8866e24b-17cd-4bd9-934f-380b906a7fd4\">\r\n          <value>\r\n            <State>\r\n              <option name=\"CUSTOM_BOOLEAN_PROPERTIES\">\r\n                <map>\r\n                  <entry key=\"Show.Git.Branches\" value=\"true\" />\r\n                </map>\r\n              </option>\r\n            </State>\r\n          </value>\r\n        </entry>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State>\r\n              <option name=\"FILTERS\">\r\n                <map>\r\n                  <entry key=\"branch\">\r\n                    <value>\r\n                      <list>\r\n                        <option value=\"origin/fatemehBranch\" />\r\n                      </list>\r\n                    </value>\r\n                  </entry>\r\n                  <entry key=\"user\">\r\n                    <value>\r\n                      <list>\r\n                        <option value=\"*\" />\r\n                      </list>\r\n                    </value>\r\n                  </entry>\r\n                </map>\r\n              </option>\r\n            </State>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"time manager\" />\r\n    <MESSAGE value=\"time manager\" />\r\n    <MESSAGE value=\"update time\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"update time\" />\r\n  </component>\r\n  <component name=\"XDebuggerManager\">\r\n    <breakpoint-manager>\r\n      <breakpoints>\r\n        <line-breakpoint enabled=\"true\" type=\"java-line\">\r\n          <url>file://$PROJECT_DIR$/src/main/java/models/Tools/ToolLevel.java</url>\r\n          <line>37</line>\r\n          <option name=\"timeStamp\" value=\"1\" />\r\n        </line-breakpoint>\r\n      </breakpoints>\r\n    </breakpoint-manager>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 91e1f435cea535c47e2f010a56d338567ce5a4ec)
++++ b/.idea/workspace.xml	(date 1747461848684)
+@@ -5,46 +5,12 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time">
+-      <change afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/Farming/GrowManager.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/ForagingManager.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/models/Events/DayWithoutWaterReach2.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Quarry.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingTree.java" afterDir="false" />
+-      <change afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/Wood.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/controllers/WeatherController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controllers/WeatherController.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/managers/Progress/Farming.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/Farming/FarmingManager.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/managers/Progress/Foraging.java" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/managers/Progress/PlantingSystem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/Farming/PlantingSystem.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileCreate.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileCreate.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/PlowSituation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/PlowSituation.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/canGrow.java" beforeDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForaging.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForaging.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingCrop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingCrop.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingMinerals.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingMinerals.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingSeed.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasForagingSeed.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasPlant.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasPlant.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/hasTree.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/lakeTile.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Tile/TileFeatures/isEmpty.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/AllCropsLoader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/AllCropsLoader.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingCrop.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingCrop.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingMineral.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingMineral.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingSeed.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/ForagingSeed.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantGrow.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/Farming/PlantGrow.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInMap.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Plant/PlantInfo.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/PlantSeed.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/PlantSeed.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/Fruit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/Fruit.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeGrow.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/Farming/TreeGrow.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInMap.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/Tree/TreeInfo.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/TreeSeed.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/crops/TreeSeed.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/models/Cooking.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Cooking.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/models/Farming.java" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/models/Foraging.java" beforeDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Axe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Axe.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Backpack/BackPackItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Backpack/BackPackItem.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Hoe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Hoe.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Scythe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Scythe.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/Tool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/Tool.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/ToolManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/ToolManager.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/src/main/java/models/Tools/WateringCan.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Tools/WateringCan.java" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -192,6 +158,8 @@
+       <workItem from="1746937223780" duration="3411000" />
+       <workItem from="1746988154975" duration="7197000" />
+       <workItem from="1747288285758" duration="14355000" />
++      <workItem from="1747404102773" duration="646000" />
++      <workItem from="1747423561796" duration="8907000" />
+     </task>
+     <task id="LOCAL-00001" summary="time manager first">
+       <option name="closed" value="true" />
