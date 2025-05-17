@@ -6,7 +6,7 @@ import models.User;
 
 import java.util.List;
 
-public class Order implements Menu{
+public class Order{
     private User currentUser;
 
     public Order(User user) {
