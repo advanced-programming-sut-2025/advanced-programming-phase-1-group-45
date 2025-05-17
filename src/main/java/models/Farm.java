@@ -1,9 +1,12 @@
 package models;
 
+import models.MapElements.Quarry;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileCreate;
 import models.MapElements.Tile.TileType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Farm {
@@ -21,9 +24,11 @@ public class Farm {
     }
 
     private static void placeElement(GameMap map, Tile tile, int x, int y, int w, int h) {
+        List<Tile> tiles = new ArrayList<>();
         for (int j = y; j < y + h; j++) {
             for (int i = x; i < x + w; i++) {
                 map.setTile(i, j, tile);
+                tiles.add(tile);
             }
         }
     }

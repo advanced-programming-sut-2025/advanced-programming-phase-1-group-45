@@ -4,7 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time" />
+    <list default="true" id="0993c2ad-0c74-4831-ad51-b6cb070c3088" name="Changes" comment="update time">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/managers/FriendshipManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/FriendshipManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/managers/Progress/ForagingManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/managers/Progress/ForagingManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Farm.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Farm.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Friendship.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Friendship.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/GameMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/GameMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/MapElements/Quarry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/MapElements/Quarry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/Player.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/models/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/models/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/views/GameMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/views/GameMenu.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/views/StartMenu.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/views/StartMenu.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -153,6 +165,7 @@
       <workItem from="1747288285758" duration="14355000" />
       <workItem from="1747404102773" duration="646000" />
       <workItem from="1747423561796" duration="8907000" />
+      <workItem from="1747471915650" duration="823000" />
     </task>
     <task id="LOCAL-00001" summary="time manager first">
       <option name="closed" value="true" />

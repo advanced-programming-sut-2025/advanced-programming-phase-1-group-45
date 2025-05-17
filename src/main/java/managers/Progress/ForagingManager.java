@@ -6,8 +6,10 @@ import models.Enums.Season;
 import models.Events.DayChangedEvent;
 import models.Events.GameEventBus;
 import models.GameMap;
+import models.MapElements.Quarry;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.*;
+import models.MapElements.Tile.TileType;
 import models.MapElements.crops.AllCropsLoader;
 import models.MapElements.crops.ForagingCrop;
 import models.MapElements.crops.ForagingMineral;
@@ -29,8 +31,9 @@ public class ForagingManager {
         grid = player.getGameMap().getMap();
     }
 
+
     @Subscribe
-    public void placeDaily(DayChangedEvent event) {
+    public void placeDailyCrop(DayChangedEvent event) {
         int numberOfForagedTiles = numOfForagedTiles();
         //at most 30% of tiles can be foraged
         numOfNewTile = Math.min(numOfNewTile, (int) (0.3 * grid.length * grid[0].length - numberOfForagedTiles));
@@ -104,5 +107,37 @@ public class ForagingManager {
     public ForagingMineral getRandomForagingMineral() {
         int random = new Random().nextInt(AllCropsLoader.allForagingMinerals.size());
         return AllCropsLoader.allForagingMinerals.get(random);
+    }
+
+
+    @Subscribe
+    public void spawnDailyForageMineral(DayChangedEvent event) {
+        List<Tile> tiles = new ArrayList<>();
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[x].length; y++) {
+                if(grid[x][y].getTileType() == TileType.QUARRY) {
+                    tiles.add(grid[x][y]);
+                }
+            }
+        }
+        int number = 2;
+        for (int i = 0; i < number; i++) {
+            ForagingMineral mineral = selectRandom();
+            Tile randomTile = selectRandomTile(tiles);
+            randomTile.addFeature(hasForaging.class, new hasForagingMinerals(mineral, randomTile));
+        }
+    }
+
+    private ForagingMineral selectRandom() {
+        return AllCropsLoader.allForagingMinerals.
+                get(new Random().nextInt(AllCropsLoader.allForagingMinerals.size()));
+    }
+
+    private Tile selectRandomTile(List<Tile> tiles) {
+        Tile tile;
+        do {
+            tile = tiles.get(new Random().nextInt(tiles.size()));
+        } while (!tile.hasFeature(hasForaging.class));
+        return tile;
     }
 }

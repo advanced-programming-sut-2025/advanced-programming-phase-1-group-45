@@ -17,7 +17,7 @@ public class Quarry {
     List<Tile> tiles = new ArrayList<>();
     int daysForForageItem = 0;
 
-    Quarry(List<Tile> tiles) {
+    public Quarry(List<Tile> tiles) {
         this.tiles = tiles;
         GameEventBus.INSTANCE.register(this);
     }

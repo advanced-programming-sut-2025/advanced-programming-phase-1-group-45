@@ -10,7 +10,7 @@ public class StartMenu implements Menu{
             controller.setCurrentMenu(new SignUpMenu());
         }else if(command.equals("menu enter login")){
             System.out.println("Login Menu");
-            controller.setCurrentMenu(new LoginMenu());
+         //   controller.setCurrentMenu(new LoginMenu());
         }else if(command.equals("show current menu")){
             System.out.println("welcome");
         }else if(command.equals("menu exit")){

@@ -394,58 +394,58 @@ public class GameMenu implements Menu {
         }
 
 
-        else if (command.startsWith("fishing -p ")) {
-            String fishingPole = command.substring(11);
-
-            if (controller.getCurrentUser().getInventoryCount(fishingPole) <= 0) {
-                System.out.println("You don't have a " + fishingPole + " in your inventory!");
-                return;
-            }
-
-            // بررسی نزدیکی به آب
-            boolean nearWater = false;
-            int playerX = gs.getPlayerX();
-            int playerY = gs.getPlayerY();
-
-            // بررسی کاشی‌های اطراف برای وجود آب
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-                    Tile tile = gs.getMap().getTile(playerX + dx, playerY + dy);
-                    if (tile != null && tile.getTileType() == TileType.LAKE) {
-                        nearWater = true;
-                        break;
-                    }
-                }
-                if (nearWater) break;
-            }
-
-            if (!nearWater) {
-                System.out.println("You need to be near water to fish!");
-                return;
-            }
-
-            // ایجاد نمونه‌های مورد نیاز برای ماهیگیری
-            models.fish.FishManager fishManager = new models.fish.FishManager();
-            models.fish.Fishing fishing = new models.fish.Fishing(fishManager);
-
-            // تعیین فصل و آب و هوا
-            String season = gs.getTimeManager().getSeason().toString();
-            String weather = WeatherController.getInstance().getCurrentWeather().toString();
-
-            // ماهیگیری
-            List<models.fish.FishCatch> catches = fishing.goFishing(fishingPole, season, weather, controller.getCurrentUser().getPlayer().getEnergy());
-
-            if (catches.isEmpty()) {
-                System.out.println("You didn't catch any fish!");
-            } else {
-                System.out.println("You caught " + catches.size() + " fish:");
-                for (models.fish.FishCatch fishCatch : catches) {
-                    System.out.println("- " + fishCatch.toString());
-                    // اضافه کردن ماهی به انبار
-                    controller.getCurrentUser().addItem(fishCatch.getQuality() + " " + fishCatch.getFishName(), 1);
-                }
-            }
-        }
+//        else if (command.startsWith("fishing -p ")) {
+//            String fishingPole = command.substring(11);
+//
+//            if (controller.getCurrentUser().getInventoryCount(fishingPole) <= 0) {
+//                System.out.println("You don't have a " + fishingPole + " in your inventory!");
+//                return;
+//            }
+//
+//            // بررسی نزدیکی به آب
+//            boolean nearWater = false;
+//            int playerX = gs.getPlayerX();
+//            int playerY = gs.getPlayerY();
+//
+//            // بررسی کاشی‌های اطراف برای وجود آب
+//            for (int dx = -1; dx <= 1; dx++) {
+//                for (int dy = -1; dy <= 1; dy++) {
+//                    Tile tile = gs.getMap().getTile(playerX + dx, playerY + dy);
+//                    if (tile != null && tile.getTileType() == TileType.LAKE) {
+//                        nearWater = true;
+//                        break;
+//                    }
+//                }
+//                if (nearWater) break;
+//            }
+//
+//            if (!nearWater) {
+//                System.out.println("You need to be near water to fish!");
+//                return;
+//            }
+//
+//            // ایجاد نمونه‌های مورد نیاز برای ماهیگیری
+//            models.fish.FishManager fishManager = new models.fish.FishManager();
+//            models.fish.Fishing fishing = new models.fish.Fishing(fishManager);
+//
+//            // تعیین فصل و آب و هوا
+//            String season = gs.getTimeManager().getSeason().toString();
+//            String weather = WeatherController.getInstance().getCurrentWeather().toString();
+//
+//            // ماهیگیری
+//            List<models.fish.FishCatch> catches = fishing.goFishing(fishingPole, season, weather, controller.getCurrentUser().getPlayer().getEnergy());
+//
+//            if (catches.isEmpty()) {
+//                System.out.println("You didn't catch any fish!");
+//            } else {
+//                System.out.println("You caught " + catches.size() + " fish:");
+//                for (models.fish.FishCatch fishCatch : catches) {
+//                    System.out.println("- " + fishCatch.toString());
+//                    // اضافه کردن ماهی به انبار
+//                    controller.getCurrentUser().addItem(fishCatch.getQuality() + " " + fishCatch.getFishName(), 1);
+//                }
+//            }
+//        }
 
 
         else System.out.println("invalid command");
@@ -499,7 +499,7 @@ public class GameMenu implements Menu {
         } else if ((matcher = Command.toolsShow.getMatcher(command)) != null) {
             gs.getToolManager().showAllToolsAvailable(controller.getCurrentUser().getPlayer());
         } else if ((matcher = Command.toolsUpgrade.getMatcher(command)) != null) {
-            gs.shopMenu().handleCommand(command);
+         //   gs.shopMenu().handleCommand(command);
         } else if ((matcher = Command.toolUse.getMatcher(command)) != null) {
             gs.getToolManager().useTool(matcher.group("direction"), controller.getCurrentUser().getPlayer());
         }

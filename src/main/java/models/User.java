@@ -75,10 +75,10 @@ public class User {
     private final Map<String, Friendship> friendships = new HashMap<>();
 
     public void addFriend(User friend) {
-        String key = generateFriendshipKey(this, friend);
-        if (!friendships.containsKey(key)) {
-            friendships.put(key, new Friendship(this, friend));
-        }
+//        String key = generateFriendshipKey(this, friend);
+//        if (!friendships.containsKey(key)) {
+//            friendships.put(key, new Friendship(this, friend));
+//        }
     }
 
     public Friendship getFriendship(User friend) {

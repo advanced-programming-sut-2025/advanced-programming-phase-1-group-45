@@ -1,6 +1,7 @@
 package models;
 
 import controllers.MenuController;
+import models.MapElements.Quarry;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileCreate;
 import models.MapElements.Tile.TileFeatures.UnWalkAble;
@@ -38,7 +39,7 @@ public class GameMap {
         } while (grid[y][x].getTileType() != TileType.PLAIN);
         grid[y][x] = t;
         grid[y][x].setX(y);
-        grid[y][x].setY(x);
+        grid[y][x].setY(x);;
     }
 
     public Tile[][] getMap() {

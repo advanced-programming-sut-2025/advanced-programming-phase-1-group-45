@@ -10,6 +10,7 @@ import models.Tools.WateringCan;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Backpack {
 
@@ -22,6 +23,10 @@ public class Backpack {
         this.items = new HashMap<>();
         this.tools = new ArrayList<>();
         GameEventBus.INSTANCE.register(this);
+    }
+
+    public Map<BackPackItem, Integer> getItems() {
+        return items;
     }
 
     public void addItemAmount(BackPackItem item, int amount) {
