@@ -9,6 +9,10 @@ import models.Cooking.CookingManager;
 import models.Crafting.CraftManager;
 import models.MapElements.Tile.Tile;
 import models.Tools.Backpack.Backpack;
+import models.Tools.*;
+import models.Tools.Backpack.Backpack;
+import models.Tools.ToolLevel.ToolLevel;
+import models.Tools.ToolLevel.WateringCanLevel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +53,11 @@ public class Player {
         this.artisanMachines = new HashMap<>();
         this.farmingManager = new FarmingManager(this);
         this.foragingManager = new ForagingManager(this);
+         backpack.addTool(new Hoe(ToolLevel.BASIC));
+        backpack.addTool(new Axe(ToolLevel.BASIC));
+        backpack.addTool(new WateringCan(WateringCanLevel.BASIC));
+        backpack.addTool(new Scythe(2));
+        backpack.addTool(new TrashCan("Trashcan", 2));
     }
 
 
