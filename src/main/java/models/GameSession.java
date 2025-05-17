@@ -31,11 +31,7 @@ public class GameSession {
 
     public GameSession(HashMap<String, User> players) {
         this.players = new ArrayList<>(players.keySet());
-        for (String player : players.keySet()) {
-            users.add(players.get(player));
-        }
-        turnManager = new PlayerTurnManager(users);
-        toolManager = new ToolManager(this, users.get(this.getTurn() - 1).getPlayer());
+        this.users = new ArrayList<>(players.values());
         GameEventBus.INSTANCE.register(this);
     }
 
@@ -78,6 +74,9 @@ public class GameSession {
         int mid = map.getSize() / 2;
         this.playerX = mid;
         this.playerY = mid;
+        users.get(this.getTurn()-1).getPlayer().setGameMap(map);
+        turnManager = new PlayerTurnManager(users);
+        toolManager = new ToolManager(this, users.get(this.getTurn() - 1).getPlayer());
     }
 
     public GameMap getMap() {

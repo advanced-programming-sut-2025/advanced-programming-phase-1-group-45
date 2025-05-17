@@ -499,7 +499,7 @@ public class GameMenu implements Menu {
         } else if ((matcher = Command.toolsShow.getMatcher(command)) != null) {
             gs.getToolManager().showAllToolsAvailable(controller.getCurrentUser().getPlayer());
         } else if ((matcher = Command.toolsUpgrade.getMatcher(command)) != null) {
-            //gs.shopMenu().handleCommand(command);
+            gs.shopMenu().handleCommand(command);
         } else if ((matcher = Command.toolUse.getMatcher(command)) != null) {
             gs.getToolManager().useTool(matcher.group("direction"), controller.getCurrentUser().getPlayer());
         }
