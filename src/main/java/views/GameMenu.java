@@ -14,6 +14,10 @@ import models.GameMap;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileType;
 import models.MapElements.crops.AllCropsLoader;
+import models.Fish.FishManager;
+import models.Fish.FishCatch;
+import models.Fish.Fishes;
+import models.Fish.Fishing;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -174,7 +178,7 @@ public class GameMenu implements Menu {
         }
         else if (command.startsWith("artisan use ")) {
             String[] parts = command.substring(12).split(" ");
-            if (parts.length < 2) {
+            if (parts.length == 3) {
                 System.out.println("Usage: artisan use <artisan_name> <item_name>");
                 return;
             }
@@ -425,24 +429,24 @@ public class GameMenu implements Menu {
 //            }
 //
 //            // ایجاد نمونه‌های مورد نیاز برای ماهیگیری
-//            models.fish.FishManager fishManager = new models.fish.FishManager();
-//            models.fish.Fishing fishing = new models.fish.Fishing(fishManager);
+//            FishManager fishManager = new FishManager();
+//            Fishing fishing = new Fishing(fishManager);
 //
 //            // تعیین فصل و آب و هوا
 //            String season = gs.getTimeManager().getSeason().toString();
 //            String weather = WeatherController.getInstance().getCurrentWeather().toString();
 //
 //            // ماهیگیری
-//            List<models.fish.FishCatch> catches = fishing.goFishing(fishingPole, season, weather, controller.getCurrentUser().getPlayer().getEnergy());
+//            List<FishCatch> catches =  goFishing(fishingPole, season, weather, controller.getCurrentUser().getPlayer().getEnergy());
 //
 //            if (catches.isEmpty()) {
 //                System.out.println("You didn't catch any fish!");
 //            } else {
 //                System.out.println("You caught " + catches.size() + " fish:");
-//                for (models.fish.FishCatch fishCatch : catches) {
+//                for (FishCatch fishCatch : catches) {
 //                    System.out.println("- " + fishCatch.toString());
 //                    // اضافه کردن ماهی به انبار
-//                    controller.getCurrentUser().addItem(fishCatch.getQuality() + " " + fishCatch.getFishName(), 1);
+//                    controller.getCurrentUser().getPlayer().getBackpack().addItem(getQuality() + " " + fishCatch.getFishName(), 1);
 //                }
 //            }
 //        }
@@ -505,4 +509,3 @@ public class GameMenu implements Menu {
         }
     }
 }
-
