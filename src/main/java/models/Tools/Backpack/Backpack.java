@@ -44,7 +44,9 @@ public class Backpack {
         }
         return null;
     }
-
+   public Map<BackPackItem, Integer> getItems() {
+        return items;
+    }
     public List<Tool> getTools() {
         return tools;
     }
