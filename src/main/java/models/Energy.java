@@ -37,6 +37,7 @@ public class Energy {
             currentEnergy -= amount;
             return true;
         } else {
+            currentEnergy = 0;
             return false;
         }
     }
