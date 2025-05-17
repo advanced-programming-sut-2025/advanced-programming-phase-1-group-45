@@ -8,6 +8,7 @@ import models.MapElements.Stone;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileCreate;
 import models.MapElements.Tile.TileFeatures.hasForaging;
+import models.MapElements.Tile.TileFeatures.PlowSituation;
 import models.MapElements.Tile.TileFeatures.hasForagingMinerals;
 import models.MapElements.Tile.TileType;
 import models.MapElements.crops.Plant.PlantInfo;
@@ -36,6 +37,9 @@ public class Pickaxe extends UpgradeAbleTool {
     @Override
     public void useTool(Tile targetTile, Player player) {
         decreaseEnergy(player);
+           if(targetTile.hasFeature(PlowSituation.class)) {
+            targetTile.getFeature(PlowSituation.class).unPlow();
+        }
         if (targetTile.getTileType().equals(TileType.STONE)) {
                 targetTile = TileCreate.create(TileType.PLAIN);
                 targetTile.setSymbol('.');
