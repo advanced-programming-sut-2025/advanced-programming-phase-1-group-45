@@ -1,4 +1,4 @@
-package models.fish;
+package models.Fish;
 
 public class Fishes {
     private String name;
