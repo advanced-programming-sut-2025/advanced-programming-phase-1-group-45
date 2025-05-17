@@ -51,15 +51,8 @@ public class ToolManager {
 //        int currentY = User.getY();
 //        Tile currentTile = GameMap.getTile(x, y);
         Tool tool = findTool(player.getCurrentTool(), player);
-        try {
-            tool.useTool(player);
-        } catch (IllegalArgumentException exception) {
-            //the player has not enough energy to use this tool
-            System.out.println(exception.getMessage());
-            return;
-        }
 
-        Tile targetTile = findTargetTile(direction);
+        Tile targetTile = findTargetTile(direction, player);
 
         if (targetTile == null) {
             System.out.println("Target tile is out of bounds");
