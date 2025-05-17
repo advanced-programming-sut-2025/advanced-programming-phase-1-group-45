@@ -34,8 +34,7 @@ public class Player {
     private ForagingManager foragingManager = new ForagingManager(this);
     public CookingManager cookingManager;
 
-    public Player(int initialEnergy, GameMap gameMap) {
-        this.map = gameMap;
+    public Player(int initialEnergy) {
         backpack = new Backpack();
         this.energy = new Energy(initialEnergy);
         this.isCollapsed = false;
@@ -52,6 +51,10 @@ public class Player {
         this.foragingManager = new ForagingManager(this);
     }
 
+
+    public void setMap(GameMap map) {
+        this.gameMap = map;
+    }
     public GameMap getGameMap() {
         return gameMap;
     }
