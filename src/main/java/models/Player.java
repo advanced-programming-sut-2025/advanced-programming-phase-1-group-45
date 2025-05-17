@@ -5,6 +5,7 @@ import managers.Progress.ForagingManager;
 import managers.ToolManager;
 import models.Animal.AnimalManager;
 import models.Animal.ProductInfo;
+import models.Cooking.CookingManager;
 import models.Crafting.CraftManager;
 import models.MapElements.Tile.Tile;
 import models.Tools.Backpack.Backpack;
@@ -31,6 +32,7 @@ public class Player {
     private AnimalManager animalManager;
     private FarmingManager farmingManager = new FarmingManager(this);
     private ForagingManager foragingManager = new ForagingManager(this);
+    public CookingManager cookingManager;
 
     public Player(int initialEnergy, GameMap gameMap) {
         this.map = gameMap;
@@ -42,9 +44,12 @@ public class Player {
         this.backpackCapacity = backpack.getCapacity();
         this.trashCanType = "Basic Trash Can";
         this.craftManager = new CraftManager();
+        this.cookingManager = new CookingManager();
         this.isAtHome = false;
         this.animalManager = new AnimalManager();
         this.artisanMachines = new HashMap<>();
+        this.farmingManager = new FarmingManager(this);
+        this.foragingManager = new ForagingManager(this);
     }
 
     public GameMap getGameMap() {
@@ -354,5 +359,65 @@ public class Player {
 
     public void setFarmingManager(FarmingManager farmingManager) {
         this.farmingManager = farmingManager;
+    }
+
+    public boolean cookRecipe(String recipeName, boolean useRefrigerator) {
+        if (!isAtHome) {
+            return false;
+        }
+
+        return cookingManager.cookRecipe(recipeName, user, useRefrigerator);
+    }
+
+    public List<String> getLearnedCookingRecipes() {
+        return cookingManager.getLearnedRecipes();
+    }
+
+    public List<String> getCookableRecipes(boolean useRefrigerator) {
+        return cookingManager.getCookableRecipes(user, useRefrigerator);
+    }
+
+    public String getCookingRecipeDetails(String recipeName) {
+        return cookingManager.getRecipeDetails(recipeName);
+    }
+
+    public boolean learnCookingRecipe(String recipeName) {
+        return cookingManager.learnRecipe(recipeName);
+    }
+
+    public boolean eatFood(String foodName) {
+        return cookingManager.eatFood(foodName, user);
+    }
+
+    public void addToRefrigerator(String item, int quantity) {
+        if (!isAtHome) {
+            return;
+        }
+
+        if (user.getInventoryCount(item) >= quantity) {
+            cookingManager.addToRefrigerator(item, quantity);
+            user.addItem(item, -quantity);
+        }
+    }
+
+    public boolean removeFromRefrigerator(String item, int quantity) {
+        if (!isAtHome) {
+            return false;
+        }
+
+        if (cookingManager.removeFromRefrigerator(item, quantity)) {
+            user.addItem(item, quantity);
+            return true;
+        }
+
+        return false;
+    }
+
+    public Map<String, Integer> getRefrigeratorContents() {
+        if (!isAtHome) {
+            return new HashMap<>();
+        }
+
+        return cookingManager.getRefrigeratorContents();
     }
 }
