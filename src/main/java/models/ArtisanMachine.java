@@ -71,15 +71,25 @@ public class ArtisanMachine {
     private String getOutputForInput(String inputItem) {
         switch (name) {
             case "Keg":
-                if (inputItem.equals("Wheat")) return "Beer";
-                if (inputItem.equals("Hops")) return "Pale Ale";
-                if (inputItem.equals("Fruit")) return "Wine";
-                if (inputItem.equals("Vegetable")) return "Juice";
+                if (inputItem.equalsIgnoreCase("Wheat")) return "Beer";
+                if (inputItem.equalsIgnoreCase("Hops")) return "Pale Ale";
+                if (inputItem.contains("Apple") ||
+                        inputItem.contains("Grape") ||
+                        inputItem.contains("Cherry") ||
+                        inputItem.contains("Melon")) return "Wine";
+                if (inputItem.contains("Tomato") ||
+                        inputItem.contains("Carrot") ||
+                        inputItem.contains("Potato")) return "Juice";
                 break;
 
             case "Preserves Jar":
-                if (inputItem.equals("Fruit")) return "Jelly";
-                if (inputItem.equals("Vegetable")) return "Pickles";
+                if (inputItem.contains("Apple") ||
+                        inputItem.contains("Grape") ||
+                        inputItem.contains("Cherry") ||
+                        inputItem.contains("Melon")) return "Jelly";
+                if (inputItem.contains("Tomato") ||
+                        inputItem.contains("Carrot") ||
+                        inputItem.contains("Potato")) return "Pickles";
                 break;
 
             case "Cheese Press":
