@@ -9,11 +9,14 @@ import models.Animal.ProductInfo;
 import models.Enums.Command;
 import models.Enums.Shop;
 import models.Enums.Weather;
+import models.Fish.Fishing;
 import models.GameSession;
 import models.GameMap;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileType;
 import models.MapElements.crops.AllCropsLoader;
+import models.Fish.FishCatch;
+import models.Fish.FishManager;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -154,12 +157,12 @@ public class GameMenu implements Menu {
                     gs.getToolManager().findTargetTile(matcher.group("direction"),
                             controller.getCurrentUser().getPlayer()));
         } else if ((matcher = Command.showPlant.getMatcher(command)) != null) {
-             Tile tile = gs.getToolManager().findTargetTile(matcher.group("direction"),
-                     controller.getCurrentUser().getPlayer());
-             if (tile == null) {
-                 System.out.println("Tile is out of bounds");
-                 return;
-             }
+            Tile tile = gs.getToolManager().findTargetTile(matcher.group("direction"),
+                    controller.getCurrentUser().getPlayer());
+            if (tile == null) {
+                System.out.println("Tile is out of bounds");
+                return;
+            }
             controller.getCurrentUser().getPlayer().getFarmingManager().showPlant(tile);
         }
         else if((matcher = Command.fertilize.getMatcher(command)) != null) {
@@ -370,7 +373,7 @@ public class GameMenu implements Menu {
                 return;
             }
 
-            boolean success = controller.getCurrentUser().getPlayer().cookRecipe(recipeName, true); 
+            boolean success = controller.getCurrentUser().getPlayer().cookRecipe(recipeName, true);
             if (success) {
                 System.out.println("Successfully cooked " + recipeName);
             } else {
@@ -402,12 +405,10 @@ public class GameMenu implements Menu {
                 return;
             }
 
-            // بررسی نزدیکی به آب
             boolean nearWater = false;
             int playerX = gs.getPlayerX();
             int playerY = gs.getPlayerY();
 
-            // بررسی کاشی‌های اطراف برای وجود آب
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dy = -1; dy <= 1; dy++) {
                     Tile tile = gs.getMap().getTile(playerX + dx, playerY + dy);
@@ -424,24 +425,21 @@ public class GameMenu implements Menu {
                 return;
             }
 
-            // ایجاد نمونه‌های مورد نیاز برای ماهیگیری
-            models.fish.FishManager fishManager = new models.fish.FishManager();
-            models.fish.Fishing fishing = new models.fish.Fishing(fishManager);
+            FishManager fishManager = new FishManager();
+            Fishing fishing = new Fishing(fishManager);
 
-            // تعیین فصل و آب و هوا
             String season = gs.getTimeManager().getSeason().toString();
             String weather = WeatherController.getInstance().getCurrentWeather().toString();
 
-            // ماهیگیری
-            List<models.fish.FishCatch> catches = fishing.goFishing(fishingPole, season, weather, controller.getCurrentUser().getPlayer().getEnergy());
+            
+            List<FishCatch> catches = fishing.goFishing(fishingPole, season, weather, controller.getCurrentUser().getPlayer().getEnergy());
 
             if (catches.isEmpty()) {
                 System.out.println("You didn't catch any fish!");
             } else {
                 System.out.println("You caught " + catches.size() + " fish:");
-                for (models.fish.FishCatch fishCatch : catches) {
+                for (FishCatch fishCatch : catches) {
                     System.out.println("- " + fishCatch.toString());
-                    // اضافه کردن ماهی به انبار
                     controller.getCurrentUser().addItem(fishCatch.getQuality() + " " + fishCatch.getFishName(), 1);
                 }
             }
@@ -499,7 +497,7 @@ public class GameMenu implements Menu {
         } else if ((matcher = Command.toolsShow.getMatcher(command)) != null) {
             gs.getToolManager().showAllToolsAvailable(controller.getCurrentUser().getPlayer());
         } else if ((matcher = Command.toolsUpgrade.getMatcher(command)) != null) {
-            gs.shopMenu().handleCommand(command);
+            //gs.shopMenu().handleCommand(command);
         } else if ((matcher = Command.toolUse.getMatcher(command)) != null) {
             gs.getToolManager().useTool(matcher.group("direction"), controller.getCurrentUser().getPlayer());
         }
