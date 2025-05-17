@@ -1,3 +1,22 @@
+package managers.Progress;
+
+import com.google.common.eventbus.Subscribe;
+import managers.TimeManager;
+import models.Enums.Season;
+import models.Events.DayChangedEvent;
+import models.Events.GameEventBus;
+import models.GameMap;
+import models.MapElements.Tile.Tile;
+import models.MapElements.Tile.TileFeatures.*;
+import models.MapElements.crops.AllCropsLoader;
+import models.MapElements.crops.ForagingCrop;
+import models.MapElements.crops.ForagingMineral;
+import models.MapElements.crops.ForagingSeed;
+import models.Player;
+
+import java.util.*;
+
+public class ForagingManager {
     private final double chance = 0.01;
     private int numOfNewTile;
     private Tile[][] grid;
@@ -9,7 +28,7 @@
         numOfNewTile = (int) (chance * player.getGameMap().getSize() * player.getGameMap().getSize());
         grid = player.getGameMap().getMap();
     }
-    
+
 
     @Subscribe
     public void placeDailyCrop(DayChangedEvent event) {
@@ -87,14 +106,14 @@
         int random = new Random().nextInt(AllCropsLoader.allForagingMinerals.size());
         return AllCropsLoader.allForagingMinerals.get(random);
     }
-    
+
 
     @Subscribe
     public void spawnDailyForageMineral(DayChangedEvent event) {
         List<Tile> tiles = new ArrayList<>();
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[x].length; y++) {
-                if(grid[x][y].getTileType() == TileType.QUARRY) {
+                if (grid[x][y].getTileType() == TileType.QUARRY) {
                     tiles.add(grid[x][y]);
                 }
             }
@@ -119,3 +138,4 @@
         } while (!tile.hasFeature(hasForaging.class));
         return tile;
     }
+}
