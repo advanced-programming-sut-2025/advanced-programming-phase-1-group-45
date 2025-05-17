@@ -1,6 +1,8 @@
-package models.fish;
+package models.Fish;
 
 import models.Energy;
+import models.fish.FishCatch;
+import models.fish.Fishes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,7 @@ public class Fishing {
 
         if (!energy.consumeEnergy(energyCost)) {
             System.out.println("Not Enough Energy");
+            return new ArrayList<>();
         }
 
 
