@@ -1,8 +1,6 @@
 package models.Fish;
 
 import models.Energy;
-import models.fish.FishCatch;
-import models.fish.Fishes;
 
 import java.util.ArrayList;
 import java.util.List;
