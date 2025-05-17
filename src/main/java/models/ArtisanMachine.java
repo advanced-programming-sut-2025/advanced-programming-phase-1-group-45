@@ -124,6 +124,9 @@ public class ArtisanMachine {
                     return "Smoked " + inputItem;
                 }
                 break;
+
+            case "BeeHouse":
+                return "Honey";
         }
 
         return null;
