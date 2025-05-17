@@ -51,7 +51,7 @@ public class UserManager {
             //save();
             return true;
         } catch(Exception ex) {
-            System.out.println("error.");
+            System.out.println("error." + ex.getMessage());
             return false;
         }
     }

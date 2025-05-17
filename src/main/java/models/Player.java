@@ -30,11 +30,10 @@ public class Player {
     public CraftManager craftManager;
     public boolean isAtHome;
     public User user;
-    private GameMap map;
     private Map<String, ArtisanMachine> artisanMachines;
     private AnimalManager animalManager;
-    private FarmingManager farmingManager = new FarmingManager(this);
-    private ForagingManager foragingManager = new ForagingManager(this);
+    private FarmingManager farmingManager ;
+    private ForagingManager foragingManager ;
     public CookingManager cookingManager;
 
     public Player(int initialEnergy) {
@@ -50,11 +49,11 @@ public class Player {
         this.isAtHome = false;
         this.animalManager = new AnimalManager();
         this.artisanMachines = new HashMap<>();
-        this.farmingManager = new FarmingManager(this);
-        this.foragingManager = new ForagingManager(this);
+//        this.farmingManager = new FarmingManager(this);
+//        this.foragingManager = new ForagingManager(this);
         backpack.addTool(new Hoe(ToolLevel.BASIC));
         backpack.addTool(new Axe(ToolLevel.BASIC));
-        backpack.addTool(new WateringCan(WateringCanLevel.BASIC));
+      //  backpack.addTool(new WateringCan(WateringCanLevel.BASIC));
         backpack.addTool(new Scythe(2));
         backpack.addTool(new TrashCan("Trashcan", 2));
     }
@@ -62,6 +61,8 @@ public class Player {
 
     public void setMap(GameMap map) {
         this.gameMap = map;
+        farmingManager = new FarmingManager(this);
+        foragingManager = new ForagingManager(this);
     }
     public GameMap getGameMap() {
         return gameMap;

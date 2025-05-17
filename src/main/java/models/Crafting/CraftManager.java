@@ -313,7 +313,7 @@ public class CraftManager {
         // این متد باید از User اطلاعات inventory را استخراج کند
         // برای مثال می‌توان از یک Map برای نگهداری آیتم‌ها و تعداد آنها استفاده کرد
        Map<String, Integer> inventory2 = new HashMap<>();
-        Map<BackPackItem, Integer> inventory= user.getPlayer().getBackpack().get;
+        Map<BackPackItem, Integer> inventory= user.getPlayer().getBackpack().getItems();
         for(BackPackItem item : inventory.keySet()) {
             inventory2.put(item.getItemName(), inventory.get(item));
         }

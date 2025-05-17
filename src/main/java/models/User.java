@@ -31,7 +31,7 @@ public class User {
         this.gender = gender;
         this.money = 1000.0;
         this.currentPlayer = new Player(200);
-        this.currentPlayer.user = this; // اضافه کردن ارجاع به User
+     //   this.currentPlayer.user = this; // اضافه کردن ارجاع به User
         this.avatar = "@";
     }
 

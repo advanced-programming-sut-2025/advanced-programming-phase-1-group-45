@@ -25,9 +25,7 @@ public class Backpack {
         GameEventBus.INSTANCE.register(this);
     }
 
-    public Map<BackPackItem, Integer> getItems() {
-        return items;
-    }
+
 
     public void addItemAmount(BackPackItem item, int amount) {
         if (backpackType.canAddItem(items.size() + tools.size())) {
