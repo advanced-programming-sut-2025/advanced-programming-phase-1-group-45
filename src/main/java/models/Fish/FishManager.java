@@ -1,4 +1,4 @@
-package models.fish;
+package models.Fish;
 
 import java.util.ArrayList;
 import java.util.HashMap;
