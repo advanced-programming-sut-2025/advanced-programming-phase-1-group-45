@@ -93,7 +93,7 @@ public class UserManager {
         if (u == null) return null;
         String newPw = generateRandomPassword(12);
         u.setPasswordHash(hash(newPw));
-        save();
+        //save();
         return newPw;
     }
 
@@ -108,7 +108,7 @@ public class UserManager {
             return false;
         }
         u.setPasswordHash(hash(newPassword));
-        save();
+        //save();
         return true;
     }
 
@@ -170,7 +170,7 @@ public class UserManager {
         user.setUsername(newUsername);
         users.remove(old);
         users.put(newUsername, user);
-        save();
+        //save();
         System.out.println("your username changed to " + newUsername + " successfully.");
         return true;
     }
@@ -181,7 +181,7 @@ public class UserManager {
             return false;
         }
         user.setNickname(newNickname);
-        save();
+        //save();
         System.out.println("your nick name changed to " + newNickname + " succesfully.");
         return true;
     }
@@ -198,7 +198,7 @@ public class UserManager {
             }
         }
         user.setEmail(newEmail);
-        save();
+       // save();
         System.out.println("your email changed to " + newEmail + "succesfully");
         return true;
     }
@@ -218,7 +218,7 @@ public class UserManager {
             return false;
         }
         user.setPasswordHash(hash(newPassword));
-        save();
+       // save();
         System.out.println("password changed successfully.");
         return true;
     }
@@ -306,7 +306,7 @@ public class UserManager {
         }} catch (Exception e){
             System.out.println("base price error");
         }
-        int have = controller.getCurrentUser().getPlayer().getBackpack().getNumberOfAnItem((product));
+        int have = controller.getCurrentUser().getInventoryCount(product);
         if(have < count){
             System.out.println("You don't have enough products to sell");
             return;
