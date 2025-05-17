@@ -1,4 +1,4 @@
-package models.fish;
+package models.Fish;
 
 public class FishCatch {
     private String fishName;
@@ -46,3 +46,4 @@ public class FishCatch {
         return quality + " " + fishName + " (" + getSellPrice() + "g)";
     }
 }
+
