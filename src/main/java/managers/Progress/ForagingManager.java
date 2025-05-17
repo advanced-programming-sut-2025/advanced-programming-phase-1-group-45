@@ -9,6 +9,7 @@ import models.GameMap;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.*;
 import models.MapElements.crops.AllCropsLoader;
+import models.MapElements.Tile.TileType;
 import models.MapElements.crops.ForagingCrop;
 import models.MapElements.crops.ForagingMineral;
 import models.MapElements.crops.ForagingSeed;
