@@ -184,4 +184,48 @@ public class User {
     public String getAnimalInfo(String name) {
         return currentPlayer.getAnimalInfo(name);
     }
+
+    public boolean cookRecipe(String recipeName, boolean useRefrigerator) {
+        return currentPlayer.cookRecipe(recipeName, useRefrigerator);
+    }
+
+    public List<String> getLearnedCookingRecipes() {
+        return currentPlayer.getLearnedCookingRecipes();
+    }
+
+    public List<String> getCookableRecipes(boolean useRefrigerator) {
+        return currentPlayer.getCookableRecipes(useRefrigerator);
+    }
+
+    public String getCookingRecipeDetails(String recipeName) {
+        return currentPlayer.getCookingRecipeDetails(recipeName);
+    }
+
+    public boolean learnCookingRecipe(String recipeName) {
+        return currentPlayer.learnCookingRecipe(recipeName);
+    }
+
+    public boolean eatFood(String foodName) {
+        return currentPlayer.eatFood(foodName);
+    }
+
+    public void addToRefrigerator(String item, int quantity) {
+        currentPlayer.addToRefrigerator(item, quantity);
+    }
+
+    public boolean removeFromRefrigerator(String item, int quantity) {
+        return currentPlayer.removeFromRefrigerator(item, quantity);
+    }
+
+    public Map<String, Integer> getRefrigeratorContents() {
+        return currentPlayer.getRefrigeratorContents();
+    }
+
+    public boolean isAtHome() {
+        return currentPlayer.isAtHome;
+    }
+
+    public void setAtHome(boolean atHome) {
+        currentPlayer.isAtHome = atHome;
+    }
 }
