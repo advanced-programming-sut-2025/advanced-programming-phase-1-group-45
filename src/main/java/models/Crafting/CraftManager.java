@@ -8,6 +8,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import models.Energy;
+import models.Tools.Backpack.BackPackItem;
+import models.User;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CraftManager {
 
@@ -301,7 +309,7 @@ public class CraftManager {
         }
     }
 
-    private Map<String, Integer> getUserInventory(User user) {
+        private Map<String, Integer> getUserInventory(User user) {
         // این متد باید از User اطلاعات inventory را استخراج کند
         // برای مثال می‌توان از یک Map برای نگهداری آیتم‌ها و تعداد آنها استفاده کرد
        Map<String, Integer> inventory2 = new HashMap<>();

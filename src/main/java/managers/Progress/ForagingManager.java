@@ -6,11 +6,10 @@ import models.Enums.Season;
 import models.Events.DayChangedEvent;
 import models.Events.GameEventBus;
 import models.GameMap;
-import models.MapElements.Quarry;
 import models.MapElements.Tile.Tile;
 import models.MapElements.Tile.TileFeatures.*;
-import models.MapElements.Tile.TileType;
 import models.MapElements.crops.AllCropsLoader;
+import models.MapElements.Tile.TileType;
 import models.MapElements.crops.ForagingCrop;
 import models.MapElements.crops.ForagingMineral;
 import models.MapElements.crops.ForagingSeed;
@@ -115,7 +114,7 @@ public class ForagingManager {
         List<Tile> tiles = new ArrayList<>();
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[x].length; y++) {
-                if(grid[x][y].getTileType() == TileType.QUARRY) {
+                if (grid[x][y].getTileType() == TileType.QUARRY) {
                     tiles.add(grid[x][y]);
                 }
             }
