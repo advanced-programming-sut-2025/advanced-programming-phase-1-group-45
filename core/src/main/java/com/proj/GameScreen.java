@@ -16,41 +16,35 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private GameMap gameMap;
     private Viewport viewport;
-    int mapPixelWidth = 80 * 16;
-    int mapPixelHeight = 65 * 16;
-
-    private boolean initialized = false;
+    private int mapPixelWidth;
+    private int mapPixelHeight;
 
     @Override
     public void show() {
-        if (!initialized) {
-            camera = new OrthographicCamera();
-            viewport = new FitViewport(640, 480, camera);
-            viewport.apply();
-            camera.update();
-            mapPixelWidth = 80 * 16;
-            mapPixelHeight = 65 * 16;
 
-            gameMap = new GameMap();
-            float startX = 28 * 16 + 8;
-            float startY = 33 * 16 + 8;
+        gameMap = new GameMap();
 
-            player = new Player(gameMap, startX, startY);
-            camera.position.set(player.getPosition().x, player.getPosition().y, 0);
-            camera.update();
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(640, 480, camera);
+        viewport.apply();
+        camera.update();
+        mapPixelWidth = gameMap.getMapWidth() * gameMap.getTileWidth();
+        mapPixelHeight = gameMap.getMapHeight() * gameMap.getTileHeight();
 
-            initialized = true;
-        }
+        float startX = 28 * 16 + 8;
+        float startY = 33 * 16 + 8;
 
-        Main.getMain().changeBackgroundMusic("music/theme1.mp3");
+        player = new Player(gameMap, startX, startY);
+        camera.position.set(player.getPosition().x, player.getPosition().y, 0);
+        camera.update();
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         handleInput();
+
         player.update(delta);
         updateCamera();
 
@@ -93,7 +87,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-        Main.getMain().getBackgroundMusic().pause();
     }
 
     @Override
@@ -118,11 +111,14 @@ public class GameScreen implements Screen {
             mapPixelHeight - halfViewportHeight
         );
         camera.position.lerp(new Vector3(clampedX, clampedY, 0), 0.1f);
+
         viewport.apply();
         camera.update();
     }
 
+
     private void handleInput() {
+
         if (player.isMoving()) return;
 
         float moveDistance = 16;
@@ -164,6 +160,6 @@ public class GameScreen implements Screen {
         if (moved) {
             Gdx.app.log("GameScreen", "Player started moving");
         }
-    }
 
+    }
 }

@@ -1,9 +1,5 @@
 package com.proj.Map;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.proj.Enum.LandObject;
-import com.proj.Enum.TileType;
 
 import java.awt.*;
 

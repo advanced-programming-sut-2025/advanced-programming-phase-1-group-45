@@ -4,17 +4,15 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.proj.Enum.Season;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LandLoader {
     private String landName;
     private String landPath;
-    private Season landSeason;
+    private com.proj.Map.Season landSeason;
     private TiledMap map;
     private int mapWidth;
     private int mapHeight;

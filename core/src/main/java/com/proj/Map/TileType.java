@@ -1,6 +1,4 @@
-package com.proj.Enum;
-
-import com.proj.Map.Tile;
+package com.proj.Map;
 
 public enum TileType {
     DIRT("Dirt"),
