@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.proj.Control.*;
 import com.proj.Main;
 
-//help: fatemeh
 public class SignupMenuView implements Screen {
     private Stage stage;
     private final Label errorMessage;
@@ -27,7 +26,7 @@ public class SignupMenuView implements Screen {
     public SignupMenuView(SignupMenuController controller, Skin skin) {
         this.controller = controller;
         this.table = new Table();
-        this.menuTitle = new Label("20 minutes till dawn", skin);
+        this.menuTitle = new Label("Stardew Valley", skin);
 
         this.usernameField = new TextField("", skin);
         usernameField.setMessageText("enter Username");
