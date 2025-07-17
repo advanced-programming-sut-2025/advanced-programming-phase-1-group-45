@@ -6,13 +6,14 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 
 import java.awt.*;
-import java.util.List;
 import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 public class LandLoader {
     private String landName;
     private String landPath;
-    private com.proj.Map.Season landSeason;
+    private Season landSeason;
     private TiledMap map;
     private int mapWidth;
     private int mapHeight;
@@ -69,7 +70,9 @@ public class LandLoader {
                     if (cell == null || cell.getTile() == null) continue;
 
                     Boolean walkable = getWalkableProperty(cell);
-
+                    if (walkable!=null && !walkable) {
+                        System.err.println("x : " + x + " y: " + y + " passable: " + walkable);
+                    }
                     if (walkable == null) walkable = layer.defaultWalkable;
 
                     if (!walkable) {

@@ -128,7 +128,7 @@ public class Player {
         int tileX = (int) (worldX / 16);
         int tileY = (int) (worldY / 16);
 
-        if (gameMap.isPassable(tileX, tileY)) {
+        if (gameMap.isPassable(worldX, worldY)) {
             targetPosition.set(tileX * 16 + 8, tileY * 16 + 8);
             isMoving = true;
             frameIndex = 1;

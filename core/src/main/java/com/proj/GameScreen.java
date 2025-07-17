@@ -18,25 +18,29 @@ public class GameScreen implements Screen {
     private Viewport viewport;
     private int mapPixelWidth;
     private int mapPixelHeight;
-
+    private boolean initialized = false;
     @Override
     public void show() {
+        if (!initialized) {
 
-        gameMap = new GameMap();
+            gameMap = new GameMap();
 
-        camera = new OrthographicCamera();
-        viewport = new FitViewport(640, 480, camera);
-        viewport.apply();
-        camera.update();
-        mapPixelWidth = gameMap.getMapWidth() * gameMap.getTileWidth();
-        mapPixelHeight = gameMap.getMapHeight() * gameMap.getTileHeight();
+            camera = new OrthographicCamera();
+            viewport = new FitViewport(640, 480, camera);
+            viewport.apply();
+            camera.update();
+            mapPixelWidth = gameMap.getMapWidth() * gameMap.getTileWidth();
+            mapPixelHeight = gameMap.getMapHeight() * gameMap.getTileHeight();
 
-        float startX = 28 * 16 + 8;
-        float startY = 33 * 16 + 8;
+            float startX = 28 * 16 + 8;
+            float startY = 33 * 16 + 8;
 
-        player = new Player(gameMap, startX, startY);
-        camera.position.set(player.getPosition().x, player.getPosition().y, 0);
-        camera.update();
+            player = new Player(gameMap, startX, startY);
+            camera.position.set(player.getPosition().x, player.getPosition().y, 0);
+            camera.update();
+
+            initialized = true;
+        }
     }
 
     @Override
