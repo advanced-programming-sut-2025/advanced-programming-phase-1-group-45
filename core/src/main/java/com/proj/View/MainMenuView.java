@@ -48,10 +48,10 @@ public class MainMenuView implements Screen {
 
         // Add elements to table
         table.add(titleLabel).padBottom(40).row();
-        table.add(profileButton).width(400).padBottom(20).row();
-        table.add(newGameButton).width(400).padBottom(20).row();
-        table.add(loadGameButton).width(400).padBottom(20).row();
-        table.add(exitButton).width(400);
+        table.add(profileButton).width(420).padBottom(20).row();
+        table.add(newGameButton).width(420).padBottom(20).row();
+        table.add(loadGameButton).width(420).padBottom(20).row();
+        table.add(exitButton).width(420);
 
         // Set up background
         backgroundImage.setFillParent(true);
