@@ -46,6 +46,13 @@ public class Main extends Game {
         loadMusic();
     }
 
+    public void startNewGame() {// in jadide
+        if (getScreen() != null) {
+            getScreen().dispose();
+        }
+        setScreen(new GameScreen());
+    }
+
     public void showAuthScreen() {
         setScreen(new SignupMenuView(
             new SignupMenuController(),
