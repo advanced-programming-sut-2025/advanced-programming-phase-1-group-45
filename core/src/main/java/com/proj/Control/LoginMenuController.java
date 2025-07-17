@@ -48,7 +48,12 @@ public class LoginMenuController {
 
                     if (login(username, password)) {
                         // After successful login, go to game screen
-                        Main.getMain().switchToGameScreen();
+                        // After successful login
+                        Main.getMain().setScreen(new MainMenuView(
+                            new MainMenuController(),
+                            GameAssetManager.getGameAssetManager().getSkin()
+                        ));
+                       // Main.getMain().switchToGameScreen();// on github, not a comment
                     }
                 }
             });
