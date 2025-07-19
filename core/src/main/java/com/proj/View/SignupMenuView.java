@@ -73,7 +73,7 @@ public class SignupMenuView implements Screen {
         table.row().pad(10, 0, 10, 0);
         table.add(guestButton).width(300);
         table.row().pad(10, 0, 10, 0); 
-        table.add(generatePasswordButton).width(300); // NEW BUTTON
+        table.add(generatePasswordButton).width(500); // NEW BUTTON
         
         backgroundImage.setFillParent(true);
         stage.addActor(backgroundImage);
