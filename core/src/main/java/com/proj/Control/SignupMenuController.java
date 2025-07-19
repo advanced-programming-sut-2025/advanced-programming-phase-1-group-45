@@ -6,8 +6,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.proj.Main;
 import com.proj.View.*;
 import com.proj.Model.*;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.graphics.Color;
 
-//help: fatemeh
+//help
 public class SignupMenuController {
     private SignupMenuView view;
     private Skin skin;
@@ -98,6 +100,31 @@ public class SignupMenuController {
 
             App.addUser(user);
             return true;
+        }
+    }
+
+    public void handleGeneratePasswordButton() {
+        if (view != null && view.getGeneratePasswordButton() != null) {
+            view.getGeneratePasswordButton().addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    String randomPassword = PasswordGenerator.generateRandomPassword();
+
+                    view.getPassword().setText(randomPassword);
+
+                    view.getPassword().setPasswordMode(false);
+
+                    view.getPassword().setColor(Color.GREEN);
+
+                    Timer.schedule(new Timer.Task() {
+                        @Override
+                        public void run() {
+                            view.getPassword().setPasswordMode(true);
+                            view.getPassword().setColor(Color.WHITE);
+                        }
+                    }, 3);
+                }
+            });
         }
     }
 }
