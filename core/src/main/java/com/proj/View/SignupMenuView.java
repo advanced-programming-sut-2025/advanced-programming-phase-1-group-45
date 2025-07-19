@@ -21,6 +21,7 @@ public class SignupMenuView implements Screen {
     public Table table;
     private final SignupMenuController controller;
     private Image backgroundImage;
+    private final TextButton generatePasswordButton;
 
 
     public SignupMenuView(SignupMenuController controller, Skin skin) {
@@ -40,6 +41,7 @@ public class SignupMenuView implements Screen {
 
         this.signUpButton = new TextButton("Sign Up", skin);
         this.guestButton = new TextButton("as Guest", skin);
+        this.generatePasswordButton = new TextButton("Generate Password", skin);
 
         this.errorMessage = new Label("", skin);
         errorMessage.setColor(1, 0, 0, 1);
@@ -70,12 +72,16 @@ public class SignupMenuView implements Screen {
         table.add(signUpButton).width(300);
         table.row().pad(10, 0, 10, 0);
         table.add(guestButton).width(300);
+        table.row().pad(10, 0, 10, 0); 
+        table.add(generatePasswordButton).width(300); // NEW BUTTON
+        
         backgroundImage.setFillParent(true);
         stage.addActor(backgroundImage);
         stage.addActor(table);
 
         controller.handleSignupMenuButton();
         controller.handleGuestButton();
+        controller.handleGeneratePasswordButton();
     }
 
     @Override
@@ -105,4 +111,7 @@ public class SignupMenuView implements Screen {
     public TextButton getSignUpButton() { return signUpButton; }
     public TextButton getGuestButton() { return guestButton; }
     public Label getErrorMessage() { return errorMessage; }
+    public TextButton getGeneratePasswordButton() {//new
+        return generatePasswordButton;
+    }
 }
