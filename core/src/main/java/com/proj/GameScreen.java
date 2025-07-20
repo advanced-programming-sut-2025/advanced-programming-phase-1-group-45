@@ -9,7 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.proj.Map.GameMap;
+import com.proj.map.GameMap;
 
 public class GameScreen implements Screen {
     private Player player;
