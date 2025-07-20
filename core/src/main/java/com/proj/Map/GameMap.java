@@ -23,7 +23,7 @@ public class GameMap {
 
     public GameMap() {
         batch = new SpriteBatch();
-        loader = new LandLoader("Farm4Corners", Season.SPRING);
+        loader = new LandLoader("Town5", Season.SPRING);
         mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
     }
 
