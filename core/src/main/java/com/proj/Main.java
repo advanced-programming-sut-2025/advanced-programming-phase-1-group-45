@@ -13,6 +13,7 @@ import com.proj.Control.SignupMenuController;
 import com.proj.Model.GameAssetManager;
 import com.proj.View.SignupMenuView;
 import com.proj.View.EntranceScreen;
+import com.proj.map.farmName;
 
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -53,7 +54,7 @@ public class Main extends Game {
         if (getScreen() != null) {
             getScreen().dispose();
         }
-        setScreen(new GameScreen());
+        setScreen(new GameScreen(farmName.STANDARD));
     }
 
     public void showAuthScreen() {
@@ -66,7 +67,7 @@ public class Main extends Game {
     public void switchToGameScreen() {
         Gdx.app.postRunnable(() -> {
             Screen current = getScreen();
-            setScreen(new GameScreen());
+            setScreen(new GameScreen(farmName.STANDARD));
             if (current != null) {
                 current.dispose();
             }

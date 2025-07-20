@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.proj.map.GameMap;
+import com.proj.map.farmName;
 
 public class GameScreen implements Screen {
     private Player player;
@@ -19,11 +20,16 @@ public class GameScreen implements Screen {
     private int mapPixelWidth;
     private int mapPixelHeight;
     private boolean initialized = false;
+    private String mapName;
+
+    public GameScreen(farmName farm) {
+        mapName = farm.getFarmName();
+    }
     @Override
     public void show() {
         if (!initialized) {
 
-            gameMap = new GameMap();
+            gameMap = new GameMap(mapName);
 
             camera = new OrthographicCamera();
             viewport = new FitViewport(640, 480, camera);

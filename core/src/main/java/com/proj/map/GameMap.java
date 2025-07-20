@@ -12,9 +12,9 @@ public class GameMap {
     private LandLoader loader;
     TiledMap tiledMap;
 
-    public GameMap() {
+    public GameMap(String farmName) {
         batch = new SpriteBatch();
-        loader = new LandLoader("Town5", Season.SPRING);
+        loader = new LandLoader(farmName, Season.SPRING);
         mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
     }
 
