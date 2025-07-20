@@ -28,7 +28,7 @@ public class LandLoader {
     public LandLoader(String farmName, Season season) {
         this.landName = farmName;
         this.landSeason = season;
-        this.landPath = "assets/Map/Land/" + landName + "_" + landSeason.toString().toLowerCase(Locale.ROOT) + ".tmx";
+        this.landPath = "assets/map/land/" + landName + "_" + landSeason.toString().toLowerCase(Locale.ROOT) + ".tmx";
         loadMap();
         initialize();
     }
@@ -70,9 +70,7 @@ public class LandLoader {
                     if (cell == null || cell.getTile() == null) continue;
 
                     Boolean walkable = getWalkableProperty(cell);
-                    if (walkable!=null && !walkable) {
-                        System.err.println("x : " + x + " y: " + y + " passable: " + walkable);
-                    }
+
                     if (walkable == null) walkable = layer.defaultWalkable;
 
                     if (!walkable) {
@@ -115,7 +113,13 @@ public class LandLoader {
         if (prop instanceof Boolean) {
             return (Boolean) prop;
         }
-        if (prop instanceof String) return Boolean.parseBoolean((String) prop);
+        if (prop instanceof String) {
+            if (prop.equals("T")) {
+                return true;
+            } else if (prop.equals("F")) {
+                return false;
+            }
+        }
         return null;
     }
 
