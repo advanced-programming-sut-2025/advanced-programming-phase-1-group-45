@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.proj.Control.SignupMenuController;
 import com.proj.Model.GameAssetManager;
 import com.proj.View.SignupMenuView;
+import com.proj.View.EntranceScreen;
+
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
@@ -40,8 +42,9 @@ public class Main extends Game {
         batch = new SpriteBatch();
         menuBackground = new Texture(Gdx.files.internal("menu_bg.png"));
 
-        showAuthScreen();
+        //showAuthScreen();
         //setScreen(new GameScreen());
+        setScreen(new EntranceScreen(this));
 
         loadMusic();
     }
