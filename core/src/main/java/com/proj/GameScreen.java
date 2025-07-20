@@ -33,7 +33,7 @@ public class GameScreen implements Screen {
             mapPixelHeight = gameMap.getMapHeight() * gameMap.getTileHeight();
 
             float startX = 28 * 16 + 8;
-            float startY = 33 * 16 + 8;
+            float startY = 12 * 16 + 8;
 
             player = new Player(gameMap, startX, startY);
             camera.position.set(player.getPosition().x, player.getPosition().y, 0);
