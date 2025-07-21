@@ -28,7 +28,8 @@ public class LandLoader {
     public LandLoader(String farmName, Season season) {
         this.landName = farmName;
         this.landSeason = season;
-        this.landPath = "assets/map/land/" + landName + "_" + landSeason.toString().toLowerCase(Locale.ROOT) + ".tmx";
+        String seasonName = landSeason.toString().toLowerCase();
+        this.landPath = "assets/map/land/" + seasonName +"/" + landName + "_" + seasonName + ".tmx";
         loadMap();
         initialize();
     }
