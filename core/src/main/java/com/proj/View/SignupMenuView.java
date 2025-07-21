@@ -27,7 +27,7 @@ public class SignupMenuView implements Screen {
     public SignupMenuView(SignupMenuController controller, Skin skin) {
         this.controller = controller;
         this.table = new Table();
-        this.menuTitle = new Label("Stardew Valley", skin);
+        this.menuTitle = new Label("SignUp menu", skin);
 
         this.usernameField = new TextField("", skin);
         usernameField.setMessageText("enter Username");
