@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.proj.Control.WorldController;
+import com.proj.Model.Weather;
 import com.proj.map.GameMap;
 import com.proj.map.farmName;
 
@@ -16,6 +18,7 @@ public class GameScreen implements Screen {
     private Player player;
     private OrthographicCamera camera;
     private GameMap gameMap;
+    private WorldController worldController;
     private Viewport viewport;
     private int mapPixelWidth;
     private int mapPixelHeight;
@@ -30,6 +33,7 @@ public class GameScreen implements Screen {
         if (!initialized) {
 
             gameMap = new GameMap(mapName);
+            worldController = new WorldController();
 
             camera = new OrthographicCamera();
             viewport = new FitViewport(640, 480, camera);
@@ -55,18 +59,30 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         handleInput();
 
+
         player.update(delta);
         updateCamera();
+        worldController.update(delta);
 
         gameMap.render(camera);
+
+        //
+        gameMap.getSpriteBatch().setProjectionMatrix(camera.combined);
+        gameMap.getSpriteBatch().begin();
+
+
+        worldController.render(gameMap.getSpriteBatch(), Weather.SNOWY);
         renderPlayer();
+        gameMap.getSpriteBatch().end();
+
+
     }
 
     private void renderPlayer() {
-        gameMap.getSpriteBatch().setProjectionMatrix(camera.combined);
-        gameMap.getSpriteBatch().begin();
+//        gameMap.getSpriteBatch().setProjectionMatrix(camera.combined);
+//        gameMap.getSpriteBatch().begin();
         player.render(gameMap.getSpriteBatch());
-        gameMap.getSpriteBatch().end();
+//        gameMap.getSpriteBatch().end();
     }
 
     @Override
@@ -85,6 +101,7 @@ public class GameScreen implements Screen {
             mapPixelHeight - halfViewportHeight
         );
         camera.update();
+        worldController.resize(width, height);
     }
 
     @Override
@@ -103,6 +120,7 @@ public class GameScreen implements Screen {
     public void dispose() {
         player.dispose();
         gameMap.dispose();
+        worldController.dispose();
     }
 
     private void updateCamera() {
