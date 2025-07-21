@@ -11,10 +11,17 @@ public class GameMap {
     private OrthogonalTiledMapRenderer mapRenderer;
     private LandLoader loader;
     TiledMap tiledMap;
+    private String mapName;
 
     public GameMap(String farmName) {
+        mapName = farmName;
         batch = new SpriteBatch();
-        loader = new LandLoader(farmName, Season.SPRING);
+        loader = new LandLoader(mapName, Season.WINTER);
+        mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
+    }
+
+    public void changeSeason(Season season) {
+        loader = new LandLoader(mapName, season);
         mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
     }
 
