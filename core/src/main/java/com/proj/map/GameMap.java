@@ -16,7 +16,7 @@ public class GameMap {
     public GameMap(String farmName) {
         mapName = farmName;
         batch = new SpriteBatch();
-        loader = new LandLoader(mapName, Season.WINTER);
+        loader = new LandLoader(mapName, Season.SPRING);
         mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
     }
 
