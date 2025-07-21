@@ -3,6 +3,6 @@ package com.proj.map;
 public enum Season {
     SPRING,
     SUMMER,
-    AUTUMN,
+    FALL,
     WINTER;
 }
