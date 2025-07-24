@@ -147,7 +147,9 @@ public class GameScreen implements Screen {
 
     private void handleInput() {
 
-        if (player.isMoving()) return;
+        if (player.isMoving() || player.isFainted() || player.isFainting()) {
+            return;
+        }
 
         float moveDistance = 16;
         boolean moved = false;
@@ -159,24 +161,21 @@ public class GameScreen implements Screen {
                 player.getPosition().y + moveDistance
             );
             moved = true;
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
             player.setDirection(PlayerDirection.DOWN);
             player.setTargetPosition(
                 player.getPosition().x,
                 player.getPosition().y - moveDistance
             );
             moved = true;
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             player.setDirection(PlayerDirection.LEFT);
             player.setTargetPosition(
                 player.getPosition().x - moveDistance,
                 player.getPosition().y
             );
             moved = true;
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+        } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             player.setDirection(PlayerDirection.RIGHT);
             player.setTargetPosition(
                 player.getPosition().x + moveDistance,
@@ -188,6 +187,5 @@ public class GameScreen implements Screen {
         if (moved) {
             Gdx.app.log("GameScreen", "Player started moving");
         }
-
     }
 }
