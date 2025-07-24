@@ -1,6 +1,7 @@
 package com.proj;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -26,6 +27,17 @@ public class Player {
     private TextureRegion[] leftFrames;
     private TextureRegion[] rightFrames;
 
+    private float maxEnergy = 100f;
+    private float currentEnergy = maxEnergy;
+    private boolean isFainted = false;
+    private boolean isFainting = false;
+    private float faintAnimationTimer = 0f;
+    private static final float FAINT_DURATION = 2.0f;
+    private static final float ENERGY_COST_PER_TILE = 5f;
+
+    private TextureRegion faintFrame;
+    private TextureRegion faintFinalFrame;
+
     private final float WIDTH = 32;
     private final float HEIGHT = 32;
 
@@ -33,9 +45,7 @@ public class Player {
         this.gameMap = gameMap;
         this.position = new Vector2(startX, startY);
         this.targetPosition = new Vector2(startX, startY);
-
         this.boundingBox = new Rectangle(position.x - WIDTH/4, position.y - HEIGHT/4, WIDTH/2, HEIGHT/2);
-
         loadAnimations();
     }
 
@@ -61,14 +71,47 @@ public class Player {
             rightFrames[1] = new TextureRegion(new Texture(Gdx.files.internal("character/walk_right-removebg-preview.png")));
             rightFrames[2] = new TextureRegion(new Texture(Gdx.files.internal("character/run_right-removebg-preview.png")));
 
+            faintFrame = new TextureRegion(new Texture(Gdx.files.internal("characters/stand_down-removebg-preview.png")));
+            faintFinalFrame = new TextureRegion(new Texture(Gdx.files.internal("characters/passed_out.png")));
+
             Gdx.app.log("Player", "All animation frames loaded successfully");
         } catch (Exception e) {
             Gdx.app.error("Player", "Error loading player animations: " + e.getMessage());
             e.printStackTrace();
+
+            Pixmap pixmap = new Pixmap(16, 16, Pixmap.Format.RGBA8888);
+            pixmap.setColor(1, 0, 0, 1); 
+            pixmap.fill();
+
+            Texture fallback = new Texture(pixmap);
+            pixmap.dispose();
+
+            faintFrame = new TextureRegion(fallback);
+            faintFinalFrame = new TextureRegion(fallback);
+
+            downFrames = new TextureRegion[3];
+            for (int i = 0; i < 3; i++) {
+                downFrames[i] = faintFrame;
+            }
+            upFrames = downFrames;
+            leftFrames = downFrames;
+            rightFrames = downFrames;
         }
     }
 
     public void update(float delta) {
+        if (isFainting) {
+            faintAnimationTimer += delta;
+            if (faintAnimationTimer >= FAINT_DURATION) {
+                isFainting = false;
+                isFainted = true;
+            }
+            return;
+        }
+
+        // Skip update if fainted, change if needed.
+        if (isFainted) return;
+
         isMoving = !position.epsilonEquals(targetPosition, 0.5f);
 
         if (isMoving) {
@@ -77,7 +120,6 @@ public class Player {
             if (frameTime >= FRAME_DURATION) {
                 frameTime -= FRAME_DURATION;
                 frameIndex = (frameIndex + 1) % 3;
-                Gdx.app.log("Player", "Animation frame changed to: " + frameIndex);
             }
 
             Vector2 direction = new Vector2(targetPosition).sub(position).nor();
@@ -95,25 +137,39 @@ public class Player {
     }
 
     public void render(SpriteBatch batch) {
+        if (isFainted) {
+            batch.draw(faintFinalFrame, position.x - WIDTH/2, position.y - HEIGHT/2, WIDTH, HEIGHT);
+            return;
+        }
+        // Fainting
+        if (isFainting) {
+            batch.draw(faintFrame, position.x - WIDTH/2, position.y - HEIGHT/2, WIDTH, HEIGHT);
+            return;
+        }
+        // Normal 
         TextureRegion currentTexture = getCurrentFrame();
-
-        batch.draw(
-            currentTexture,
-            position.x - WIDTH/2,
-            position.y - HEIGHT/2,
-            WIDTH,
-            HEIGHT
-        );
+        batch.draw(currentTexture, position.x - WIDTH/2, position.y - HEIGHT/2, WIDTH, HEIGHT);
     }
 
     private TextureRegion getCurrentFrame() {
         switch (currentDirection) {
-            case UP: return upFrames[frameIndex];
-            case DOWN: return downFrames[frameIndex];
-            case LEFT: return leftFrames[frameIndex];
-            case RIGHT: return rightFrames[frameIndex];
-            default: return downFrames[frameIndex];
+            case UP:
+                if (upFrames != null && upFrames.length > frameIndex)
+                    return upFrames[frameIndex];
+            case DOWN:
+                if (downFrames != null && downFrames.length > frameIndex)
+                    return downFrames[frameIndex];
+            case LEFT:
+                if (leftFrames != null && leftFrames.length > frameIndex)
+                    return leftFrames[frameIndex];
+            case RIGHT:
+                if (rightFrames != null && rightFrames.length > frameIndex)
+                    return rightFrames[frameIndex];
+            default:
+                if (downFrames != null && downFrames.length > frameIndex)
+                    return downFrames[frameIndex];
         }
+        return null;
     }
 
     public boolean isMoving() {
@@ -125,14 +181,19 @@ public class Player {
     }
 
     public void setTargetPosition(float worldX, float worldY) {
+        if (isFainted || isFainting) return;
+
         int tileX = (int) (worldX / 16);
         int tileY = (int) (worldY / 16);
 
-        if (gameMap.isPassable(worldX, worldY)) {
+        if (gameMap.isPassable(worldX, worldY) && currentEnergy >= ENERGY_COST_PER_TILE) {
+            currentEnergy -= ENERGY_COST_PER_TILE;
             targetPosition.set(tileX * 16 + 8, tileY * 16 + 8);
             isMoving = true;
             frameIndex = 1;
             frameTime = 0;
+        } else if (currentEnergy < ENERGY_COST_PER_TILE) {
+            startFainting();
         }
     }
 
@@ -153,15 +214,46 @@ public class Player {
         disposeTextureArray(downFrames);
         disposeTextureArray(leftFrames);
         disposeTextureArray(rightFrames);
+
+        disposeTextureRegion(faintFrame);
+        disposeTextureRegion(faintFinalFrame);
     }
 
     private void disposeTextureArray(TextureRegion[] frames) {
         if (frames != null) {
             for (TextureRegion frame : frames) {
-                if (frame != null && frame.getTexture() != null) {
-                    frame.getTexture().dispose();
-                }
+                disposeTextureRegion(frame);
             }
         }
+    }
+
+    private void disposeTextureRegion(TextureRegion region) {
+        if (region != null && region.getTexture() != null) {
+            region.getTexture().dispose();
+        }
+    }
+
+    private void startFainting() {
+        isFainting = true;
+        faintAnimationTimer = 0f;
+        isMoving = false;
+        targetPosition.set(position.x, position.y);
+    }
+
+    public void restoreEnergy(float amount) {
+        currentEnergy = Math.min(currentEnergy + amount, maxEnergy);
+    }
+
+    public void resetEnergy() {
+        currentEnergy = maxEnergy;
+        isFainted = false;
+    }
+
+    public boolean isFainted() {
+        return isFainted;
+    }
+
+    public boolean isFainting() {
+        return isFainting;
     }
 }
