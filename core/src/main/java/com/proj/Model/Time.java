@@ -1,6 +1,6 @@
 package com.proj.Model;
 
-import com.proj.map.Season;
+import com.proj.Map.Season;
 
 public class Time {
     private int day;

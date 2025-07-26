@@ -1,4 +1,4 @@
-package com.proj.map;
+package com.proj.Map;
 
 public enum TileType {
     DIRT("Dirt"),

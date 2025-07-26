@@ -3,7 +3,7 @@ package com.proj.Model;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Disposable;
-import com.proj.map.farmName;
+import com.proj.Map.farmName;
 
 public class Character implements Disposable {
     private Texture characterTexture;

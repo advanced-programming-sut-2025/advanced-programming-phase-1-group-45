@@ -10,9 +10,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.proj.Control.WorldController;
+import com.proj.Model.Inventory.InventoryItem;
+import com.proj.Model.Inventory.Tool;
 import com.proj.Model.Weather;
-import com.proj.map.GameMap;
-import com.proj.map.farmName;
+import com.proj.Map.GameMap;
+import com.proj.Map.farmName;
+import com.proj.Model.Inventory.InventoryManager;
 
 public class GameScreen implements Screen {
     private Player player;
@@ -24,14 +27,15 @@ public class GameScreen implements Screen {
     private int mapPixelHeight;
     private boolean initialized = false;
     private String mapName;
+    private InventoryManager inventoryManager;
 
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
     }
+
     @Override
     public void show() {
         if (!initialized) {
-
             gameMap = new GameMap(mapName);
             worldController = new WorldController();
 
@@ -49,6 +53,10 @@ public class GameScreen implements Screen {
             camera.position.set(player.getPosition().x, player.getPosition().y, 0);
             camera.update();
 
+            // Initialize inventory system
+            inventoryManager = InventoryManager.getInstance();
+            inventoryManager.initialize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
             initialized = true;
         }
     }
@@ -57,32 +65,38 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        // Handle input and update
         handleInput();
-
-
         player.update(delta);
         updateCamera();
         worldController.update(delta);
+        inventoryManager.update(delta, player);
 
         gameMap.render(camera);
 
-        //
+        // Render entities with one batch operation
         gameMap.getSpriteBatch().setProjectionMatrix(camera.combined);
         gameMap.getSpriteBatch().begin();
-
-
         worldController.render(gameMap.getSpriteBatch(), Weather.SNOWY);
         renderPlayer();
         gameMap.getSpriteBatch().end();
 
+        gameMap.getSpriteBatch().begin();
+        inventoryManager.render(gameMap.getSpriteBatch());
+        gameMap.getSpriteBatch().end();
 
+        // Check for T key to toggle inventory
+        if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
+            inventoryManager.getPlayerInventory().toggleVisibility();
+        }
+
+        // Handle tool usage
+        handleToolUse();
     }
 
     private void renderPlayer() {
-//        gameMap.getSpriteBatch().setProjectionMatrix(camera.combined);
-//        gameMap.getSpriteBatch().begin();
         player.render(gameMap.getSpriteBatch());
-//        gameMap.getSpriteBatch().end();
     }
 
     @Override
@@ -121,6 +135,7 @@ public class GameScreen implements Screen {
         player.dispose();
         gameMap.dispose();
         worldController.dispose();
+        inventoryManager.dispose();
     }
 
     private void updateCamera() {
@@ -144,9 +159,7 @@ public class GameScreen implements Screen {
         camera.update();
     }
 
-
     private void handleInput() {
-
         if (player.isMoving() || player.isFainted() || player.isFainting()) {
             return;
         }
@@ -186,6 +199,28 @@ public class GameScreen implements Screen {
 
         if (moved) {
             Gdx.app.log("GameScreen", "Player started moving");
+        }
+    }
+
+    private void handleToolUse() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
+            InventoryItem selectedItem = inventoryManager.getPlayerInventory().getSelectedItem();
+            if (selectedItem instanceof Tool) {
+                Tool tool = (Tool) selectedItem;
+                int tileX = (int) (player.getPosition().x / 16);
+                int tileY = (int) (player.getPosition().y / 16);
+
+                switch (player.getDirection()) {
+                    case UP: tileY++; break;
+                    case DOWN: tileY--; break;
+                    case LEFT: tileX--; break;
+                    case RIGHT: tileX++; break;
+                }
+
+                if (tool.useOnTile(tileX, tileY)) {
+                    player.useEnergy(tool.getEnergyCost());
+                }
+            }
         }
     }
 }

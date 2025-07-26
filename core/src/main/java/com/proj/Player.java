@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.proj.map.GameMap;
+import com.proj.Map.GameMap;
 
 public class Player {
     private Vector2 position;
@@ -80,7 +80,7 @@ public class Player {
             e.printStackTrace();
 
             Pixmap pixmap = new Pixmap(16, 16, Pixmap.Format.RGBA8888);
-            pixmap.setColor(1, 0, 0, 1); 
+            pixmap.setColor(1, 0, 0, 1);
             pixmap.fill();
 
             Texture fallback = new Texture(pixmap);
@@ -146,7 +146,7 @@ public class Player {
             batch.draw(faintFrame, position.x - WIDTH/2, position.y - HEIGHT/2, WIDTH, HEIGHT);
             return;
         }
-        // Normal 
+        // Normal
         TextureRegion currentTexture = getCurrentFrame();
         batch.draw(currentTexture, position.x - WIDTH/2, position.y - HEIGHT/2, WIDTH, HEIGHT);
     }
@@ -256,4 +256,16 @@ public class Player {
     public boolean isFainting() {
         return isFainting;
     }
+
+    public void useEnergy(float amount) {
+        currentEnergy = Math.max(0, currentEnergy - amount);
+        if (currentEnergy <= 0 && !isFainted && !isFainting) {
+            startFainting();
+        }
+    }
+
+    public PlayerDirection getDirection() {
+        return currentDirection;
+    }
+
 }

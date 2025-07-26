@@ -1,19 +1,16 @@
 package com.proj;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.proj.Control.SignupMenuController;
 import com.proj.Model.GameAssetManager;
 import com.proj.View.SignupMenuView;
 import com.proj.View.EntranceScreen;
-import com.proj.map.farmName;
+import com.proj.Map.farmName;
 
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
