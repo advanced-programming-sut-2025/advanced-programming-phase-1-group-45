@@ -161,7 +161,7 @@ public class GameAssetManager {
 
         FarmInOutPoint busStop = new FarmInOutPoint("BusStop", 2);
         busStop.addFarmExitPoint(new Point(45, 6), 3);
-        busStop.addFarmEnterPoint(new Point(45, 6), 3);
+        busStop.addFarmExitPoint(new Point(45, 6), 3);
 
         busStop.addFarmEnterPoint(new Point(44, 6), 3);
 

@@ -16,15 +16,10 @@ public class WeatherController {
     private RainyWeather rainRenderer;
 
 
-    private Stage uistage;
-    private ClockWidget clockWidget;
-    private TimeDisplayActor timeDisplayActor;
-
-
     public WeatherController() {
         snowRenderer = new SnowyWeather();
         rainRenderer = new RainyWeather();
-        weather = Weather.SUNNY;
+        weather = Weather.SNOWY;
     }
 
     public void update(Weather weather, float delta) {
