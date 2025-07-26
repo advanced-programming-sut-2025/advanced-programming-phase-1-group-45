@@ -19,7 +19,7 @@ public class GameMap {
     public GameMap(String farmName, Season season) {
         mapName = farmName;
         batch = new SpriteBatch();
-        loader = new LandLoader(farmName, Season.WINTER);
+        loader = new LandLoader(farmName, season);
         tiledMap = loader.getMap();
         playerSpawnPoint = loader.getPlayerSpawnPoint();
         mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
