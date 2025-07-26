@@ -1,10 +1,10 @@
-package com.proj.Model;
+package com.proj.Model.TimeAndWeather;
 
 public enum Weather {
     SUNNY("Sunny"),
     SNOWY("Snowy"),
     RAINY("Rainy"),
-    WINDY("Windy");
+    STORMY("Stormy");
     private String weather;
     Weather(String weather) {
         this.weather = weather;

@@ -1,4 +1,4 @@
-package com.proj.Model;
+package com.proj.Model.TimeAndWeather;
 
 public enum DayOfWeek {
     Saturday, Sunday,
