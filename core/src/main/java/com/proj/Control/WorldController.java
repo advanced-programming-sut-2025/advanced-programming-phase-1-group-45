@@ -178,10 +178,10 @@ public class WorldController {
         int tileY = (int) (y / gameMap.getTileHeight());
         Point point = new Point(tileX, tileY);
         System.err.println("new x = " + tileX + ", new y = " + tileY);
-//        if (isExitPoint(point)) {
-//            triggerToOtherMap(point);
-//            return false;
-//        }
+        if (isExitPoint(point)) {
+            triggerToOtherMap(point);
+            return false;
+        }
 
         return gameMap.isPassable(x, y);
     }
