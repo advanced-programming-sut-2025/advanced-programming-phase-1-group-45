@@ -1,4 +1,4 @@
-package com.proj.Map;
+package com.proj.map;
 
 public enum LandObject {
     TREE();

@@ -1,4 +1,4 @@
-package com.proj.Map;
+package com.proj.map;
 
 
 import java.awt.*;
@@ -11,6 +11,9 @@ public class Tile {
     private boolean passable = false;
     private boolean hasForaging = false;
     private String foraging;
+
+    private boolean isHomeGate = false;
+
 
     public Tile(Point location, TileType type) {
         this.location = location;
@@ -45,4 +48,15 @@ public class Tile {
         return passable;
     }
 
+    public void setHomeGate(boolean homeGate) {
+        isHomeGate = homeGate;
+    }
+
+    public boolean isHomeGate() {
+        return isHomeGate;
+    }
+
+    public Point getLocation() {
+        return location;
+    }
 }

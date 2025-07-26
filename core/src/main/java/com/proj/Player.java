@@ -7,13 +7,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.proj.Map.GameMap;
+import com.proj.Control.WorldController;
+import com.proj.map.GameMap;
 
 public class Player {
     private Vector2 position;
     private Vector2 targetPosition;
     private float speed = 100f;
-    private GameMap gameMap;
+    private WorldController worldController;
     private Rectangle boundingBox;
     private PlayerDirection currentDirection = PlayerDirection.DOWN;
     private boolean isMoving = false;
@@ -27,7 +28,7 @@ public class Player {
     private TextureRegion[] leftFrames;
     private TextureRegion[] rightFrames;
 
-    private float maxEnergy = 100f;
+    private float maxEnergy = 5000f;
     private float currentEnergy = maxEnergy;
     private boolean isFainted = false;
     private boolean isFainting = false;
@@ -41,8 +42,8 @@ public class Player {
     private final float WIDTH = 32;
     private final float HEIGHT = 32;
 
-    public Player(GameMap gameMap, float startX, float startY) {
-        this.gameMap = gameMap;
+    public Player(WorldController worldController, float startX, float startY) {
+        this.worldController = worldController;
         this.position = new Vector2(startX, startY);
         this.targetPosition = new Vector2(startX, startY);
         this.boundingBox = new Rectangle(position.x - WIDTH/4, position.y - HEIGHT/4, WIDTH/2, HEIGHT/2);
@@ -183,7 +184,7 @@ public class Player {
         int tileX = (int) (worldX / 16);
         int tileY = (int) (worldY / 16);
 
-        if (gameMap.isPassable(worldX, worldY) && currentEnergy >= ENERGY_COST_PER_TILE) {
+        if (worldController.isPassable(worldX, worldY) && currentEnergy >= ENERGY_COST_PER_TILE) {
             currentEnergy -= ENERGY_COST_PER_TILE;
             targetPosition.set(tileX * 16 + 8, tileY * 16 + 8);
             isMoving = true;
@@ -263,6 +264,10 @@ public class Player {
 
     public PlayerDirection getDirection() {
         return currentDirection;
+    }
+
+    public void setPosition(float worldX, float worldY) {
+        position.set(worldX, worldY);
     }
 
 }

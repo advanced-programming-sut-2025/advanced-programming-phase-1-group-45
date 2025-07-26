@@ -7,27 +7,32 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.proj.Control.WorldController;
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.Inventory.Tool;
-import com.proj.Model.Weather;
-import com.proj.Map.GameMap;
-import com.proj.Map.farmName;
+import com.proj.Model.TimeAndWeather.time.Time;
+import com.proj.map.GameMap;
+import com.proj.map.farmName;
 import com.proj.Model.Inventory.InventoryManager;
 
 public class GameScreen implements Screen {
     private Player player;
     private OrthographicCamera camera;
-    private GameMap gameMap;
+    private String mapName;
+    private Time gameTime;
+
+
     private WorldController worldController;
     private Viewport viewport;
     private int mapPixelWidth;
     private int mapPixelHeight;
     private boolean initialized = false;
-    private String mapName;
     private InventoryManager inventoryManager;
+    private boolean timeIsPaused = false;
+    private Stage uistage;
 
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
@@ -36,26 +41,33 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         if (!initialized) {
-            gameMap = new GameMap(mapName);
-            worldController = new WorldController();
+            gameTime = new Time();
+            uistage = new Stage();
+            worldController = new WorldController(mapName, gameTime, uistage);
 
             camera = new OrthographicCamera();
             viewport = new FitViewport(640, 480, camera);
             viewport.apply();
             camera.update();
-            mapPixelWidth = gameMap.getMapWidth() * gameMap.getTileWidth();
-            mapPixelHeight = gameMap.getMapHeight() * gameMap.getTileHeight();
+            mapPixelWidth = worldController.getMapWidth() * worldController.getTileWidth();
+            mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
 
-            float startX = 28 * 16 + 8;
-            float startY = 12 * 16 + 8;
+            float startX = 15*16 + 8;
+            float startY = 0*16 + 8;
+            int tileX;
+            int tileY;
 
-            player = new Player(gameMap, startX, startY);
+            if (worldController.getPlayerSpawnPoint() != null) {
+                startX = worldController.getPlayerSpawnPoint().x * worldController.getTileWidth() +
+                    (float) worldController.getTileWidth() / 2;
+                startY = worldController.getPlayerSpawnPoint().y * worldController.getTileHeight() +
+                    (float) worldController.getTileHeight() / 2;
+            }
+
+            player = new Player(worldController, startX, startY);
+            worldController.setPlayer(player);
             camera.position.set(player.getPosition().x, player.getPosition().y, 0);
             camera.update();
-
-            // Initialize inventory system
-            inventoryManager = InventoryManager.getInstance();
-            inventoryManager.initialize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
             initialized = true;
         }
@@ -65,24 +77,24 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+        mapPixelWidth = worldController.getMapWidth() * worldController.getTileWidth();
+        mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
         handleInput();
         player.update(delta);
         updateCamera();
+        gameTime.update(delta, timeIsPaused);
         worldController.update(delta);
-        inventoryManager.update(delta, player);
+//        inventoryManager.update(delta, player);
 
-        gameMap.render(camera);
+        worldController.render(camera);
 
-        gameMap.getSpriteBatch().setProjectionMatrix(camera.combined);
-        gameMap.getSpriteBatch().begin();
-        worldController.render(gameMap.getSpriteBatch(), Weather.SNOWY);
         renderPlayer();
-        gameMap.getSpriteBatch().end();
+//        inventoryManager.render(gameMap.getSpriteBatch());
+        worldController.renderNight();
 
-        gameMap.getSpriteBatch().begin();
-        inventoryManager.render(gameMap.getSpriteBatch());
-        gameMap.getSpriteBatch().end();
+        worldController.getSpriteBatch().end();
+        uistage.act(delta);
+        uistage.draw();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
             inventoryManager.getPlayerInventory();
@@ -95,7 +107,7 @@ public class GameScreen implements Screen {
     }
 
     private void renderPlayer() {
-        player.render(gameMap.getSpriteBatch());
+        player.render(worldController.getSpriteBatch());
     }
 
     @Override
@@ -132,9 +144,8 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         player.dispose();
-        gameMap.dispose();
         worldController.dispose();
-        inventoryManager.dispose();
+//        inventoryManager.dispose();
     }
 
     private void updateCamera() {

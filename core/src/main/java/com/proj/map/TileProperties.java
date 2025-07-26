@@ -1,4 +1,4 @@
-package com.proj.Map;
+package com.proj.map;
 
 public class TileProperties {
     public static int Passable = 1 << 0;

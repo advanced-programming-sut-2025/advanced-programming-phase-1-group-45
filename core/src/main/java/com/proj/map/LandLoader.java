@@ -1,9 +1,13 @@
-package com.proj.Map;
+package com.proj.map;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import jdk.internal.org.commonmark.internal.inline.BackslashInlineParser;
 
 import java.awt.*;
 import java.util.*;
@@ -22,19 +26,22 @@ public class LandLoader {
     private Tile[][] tiles;
     private TileProperties[][] properties;
     private Map<String, Boolean> layerConfig = new HashMap<>();
+    private Point playerSpawnPoint;
 
     int countUnPassed = 0;
 
     public LandLoader(String farmName, Season season) {
         this.landName = farmName;
         this.landSeason = season;
-        String seasonName = landSeason.toString().toLowerCase();
-        this.landPath = "assets/map/land/" + seasonName +"/" + landName + "_" + seasonName + ".tmx";
         loadMap();
-        initialize();
+//        initialize();
+//        findPlayerSpawnPoint();
     }
 
+
     private void loadMap() {
+        String seasonName = landSeason.toString().toLowerCase();
+        this.landPath = "assets/map/land/" + seasonName +"/" + landName + "_" + seasonName + ".tmx";
         map = new TmxMapLoader().load(landPath);
 
         mapWidth = map.getProperties().get("width", Integer.class);
@@ -44,6 +51,16 @@ public class LandLoader {
 
         System.err.println("width: " + mapWidth + " height: " + mapHeight);
 
+        initialize();
+        findPlayerSpawnPoint();
+
+    }
+
+    public void changeSeason(Season newSeason) {
+        this.landSeason = newSeason;
+        String seasonName = landSeason.toString().toLowerCase();
+        this.landPath = "assets/map/land/" + seasonName +"/" + landName + "_" + seasonName + ".tmx";
+        loadMap();
     }
 
     private void initialize() {
@@ -79,12 +96,28 @@ public class LandLoader {
                         break;
                     }
 
+                    if (getHomeGate(cell)){
+                        tiles[x][y].setHomeGate(true);
+                    }
                 }
                 tiles[x][y].setPassable(passable);
                 if (!passable) countUnPassed++;
+
             }
         }
 
+    }
+
+    private void findPlayerSpawnPoint() {
+        for (Tile[] tile : tiles) {
+            for (Tile tile1 : tile) {
+                if (tile1.isHomeGate()) {
+                    playerSpawnPoint = tile1.getLocation();
+                    return;
+                }
+            }
+        }
+        playerSpawnPoint = null;
     }
 
     private void makeCollisionLayer(List<LayerInfo> collisionLayers) {
@@ -124,6 +157,14 @@ public class LandLoader {
         return null;
     }
 
+    private Boolean getHomeGate(TiledMapTileLayer.Cell cell) {
+        Object gateWay = cell.getTile().getProperties().get("home_gate");
+        if (gateWay != null) {
+            return true;
+        }
+        return false;
+    }
+
 
     static void makeLayerConfig(Map<String, Boolean> layerConfig) {
         layerConfig.put("Back", true);
@@ -138,6 +179,7 @@ public class LandLoader {
         layerConfig.put("Front", false);
         layerConfig.put("AlwaysFront", false);
         layerConfig.put("AlwaysFront2", false);
+        layerConfig.put("AlwaysFront3", false);
     }
 
 
@@ -157,10 +199,14 @@ public class LandLoader {
         return tileHeight;
     }
 
+
+
     public boolean isPassable(float x, float y) {
         int tileX = (int) (x / tileWidth);
         int tileY = (int) (y / tileHeight);
-        if (tileY >= mapHeight || tileX >= mapWidth || tileX < 0 || tileY < 0) {
+        if (tileY >= mapHeight || tileX >= mapWidth || tileX <= 0 || tileY <= 0) {
+            System.err.println("x : " + tileX + " y : " + tileY);
+
             System.err.println("out of bounds");
             return false;
         }
@@ -176,4 +222,7 @@ public class LandLoader {
         return map;
     }
 
+    public Point getPlayerSpawnPoint() {
+        return playerSpawnPoint;
+    }
 }
