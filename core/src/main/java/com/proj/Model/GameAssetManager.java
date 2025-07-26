@@ -172,12 +172,12 @@ public class GameAssetManager {
         exitPointList.add(busStop);
 
         FarmInOutPoint mountain = new FarmInOutPoint("Mountain", 4);
-        mountain.addFarmExitPoint(new Point(0, 27), 5);
+        mountain.addFarmExitPoint(new Point(0, 28), 5);
         mountain.addFarmEnterPoint(new Point(1,27),5 );
 
-        mountain.addFarmExitPoint(new Point(15, 0), 2);
-        mountain.addFarmExitPoint(new Point(16, 0), 2);
-        mountain.addFarmEnterPoint(new Point(15, 1), 2);
+        mountain.addFarmExitPoint(new Point(15, 0), 3);
+        mountain.addFarmExitPoint(new Point(16, 0), 3);
+        mountain.addFarmEnterPoint(new Point(15, 1), 3);
 
         exitPointList.add(mountain);
     }
