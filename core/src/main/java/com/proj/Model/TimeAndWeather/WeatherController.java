@@ -21,14 +21,13 @@ public class WeatherController {
     private TimeDisplayActor timeDisplayActor;
 
 
-
     public WeatherController() {
         snowRenderer = new SnowyWeather();
         rainRenderer = new RainyWeather();
         weather = Weather.SUNNY;
     }
 
-    public void update(Weather weather,float delta) {
+    public void update(Weather weather, float delta) {
         //  Weather weather;
         // Update sky color based on weather
         if (!this.weather.equals(weather)) {
@@ -60,9 +59,14 @@ public class WeatherController {
     }
 
     public void resize(int width, int height) {
-
-//        snowRenderer.resize(width, height);
-        rainRenderer.resize(width, height);
+        switch (weather) {
+            case SNOWY:
+                snowRenderer.resize(width, height);
+                break;
+            case RAINY:
+                rainRenderer.resize(width, height);
+                break;
+        }
     }
 
     public void dispose() {
