@@ -14,7 +14,7 @@
     <property name="Winter_Objects" type="string" value="392 .8" />
   </properties>
   <tileset firstgid="1" name="Paths" tilewidth="16" tileheight="16" tilecount="64" columns="4">
-    <image source="../../tileSets/fall/paths" width="64" height="256" />
+    <image source="../../tileSets/fall/paths.png" width="64" height="256" />
     <tile id="0">
       <properties>
         <property name="PathType" type="string" value="NE" />
@@ -47,7 +47,7 @@
     </tile>
   </tileset>
   <tileset firstgid="65" name="untitled tile sheet" tilewidth="16" tileheight="16" tilecount="527" columns="17">
-    <image source="../../tileSets/fall/beach" width="272" height="496" />
+    <image source="../../tileSets/fall/beach.png" width="272" height="496" />
     <tile id="7">
       <properties>
         <property name="Water" type="string" value="T" />
@@ -1066,7 +1066,7 @@
     </tile>
   </tileset>
   <tileset firstgid="592" name="v16_Shadows" tilewidth="16" tileheight="16" tilecount="475" columns="19">
-    <image source="../../tileSets/fall/Shadows" width="304" height="400" />
+    <image source="../../tileSets/fall/Shadows.png" width="304" height="400" />
   </tileset>
   <layer id="1" name="Back" width="104" height="50" opacity="1" offsetx="0" offsety="0">
     <properties />

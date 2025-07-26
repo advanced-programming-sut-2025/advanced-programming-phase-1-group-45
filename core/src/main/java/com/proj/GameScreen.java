@@ -36,6 +36,7 @@ public class GameScreen implements Screen {
 
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
+        mapName = "Beach";
     }
 
     @Override
