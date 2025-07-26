@@ -66,7 +66,6 @@ public class GameScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        // Handle input and update
         handleInput();
         player.update(delta);
         updateCamera();
@@ -75,7 +74,6 @@ public class GameScreen implements Screen {
 
         gameMap.render(camera);
 
-        // Render entities with one batch operation
         gameMap.getSpriteBatch().setProjectionMatrix(camera.combined);
         gameMap.getSpriteBatch().begin();
         worldController.render(gameMap.getSpriteBatch(), Weather.SNOWY);
@@ -86,12 +84,10 @@ public class GameScreen implements Screen {
         inventoryManager.render(gameMap.getSpriteBatch());
         gameMap.getSpriteBatch().end();
 
-        // Check for T key to toggle inventory
         if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
             inventoryManager.getPlayerInventory().toggleVisibility();
         }
 
-        // Handle tool usage
         handleToolUse();
     }
 

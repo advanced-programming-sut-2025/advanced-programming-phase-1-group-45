@@ -109,7 +109,6 @@ public class Player {
             return;
         }
 
-        // Skip update if fainted, change if needed.
         if (isFainted) return;
 
         isMoving = !position.epsilonEquals(targetPosition, 0.5f);
@@ -141,12 +140,10 @@ public class Player {
             batch.draw(faintFinalFrame, position.x - WIDTH/2, position.y - HEIGHT/2, WIDTH, HEIGHT);
             return;
         }
-        // Fainting
         if (isFainting) {
             batch.draw(faintFrame, position.x - WIDTH/2, position.y - HEIGHT/2, WIDTH, HEIGHT);
             return;
         }
-        // Normal
         TextureRegion currentTexture = getCurrentFrame();
         batch.draw(currentTexture, position.x - WIDTH/2, position.y - HEIGHT/2, WIDTH, HEIGHT);
     }

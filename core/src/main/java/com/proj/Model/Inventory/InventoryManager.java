@@ -40,37 +40,32 @@ public class InventoryManager {
         // Load tool textures from the assets provided in the image
         // Assuming you've placed these files in the correct directory structure
 
-        // Basic tools
         itemTextures.put("hoe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Hoe/Hoe.png"))));
-        //itemTextures.put("pickaxe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Pickaxe/Pickaxe.png")))); // Uncommented this line
+        itemTextures.put("pickaxe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Pickaxe/Pickaxe.png")))); // Uncommented this line
         itemTextures.put("axe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Axe/Axe.png"))));
         itemTextures.put("watering_can_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Watering_Can/Watering_Can.png"))));
         itemTextures.put("fishing_rod_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Fishing_Pole/Training_Rod.png"))));
         itemTextures.put("scythe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Scythe/Scythe.png"))));
 
-        // Copper tools
-        // itemTextures.put("hoe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_copper.png"))));
-        // itemTextures.put("pickaxe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_copper.png"))));
-        // itemTextures.put("axe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_copper.png"))));
-        // itemTextures.put("watering_can_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_copper.png"))));
-        //
-        // // Steel tools
-        // itemTextures.put("hoe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_steel.png"))));
-        // itemTextures.put("pickaxe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_steel.png"))));
-        // itemTextures.put("axe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_steel.png"))));
-        // itemTextures.put("watering_can_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_steel.png"))));
-        //
-        // // Gold tools
-        // itemTextures.put("hoe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_gold.png"))));
-        // itemTextures.put("pickaxe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_gold.png"))));
-        // itemTextures.put("axe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_gold.png"))));
-        // itemTextures.put("watering_can_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_gold.png"))));
+         itemTextures.put("hoe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_copper.png"))));
+         itemTextures.put("pickaxe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_copper.png"))));
+         itemTextures.put("axe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_copper.png"))));
+         itemTextures.put("watering_can_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_copper.png"))));
 
-        // Iridium tools
-        // itemTextures.put("hoe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_iridium.png"))));
-        // itemTextures.put("pickaxe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_iridium.png"))));
-        // itemTextures.put("axe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_iridium.png"))));
-        // itemTextures.put("watering_can_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_iridium.png"))));
+         itemTextures.put("hoe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_steel.png"))));
+         itemTextures.put("pickaxe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_steel.png"))));
+         itemTextures.put("axe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_steel.png"))));
+         itemTextures.put("watering_can_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_steel.png"))));
+
+         itemTextures.put("hoe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_gold.png"))));
+         itemTextures.put("pickaxe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_gold.png"))));
+         itemTextures.put("axe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_gold.png"))));
+         itemTextures.put("watering_can_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_gold.png"))));
+
+         itemTextures.put("hoe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_iridium.png"))));
+         itemTextures.put("pickaxe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_iridium.png"))));
+         itemTextures.put("axe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_iridium.png"))));
+         itemTextures.put("watering_can_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_iridium.png"))));
     }
 
     private void loadInventoryUI() {
@@ -95,12 +90,11 @@ public class InventoryManager {
     }
 
     private void createInitialTools() {
-        // Add basic tools to inventory as shown in the image
         playerInventory.addItem(new Pickaxe("pickaxe_basic", "Pickaxe", itemTextures.get("pickaxe_basic"), 1));
-       // playerInventory.addItem(new Axe("axe_basic", "Axe", itemTextures.get("axe_basic"), 1)); // Uncommented this line
+        playerInventory.addItem(new Axe("axe_basic", "Axe", itemTextures.get("axe_basic"), 1)); // Uncommented this line
         playerInventory.addItem(new Hoe("hoe_basic", "Hoe", itemTextures.get("hoe_basic"), 1));
-       // playerInventory.addItem(new WateringCan("watering_can_basic", "Watering Can", itemTextures.get("watering_can_basic"), 1)); // Uncommented this line
-       // playerInventory.addItem(new FishingRod("fishing_rod_basic", "Fishing Rod", itemTextures.get("fishing_rod_basic"), 1)); // Uncommented this line
+        playerInventory.addItem(new WateringCan("watering_can_basic", "Watering Can", itemTextures.get("watering_can_basic"), 1)); // Uncommented this line
+        playerInventory.addItem(new FishingRod("fishing_rod_basic", "Fishing Rod", itemTextures.get("fishing_rod_basic"), 1)); // Uncommented this line
         playerInventory.addItem(new Scythe("scythe_basic", "Scythe", itemTextures.get("scythe_basic"), 1));
     }
 
