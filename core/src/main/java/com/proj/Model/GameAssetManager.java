@@ -122,8 +122,8 @@ public class GameAssetManager {
         BackWoods.addFarmExitPoint(new Point(15, 0), 1);
         BackWoods.addFarmEnterPoint(new Point(14, 2), 1);
 
-        BackWoods.addFarmExitPoint(new Point(50, 24), 4);
-        BackWoods.addFarmEnterPoint(new Point(49, 24), 4);
+        BackWoods.addFarmExitPoint(new Point(48, 24), 4);
+        BackWoods.addFarmEnterPoint(new Point(47, 24), 4);
         exitPointList.add(BackWoods);
 
         FarmInOutPoint town = new FarmInOutPoint("Town" ,3);
