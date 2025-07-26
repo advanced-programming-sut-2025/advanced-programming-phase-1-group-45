@@ -169,18 +169,18 @@ public class InventoryManager {
                 textureId = "pickaxe_" + levelName;
                 tool = new Pickaxe("pickaxe_" + levelName, "Pickaxe", itemTextures.get(textureId), level);
                 break;
-//            case AXE:
-//                textureId = "axe_" + levelName;
-//                tool = new Axe("axe_" + levelName, "Axe", itemTextures.get(textureId), level);
-//                break;
-//            case WATERING_CAN:
-//                textureId = "watering_can_" + levelName;
-//                tool = new WateringCan("watering_can_" + levelName, "Watering Can", itemTextures.get(textureId), level);
-//                break;
-//            case FISHING_ROD:
-//                textureId = "fishing_rod_" + levelName;
-//                tool = new FishingRod("fishing_rod_" + levelName, "Fishing Rod", itemTextures.get(textureId), level);
-//                break;
+            case AXE:
+                textureId = "axe_" + levelName;
+                tool = new Axe("axe_" + levelName, "Axe", itemTextures.get(textureId), level);
+                break;
+            case WATERING_CAN:
+                textureId = "watering_can_" + levelName;
+                tool = new WateringCan("watering_can_" + levelName, "Watering Can", itemTextures.get(textureId), level);
+                break;
+            case FISHING_ROD:
+                textureId = "fishing_rod_" + levelName;
+                tool = new FishingRod("fishing_rod_" + levelName, "Fishing Rod", itemTextures.get(textureId), level);
+                break;
             case SCYTHE:
                 textureId = "scythe_" + levelName;
                 tool = new Scythe("scythe_" + levelName, "Scythe", itemTextures.get(textureId), level);

@@ -85,7 +85,10 @@ public class GameScreen implements Screen {
         gameMap.getSpriteBatch().end();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
-            inventoryManager.getPlayerInventory().toggleVisibility();
+            inventoryManager.getPlayerInventory();
+            if (Gdx.input.isKeyJustPressed(Input.Keys.C)){
+                inventoryManager.getPlayerInventory().clear();
+            }
         }
 
         handleToolUse();
