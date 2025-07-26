@@ -21,7 +21,7 @@ public class InventoryManager {
     private TextureRegion inventoryBackground;
     private TextureRegion selectedSlotHighlight;
 
-    private InventoryManager() {
+    public InventoryManager() {
         itemTextures = new HashMap<>();
         playerInventory = new Inventory(24); // Start with medium backpack
         loadTextures();

@@ -44,6 +44,7 @@ public class GameScreen implements Screen {
             gameTime = new Time();
             uistage = new Stage();
             worldController = new WorldController(mapName, gameTime, uistage);
+            inventoryManager = new InventoryManager();
 
             camera = new OrthographicCamera();
             viewport = new FitViewport(640, 480, camera);
@@ -84,12 +85,12 @@ public class GameScreen implements Screen {
         updateCamera();
         gameTime.update(delta, timeIsPaused);
         worldController.update(delta);
-//        inventoryManager.update(delta, player);
+        inventoryManager.update(delta, player);
 
         worldController.render(camera);
 
         renderPlayer();
-//        inventoryManager.render(gameMap.getSpriteBatch());
+        inventoryManager.render(worldController.getSpriteBatch());
         worldController.renderNight();
 
         worldController.getSpriteBatch().end();
