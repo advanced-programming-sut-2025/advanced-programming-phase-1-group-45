@@ -41,31 +41,31 @@ public class InventoryManager {
         // Assuming you've placed these files in the correct directory structure
 
         itemTextures.put("hoe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Hoe/Hoe.png"))));
-        itemTextures.put("pickaxe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Pickaxe/Pickaxe.png")))); // Uncommented this line
+        itemTextures.put("pickaxe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/PickAxe/starter.png")))); // Uncommented this line
         itemTextures.put("axe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Axe/Axe.png"))));
         itemTextures.put("watering_can_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Watering_Can/Watering_Can.png"))));
         itemTextures.put("fishing_rod_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Fishing_Pole/Training_Rod.png"))));
         itemTextures.put("scythe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Scythe/Scythe.png"))));
 
-         itemTextures.put("hoe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_copper.png"))));
-         itemTextures.put("pickaxe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_copper.png"))));
-         itemTextures.put("axe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_copper.png"))));
-         itemTextures.put("watering_can_copper", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_copper.png"))));
+         itemTextures.put("hoe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/Hoe/Copper_Hoe.png"))));
+         itemTextures.put("pickaxe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/PickAxe/copper.png"))));
+         itemTextures.put("axe_copper", new TextureRegion(new Texture(Gdx.files.internal("items/Axe/Copper_Axe.png"))));
+         itemTextures.put("watering_can_copper", new TextureRegion(new Texture(Gdx.files.internal("items/Watering_Can/Copper_Watering_Can.png"))));
 
-         itemTextures.put("hoe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_steel.png"))));
-         itemTextures.put("pickaxe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_steel.png"))));
-         itemTextures.put("axe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_steel.png"))));
-         itemTextures.put("watering_can_steel", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_steel.png"))));
+         itemTextures.put("hoe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/Hoe/Steel_Hoe.png"))));
+         itemTextures.put("pickaxe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/PickAxe/steel.png"))));
+         itemTextures.put("axe_steel", new TextureRegion(new Texture(Gdx.files.internal("items/Axe/Steel_Axe.png"))));
+         itemTextures.put("watering_can_steel", new TextureRegion(new Texture(Gdx.files.internal("items/Watering_Can/Steel_Watering_Can.png"))));
 
-         itemTextures.put("hoe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_gold.png"))));
-         itemTextures.put("pickaxe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_gold.png"))));
-         itemTextures.put("axe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_gold.png"))));
-         itemTextures.put("watering_can_gold", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_gold.png"))));
+         itemTextures.put("hoe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/Hoe/Gold_Hoe.png"))));
+         itemTextures.put("pickaxe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/PickAxe/gold.png"))));
+         itemTextures.put("axe_gold", new TextureRegion(new Texture(Gdx.files.internal("items/Axe/Gold_Axe.png"))));
+         itemTextures.put("watering_can_gold", new TextureRegion(new Texture(Gdx.files.internal("items/Watering_Can/Gold_Watering_Can.png"))));
 
-         itemTextures.put("hoe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/hoe_iridium.png"))));
-         itemTextures.put("pickaxe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/pickaxe_iridium.png"))));
-         itemTextures.put("axe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/axe_iridium.png"))));
-         itemTextures.put("watering_can_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/tools/watering_can_iridium.png"))));
+         itemTextures.put("hoe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/Hoe/Iridium_Hoe.png"))));
+         itemTextures.put("pickaxe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/PickAxe/iridium.png"))));
+         itemTextures.put("axe_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/Axe/Iridium_Axe.png"))));
+         itemTextures.put("watering_can_iridium", new TextureRegion(new Texture(Gdx.files.internal("items/Watering_Can/Iridium_Watering_Can.png"))));
     }
 
     private void loadInventoryUI() {
