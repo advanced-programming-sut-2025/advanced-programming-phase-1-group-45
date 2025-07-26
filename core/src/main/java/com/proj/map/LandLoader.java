@@ -168,8 +168,8 @@ public class LandLoader {
 
     static void makeLayerConfig(Map<String, Boolean> layerConfig) {
         layerConfig.put("Back", true);
-        layerConfig.put("Back2", false);
-        layerConfig.put("Back3", false);
+        layerConfig.put("Back2", true);
+        layerConfig.put("Back3", true);
         layerConfig.put("Tree", true);
         layerConfig.put("Path", false);
         layerConfig.put("Paths", false);
