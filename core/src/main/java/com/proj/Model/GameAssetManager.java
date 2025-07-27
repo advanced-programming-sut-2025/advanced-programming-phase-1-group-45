@@ -145,7 +145,7 @@ public class GameAssetManager {
         town.addFarmExitPoint(new Point(53, 0), 7);
         town.addFarmExitPoint(new Point(55, 0), 7);
 
-        town.addFarmEnterPoint(new Point(64, 1), 7);
+        town.addFarmEnterPoint(new Point(54, 1), 7);
 
         town.addFarmExitPoint(new Point(0, 20), 6);
         town.addFarmExitPoint(new Point(0, 19), 6);
