@@ -116,15 +116,18 @@ public class GameAssetManager {
 
         exitPointList.add(standard);
 
-        FarmInOutPoint BackWoods = new FarmInOutPoint("BackWoods", 5);
-        BackWoods.addFarmExitPoint(new Point(14, 0), 1);
-        BackWoods.addFarmExitPoint(new Point(13, 0), 1);
-        BackWoods.addFarmExitPoint(new Point(15, 0), 1);
-        BackWoods.addFarmEnterPoint(new Point(14, 2), 1);
+        FarmInOutPoint backWoods = new FarmInOutPoint("BackWoods", 5);
+        backWoods.addFarmExitPoint(new Point(14, 0), 1);
+        backWoods.addFarmExitPoint(new Point(13, 0), 1);
+        backWoods.addFarmExitPoint(new Point(15, 0), 1);
+        backWoods.addFarmEnterPoint(new Point(14, 2), 1);
 
-        BackWoods.addFarmExitPoint(new Point(48, 24), 4);
-        BackWoods.addFarmEnterPoint(new Point(47, 24), 4);
-        exitPointList.add(BackWoods);
+        backWoods.addFarmExitPoint(new Point(50, 27), 4);
+        backWoods.addFarmExitPoint(new Point(50, 26), 4);
+        backWoods.addFarmExitPoint(new Point(50, 25), 4);
+        backWoods.addFarmExitPoint(new Point(50, 24), 4);
+        backWoods.addFarmEnterPoint(new Point(49, 26), 4);
+        exitPointList.add(backWoods);
 
         FarmInOutPoint town = new FarmInOutPoint("Town" ,3);
         town.addFarmExitPoint(new Point(0, 55), 2);
@@ -143,6 +146,14 @@ public class GameAssetManager {
         town.addFarmExitPoint(new Point(55, 0), 7);
 
         town.addFarmEnterPoint(new Point(64, 1), 7);
+
+        town.addFarmExitPoint(new Point(0, 20), 6);
+        town.addFarmExitPoint(new Point(0, 19), 6);
+        town.addFarmExitPoint(new Point(0, 18), 6);
+        town.addFarmExitPoint(new Point(0, 17), 6);
+
+        town.addFarmEnterPoint(new Point(1, 19), 6);
+
         exitPointList.add(town);
 
         FarmInOutPoint forest = new FarmInOutPoint("Forest", 6);
@@ -173,7 +184,7 @@ public class GameAssetManager {
 
         FarmInOutPoint mountain = new FarmInOutPoint("Mountain", 4);
         mountain.addFarmExitPoint(new Point(0, 28), 5);
-        mountain.addFarmEnterPoint(new Point(1,27),5 );
+        mountain.addFarmEnterPoint(new Point(1,28),5);
 
         mountain.addFarmExitPoint(new Point(15, 0), 3);
         mountain.addFarmExitPoint(new Point(16, 0), 3);
