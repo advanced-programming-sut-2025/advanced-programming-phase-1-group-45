@@ -191,6 +191,13 @@ public class GameAssetManager {
         mountain.addFarmEnterPoint(new Point(15, 1), 3);
 
         exitPointList.add(mountain);
+
+        FarmInOutPoint beach = new FarmInOutPoint("Beach", 7);
+        beach.addFarmExitPoint(new Point(38, 49), 3);
+        beach.addFarmExitPoint(new Point(39, 49), 3);
+        beach.addFarmEnterPoint(new Point(38, 45), 3);
+
+        exitPointList.add(beach);
     }
 
     public List<FarmInOutPoint> getExitPointList() {
