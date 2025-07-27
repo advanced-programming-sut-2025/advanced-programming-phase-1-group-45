@@ -53,8 +53,8 @@ public class GameScreen implements Screen {
             mapPixelWidth = worldController.getMapWidth() * worldController.getTileWidth();
             mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
 
-            float startX = 20 *16 + 8;
-            float startY = 28 *16 + 8;
+            float startX = 20 * 16 + 8;
+            float startY = 28 * 16 + 8;
             int tileX;
             int tileY;
 

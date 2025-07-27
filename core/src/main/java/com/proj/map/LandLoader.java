@@ -41,7 +41,7 @@ public class LandLoader {
 
     private void loadMap() {
         String seasonName = landSeason.toString().toLowerCase();
-        this.landPath = "assets/map/land/" + seasonName +"/" + landName + "_" + seasonName + ".tmx";
+        this.landPath = "assets/map/land/" + seasonName + "/" + landName + "_" + seasonName + ".tmx";
         map = new TmxMapLoader().load(landPath);
 
         mapWidth = map.getProperties().get("width", Integer.class);
@@ -52,14 +52,16 @@ public class LandLoader {
         System.err.println("width: " + mapWidth + " height: " + mapHeight);
 
         initialize();
-        findPlayerSpawnPoint();
 
+        if (Arrays.stream(farmName.values()).anyMatch(name -> name.getFarmName().equals(landName))) {
+            findPlayerSpawnPoint();
+        }
     }
 
     public void changeSeason(Season newSeason) {
         this.landSeason = newSeason;
         String seasonName = landSeason.toString().toLowerCase();
-        this.landPath = "assets/map/land/" + seasonName +"/" + landName + "_" + seasonName + ".tmx";
+        this.landPath = "assets/map/land/" + seasonName + "/" + landName + "_" + seasonName + ".tmx";
         loadMap();
     }
 
@@ -96,7 +98,7 @@ public class LandLoader {
                         break;
                     }
 
-                    if (getHomeGate(cell)){
+                    if (getHomeGate(cell)) {
                         tiles[x][y].setHomeGate(true);
                     }
                 }
@@ -198,7 +200,6 @@ public class LandLoader {
     public int getTileHeight() {
         return tileHeight;
     }
-
 
 
     public boolean isPassable(float x, float y) {
