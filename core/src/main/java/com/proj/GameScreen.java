@@ -14,7 +14,6 @@ import com.proj.Control.WorldController;
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.Inventory.Tool;
 import com.proj.Model.TimeAndWeather.time.Time;
-import com.proj.map.GameMap;
 import com.proj.map.farmName;
 import com.proj.Model.Inventory.InventoryManager;
 
@@ -91,7 +90,7 @@ public class GameScreen implements Screen {
 
         renderPlayer();
         inventoryManager.render(worldController.getSpriteBatch());
-        worldController.renderNight();
+        worldController.renderAfterPlayer();
 
         worldController.getSpriteBatch().end();
         uistage.act(delta);

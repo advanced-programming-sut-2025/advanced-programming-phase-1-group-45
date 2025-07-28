@@ -47,7 +47,7 @@ public class GameAssetManager {
         summerClock = new Texture("clock/summer.png");
         winterClock = new Texture("clock/winter.png");
         thunder = new Texture("assets/thunderStorm.png");
-        lanternLight = new Texture("assets/windowLight.png");
+        lanternLight = new Texture("assets/lantern.png");
         smallFont = new BitmapFont(Gdx.files.internal("smallFont/exo-small.fnt"));
         loadFarmExitPoints();
     }

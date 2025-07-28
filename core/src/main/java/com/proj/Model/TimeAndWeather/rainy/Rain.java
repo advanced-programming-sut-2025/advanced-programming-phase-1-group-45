@@ -28,7 +28,7 @@ public class Rain {
             MathUtils.random(-15, 15),
             MathUtils.random(-600, -400)
         );
-        length = MathUtils.random(12f, 25f);
+        length = MathUtils.random(8f, 9f);
         scale = MathUtils.random(1f, 2f);
 
     }

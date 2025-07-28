@@ -38,9 +38,7 @@ public class LanternLightSystem {
                 int x = Integer.parseInt(parts[i]);
                 int y = map.getProperties().get("height", Integer.class) - Integer.parseInt(parts[i + 1]);
                 int num = Integer.parseInt(parts[i + 2]);
-                boolean isWindow = false;
-                if (num == 8) isWindow = true;
-
+                boolean isWindow = num == 8;
                 lightPositions.put(new Vector2(x, y), isWindow);
             }
         }
@@ -80,12 +78,13 @@ public class LanternLightSystem {
         if (!isNight) return;
 
         for (Vector2 position : lightPositions.keySet()) {
-            float worldX = position.x * tileWidth - lanternTexture.getRegionWidth() / 2;
-            float worldY = position.y * tileHeight - lanternTexture.getRegionHeight() / 2;
+            float worldX = position.x * tileWidth - (float) lanternTexture.getRegionWidth() / 2;
+            float worldY = position.y * tileHeight - (float) lanternTexture.getRegionHeight() / 2;
             if (lightPositions.get(position)) {
                 batch.draw(windowLightTexture, worldX, worldY);
-            } else
-            batch.draw(lanternTexture, worldX, worldY);
+            } else {
+                batch.draw(lanternTexture, worldX, worldY);
+            }
         }
     }
 }
