@@ -100,6 +100,7 @@ public class WorldController {
         }
         weatherController.update(gameTime.getWeather(), delta);
         nightRender.update(gameTime);
+        gameMap.setNightMode(gameTime.getHour() >= 19);
     }
 
     public void render(OrthographicCamera camera) {
@@ -110,8 +111,9 @@ public class WorldController {
         weatherController.render(gameMap.getSpriteBatch(), gameTime.getWeather());
     }
 
-    public void renderNight() {
+    public void renderAfterPlayer() {
         nightRender.render(gameMap.getSpriteBatch());
+        gameMap.renderLights();
     }
 
     public void resize(int width, int height) {
@@ -119,7 +121,6 @@ public class WorldController {
         positionUiElement(width, height);
         weatherController.resize((int) width, (int) height);
         nightRender.resize(width, height);
-
     }
 
     public void dispose() {

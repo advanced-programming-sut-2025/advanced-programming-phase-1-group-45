@@ -1,7 +1,5 @@
 
-
 package com.proj.Model.TimeAndWeather.time;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -54,6 +52,8 @@ public class NightRender {
         shapeRenderer.end();
         batch.begin();
         if (darknessDegree > 0.3f) {
+
+
 //            batch.setColor(1, 1, 1, Math.min(1f, (darknessDegree - 0.3f) * 2f));
             for (Vector2 star : stars) {
                 batch.draw(starTexture, star.x, star.y, 1, 1);
@@ -69,18 +69,12 @@ public class NightRender {
         }
 
         switch (time.getSeason()) {
-            case SPRING:
-                blueDegree = 0.2f;
+            case WINTER:
+                blueDegree = 0.6f;
                 break;
-                case SUMMER:
-                    blueDegree = 0.1f;
-                    break;
-                    case WINTER:
-                        blueDegree = 0.5f;
-                        break;
-                        case FALL:
-                            blueDegree = 0.3f;
-                            break;
+            default:
+                darknessDegree = 0.4f;
+                break;
         }
 
         float nightDegree = ((time.getHour() - 18) * 60 + time.getMinute()) / (4f * 60f);

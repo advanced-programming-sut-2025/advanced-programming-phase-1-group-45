@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.proj.Model.TimeAndWeather.rainy.RainyWeather;
 import com.proj.Model.TimeAndWeather.snowy.SnowyWeather;
+import com.proj.Model.TimeAndWeather.stormy.StormyWeather;
 import com.proj.Model.TimeAndWeather.time.ClockWidget;
 import com.proj.Model.TimeAndWeather.time.TimeDisplayActor;
 
@@ -14,12 +15,14 @@ public class WeatherController {
     private Weather weather;
     private SnowyWeather snowRenderer;
     private RainyWeather rainRenderer;
+    private StormyWeather stormyRenderer;
 
 
     public WeatherController() {
         snowRenderer = new SnowyWeather();
         rainRenderer = new RainyWeather();
-        weather = Weather.SNOWY;
+        stormyRenderer = new StormyWeather();
+        weather = Weather.SUNNY;
     }
 
     public void update(Weather weather, float delta) {
@@ -37,7 +40,10 @@ public class WeatherController {
             case RAINY:
                 rainRenderer.update(delta);
                 break;
-            // Other weather types...
+
+            case STORMY:
+                stormyRenderer.update(delta);
+                break;
         }
 
     }
@@ -50,6 +56,9 @@ public class WeatherController {
             case RAINY:
                 rainRenderer.render(batch);
                 break;
+            case STORMY:
+                stormyRenderer.render(batch);
+                break;
         }
     }
 
@@ -61,12 +70,17 @@ public class WeatherController {
             case RAINY:
                 rainRenderer.resize(width, height);
                 break;
+
+                case STORMY:
+                    stormyRenderer.resize(width, height);
+                    break;
         }
     }
 
     public void dispose() {
         snowRenderer.dispose();
         rainRenderer.dispose();
+        stormyRenderer.dispose();
     }
 
     public void changeWeather(Weather weather) {

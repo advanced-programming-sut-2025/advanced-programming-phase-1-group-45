@@ -28,8 +28,11 @@ public class GameAssetManager {
     private Texture summerClock;
     private Texture winterClock;
 
-    private List<FarmInOutPoint> exitPointList = new ArrayList<>();
+    private Texture thunder;
+    private Texture lanternLight;
 
+
+    private List<FarmInOutPoint> exitPointList = new ArrayList<>();
 
 
     private GameAssetManager() {
@@ -43,7 +46,8 @@ public class GameAssetManager {
         springClock = new Texture("clock/spring.png");
         summerClock = new Texture("clock/summer.png");
         winterClock = new Texture("clock/winter.png");
-
+        thunder = new Texture("assets/thunderStorm.png");
+        lanternLight = new Texture("assets/lantern.png");
         smallFont = new BitmapFont(Gdx.files.internal("smallFont/exo-small.fnt"));
         loadFarmExitPoints();
     }
@@ -98,21 +102,28 @@ public class GameAssetManager {
         return winterClock;
     }
 
+    public Texture getThunder() {
+        return thunder;
+    }
+
+    public Texture getLanternLight() {
+        return lanternLight;
+    }
 
     private void loadFarmExitPoints() {
         FarmInOutPoint standard = new FarmInOutPoint("Standard", 1);
         standard.addFarmExitPoint(new Point(40, 65), 5);
         standard.addFarmExitPoint(new Point(41, 65), 5);
 
-        standard.addFarmEnterPoint(new Point(40, 64) , 5);
+        standard.addFarmEnterPoint(new Point(40, 64), 5);
 
         standard.addFarmExitPoint(new Point(41, 3), 6);
         standard.addFarmExitPoint(new Point(41, 3), 6);
-        standard.addFarmEnterPoint(new Point(41, 4) , 6);
+        standard.addFarmEnterPoint(new Point(41, 4), 6);
 
 
-        standard.addFarmExitPoint(new Point(80, 48 ), 2);
-        standard.addFarmEnterPoint(new Point(79, 48) , 2);
+        standard.addFarmExitPoint(new Point(80, 48), 2);
+        standard.addFarmEnterPoint(new Point(79, 48), 2);
 
         exitPointList.add(standard);
 
@@ -129,7 +140,7 @@ public class GameAssetManager {
         backWoods.addFarmEnterPoint(new Point(49, 26), 4);
         exitPointList.add(backWoods);
 
-        FarmInOutPoint town = new FarmInOutPoint("Town" ,3);
+        FarmInOutPoint town = new FarmInOutPoint("Town", 3);
         town.addFarmExitPoint(new Point(0, 55), 2);
         town.addFarmExitPoint(new Point(0, 56), 2);
         town.addFarmEnterPoint(new Point(1, 55), 2);
@@ -157,7 +168,7 @@ public class GameAssetManager {
         exitPointList.add(town);
 
         FarmInOutPoint forest = new FarmInOutPoint("Forest", 6);
-        forest.addFarmExitPoint(new Point(67, 120) , 1);
+        forest.addFarmExitPoint(new Point(67, 120), 1);
         forest.addFarmExitPoint(new Point(68, 120), 1);
         forest.addFarmExitPoint(new Point(69, 120), 1);
         forest.addFarmExitPoint(new Point(70, 120), 1);
@@ -184,7 +195,7 @@ public class GameAssetManager {
 
         FarmInOutPoint mountain = new FarmInOutPoint("Mountain", 4);
         mountain.addFarmExitPoint(new Point(0, 28), 5);
-        mountain.addFarmEnterPoint(new Point(1,28),5);
+        mountain.addFarmEnterPoint(new Point(1, 28), 5);
 
         mountain.addFarmExitPoint(new Point(15, 0), 3);
         mountain.addFarmExitPoint(new Point(16, 0), 3);
@@ -203,7 +214,6 @@ public class GameAssetManager {
     public List<FarmInOutPoint> getExitPointList() {
         return exitPointList;
     }
-
 }
 
 

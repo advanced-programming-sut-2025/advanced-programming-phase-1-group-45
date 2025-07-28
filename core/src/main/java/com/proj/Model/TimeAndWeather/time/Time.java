@@ -27,6 +27,7 @@ public class Time {
         weather = Weather.SUNNY;
         frame = 0;
         dayPassed = 0;
+        isNight = hour >= 18;
     }
 
     public void update(float delta, boolean isPaused) {

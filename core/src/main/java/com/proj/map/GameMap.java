@@ -2,9 +2,13 @@
 package com.proj.map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.proj.Model.GameAssetManager;
+import com.proj.Model.TimeAndWeather.time.LanternLightSystem;
 
 import java.awt.*;
 
@@ -15,6 +19,8 @@ public class GameMap {
     TiledMap tiledMap;
     private String mapName;
     private Point playerSpawnPoint;
+    private LanternLightSystem lanternLightSystem;
+
 
     public GameMap(String farmName, Season season) {
         mapName = farmName;
@@ -23,6 +29,7 @@ public class GameMap {
         tiledMap = loader.getMap();
         playerSpawnPoint = loader.getPlayerSpawnPoint();
         mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
+        initializeLanternSystem();
     }
 
     public LandLoader getLandLoader() {
@@ -33,11 +40,13 @@ public class GameMap {
         loader.changeSeason(season);
         tiledMap = loader.getMap();
         mapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
+        initializeLanternSystem();
     }
 
     public void changeMap(String mapName, Season season) {
         loader = new LandLoader(mapName, season);
         mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
+        initializeLanternSystem();
     }
 
     public void render(OrthographicCamera camera) {
@@ -53,6 +62,20 @@ public class GameMap {
 
         return loader.isPassable(x, y);
     }
+
+    private void initializeLanternSystem() {
+        TextureRegion light = new TextureRegion(GameAssetManager.getGameAssetManager().getLanternLight());
+        lanternLightSystem = new LanternLightSystem(loader.getMap(), light, loader.getTileWidth(), loader.getTileHeight());
+    }
+
+    public void setNightMode(boolean isNight) {
+        lanternLightSystem.setNightMode(isNight);
+    }
+
+    public void renderLights() {
+        lanternLightSystem.render(batch);
+    }
+
 
     public void dispose() {
         tiledMap.dispose();
