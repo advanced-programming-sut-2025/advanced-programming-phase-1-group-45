@@ -14,7 +14,6 @@ public class StardewInventoryUI extends InventoryUI {
     private int slotSize = 36; // Based on the Stardew Valley slot size
     private int padding = 2;
 
-    // Inventory UI textures
     private TextureRegion backgroundTexture;
     private TextureRegion[] slotTextures;
     private TextureRegion selectedSlotTexture;
@@ -130,4 +129,7 @@ public class StardewInventoryUI extends InventoryUI {
     public void dispose() {
         font.dispose();
     }
+
+
+
 }

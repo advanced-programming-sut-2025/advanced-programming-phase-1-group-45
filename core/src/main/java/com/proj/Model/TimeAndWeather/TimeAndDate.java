@@ -1,7 +1,5 @@
 package com.proj.Model.TimeAndWeather;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.MathUtils;
 import com.proj.map.Season;
 
 public class TimeAndDate {

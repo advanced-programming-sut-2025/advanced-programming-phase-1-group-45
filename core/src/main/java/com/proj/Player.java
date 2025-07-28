@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.proj.Control.WorldController;
-import com.proj.map.GameMap;
 
 public class Player {
     private Vector2 position;

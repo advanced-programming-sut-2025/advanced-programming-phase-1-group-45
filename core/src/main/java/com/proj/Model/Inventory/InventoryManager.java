@@ -15,7 +15,6 @@ public class InventoryManager {
     private Inventory playerInventory;
     private InventoryUI inventoryUI;
 
-    // Texture atlas for inventory UI components
     private Texture inventoryPartsTexture;
     private TextureRegion[] inventorySlots;
     private TextureRegion inventoryBackground;
@@ -37,8 +36,7 @@ public class InventoryManager {
     }
 
     private void loadTextures() {
-        // Load tool textures from the assets provided in the image
-        // Assuming you've placed these files in the correct directory structure
+
 
         itemTextures.put("hoe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Hoe/Hoe.png"))));
         itemTextures.put("pickaxe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/PickAxe/starter.png")))); // Uncommented this line
@@ -69,21 +67,13 @@ public class InventoryManager {
     }
 
     private void loadInventoryUI() {
-        // Load the inventory UI components from the Inventory_Parts.png
         inventoryPartsTexture = new Texture(Gdx.files.internal("items/Inventory_Parts.png"));
 
-        // Extract the relevant parts based on the image
-        // These coordinates should match the regions in your Inventory_Parts.png
-        // You'll need to adjust these based on the exact layout of your texture
-
-        // Inventory background (the main panel)
         inventoryBackground = new TextureRegion(inventoryPartsTexture, 0, 0, 384, 256);
 
-        // Selected slot highlight (the golden border)
         selectedSlotHighlight = new TextureRegion(inventoryPartsTexture, 384, 0, 36, 36);
 
-        // Individual inventory slots
-        inventorySlots = new TextureRegion[12]; // Assuming 12 slots per row
+        inventorySlots = new TextureRegion[12];
         for (int i = 0; i < 12; i++) {
             inventorySlots[i] = new TextureRegion(inventoryPartsTexture, i * 36, 256, 36, 36);
         }
@@ -205,5 +195,7 @@ public class InventoryManager {
             inventoryUI.dispose();
         }
     }
+
+
 }
 
