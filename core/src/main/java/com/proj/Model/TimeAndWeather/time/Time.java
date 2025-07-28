@@ -20,7 +20,7 @@ public class Time {
 
     public Time() {
         day = 1;
-        hour = 9;
+        hour = 19;
         minute = 0;
         dayOfWeek = DayOfWeek.Saturday;
         season = Season.SPRING;

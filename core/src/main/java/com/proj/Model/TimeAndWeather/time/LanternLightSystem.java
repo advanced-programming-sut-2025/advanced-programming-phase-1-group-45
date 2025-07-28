@@ -5,7 +5,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.math.Vector2;
 import com.proj.Model.GameAssetManager;
 
@@ -24,7 +26,7 @@ public class LanternLightSystem {
                               int tileWidth, int tileHeight) {
         this.map = map;
         this.lanternTexture = lanternTexture;
-        this.windowLightTexture =new TextureRegion(GameAssetManager.getGameAssetManager().getLanternLight());
+        this.windowLightTexture = new TextureRegion(GameAssetManager.getGameAssetManager().getLanternLight());
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
         parseLightProperties();
@@ -60,14 +62,30 @@ public class LanternLightSystem {
             for (int i = 0; i < parts.length; i += 4) {
                 String layerName = parts[i];
                 int x = Integer.parseInt(parts[i + 1]);
-                int y = Integer.parseInt(parts[i + 2]);
+                int y = map.getProperties().get("height", Integer.class) - Integer.parseInt(parts[i + 2]) - 1;
                 int tileId = Integer.parseInt(parts[i + 3]);
 
                 TiledMapTileLayer layer = (TiledMapTileLayer) map.getLayers().get(layerName);
                 if (layer != null) {
                     TiledMapTileLayer.Cell cell = layer.getCell(x, y);
                     if (cell != null) {
-                        cell.setTile(map.getTileSets().getTile(tileId));
+                        TiledMapTile tile = cell.getTile();
+                        TiledMapTileSet source = null;
+                        if (tile != null) {
+                            for (TiledMapTileSet ts : map.getTileSets()) {
+                                if (ts.getTile(tile.getId()) == tile) {
+                                    source = ts;
+                                    break;
+                                }
+                            }
+                            if (source != null) {
+                                int first = source.getProperties().get("firstgid", Integer.class);
+                                TiledMapTile newTile = source.getTile(tileId + first);
+                                if (newTile != null) {
+                                    cell.setTile(newTile);
+                                }
+                            }
+                        }
                     }
                 }
             }
