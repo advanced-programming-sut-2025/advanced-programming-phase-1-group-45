@@ -69,17 +69,11 @@ public class NightRender {
         }
 
         switch (time.getSeason()) {
-            case SPRING:
-                blueDegree = 0.2f;
-                break;
-            case SUMMER:
-                blueDegree = 0.1f;
-                break;
             case WINTER:
-                blueDegree = 0.5f;
+                blueDegree = 0.6f;
                 break;
-            case FALL:
-                blueDegree = 0.3f;
+            default:
+                darknessDegree = 0.4f;
                 break;
         }
 

@@ -38,7 +38,7 @@ public class LanternLightSystem {
             String[] parts = lightProperty.split(" ");
             for (int i = 0; i < parts.length; i += 3) {
                 int x = Integer.parseInt(parts[i]);
-                int y = map.getProperties().get("height", Integer.class) - Integer.parseInt(parts[i + 1]);
+                int y = map.getProperties().get("height", Integer.class) - Integer.parseInt(parts[i + 1]) - 1;
                 int num = Integer.parseInt(parts[i + 2]);
                 boolean isWindow = num == 8;
                 lightPositions.put(new Vector2(x, y), isWindow);
