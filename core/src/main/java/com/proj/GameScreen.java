@@ -115,7 +115,7 @@ public class GameScreen implements Screen {
                 playerBag.render(worldController.getSpriteBatch(), camera);
             }
 
-            worldController.renderNight();
+            worldController.renderAfterPlayer();
 
             worldController.getSpriteBatch().end();
             uistage.act(delta);
