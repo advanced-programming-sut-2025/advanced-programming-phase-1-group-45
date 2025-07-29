@@ -5,10 +5,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.proj.Model.TimeAndWeather.Weather;
 import com.proj.map.FarmInOutPoint;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class GameAssetManager {
@@ -28,11 +30,14 @@ public class GameAssetManager {
     private Texture summerClock;
     private Texture winterClock;
 
+    private HashMap<String, TextureRegion> weatherClocks;
+
     private Texture thunder;
     private Texture lanternLight;
 
 
     private List<FarmInOutPoint> exitPointList = new ArrayList<>();
+    private HashMap<String, Texture> foragingItem = new HashMap<>();
 
 
     private GameAssetManager() {
@@ -46,10 +51,16 @@ public class GameAssetManager {
         springClock = new Texture("clock/spring.png");
         summerClock = new Texture("clock/summer.png");
         winterClock = new Texture("clock/winter.png");
+        weatherClocks = new HashMap<>();
+        weatherClocks.put("sunny", new TextureRegion(new Texture("clock/sunny.png")));
+        weatherClocks.put("rainy", new TextureRegion(new Texture("clock/rainy.png")));
+        weatherClocks.put("snowy", new TextureRegion(new Texture("clock/snowy.png")));
+        weatherClocks.put("stormy", new TextureRegion(new Texture("clock/stormy.png")));
         thunder = new Texture("assets/thunderStorm.png");
         lanternLight = new Texture("assets/lantern.png");
         smallFont = new BitmapFont(Gdx.files.internal("smallFont/exo-small.fnt"));
         loadFarmExitPoints();
+//        loadForagingItems();
     }
 
     public static GameAssetManager getGameAssetManager() {
@@ -100,6 +111,10 @@ public class GameAssetManager {
 
     public Texture getWinterClock() {
         return winterClock;
+    }
+
+    public TextureRegion getWeatherTexture(Weather weather) {
+        return weatherClocks.get(weather.toString().toLowerCase());
     }
 
     public Texture getThunder() {
@@ -211,9 +226,40 @@ public class GameAssetManager {
         exitPointList.add(beach);
     }
 
+    private void loadForagingItems() {
+        foragingItem.put("commonmushroom", new Texture("assets/foraging/Common_Mushroom.png"));
+        foragingItem.put("daffodil", new Texture("assets/foraging/Daffodil.png"));
+        foragingItem.put("dandelion", new Texture("assets/foraging/Dandelion.png"));
+        foragingItem.put("leek", new Texture("assets/foraging/Leek.png"));
+        foragingItem.put("morel", new Texture("assets/foraging/Morel.png"));
+        foragingItem.put("salmonberry", new Texture("assets/foraging/Salmonberry.png"));
+        foragingItem.put("springonion", new Texture("assets/foraging/Spring_Onion.png"));
+        foragingItem.put("wildhorseradish", new Texture("assets/foraging/Wild_Horseradish.png"));
+        foragingItem.put("fiddleheadfern", new Texture("assets/foraging/Fiddlehead_Fern.png"));
+        foragingItem.put("grape", new Texture("assets/foraging/Grape.png"));
+        foragingItem.put("redmushroom", new Texture("assets/foraging/Red_Mushroom.png"));
+        foragingItem.put("spiceberry", new Texture("assets/foraging/Spice_Berry.png"));
+        foragingItem.put("sweetpea", new Texture("assets/foraging/Sweet_Pea.png"));
+        foragingItem.put("blackberry", new Texture("assets/foraging/Blackberry.png"));
+        foragingItem.put("chanterelle", new Texture("assets/foraging/Chanterelle.png"));
+        foragingItem.put("hazelnut", new Texture("assets/foraging/Hazelnut.png"));
+        foragingItem.put("purplemushroom", new Texture("assets/foraging/Purple_Mushroom.png"));
+        foragingItem.put("wildplum", new Texture("assets/foraging/Wild_Plum.png"));
+        foragingItem.put("crocus", new Texture("assets/foraging/Crocus.png"));
+        foragingItem.put("crystalfruit", new Texture("assets/foraging/Crystal_Fruit.png"));
+        foragingItem.put("holly", new Texture("assets/foraging/Holly.png"));
+        foragingItem.put("snowyam", new Texture("assets/foraging/Snow_Yam.png"));
+        foragingItem.put("winterroot", new Texture("assets/foraging/Winter_Root.png"));
+    }
+
     public List<FarmInOutPoint> getExitPointList() {
         return exitPointList;
     }
+
+//    public Texture getForagingTexture(String forageName) {
+//        if(!foragingItem.containsKey(forageName)) {
+//            return null;
+//        }
+//        return foragingItem.get(forageName);
+//    }
 }
-
-
