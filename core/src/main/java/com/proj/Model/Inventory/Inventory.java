@@ -1,5 +1,6 @@
 package com.proj.Model.Inventory;
 
+import com.badlogic.gdx.Gdx;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ public class Inventory {
     private Map<Integer, InventoryItem> items;
     private int selectedSlot = 0;
     private boolean isVisible = false;
+    private boolean noToolSelected = true; // برای شروع بدون ابزار
 
     public Inventory() {
         this.capacity = DEFAULT_CAPACITY;
@@ -25,7 +27,6 @@ public class Inventory {
     public boolean addItem(InventoryItem item) {
         if (item == null) return false;
 
-        // Check if similar item exists with space
         for (Integer slot : items.keySet()) {
             InventoryItem existingItem = items.get(slot);
             if (existingItem.canStack(item)) {
@@ -34,14 +35,13 @@ public class Inventory {
             }
         }
 
-        // Find empty slot
         for (int i = 0; i < capacity; i++) {
             if (!items.containsKey(i)) {
                 items.put(i, item);
                 return true;
             }
         }
-        return false; // Inventory is full
+        return false;
     }
 
     public InventoryItem getItem(int slot) {
@@ -62,13 +62,31 @@ public class Inventory {
     }
 
     public InventoryItem getSelectedItem() {
+        if (noToolSelected) {
+            return null;
+        }
         return items.get(selectedSlot);
     }
 
     public void selectSlot(int slot) {
         if (slot >= 0 && slot < capacity) {
             selectedSlot = slot;
+            noToolSelected = (items.get(slot) == null);
+            Gdx.app.log("Inventory", "Selected slot " + slot + ", is empty: " + noToolSelected);
         }
+    }
+
+    public boolean isNoToolSelected() {
+        return noToolSelected;
+    }
+
+    public void setNoToolSelected(boolean noToolSelected) {
+        this.noToolSelected = noToolSelected;
+    }
+
+    public void selectNoTool() {
+        noToolSelected = true;
+        Gdx.app.log("Inventory", "No tool selected");
     }
 
     public int getCapacity() {
@@ -116,3 +134,4 @@ public class Inventory {
         return items;
     }
 }
+

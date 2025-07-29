@@ -17,40 +17,48 @@ public class PlayerBag {
     // تصویر کیف
     private Texture bagTexture;
 
-    // تصویر نوار ابزار بالای صفحه
-    private Texture toolbarTexture;
-
     // اندازه و موقعیت کیف
     private float scale = 0.7f;
-    private float offsetX = -300;
-    private float offsetY = -150;
+    private float offsetX = -150;
+    private float offsetY = -150; // تنظیم شده به -150
 
-    // موقعیت نوار ابزار
-    private float toolbarX = 10;
-    private float toolbarY = 400;
-    private float toolbarScale = 1.0f;
+    // موقعیت نوار ابزار (ثابت نسبت به صفحه)
+    private float toolbarX;
+    private float toolbarY;
 
-    // مناطق کلیک برای ابزارها در نوار ابزار (بر اساس تصویر بازی)
+    // مناطق کلیک برای ابزارها در نوار ابزار
     private int[][] toolbarSlots = {
-        {10, 400, 32, 32},   // ابزار 1 (داس)
-        {46, 400, 32, 32},   // ابزار 2 (آبپاش)
-        {82, 400, 32, 32},   // ابزار 3 (تبر)
-        {118, 400, 32, 32},  // ابزار 4 (کلنگ)
-        {154, 400, 32, 32},  // ابزار 5 (بیل)
-        {190, 400, 32, 32}   // ابزار 6 (چوب ماهیگیری)
+        {76, 336, 36, 36},  // ابزار 1: {x, y, width, height}
+        {112, 336, 36, 36}, // ابزار 2
+        {148, 336, 36, 36}, // ابزار 3
+        {184, 336, 36, 36}, // ابزار 4
+        {220, 336, 36, 36}, // ابزار 5
+        {256, 336, 36, 36}  // ابزار 6
     };
+
+    // منطقه کلیک برای دکمه "بدون ابزار"
+    private int[] noToolButton = {292, 336, 36, 36}; // دکمه بدون ابزار کنار ابزارهای دیگر
 
     public PlayerBag(Player player, Inventory inventory) {
         this.player = player;
         this.inventory = inventory;
 
+        // تنظیم موقعیت نوار ابزار
+        toolbarX = 10;
+        toolbarY = Gdx.graphics.getHeight() - 42;
+
         // بارگذاری تصویر کیف
         try {
             bagTexture = new Texture(Gdx.files.internal("items/Inventory_Parts.png"));
-            // بارگذاری تصویر نوار ابزار (همان تصویر کیف را استفاده می‌کنیم و بخش مورد نظر را برش می‌دهیم)
-            toolbarTexture = new Texture(Gdx.files.internal("items/Inventory_Parts.png"));
+
+            if (bagTexture == null) {
+                Gdx.app.error("PlayerBag", "Failed to load bag texture");
+            } else {
+                Gdx.app.log("PlayerBag", "Textures loaded successfully");
+            }
         } catch (Exception e) {
             Gdx.app.error("PlayerBag", "Failed to load textures", e);
+            e.printStackTrace();
         }
     }
 
@@ -61,9 +69,6 @@ public class PlayerBag {
     public void render(SpriteBatch batch, OrthographicCamera camera) {
         try {
             if (!isVisible) return;
-
-            // نمایش نوار ابزار بالای صفحه (همیشه نمایش داده می‌شود)
-            renderToolbar(batch);
 
             // اگر کیف بسته است، فقط آیتم انتخاب شده را نمایش بده
             if (!isOpen) {
@@ -106,86 +111,109 @@ public class PlayerBag {
         }
     }
 
-    // متد جدید برای رندر کردن نوار ابزار بالای صفحه
-    private void renderToolbar(SpriteBatch batch) {
-        // برش قسمت نوار ابزار از تصویر اصلی (فرض می‌کنیم در مختصات 0,0 با عرض 240 و ارتفاع 32 قرار دارد)
-        TextureRegion toolbarRegion = new TextureRegion(toolbarTexture, 0, 0, 240, 32);
-
-        // نمایش نوار ابزار در بالای صفحه
-        batch.draw(toolbarRegion, toolbarX, toolbarY, 240 * toolbarScale, 32 * toolbarScale);
-
-        // نمایش آیتم‌ها در نوار ابزار
-        for (int i = 0; i < 6 && i < inventory.getCapacity(); i++) {
-            InventoryItem item = inventory.getItem(i);
-            if (item != null && item.getTexture() != null) {
-                float itemX = toolbarX + (i * 36) * toolbarScale + 4 * toolbarScale;
-                float itemY = toolbarY + 4 * toolbarScale;
-                batch.draw(item.getTexture(), itemX, itemY, 24 * toolbarScale, 24 * toolbarScale);
-            }
-        }
-
-        // نمایش هایلایت برای اسلات انتخاب شده
-        int selectedSlot = inventory.getSelectedSlot();
-        if (selectedSlot >= 0 && selectedSlot < 6) {
-            // فرض می‌کنیم هایلایت در مختصات 240,0 با عرض 36 و ارتفاع 32 قرار دارد
-            TextureRegion highlightRegion = new TextureRegion(toolbarTexture, 240, 0, 36, 32);
-            float highlightX = toolbarX + (selectedSlot * 36) * toolbarScale;
-            batch.draw(highlightRegion, highlightX, toolbarY, 36 * toolbarScale, 32 * toolbarScale);
-        }
-    }
-
-    // متد جدید برای رندر کردن ابزار در دست کاراکتر
+    // متد برای رندر کردن ابزار در دست کاراکتر
     private void renderToolInHand(SpriteBatch batch, InventoryItem item) {
-        float x = player.getPosition().x;
-        float y = player.getPosition().y;
+        try {
+            if (item == null || item.getTexture() == null) return;
 
-        // تنظیم موقعیت ابزار بر اساس جهت کاراکتر
-        switch (player.getDirection()) {
-            case UP:
-                x += 16; // کمی به راست
-                y += 20; // بالاتر
-                break;
-            case DOWN:
-                x -= 16; // کمی به چپ
-                y -= 16; // پایین‌تر
-                break;
-            case LEFT:
-                x -= 24; // سمت چپ
-                break;
-            case RIGHT:
-                x += 24; // سمت راست
-                break;
+            float x = player.getPosition().x;
+            float y = player.getPosition().y;
+
+            // تنظیم موقعیت ابزار بر اساس جهت کاراکتر
+            switch (player.getDirection()) {
+                case UP:
+                    x += 16;
+                    y += 20;
+                    break;
+                case DOWN:
+                    x -= 16;
+                    y -= 16;
+                    break;
+                case LEFT:
+                    x -= 24;
+                    break;
+                case RIGHT:
+                    x += 24;
+                    break;
+            }
+
+            // نمایش ابزار با اندازه مناسب
+            batch.draw(item.getTexture(), x, y, 32, 32);
+
+            // اضافه کردن لاگ برای دیباگ
+            Gdx.app.log("PlayerBag", "Drawing tool in hand at: " + x + ", " + y);
+        } catch (Exception e) {
+            Gdx.app.error("PlayerBag", "Error in renderToolInHand", e);
+            e.printStackTrace();
         }
-
-        // نمایش ابزار با اندازه مناسب
-        batch.draw(item.getTexture(), x, y, 32, 32);
-
-        // اضافه کردن لاگ برای دیباگ
-        Gdx.app.log("PlayerBag", "Drawing tool in hand at: " + x + ", " + y);
     }
 
-    // متد جدید برای بررسی کلیک روی نوار ابزار
+    // متد برای بررسی کلیک موس روی کیف
     private void checkToolbarClick(OrthographicCamera camera) {
         if (Gdx.input.justTouched()) {
-            Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
-            camera.unproject(touchPos);
+            try {
+                Vector3 touchPos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
+                camera.unproject(touchPos);
 
-            // بررسی کلیک روی اسلات‌های نوار ابزار
-            for (int i = 0; i < toolbarSlots.length && i < inventory.getCapacity(); i++) {
-                float slotX = toolbarSlots[i][0] * toolbarScale;
-                float slotY = toolbarSlots[i][1] * toolbarScale;
-                float slotWidth = toolbarSlots[i][2] * toolbarScale;
-                float slotHeight = toolbarSlots[i][3] * toolbarScale;
+                Gdx.app.log("PlayerBag", "Mouse clicked at: " + touchPos.x + ", " + touchPos.y);
 
-                if (touchPos.x >= slotX && touchPos.x < slotX + slotWidth &&
-                    touchPos.y >= slotY && touchPos.y < slotY + slotHeight) {
-                    // انتخاب اسلات
-                    inventory.selectSlot(i);
-                    Gdx.app.log("PlayerBag", "Selected toolbar slot: " + i);
-                    break;
+                // محاسبه موقعیت کیف
+                float bagX = player.getPosition().x + offsetX;
+                float bagY = player.getPosition().y + offsetY;
+
+                // بررسی کلیک روی اسلات‌های ابزار در کیف
+                for (int i = 0; i < toolbarSlots.length && i < inventory.getCapacity(); i++) {
+                    float toolX = bagX + toolbarSlots[i][0] * scale;
+                    float toolY = bagY + toolbarSlots[i][1] * scale;
+                    float toolWidth = toolbarSlots[i][2] * scale;
+                    float toolHeight = toolbarSlots[i][3] * scale;
+
+                    Gdx.app.log("PlayerBag", "Tool slot " + i + " rect: " + toolX + ", " + toolY + ", " + toolWidth + ", " + toolHeight);
+
+                    if (touchPos.x >= toolX && touchPos.x < toolX + toolWidth &&
+                        touchPos.y >= toolY && touchPos.y < toolY + toolHeight) {
+                        // انتخاب اسلات
+                        inventory.selectSlot(i);
+                        Gdx.app.log("PlayerBag", "Selected tool slot: " + i);
+                        return;
+                    }
                 }
+
+                // بررسی کلیک روی دکمه "بدون ابزار"
+                float noToolX = bagX + noToolButton[0] * scale;
+                float noToolY = bagY + noToolButton[1] * scale;
+                float noToolWidth = noToolButton[2] * scale;
+                float noToolHeight = noToolButton[3] * scale;
+
+                if (touchPos.x >= noToolX && touchPos.x < noToolX + noToolWidth &&
+                    touchPos.y >= noToolY && touchPos.y < noToolY + noToolHeight) {
+                    // انتخاب حالت بدون ابزار
+                    selectNoTool();
+                    Gdx.app.log("PlayerBag", "Selected no tool");
+                    return;
+                }
+            } catch (Exception e) {
+                Gdx.app.error("PlayerBag", "Error in checkToolbarClick", e);
+                e.printStackTrace();
             }
         }
+    }
+
+    // متد جدید برای انتخاب حالت "بدون ابزار"
+    public void selectNoTool() {
+        // در اینجا باید کلاس Inventory را اصلاح کنیم تا این متد را پشتیبانی کند
+        // اما فعلاً می‌توانیم با انتخاب یک اسلات خالی این کار را انجام دهیم
+        for (int i = 0; i < inventory.getCapacity(); i++) {
+            if (inventory.getItem(i) == null) {
+                inventory.selectSlot(i);
+                Gdx.app.log("PlayerBag", "Selected empty slot as 'no tool'");
+                return;
+            }
+        }
+
+        // اگر هیچ اسلات خالی پیدا نشد، اسلات اول را انتخاب کنید
+        inventory.selectSlot(0);
+        Gdx.app.log("PlayerBag", "No empty slot found, selected slot 0");
     }
 
     public void setVisible(boolean visible) {
@@ -198,14 +226,16 @@ public class PlayerBag {
 
     public void toggleOpen() {
         isOpen = !isOpen;
+        Gdx.app.log("PlayerBag", "Toggled inventory: " + (isOpen ? "open" : "closed"));
     }
 
     public void dispose() {
-        if (bagTexture != null) {
-            bagTexture.dispose();
-        }
-        if (toolbarTexture != null && toolbarTexture != bagTexture) {
-            toolbarTexture.dispose();
+        try {
+            if (bagTexture != null) {
+                bagTexture.dispose();
+            }
+        } catch (Exception e) {
+            Gdx.app.error("PlayerBag", "Error in dispose", e);
         }
     }
 

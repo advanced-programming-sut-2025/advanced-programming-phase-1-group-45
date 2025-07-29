@@ -77,8 +77,7 @@ public class GameScreen implements Screen {
 
                 Gdx.app.log("GameScreen", "Game initialized successfully");
 
-                inventoryManager.getPlayerInventory().selectSlot(0);
-            } catch (Exception e) {
+                inventoryManager.getPlayerInventory().selectNoTool();            } catch (Exception e) {
                 Gdx.app.error("GameScreen", "Error in show method", e);
                 e.printStackTrace();
             }
@@ -258,6 +257,12 @@ public class GameScreen implements Screen {
             } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
                 selectToolSlot(5);
             }
+            else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
+                if (inventoryManager != null && inventoryManager.getPlayerInventory() != null) {
+                    inventoryManager.getPlayerInventory().selectNoTool();
+                    Gdx.app.log("GameScreen", "Selected no tool");
+                }
+            }
 
             if (moved) {
                 Gdx.app.log("GameScreen", "Player started moving");
@@ -304,6 +309,10 @@ public class GameScreen implements Screen {
 
                         Gdx.app.log("GameScreen", "Used tool " + tool.getName() + " at tile: " + tileX + ", " + tileY);
                     }
+                }
+                if (inventoryManager.getPlayerInventory().isNoToolSelected()) {
+                    Gdx.app.log("GameScreen", "No tool selected, cannot use");
+                    return;
                 }
             }
         } catch (Exception e) {
