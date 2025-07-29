@@ -64,7 +64,7 @@
       "name": "Red Mushroom",
       "season": ["SUMMER"],
       "baseSellPrice": 75,
-      "energy": -50
+      "energy": 50
     },
     {
       "name": "Spice Berry",
@@ -124,7 +124,7 @@
       "name": "Holly",
       "season": ["WINTER"],
       "baseSellPrice": 80,
-      "energy": -37
+      "energy": 37
     },
     {
       "name": "Snow Yam",
