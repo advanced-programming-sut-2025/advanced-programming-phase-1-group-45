@@ -1,14 +1,9 @@
 package com.proj.Model.TimeAndWeather;
 
-
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.proj.Model.TimeAndWeather.rainy.RainyWeather;
 import com.proj.Model.TimeAndWeather.snowy.SnowyWeather;
 import com.proj.Model.TimeAndWeather.stormy.StormyWeather;
-import com.proj.Model.TimeAndWeather.time.ClockWidget;
-import com.proj.Model.TimeAndWeather.time.TimeDisplayActor;
 
 public class WeatherController {
 
@@ -26,8 +21,6 @@ public class WeatherController {
     }
 
     public void update(Weather weather, float delta) {
-        //  Weather weather;
-        // Update sky color based on weather
         if (!this.weather.equals(weather)) {
             changeWeather(weather);
         }
