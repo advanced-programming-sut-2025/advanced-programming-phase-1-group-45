@@ -3,7 +3,6 @@ package com.proj.Control;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.TimeAndWeather.time.*;
@@ -12,9 +11,8 @@ import com.proj.Model.TimeAndWeather.WeatherController;
 import com.proj.Player;
 import com.proj.map.FarmInOutPoint;
 import com.proj.map.GameMap;
-import com.proj.map.LandLoader;
 import com.proj.map.Season;
-import sun.font.HBShaper;
+//import sun.font.HBShaper;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -235,5 +233,9 @@ public class WorldController {
 
     public SpriteBatch getSpriteBatch() {
         return gameMap.getSpriteBatch();
+    }
+
+    public GameMap getGameMap() {
+        return gameMap;
     }
 }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.proj.Control.WorldController;
+import com.proj.Control.AnimalBuildingController;
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.Inventory.InventoryManager;
 import com.proj.Model.Inventory.PlayerBag;
@@ -33,6 +34,7 @@ public class GameScreen implements Screen {
     private boolean timeIsPaused = false;
     private Stage uistage;
     private PlayerBag playerBag;
+    private AnimalBuildingController animalBuildingController;
 
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
@@ -46,6 +48,7 @@ public class GameScreen implements Screen {
                 uistage = new Stage();
                 worldController = new WorldController(mapName, gameTime, uistage);
                 inventoryManager = new InventoryManager();
+                animalBuildingController = new AnimalBuildingController(worldController.getGameMap());
 
                 camera = new OrthographicCamera();
                 viewport = new FitViewport(640, 480, camera);
@@ -77,7 +80,8 @@ public class GameScreen implements Screen {
 
                 Gdx.app.log("GameScreen", "Game initialized successfully");
 
-                inventoryManager.getPlayerInventory().selectNoTool();            } catch (Exception e) {
+                inventoryManager.getPlayerInventory().selectNoTool();
+            } catch (Exception e) {
                 Gdx.app.error("GameScreen", "Error in show method", e);
                 e.printStackTrace();
             }
@@ -93,24 +97,34 @@ public class GameScreen implements Screen {
             mapPixelWidth = worldController.getMapWidth() * worldController.getTileWidth();
             mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
 
-            handleInput();
-            player.update(delta);
-            updateCamera();
-            gameTime.update(delta, timeIsPaused);
-            worldController.update(delta);
-            inventoryManager.update(delta, player);
+            handleAnimalBuildingInput();
 
-            if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
-                if (playerBag != null) {
-                    playerBag.toggleOpen();
-                    Gdx.app.log("GameScreen", "Toggled inventory: " + (playerBag.isOpen() ? "open" : "closed"));
-                }
+            if (animalBuildingController != null && animalBuildingController.isShowingInterior()) {
+                animalBuildingController.update(worldController.getSpriteBatch(), delta);
+            } else {
+                handleInput();
+                player.update(delta);
+                updateCamera();
+                gameTime.update(delta, timeIsPaused);
+                worldController.update(delta);
+                inventoryManager.update(delta, player);
             }
 
             worldController.render(camera);
-            renderPlayer();
 
-            if (playerBag != null) {
+            if (animalBuildingController != null) {
+                if (animalBuildingController.isShowingInterior()) {
+                    animalBuildingController.renderInterior(worldController.getSpriteBatch());
+                } else {
+                    animalBuildingController.renderBuildings(worldController.getSpriteBatch());
+                    renderPlayer();
+                    animalBuildingController.renderPlacingBuilding(worldController.getSpriteBatch());
+                }
+            } else {
+                renderPlayer();
+            }
+
+            if (playerBag != null && !animalBuildingController.isShowingInterior()) {
                 playerBag.render(worldController.getSpriteBatch(), camera);
             }
 
@@ -120,15 +134,38 @@ public class GameScreen implements Screen {
             uistage.act(delta);
             uistage.draw();
 
-            handleToolUse();
+            if (!animalBuildingController.isShowingInterior()) {
+                handleToolUse();
+            }
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in render method", e);
             e.printStackTrace();
         }
     }
 
+
     private void renderPlayer() {
-        player.render(worldController.getSpriteBatch());
+        if (!animalBuildingController.isShowingInterior()) {
+            player.render(worldController.getSpriteBatch());
+        }
+    }
+
+    private void handleAnimalBuildingInput() {
+        if (animalBuildingController == null) return;
+
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.K) &&
+            !animalBuildingController.isPlacingCoop() &&
+            !animalBuildingController.isPlacingBarn()) {
+            animalBuildingController.startPlacingCoop(player.getPosition().x, player.getPosition().y);
+        }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.B) &&
+            !animalBuildingController.isPlacingBarn() &&
+            !animalBuildingController.isPlacingCoop()) {
+            animalBuildingController.startPlacingBarn(player.getPosition().x, player.getPosition().y);
+            System.out.println("Barn placement started at: " + player.getPosition().x + ", " + player.getPosition().y);
+        }
     }
 
     @Override
@@ -175,6 +212,9 @@ public class GameScreen implements Screen {
             if (playerBag != null) {
                 playerBag.dispose();
             }
+            if (animalBuildingController != null) {
+                animalBuildingController.dispose();
+            }
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in dispose method", e);
         }
@@ -207,6 +247,16 @@ public class GameScreen implements Screen {
 
     private void handleInput() {
         try {
+            if (animalBuildingController != null &&
+                (animalBuildingController.isPlacingBarn() ||
+                    animalBuildingController.isPlacingCoop() ||
+                    animalBuildingController.isShowingInterior())) {
+                System.out.println("Skipping player movement - placing building: " +
+                    animalBuildingController.isPlacingBarn() + ", " +
+                    animalBuildingController.isPlacingCoop());
+                return;
+            }
+
             if (player.isMoving() || player.isFainted() || player.isFainting()) {
                 return;
             }
@@ -264,12 +314,20 @@ public class GameScreen implements Screen {
                 }
             }
 
+            if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
+                if (playerBag != null) {
+                    playerBag.toggleOpen();
+                    Gdx.app.log("GameScreen", "Toggled inventory: " + (playerBag.isOpen() ? "open" : "closed"));
+                }
+            }
+
             if (moved) {
                 Gdx.app.log("GameScreen", "Player started moving");
             }
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in handleInput method", e);
         }
+
     }
 
     private void selectToolSlot(int slot) {
@@ -290,6 +348,10 @@ public class GameScreen implements Screen {
 
     private void handleToolUse() {
         try {
+            if (animalBuildingController != null && animalBuildingController.isShowingInterior()) {
+                return;
+            }
+
             if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
                 InventoryItem selectedItem = inventoryManager.getPlayerInventory().getSelectedItem();
                 if (selectedItem instanceof Tool) {
@@ -320,3 +382,4 @@ public class GameScreen implements Screen {
         }
     }
 }
+
