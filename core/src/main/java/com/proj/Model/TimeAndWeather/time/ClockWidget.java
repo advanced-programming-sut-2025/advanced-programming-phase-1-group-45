@@ -17,7 +17,6 @@ public class ClockWidget extends Group {
         this.timer = timer;
         Texture clockTexture = GameAssetManager.getGameAssetManager().getClockBGTexture();
         TextureRegion clock = new TextureRegion(clockTexture,0,0, clockTexture.getWidth(), clockTexture.getHeight() );
-        TextureRegion hand = new TextureRegion(GameAssetManager.getGameAssetManager().getClockHand());
         Image backgroundImg = new Image(clock);
         addActor(backgroundImg);
         TextureRegion seasonTexture = new TextureRegion(GameAssetManager.getGameAssetManager().getSpringClock());
