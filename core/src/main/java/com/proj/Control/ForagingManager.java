@@ -24,16 +24,15 @@ public class ForagingManager {
 
 
     public void spawnDailyItems(Season currentSeason) {
-        currentMap.removeForaging();
+        currentMap.removeForagings();
         Array<ForagingItem> seasonalItems = new Array<>();
         for (ForagingItem item : foragingCrops) {
             if (item.getSeason().contains(currentSeason)) {
                 seasonalItems.add(item);
             }
         }
-        if (seasonalItems.size == 0) return;
         int totalTiles = currentMap.getMapWidth() * currentMap.getMapHeight();
-        int itemsToSpawn = Math.max(1, (int) (totalTiles * 0.02));
+        int itemsToSpawn = Math.max(1, (int) (totalTiles * 0.005));
         for (int i = 0; i < itemsToSpawn; i++) {
             Point position = findValidSpawnPosition();
             ForagingItem template = seasonalItems.random();
@@ -45,7 +44,7 @@ public class ForagingManager {
                 template.getEnergy(),
                 template.getTexture()
             );
-
+            System.err.println(newItem.getName());
             newItem.setPosition(position);
             currentMap.putForagingInTile(position.x, position.y, newItem);
         }

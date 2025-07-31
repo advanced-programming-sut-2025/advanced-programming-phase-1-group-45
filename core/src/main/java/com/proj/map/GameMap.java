@@ -104,7 +104,7 @@ public class GameMap {
         foragingCropTiles.add(tile);
     }
 
-    public void removeForaging() {
+    public void removeForagings() {
         for (Tile tile : foragingCropTiles) {
             tile.setPassable(true);
             tile.removeObject();
