@@ -99,45 +99,51 @@ public class GameScreen implements Screen {
 
             handleAnimalBuildingInput();
 
-            if (animalBuildingController != null && animalBuildingController.isShowingInterior()) {
-                animalBuildingController.update(worldController.getSpriteBatch(), delta);
-            } else {
+            if (animalBuildingController != null) {
+                animalBuildingController.update(delta);
+            }
+
+            if (animalBuildingController == null ||
+                (!animalBuildingController.isPlacingBarn() &&
+                    !animalBuildingController.isPlacingCoop())) {
                 handleInput();
                 player.update(delta);
-                updateCamera();
-                gameTime.update(delta, timeIsPaused);
-                worldController.update(delta);
-                inventoryManager.update(delta, player);
             }
 
-            worldController.render(camera);
+            updateCamera();
+            gameTime.update(delta, timeIsPaused);
+            worldController.update(delta);
+            inventoryManager.update(delta, player);
+
+            worldController.getSpriteBatch().begin();
+
+            worldController.renderMap(camera);
+            player.render(worldController.getSpriteBatch());
 
             if (animalBuildingController != null) {
-                if (animalBuildingController.isShowingInterior()) {
-                    animalBuildingController.renderInterior(worldController.getSpriteBatch());
-                } else {
-                    animalBuildingController.renderBuildings(worldController.getSpriteBatch());
-                    renderPlayer();
-                    animalBuildingController.renderPlacingBuilding(worldController.getSpriteBatch());
-                }
-            } else {
-                renderPlayer();
+                animalBuildingController.render(worldController.getSpriteBatch());
             }
 
-            if (playerBag != null && !animalBuildingController.isShowingInterior()) {
+            if (playerBag != null) {
                 playerBag.render(worldController.getSpriteBatch(), camera);
             }
 
             worldController.renderAfterPlayer();
 
             worldController.getSpriteBatch().end();
+
             uistage.act(delta);
             uistage.draw();
 
-            if (!animalBuildingController.isShowingInterior()) {
+            if (animalBuildingController == null ||
+                (!animalBuildingController.isPlacingBarn() &&
+                    !animalBuildingController.isPlacingCoop())) {
                 handleToolUse();
             }
         } catch (Exception e) {
+            if (worldController.getSpriteBatch().isDrawing()) {
+                worldController.getSpriteBatch().end();
+            }
             Gdx.app.error("GameScreen", "Error in render method", e);
             e.printStackTrace();
         }
@@ -145,10 +151,9 @@ public class GameScreen implements Screen {
 
 
     private void renderPlayer() {
-        if (!animalBuildingController.isShowingInterior()) {
-            player.render(worldController.getSpriteBatch());
-        }
+        player.render(worldController.getSpriteBatch());
     }
+
 
     private void handleAnimalBuildingInput() {
         if (animalBuildingController == null) return;

@@ -248,4 +248,10 @@ public class WorldController {
     public ForagingManager getForagingManager() {
         return foragingManager;
     }
+    public void renderMap(OrthographicCamera camera) {
+        if (gameMap != null) {
+            gameMap.render(camera);
+        }
+    }
+
 }
