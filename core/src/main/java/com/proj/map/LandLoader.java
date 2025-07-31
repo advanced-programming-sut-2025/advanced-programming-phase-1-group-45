@@ -19,7 +19,6 @@ public class LandLoader {
     private int tileWidth;
     private int tileHeight;
     private Tile[][] tiles;
-    private TileProperties[][] properties;
     private Map<String, Boolean> layerConfig = new HashMap<>();
     private Point playerSpawnPoint;
 

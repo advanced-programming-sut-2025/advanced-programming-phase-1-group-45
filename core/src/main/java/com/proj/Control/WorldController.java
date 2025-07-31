@@ -115,7 +115,7 @@ public class WorldController {
             foragingManager.setCurrentMap(gameMap);
         }
         nightRender.update(gameTime);
-        gameMap.setNightMode(gameTime.getHour() >= 19);
+        gameMap.setNightMode(gameTime.isNight());
     }
 
     public void render(OrthographicCamera camera) {
