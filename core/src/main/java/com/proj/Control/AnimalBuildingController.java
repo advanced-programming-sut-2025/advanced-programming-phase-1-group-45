@@ -2,183 +2,59 @@ package com.proj.Control;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.proj.map.GameMap;
-import com.proj.Model.Place.Barn;
-import com.proj.Model.Place.Coop;
-
-import java.awt.Point;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AnimalBuildingController {
-    private final Sprite coop;
-    private final Sprite barn;
-    private final Sprite coopInside;
-    private final Sprite barnInside;
-
-    private boolean isPlacingCoop = false;
-    private float tempCoopX = 0;
-    private float tempCoopY = 0;
-    private final List<Coop> placedCoops = new ArrayList<>();
-
-    private Coop selectedCoop = null;
-    private boolean showingCoopInterior = false;
+    private Texture barnTexture;
+    private Texture coopTexture;
 
     private boolean isPlacingBarn = false;
-    private float tempBarnX = 0;
-    private float tempBarnY = 0;
-    private final List<Barn> placedBarns = new ArrayList<>();
+    private boolean isPlacingCoop = false;
 
-    private Barn selectedBarn = null;
-    private boolean showingBarnInterior = false;
+    private float barnX = 0;
+    private float barnY = 0;
+    private float coopX = 0;
+    private float coopY = 0;
 
     private final float MOVEMENT_SPEED = 5.0f;
-    private GameMap gameMap;
 
-    private float interiorDisplayTime = 0;
-    private final float INTERIOR_DISPLAY_DURATION = 5.0f;
-    private boolean autoHideInterior = true;
+    private float[] placedBarnsX = new float[100];
+    private float[] placedBarnsY = new float[100];
+    private int barnCount = 0;
 
-    private ShapeRenderer shapeRenderer;
-
-    private float interiorX;
-    private float interiorY;
-    private float interiorScale = 1.5f;
+    private float[] placedCoopsX = new float[100];
+    private float[] placedCoopsY = new float[100];
+    private int coopCount = 0;
 
     public AnimalBuildingController(GameMap gameMap) {
-        this.coop = new Sprite(new Texture(Gdx.files.internal("buildings/coop.png")));
-        this.barn = new Sprite(new Texture(Gdx.files.internal("buildings/barn.png")));
-        this.coopInside = new Sprite(new Texture(Gdx.files.internal("buildings/coopinside.png")));
-        this.barnInside = new Sprite(new Texture(Gdx.files.internal("buildings/barninside.png")));
-
-        this.shapeRenderer = new ShapeRenderer();
-        this.gameMap = gameMap;
-    }
-
-    public void update(SpriteBatch batch, float delta) {
-        if (isShowingInterior()) {
-            renderInterior(batch);
-        } else {
-            renderBuildings(batch);
-            renderPlacingBuilding(batch);
-        }
-
-        handleInput(delta);
-        updateInteriorDisplayTime(delta);
-    }
-
-    public void renderBuildings(SpriteBatch batch) {
-        for (Coop coop : placedCoops) {
-            Point pos = coop.getPosition();
-            batch.draw(this.coop, pos.x, pos.y);
-        }
-
-        for (Barn barn : placedBarns) {
-            Point pos = barn.getPosition();
-            batch.draw(this.barn, pos.x, pos.y);
+        try {
+            barnTexture = new Texture(Gdx.files.internal("buildings/barn.png"));
+            coopTexture = new Texture(Gdx.files.internal("buildings/coop.png"));
+        } catch (Exception e) {
+            Gdx.app.error("AnimalBuildingController", "Error loading textures", e);
         }
     }
 
-    public void renderInterior(SpriteBatch batch) {
-        float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();
-
-        batch.end();
-
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.BLACK);
-        shapeRenderer.rect(0, 0, screenWidth, screenHeight);
-        shapeRenderer.end();
-
-        batch.begin();
-
-        if (showingCoopInterior && selectedCoop != null) {
-            Sprite interiorSprite = coopInside;
-            float spriteWidth = interiorSprite.getWidth() * interiorScale;
-            float spriteHeight = interiorSprite.getHeight() * interiorScale;
-
-            interiorX = (screenWidth - spriteWidth) / 2;
-            interiorY = (screenHeight - spriteHeight) / 2;
-
-            batch.draw(interiorSprite, interiorX, interiorY, spriteWidth, spriteHeight);
-
-        } else if (showingBarnInterior && selectedBarn != null) {
-            Sprite interiorSprite = barnInside;
-            float spriteWidth = interiorSprite.getWidth() * interiorScale;
-            float spriteHeight = interiorSprite.getHeight() * interiorScale;
-
-            interiorX = (screenWidth - spriteWidth) / 2;
-            interiorY = (screenHeight - spriteHeight) / 2;
-
-            batch.draw(interiorSprite, interiorX, interiorY, spriteWidth, spriteHeight);
-        }
-    }
-
-    public void renderPlacingBuilding(SpriteBatch batch) {
-        if (isPlacingCoop) {
-            coop.setAlpha(0.7f);
-            coop.setPosition(tempCoopX, tempCoopY);
-            coop.draw(batch);
-            coop.setAlpha(1.0f);
-        }
-
+    public void update(float delta) {
         if (isPlacingBarn) {
-            barn.setAlpha(0.7f);
-            barn.setPosition(tempBarnX, tempBarnY);
-            barn.draw(batch);
-            barn.setAlpha(1.0f);
-        }
-    }
-
-    private void updateInteriorDisplayTime(float delta) {
-        if (autoHideInterior && (showingCoopInterior || showingBarnInterior)) {
-            interiorDisplayTime += delta;
-
-            if (interiorDisplayTime >= INTERIOR_DISPLAY_DURATION) {
-                closeInteriorView();
+            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+                barnY += MOVEMENT_SPEED;
+                System.out.println("Moving barn up: " + barnY);
             }
-        }
-    }
-
-    private void handleInput(float delta) {
-        if (isShowingInterior()) {
-            if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-                closeInteriorView();
-                return;
+            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+                barnY -= MOVEMENT_SPEED;
+                System.out.println("Moving barn down: " + barnY);
             }
-
-            if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                barnX -= MOVEMENT_SPEED;
+                System.out.println("Moving barn left: " + barnX);
             }
-
-            return;
-        }
-
-        System.out.println("Calling handleBuildingPlacement");
-        handleBuildingPlacement();
-    }
-
-    private void handleBuildingPlacement() {
-        if (isPlacingCoop) {
-            handleBuildingMovement(true);
-
-            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-                placeCoop();
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                barnX += MOVEMENT_SPEED;
+                System.out.println("Moving barn right: " + barnX);
             }
-
-            if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-                isPlacingCoop = false;
-            }
-        }
-
-        if (isPlacingBarn) {
-            System.out.println("Handling barn movement");
-            handleBuildingMovement(false);
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
                 placeBarn();
@@ -186,231 +62,111 @@ public class AnimalBuildingController {
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
                 isPlacingBarn = false;
+                System.out.println("Cancelled placing barn");
+            }
+        }
+
+        if (isPlacingCoop) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+                coopY += MOVEMENT_SPEED;
+                System.out.println("Moving coop up: " + coopY);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+                coopY -= MOVEMENT_SPEED;
+                System.out.println("Moving coop down: " + coopY);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                coopX -= MOVEMENT_SPEED;
+                System.out.println("Moving coop left: " + coopX);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                coopX += MOVEMENT_SPEED;
+                System.out.println("Moving coop right: " + coopX);
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                placeCoop();
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+                isPlacingCoop = false;
+                System.out.println("Cancelled placing coop");
             }
         }
     }
 
-    private void handleBuildingMovement(boolean isCoop) {
-        float currentX = isCoop ? tempCoopX : tempBarnX;
-        float currentY = isCoop ? tempCoopY : tempBarnY;
-
-        if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            if (isCoop) tempCoopY += MOVEMENT_SPEED;
-            else tempBarnY += MOVEMENT_SPEED;
-            System.out.println("W pressed: Moving " + (isCoop ? "coop" : "barn") + " up");
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            if (isCoop) tempCoopY -= MOVEMENT_SPEED;
-            else tempBarnY -= MOVEMENT_SPEED;
-            System.out.println("S pressed: Moving " + (isCoop ? "coop" : "barn") + " down");
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            if (isCoop) tempCoopX -= MOVEMENT_SPEED;
-            else tempBarnX -= MOVEMENT_SPEED;
-            System.out.println("A pressed: Moving " + (isCoop ? "coop" : "barn") + " left");
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            if (isCoop) tempCoopX += MOVEMENT_SPEED;
-            else tempBarnX += MOVEMENT_SPEED;
-            System.out.println("D pressed: Moving " + (isCoop ? "coop" : "barn") + " right");
+    public void render(SpriteBatch batch) {
+        for (int i = 0; i < barnCount; i++) {
+            batch.draw(barnTexture, placedBarnsX[i], placedBarnsY[i]);
         }
 
-        if (currentX != (isCoop ? tempCoopX : tempBarnX) || currentY != (isCoop ? tempCoopY : tempBarnY)) {
-            System.out.println("Position changed from (" + currentX + "," + currentY +
-                ") to (" + (isCoop ? tempCoopX : tempBarnX) + "," +
-                (isCoop ? tempCoopY : tempBarnY) + ")");
-        } else {
-            System.out.println("No movement detected for " + (isCoop ? "coop" : "barn"));
+        for (int i = 0; i < coopCount; i++) {
+            batch.draw(coopTexture, placedCoopsX[i], placedCoopsY[i]);
+        }
+
+        if (isPlacingBarn) {
+            batch.setColor(1, 1, 1, 0.7f);
+            batch.draw(barnTexture, barnX, barnY);
+            batch.setColor(1, 1, 1, 1);
+        }
+
+        if (isPlacingCoop) {
+            batch.setColor(1, 1, 1, 0.7f);
+            batch.draw(coopTexture, coopX, coopY);
+            batch.setColor(1, 1, 1, 1);
         }
     }
 
-
-
-    public void startPlacingCoop(float playerX, float playerY) {
-        isPlacingCoop = true;
-        tempCoopX = playerX;
-        tempCoopY = playerY;
-    }
-
-    public void startPlacingBarn(float playerX, float playerY) {
+    public void startPlacingBarn(float x, float y) {
         isPlacingBarn = true;
-        tempBarnX = playerX;
-        tempBarnY = playerY;
+        isPlacingCoop = false;
+        barnX = x;
+        barnY = y;
+        System.out.println("Started placing barn at: " + x + ", " + y);
     }
 
-    private void placeCoop() {
-        if (isValidPlacement(tempCoopX, tempCoopY, true)) {
-            Point position = new Point((int)tempCoopX, (int)tempCoopY);
-            int coopWidth = (int) this.coop.getWidth();
-            int coopHeight = (int) this.coop.getHeight();
-
-            Coop newCoop = new Coop(position, coopHeight, coopWidth);
-            placedCoops.add(newCoop);
-
-            int tileWidth = gameMap.getTileWidth();
-            int tileHeight = gameMap.getTileHeight();
-
-            int startTileX = (int) Math.floor(tempCoopX / tileWidth);
-            int startTileY = (int) Math.floor(tempCoopY / tileHeight);
-            int coopWidthInTiles = (int) Math.ceil((double) coopWidth / tileWidth);
-            int coopHeightInTiles = (int) Math.ceil((double) coopHeight / tileHeight);
-
-            System.out.println("Coop placed at tile: " + startTileX + ", " + startTileY);
-            isPlacingCoop = false;
-        } else {
-            System.out.println("Cannot place coop here. Invalid position.");
-        }
+    public void startPlacingCoop(float x, float y) {
+        isPlacingCoop = true;
+        isPlacingBarn = false;
+        coopX = x;
+        coopY = y;
+        System.out.println("Started placing coop at: " + x + ", " + y);
     }
 
     private void placeBarn() {
-        if (isValidPlacement(tempBarnX, tempBarnY, false)) {
-            Point position = new Point((int)tempBarnX, (int)tempBarnY);
-            int barnWidth = (int) this.barn.getWidth();
-            int barnHeight = (int) this.barn.getHeight();
-
-            Barn newBarn = new Barn(position, barnHeight, barnWidth);
-            placedBarns.add(newBarn);
-
-            int tileWidth = gameMap.getTileWidth();
-            int tileHeight = gameMap.getTileHeight();
-
-            int startTileX = (int) Math.floor(tempBarnX / tileWidth);
-            int startTileY = (int) Math.floor(tempBarnY / tileHeight);
-            int barnWidthInTiles = (int) Math.ceil((double) barnWidth / tileWidth);
-            int barnHeightInTiles = (int) Math.ceil((double) barnHeight / tileHeight);
-
-            System.out.println("Barn placed at tile: " + startTileX + ", " + startTileY);
+        if (barnCount < placedBarnsX.length) {
+            placedBarnsX[barnCount] = barnX;
+            placedBarnsY[barnCount] = barnY;
+            barnCount++;
             isPlacingBarn = false;
-        } else {
-            System.out.println("Cannot place barn here. Invalid position.");
+            System.out.println("Barn placed at: " + barnX + ", " + barnY);
         }
     }
 
-    private boolean isValidPlacement(float x, float y, boolean isCoop) {
-        Sprite buildingSprite = isCoop ? this.coop : this.barn;
-
-        int tileWidth = gameMap.getTileWidth();
-        int tileHeight = gameMap.getTileHeight();
-        int mapWidth = gameMap.getMapWidth();
-        int mapHeight = gameMap.getMapHeight();
-
-        float mapPixelWidth = mapWidth * tileWidth;
-        float mapPixelHeight = mapHeight * tileHeight;
-
-        if (x < 0 || y < 0 || x + buildingSprite.getWidth() > mapPixelWidth ||
-            y + buildingSprite.getHeight() > mapPixelHeight) {
-            System.out.println("Invalid placement: Out of map boundaries");
-            return false;
+    private void placeCoop() {
+        if (coopCount < placedCoopsX.length) {
+            placedCoopsX[coopCount] = coopX;
+            placedCoopsY[coopCount] = coopY;
+            coopCount++;
+            isPlacingCoop = false;
+            System.out.println("Coop placed at: " + coopX + ", " + coopY);
         }
-
-        int startTileX = (int) Math.floor(x / tileWidth);
-        int startTileY = (int) Math.floor(y / tileHeight);
-
-        int buildingWidthInTiles = (int) Math.ceil((double) buildingSprite.getWidth() / tileWidth);
-        int buildingHeightInTiles = (int) Math.ceil((double) buildingSprite.getHeight() / tileHeight);
-
-        if (startTileX + buildingWidthInTiles >= mapWidth || startTileY + buildingHeightInTiles >= mapHeight) {
-            System.out.println("Invalid placement: Building extends beyond map boundaries");
-            return false;
-        }
-
-        for (int tileX = startTileX; tileX < startTileX + buildingWidthInTiles; tileX++) {
-            for (int tileY = startTileY; tileY < startTileY + buildingHeightInTiles; tileY++) {
-                if (!gameMap.isPassable(tileX * tileWidth, tileY * tileHeight)) {
-                    System.out.println("Invalid placement: Tile is not passable");
-                    return false;
-                }
-            }
-        }
-
-        Rectangle newBuildingBounds = new Rectangle(x, y, buildingSprite.getWidth(), buildingSprite.getHeight());
-
-        for (Coop placedCoop : placedCoops) {
-            Point placedPos = placedCoop.getPosition();
-            Rectangle placedBounds = new Rectangle(placedPos.x, placedPos.y,
-                this.coop.getWidth(),
-                this.coop.getHeight());
-
-            if (newBuildingBounds.overlaps(placedBounds)) {
-                System.out.println("Invalid placement: Overlaps with another coop");
-                return false;
-            }
-        }
-
-        for (Barn placedBarn : placedBarns) {
-            Point placedPos = placedBarn.getPosition();
-            Rectangle placedBounds = new Rectangle(placedPos.x, placedPos.y,
-                this.barn.getWidth(),
-                this.barn.getHeight());
-
-            if (newBuildingBounds.overlaps(placedBounds)) {
-                System.out.println("Invalid placement: Overlaps with a barn");
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public void closeInteriorView() {
-        showingCoopInterior = false;
-        showingBarnInterior = false;
-        selectedCoop = null;
-        selectedBarn = null;
-        interiorDisplayTime = 0;
-    }
-
-    public boolean isPlacingCoop() {
-        return isPlacingCoop;
     }
 
     public boolean isPlacingBarn() {
         return isPlacingBarn;
     }
 
-    public boolean isShowingCoopInterior() {
-        return showingCoopInterior;
-    }
-
-    public boolean isShowingBarnInterior() {
-        return showingBarnInterior;
+    public boolean isPlacingCoop() {
+        return isPlacingCoop;
     }
 
     public boolean isShowingInterior() {
-        return showingCoopInterior || showingBarnInterior;
-    }
-
-    public Coop getSelectedCoop() {
-        return selectedCoop;
-    }
-
-    public Barn getSelectedBarn() {
-        return selectedBarn;
-    }
-
-    public void setAutoHideInterior(boolean autoHide) {
-        this.autoHideInterior = autoHide;
+        return false;
     }
 
     public void dispose() {
-        if (shapeRenderer != null) {
-            shapeRenderer.dispose();
-        }
-
-        // آزادسازی تصاویر
-        if (coop != null && coop.getTexture() != null) {
-            coop.getTexture().dispose();
-        }
-        if (barn != null && barn.getTexture() != null) {
-            barn.getTexture().dispose();
-        }
-        if (coopInside != null && coopInside.getTexture() != null) {
-            coopInside.getTexture().dispose();
-        }
-        if (barnInside != null && barnInside.getTexture() != null) {
-            barnInside.getTexture().dispose();
-        }
+        if (barnTexture != null) barnTexture.dispose();
+        if (coopTexture != null) coopTexture.dispose();
     }
 }
-
-
