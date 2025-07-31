@@ -17,6 +17,7 @@ public class Time {
     private boolean isPaused;
     private boolean isNight = false;
     boolean dayChanged = false;
+    boolean isNewDay = true;
 
     public Time() {
         day = 1;
@@ -66,8 +67,7 @@ public class Time {
     }
 
     public void advanceDay(int days) {
-        dayChanged = true;
-        System.err.println("dayChanged: " + dayChanged);
+        isNewDay = true;
         for (int i = 0; i < days; i++) {
             day++;
             dayPassed++;
@@ -83,6 +83,12 @@ public class Time {
                 System.err.println("season changed to = " + season.toString());
             }
         }
+    }
+
+    public boolean isNewDay() {
+        boolean preIsNewDay = isNewDay;
+        isNewDay = false;
+        return preIsNewDay;
     }
 
     private Weather generateRandomWeather() {
@@ -145,24 +151,24 @@ public class Time {
             case Saturday:
                 sb.append("Sat.");
                 break;
-                case Sunday:
-                    sb.append("Sun.");
-                    break;
-                    case Monday:
-                        sb.append("Mon.");
-                        break;
-                        case Tuesday:
-                            sb.append("Tue.");
-                            break;
-                            case Wednesday:
-                                sb.append("Wed.");
-                                break;
-                                case Thursday:
-                                    sb.append("Thu.");
-                                    break;
-                                    case Friday:
-                                        sb.append("Fri.");
-                                        break;
+            case Sunday:
+                sb.append("Sun.");
+                break;
+            case Monday:
+                sb.append("Mon.");
+                break;
+            case Tuesday:
+                sb.append("Tue.");
+                break;
+            case Wednesday:
+                sb.append("Wed.");
+                break;
+            case Thursday:
+                sb.append("Thu.");
+                break;
+            case Friday:
+                sb.append("Fri.");
+                break;
         }
         sb.append(day);
         return sb.toString();

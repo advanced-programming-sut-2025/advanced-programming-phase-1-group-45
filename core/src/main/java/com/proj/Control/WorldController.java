@@ -12,7 +12,6 @@ import com.proj.Player;
 import com.proj.map.FarmInOutPoint;
 import com.proj.map.GameMap;
 import com.proj.map.Season;
-//import sun.font.HBShaper;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -20,7 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 
 public class WorldController {
-
+    private static WorldController instance;
+    public static WorldController getInstance() {
+        return instance;
+    }
     private GameMap gameMap;
     private String farmName;
 
@@ -32,7 +34,6 @@ public class WorldController {
     private ClockWidget clockWidget;
     private TimeDisplayActor timeDisplayActor;
     private DateDisplayActor dateDisplayActor;
-    //    private SeasonActor seasonActor;
     private NightRender nightRender;
 
     private Season currentSeason;
@@ -44,7 +45,7 @@ public class WorldController {
 
     private Player player;
 
-//    private ForagingManager foragingManager;
+    private ForagingManager foragingManager;
 
 
     public WorldController(String landName, Time gameTime, Stage uisatge) {
@@ -52,6 +53,7 @@ public class WorldController {
         this.nightRender = new NightRender();
         this.farmName = landName;
         currentSeason = gameTime.getSeason();
+        instance = this;
         loadMaps();
         gameMap = gameMaps.get(1);
         this.uistage = uisatge;
@@ -59,15 +61,13 @@ public class WorldController {
         clockWidget = new ClockWidget(gameTime);
         timeDisplayActor = new TimeDisplayActor(gameTime);
         dateDisplayActor = new DateDisplayActor(gameTime);
-//        seasonActor = new SeasonActor(new TextureRegion(GameAssetManager.getGameAssetManager().getSpringClock()));
         uistage.addActor(clockWidget);
-//        uistage.addActor(seasonActor);
         uistage.addActor(timeDisplayActor);
         uistage.addActor(dateDisplayActor);
         positionUiElement(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         farmInOutPoints = GameAssetManager.getGameAssetManager().getExitPointList();
         currentFarmInOutPoint = findExitEnterPointsById(maps.get(landName));
-//        foragingManager = new ForagingManager();
+        foragingManager = new ForagingManager();
     }
 
     private void loadMaps() {
@@ -97,7 +97,6 @@ public class WorldController {
         this.player = player;
     }
 
-
     public void update(float delta) {
         Season newSeason = gameTime.getSeason();
         if (currentSeason != newSeason) {
@@ -107,10 +106,14 @@ public class WorldController {
             }
         }
         weatherController.update(gameTime.getWeather(), delta);
-//        if (gameTime.isNewDay()) {
-//            foragingManager.setCurrentMap(gameMap);
-//            foragingManager.spawnDailyItems(gameTime.getSeason());
-//        }
+        if (gameTime.isNewDay()) {
+            for (Integer mapId : gameMaps.keySet()) {
+                if(mapId == 2 || mapId == 3) continue;
+                foragingManager.setCurrentMap(gameMaps.get(mapId));
+                foragingManager.spawnDailyItems(gameTime.getSeason());
+            }
+            foragingManager.setCurrentMap(gameMap);
+        }
         nightRender.update(gameTime);
         gameMap.setNightMode(gameTime.getHour() >= 19);
     }
@@ -121,10 +124,10 @@ public class WorldController {
         gameMap.getSpriteBatch().begin();
 
         weatherController.render(gameMap.getSpriteBatch(), gameTime.getWeather());
-//        foragingManager.rener(gameMap.getSpriteBatch());
     }
 
     public void renderAfterPlayer() {
+        gameMap.renderLandObject();
         nightRender.render(gameMap.getSpriteBatch());
         gameMap.renderLights();
     }
@@ -191,12 +194,10 @@ public class WorldController {
         int tileX = (int) (x / gameMap.getTileWidth());
         int tileY = (int) (y / gameMap.getTileHeight());
         Point point = new Point(tileX, tileY);
-        System.err.println("new x = " + tileX + ", new y = " + tileY);
         if (isExitPoint(point)) {
             triggerToOtherMap(point);
             return false;
         }
-
         return gameMap.isPassable(x, y);
     }
 
@@ -210,6 +211,7 @@ public class WorldController {
             }
         }
         gameMap = gameMaps.get(newMapId);
+        foragingManager.setCurrentMap(gameMap);
 
         FarmInOutPoint nexMap = findExitEnterPointsById(newMapId);
         if (nexMap == null) {
@@ -223,10 +225,10 @@ public class WorldController {
             }
         }
         if (targetPoint != null) {
-            player.setPosition(targetPoint.x * gameMap.getTileWidth() + gameMap.getTileWidth() / 2,
-                targetPoint.y * gameMap.getTileHeight() + gameMap.getTileHeight() / 2);
-            player.setTargetPosition(targetPoint.x * gameMap.getTileWidth() + gameMap.getTileWidth() / 2,
-                targetPoint.y * gameMap.getTileHeight() + gameMap.getTileHeight() / 2);
+            player.setPosition(targetPoint.x * gameMap.getTileWidth() + (float) gameMap.getTileWidth() / 2,
+                targetPoint.y * gameMap.getTileHeight() + (float) gameMap.getTileHeight() / 2);
+            player.setTargetPosition(targetPoint.x * gameMap.getTileWidth() + (float) gameMap.getTileWidth() / 2,
+                targetPoint.y * gameMap.getTileHeight() + (float) gameMap.getTileHeight() / 2);
         }
         currentFarmInOutPoint = nexMap;
     }
@@ -237,5 +239,13 @@ public class WorldController {
 
     public GameMap getGameMap() {
         return gameMap;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public ForagingManager getForagingManager() {
+        return foragingManager;
     }
 }

@@ -5,7 +5,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.proj.Model.TimeAndWeather.Weather;
+import com.proj.Model.mapObjects.ForagingItem;
+import com.proj.Model.mapObjects.NaturalResource;
 import com.proj.map.FarmInOutPoint;
 
 import java.awt.*;
@@ -38,6 +41,8 @@ public class GameAssetManager {
 
     private List<FarmInOutPoint> exitPointList = new ArrayList<>();
     private HashMap<String, Texture> foragingItem = new HashMap<>();
+    private ForagingLoader foragingLoader;
+    private HashMap<String, NaturalResource> resources = new HashMap<>();
 
 
     private GameAssetManager() {
@@ -60,7 +65,8 @@ public class GameAssetManager {
         lanternLight = new Texture("assets/lantern.png");
         smallFont = new BitmapFont(Gdx.files.internal("smallFont/exo-small.fnt"));
         loadFarmExitPoints();
-//        loadForagingItems();
+        loadForagingItems();
+        loadResources();
     }
 
     public static GameAssetManager getGameAssetManager() {
@@ -70,6 +76,7 @@ public class GameAssetManager {
     }
 
     public Skin getSkin() {
+        foragingLoader = new ForagingLoader();
         return skin;
     }
 
@@ -123,6 +130,10 @@ public class GameAssetManager {
 
     public Texture getLanternLight() {
         return lanternLight;
+    }
+
+    public Array<ForagingItem> getForagingCrops() {
+        return foragingLoader.getForagingCrops();
     }
 
     private void loadFarmExitPoints() {
@@ -252,14 +263,29 @@ public class GameAssetManager {
         foragingItem.put("winterroot", new Texture("assets/foraging/Winter_Root.png"));
     }
 
+    private void loadResources() {
+        TextureRegion fiber = new TextureRegion(new Texture("assets/resources/fiber.png"));
+        TextureRegion stone = new TextureRegion(new Texture("assets/resources/stone.png"));
+        TextureRegion wood = new TextureRegion(new Texture("assets/resources/wood.png"));
+        resources.put("fiber", new NaturalResource("naturalResource", "Fiber", fiber, true, 7));
+        resources.put("stone", new NaturalResource("naturalResource", "Stone", stone, true, 7));
+        resources.put("wood", new NaturalResource("naturalResource", "Wood", wood, true, 7));
+    }
+
     public List<FarmInOutPoint> getExitPointList() {
         return exitPointList;
     }
 
-//    public Texture getForagingTexture(String forageName) {
-//        if(!foragingItem.containsKey(forageName)) {
-//            return null;
-//        }
-//        return foragingItem.get(forageName);
-//    }
+    public Texture getForagingTexture(String forageName) {
+        if(!foragingItem.containsKey(forageName)) {
+            return null;
+        }
+        return foragingItem.get(forageName);
+    }
+
+    public HashMap<String , NaturalResource> getNaturalResourceList() {
+        return resources;
+    }
 }
+
+

@@ -1,6 +1,12 @@
 package com.proj.Model.Inventory;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.proj.Control.WorldController;
+import com.proj.Model.mapObjects.NaturalResource;
+import com.proj.map.Tile;
+import com.proj.map.TileType;
+
+import java.awt.*;
 
 public class Pickaxe extends Tool {
 
@@ -15,8 +21,14 @@ public class Pickaxe extends Tool {
 
     @Override
     public boolean useOnTile(int tileX, int tileY) {
-        // Logic for using pickaxe on a tile
-        // For example, break stones, clear hoed land
+        Tile tile = WorldController.getInstance().getGameMap().getLandLoader().getTiles()[tileX][tileY];
+        if (tile.getType() == TileType.STONE || tile.getType() == TileType.WOOD) {
+            NaturalResource nr = WorldController.getInstance().getGameMap().pickNaturalResource(new Point(tileX, tileY));
+            if (nr != null) {
+                InventoryManager.getInstance().getPlayerInventory().addItem(nr);
+                return true;
+            }
+        }
         return true;
     }
 

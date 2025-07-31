@@ -1,14 +1,16 @@
 package com.proj.map;
 
 public enum TileType {
-    DIRT("Dirt"),
+    EMPTY("Empty"),
     GRASS("Grass"),
+    FIBER("Fiber"),
     STONE("Stone"),
     WOOD("Wood"),
     CABIN("Cabin"),
     QUARRY("Quarry"),
     WATER("Water"),
-    SHOP("Shop");
+    SHOP("Shop"),
+    FORAGING("Foraging");
     private final String type;
     TileType(String type) {
         this.type = type;

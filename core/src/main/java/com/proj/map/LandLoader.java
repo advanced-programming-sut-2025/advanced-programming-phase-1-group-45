@@ -1,10 +1,8 @@
 package com.proj.map;
 
 import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-//import jdk.internal.org.commonmark.internal.inline.BackslashInlineParser;
+import com.badlogic.gdx.maps.tiled.*;
+import com.proj.Model.GameAssetManager;
 
 import java.awt.*;
 import java.util.*;
@@ -31,8 +29,6 @@ public class LandLoader {
         this.landName = farmName;
         this.landSeason = season;
         loadMap();
-//        initialize();
-//        findPlayerSpawnPoint();
     }
 
 
@@ -85,7 +81,14 @@ public class LandLoader {
                 for (LayerInfo layer : collisionLayers) {
                     TiledMapTileLayer.Cell cell = layer.tileLayer.getCell(x, y);
                     if (cell == null || cell.getTile() == null) continue;
-
+                    TileType tileType = findType(cell);
+                    if (tileType != null) {
+                        tiles[x][y].setType(tileType);
+                        if (tileType == TileType.FIBER || tileType == TileType.STONE || tileType == TileType.WOOD) {
+                            tiles[x][y].setObject(GameAssetManager.getGameAssetManager().
+                                getNaturalResourceList().get(tileType.toString().toLowerCase()));
+                        }
+                    }
                     Boolean walkable = getWalkableProperty(cell);
 
                     if (walkable == null) walkable = layer.defaultWalkable;
@@ -94,7 +97,6 @@ public class LandLoader {
                         passable = false;
                         break;
                     }
-
                     if (getHomeGate(cell)) {
                         tiles[x][y].setHomeGate(true);
                     }
@@ -179,6 +181,7 @@ public class LandLoader {
         layerConfig.put("AlwaysFront", false);
         layerConfig.put("AlwaysFront2", false);
         layerConfig.put("AlwaysFront3", false);
+        layerConfig.put("forageItem", false);
     }
 
 
@@ -196,6 +199,10 @@ public class LandLoader {
 
     public int getTileHeight() {
         return tileHeight;
+    }
+
+    public Tile[][] getTiles() {
+        return tiles;
     }
 
 
@@ -216,6 +223,32 @@ public class LandLoader {
         return tile.isPassable();
     }
 
+    private TileType findType(TiledMapTileLayer.Cell cell) {
+        TiledMapTile tile = cell.getTile();
+        TiledMapTileSet source = null;
+        if (tile != null) {
+            int tileId = tile.getId();
+            for (TiledMapTileSet ts : map.getTileSets()) {
+                if (ts.getTile(tile.getId()) == tile) {
+                    source = ts;
+                    break;
+                }
+            }
+            if (source != null && source.getName().equals("Paths")) {
+                int first = source.getProperties().get("firstgid", Integer.class);
+                if (tileId == first + 13 || tileId == first + 14 ||
+                    tileId == first + 15 || tileId == first + 23) {
+                    return TileType.FIBER;
+                } else if (tileId == first + 16 || tileId == first + 17) {
+                    return TileType.STONE;
+                } else if (tileId == first + 18) {
+                    return TileType.WOOD;
+                }
+            }
+        }
+        return null;
+    }
+
     public TiledMap getMap() {
         return map;
     }
@@ -223,4 +256,5 @@ public class LandLoader {
     public Point getPlayerSpawnPoint() {
         return playerSpawnPoint;
     }
+
 }

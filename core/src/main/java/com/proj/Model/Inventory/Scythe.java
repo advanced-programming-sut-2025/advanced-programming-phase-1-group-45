@@ -1,6 +1,13 @@
 package com.proj.Model.Inventory;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.proj.Control.WorldController;
+import com.proj.Model.mapObjects.ForagingItem;
+import com.proj.Model.mapObjects.NaturalResource;
+import com.proj.map.Tile;
+import com.proj.map.TileType;
+
+import java.awt.*;
 
 public class Scythe extends Tool {
 
@@ -15,10 +22,29 @@ public class Scythe extends Tool {
 
     @Override
     public boolean useOnTile(int tileX, int tileY) {
-        // Logic for using scythe on a tile
-        // For example, cut grass or harvest crops
-        return true;
+        Tile tile = WorldController.getInstance().getGameMap().getLandLoader().getTiles()[tileX][tileY];
+        if (tile.getType() == TileType.FIBER) {
+            NaturalResource nr = WorldController.getInstance().getGameMap().pickNaturalResource(new Point(tileX, tileY));
+            if (nr != null) {
+                InventoryManager.getInstance().getPlayerInventory().addItem(nr);
+                return true;
+            }
+        }
+        if (tile.getType() == TileType.FORAGING) {
+            ForagingItem collectedItem = WorldController
+                .getInstance()
+                .getForagingManager()
+                .tryCollectItem(new Point(tileX, tileY), "Scythe");
+            if (collectedItem != null) {
+                InventoryManager.getInstance()
+                    .getPlayerInventory()
+                    .addItem(collectedItem);
+                return true;
+            }
+        }
+        return false;
     }
+
 
     @Override
     public void use() {

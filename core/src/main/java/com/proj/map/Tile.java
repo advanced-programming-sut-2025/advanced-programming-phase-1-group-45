@@ -32,6 +32,9 @@ public class Tile {
     public void setObject(LandObject landObject) {
         this.landObject = landObject;
     }
+    public void removeObject() {
+        landObject = null;
+    }
 
     public void setPassable(boolean passable) {
         this.passable = passable;
@@ -42,9 +45,6 @@ public class Tile {
     }
 
     public boolean isPassable() {
-        if(!passable) {
-            System.err.println("Tile is not passable" + " " + location.x + " " + location.y);
-        }
         return passable;
     }
 
@@ -58,5 +58,9 @@ public class Tile {
 
     public Point getLocation() {
         return location;
+    }
+
+    public LandObject getLandObject() {
+        return landObject;
     }
 }
