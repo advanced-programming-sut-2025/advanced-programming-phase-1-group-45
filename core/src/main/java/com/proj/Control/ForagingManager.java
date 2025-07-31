@@ -22,7 +22,6 @@ public class ForagingManager {
         this.currentMap = map;
     }
 
-
     public void spawnDailyItems(Season currentSeason) {
         currentMap.removeForagings();
         Array<ForagingItem> seasonalItems = new Array<>();
