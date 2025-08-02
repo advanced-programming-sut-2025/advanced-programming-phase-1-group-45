@@ -10,8 +10,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.proj.Control.AnimalManager;
 import com.proj.Control.WorldController;
 import com.proj.Control.AnimalBuildingController;
+import com.proj.Model.Animal;
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.Inventory.InventoryManager;
 import com.proj.Model.Inventory.PlayerBag;
@@ -35,7 +37,7 @@ public class GameScreen implements Screen {
     private Stage uistage;
     private PlayerBag playerBag;
     private AnimalBuildingController animalBuildingController;
-
+    private AnimalManager animalManager;
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
     }
@@ -49,7 +51,7 @@ public class GameScreen implements Screen {
                 worldController = new WorldController(mapName, gameTime, uistage);
                 inventoryManager = new InventoryManager();
                 animalBuildingController = new AnimalBuildingController(worldController.getGameMap());
-
+                animalManager = new AnimalManager();
                 camera = new OrthographicCamera();
                 viewport = new FitViewport(640, 480, camera);
                 viewport.apply();
@@ -114,12 +116,12 @@ public class GameScreen implements Screen {
             gameTime.update(delta, timeIsPaused);
             worldController.update(delta);
             inventoryManager.update(delta, player);
-
+            animalManager.update(delta);
             worldController.getSpriteBatch().begin();
 
             worldController.renderMap(camera);
             player.render(worldController.getSpriteBatch());
-
+            animalManager.render(worldController.getSpriteBatch());
             if (animalBuildingController != null) {
                 animalBuildingController.render(worldController.getSpriteBatch());
             }
@@ -158,20 +160,22 @@ public class GameScreen implements Screen {
     private void handleAnimalBuildingInput() {
         if (animalBuildingController == null) return;
 
-
         if (Gdx.input.isKeyJustPressed(Input.Keys.K) &&
             !animalBuildingController.isPlacingCoop() &&
             !animalBuildingController.isPlacingBarn()) {
             animalBuildingController.startPlacingCoop(player.getPosition().x, player.getPosition().y);
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.B) &&
-            !animalBuildingController.isPlacingBarn() &&
-            !animalBuildingController.isPlacingCoop()) {
-            animalBuildingController.startPlacingBarn(player.getPosition().x, player.getPosition().y);
-            System.out.println("Barn placement started at: " + player.getPosition().x + ", " + player.getPosition().y);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
+            if (!animalBuildingController.isPlacingBarn() && !animalBuildingController.isPlacingCoop()) {
+                animalBuildingController.startPlacingBarn(player.getPosition().x, player.getPosition().y);
+                System.out.println("Barn placement started at: " + player.getPosition().x + ", " + player.getPosition().y);
+            } else if (animalManager != null) {
+                animalManager.showBuyMenu();
+            }
         }
     }
+
 
     @Override
     public void resize(int width, int height) {
@@ -219,6 +223,9 @@ public class GameScreen implements Screen {
             }
             if (animalBuildingController != null) {
                 animalBuildingController.dispose();
+            }
+            if (animalManager != null) {
+                animalManager.dispose();
             }
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in dispose method", e);
@@ -329,10 +336,37 @@ public class GameScreen implements Screen {
             if (moved) {
                 Gdx.app.log("GameScreen", "Player started moving");
             }
+
+            // کدهای مربوط به حیوانات
+            if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+                if (animalManager != null) {
+                    animalManager.printAnimalsStatus();
+                }
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
+                if (animalManager != null) {
+                    animalManager.newDay();
+                }
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
+                if (animalManager != null && animalManager.getSelectedAnimal() != null) {
+                    boolean isBarn = true; // یا false برای قفس
+                    int buildingIndex = 0; // شاخص ساختمان مورد نظر
+                    connectAnimalToBuilding(animalManager.getSelectedAnimal(), isBarn, buildingIndex);
+                }
+            }
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in handleInput method", e);
         }
+    }
 
+
+    private void connectAnimalToBuilding(Animal animal, boolean isBarn, int buildingIndex) {
+        if (animalBuildingController != null) {
+            animalBuildingController.addAnimalToBuilding(animal, isBarn, buildingIndex);
+        }
     }
 
     private void selectToolSlot(int slot) {
