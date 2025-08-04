@@ -29,6 +29,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.awt.*;
 import java.util.ArrayList;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
+import com.proj.Control.NPCManager;
+import com.proj.Model.GameAssetManager;
+import com.proj.map.farmName;
 
 public class GameScreen implements Screen {
     private Player player;
@@ -51,6 +58,8 @@ public class GameScreen implements Screen {
     private Texture npcTexture;
     private Point customSpawnPoint;
     private farmName farm;
+    private Texture spaceImage;
+    private boolean showSpaceImage = false;
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
            this.farm = farm;
@@ -61,13 +70,7 @@ public class GameScreen implements Screen {
         this.player = player;
 
         if (worldController != null) {
-
-
-
             worldController.setPlayer(player);
-
-
-
         }
 
         if (camera != null && player != null) {
@@ -75,9 +78,7 @@ public class GameScreen implements Screen {
             camera.position.set(player.getPosition().x, player.getPosition().y, 0);
 
             camera.update();
-
         }
-
     }
 
     public void setNPCManager(NPCManager npcManager) {
@@ -150,6 +151,7 @@ public class GameScreen implements Screen {
                 inventoryManager = new InventoryManager();
                 animalBuildingController = new AnimalBuildingController(worldController.getGameMap());
                 animalManager = new AnimalManager();
+                spaceImage = GameAssetManager.getGameAssetManager().getSpaceImageTexture();
                 camera = new OrthographicCamera();
                 viewport = new FitViewport(640, 480, camera);
                 viewport.apply();
@@ -248,6 +250,19 @@ public class GameScreen implements Screen {
 
             if (playerBag != null) {
                 playerBag.render(worldController.getSpriteBatch(), camera);
+            }
+             if (showSpaceImage && spaceImage != null) {
+                Matrix4 originalProjection = worldController.getSpriteBatch().getProjectionMatrix();
+                Matrix4 screenProjection = new Matrix4()
+
+                    .setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+                worldController.getSpriteBatch().setProjectionMatrix(screenProjection);
+
+                float x = (Gdx.graphics.getWidth() - spaceImage.getWidth()) / 2;
+                float y = (Gdx.graphics.getHeight() - spaceImage.getHeight()) / 2;
+                worldController.getSpriteBatch().draw(spaceImage, x, y);
+                worldController.getSpriteBatch().setProjectionMatrix(originalProjection);
             }
 
             worldController.renderAfterPlayer();
@@ -457,6 +472,11 @@ public class GameScreen implements Screen {
                     inventoryManager.getPlayerInventory().selectNoTool();
                     Gdx.app.log("GameScreen", "Selected no tool");
                 }
+            }
+             if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                showSpaceImage = !showSpaceImage; // Toggle visibility
+                Gdx.app.log("GameScreen", "Space pressed. showSpaceImage: " + showSpaceImage);
+
             }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
