@@ -1,6 +1,7 @@
 package com.proj.Control;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -12,6 +13,8 @@ import com.proj.Player;
 import com.proj.map.FarmInOutPoint;
 import com.proj.map.GameMap;
 import com.proj.map.Season;
+import com.proj.GameScreen;
+import com.proj.map.farmName;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -24,7 +27,7 @@ public class WorldController {
         return instance;
     }
     private GameMap gameMap;
-    private String farmName;
+    private String currentFarmName;
 
     private final WeatherController weatherController;
     private TimeRenderer timeRenderer;
@@ -46,18 +49,31 @@ public class WorldController {
     private Player player;
 
     private ForagingManager foragingManager;
+    private NPCManager npcManager;
+    private boolean initialized = false;
+    private GameMap currentMap;
+    private String currentMapName;
 
 
     public WorldController(String landName, Time gameTime, Stage uisatge) {
         this.gameTime = gameTime;
         this.nightRender = new NightRender();
-        this.farmName = landName;
+        this.currentFarmName = landName;
         currentSeason = gameTime.getSeason();
         instance = this;
+        this.uistage = uistage;
         loadMaps();
         gameMap = gameMaps.get(1);
         this.uistage = uisatge;
         this.weatherController = new WeatherController();
+         this.npcManager = new NPCManager();  // Initialize NPC manager
+        loadMaps();
+        if (maps.containsKey(landName)) {
+            currentMap = gameMaps.get(maps.get(landName));
+        } else {
+            throw new RuntimeException("Map not found: " + landName);
+        }
+        initUI();
         clockWidget = new ClockWidget(gameTime);
         timeDisplayActor = new TimeDisplayActor(gameTime);
         dateDisplayActor = new DateDisplayActor(gameTime);
@@ -71,7 +87,7 @@ public class WorldController {
     }
 
     private void loadMaps() {
-        maps.put(farmName, 1);
+        maps.put(currentMapName, 1);
         maps.put("BusStop", 2);
         maps.put("Town", 3);
         maps.put("Mountain", 4);
@@ -91,6 +107,23 @@ public class WorldController {
             }
         }
         return null;
+    }
+
+     private void initUI() {
+
+        if (uistage == null) {
+            throw new IllegalStateException("Stage must be initialized first");
+        }
+        clockWidget = new ClockWidget(gameTime);
+        timeDisplayActor = new TimeDisplayActor(gameTime);
+        dateDisplayActor = new DateDisplayActor(gameTime);
+        uistage.addActor(clockWidget);
+        uistage.addActor(timeDisplayActor);
+        uistage.addActor(dateDisplayActor);
+        positionUiElement(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    }
+    public NPCManager getNPCManager() {
+        return npcManager;
     }
 
     public void setPlayer(Player player) {
@@ -252,6 +285,23 @@ public class WorldController {
         if (gameMap != null) {
             gameMap.render(camera);
         }
+    }
+      public void triggerToNewScreen(String newMapName, Point spawnPoint) {
+        GameScreen newScreen = new GameScreen(getFarmNameFromString(newMapName));
+        newScreen.setPlayerSpawnPoint(spawnPoint);
+        newScreen.setNPCManager(this.npcManager);
+        if (this.player != null) {
+            newScreen.setPlayer(this.player);
+        }
+        ((Game) Gdx.app.getApplicationListener()).setScreen(newScreen);
+    }
+    private farmName getFarmNameFromString(String name) {
+        for (farmName farm : farmName.values()) {
+            if (farm.getFarmName().equalsIgnoreCase(name)) {
+                return farm;
+            }
+        }
+        return farmName.STANDARD;
     }
 
 }
