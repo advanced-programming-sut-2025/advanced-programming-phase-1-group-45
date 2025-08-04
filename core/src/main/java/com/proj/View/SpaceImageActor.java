@@ -13,7 +13,7 @@ public class SpaceImageActor extends Actor {
     public SpaceImageActor() {
         // Load your PNG image
         GameAssetManager assetManager = GameAssetManager.getGameAssetManager();
-        this.image = new TextureRegion(assetManager.getSpaceImageTexture());
+//        this.image = new TextureRegion(assetManager.getSpaceImageTexture());
 
         // Set size based on texture
         setSize(image.getRegionWidth(), image.getRegionHeight());

@@ -1,7 +1,7 @@
 package com.proj.Control;
 
 import com.badlogic.gdx.utils.Array;
-import com.proj.Model.mapObjects.ForagingItem;
+import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.Model.GameAssetManager;
 import com.proj.map.GameMap;
 import com.proj.map.Season;

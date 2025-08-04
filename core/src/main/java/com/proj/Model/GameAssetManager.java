@@ -7,8 +7,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.proj.Model.TimeAndWeather.Weather;
-import com.proj.Model.mapObjects.ForagingItem;
-import com.proj.Model.mapObjects.NaturalResource;
+import com.proj.Model.inventoryItems.ForagingItem;
+import com.proj.Model.inventoryItems.ResourceItem;
+import com.proj.Model.inventoryItems.crops.CropRegistry;
+import com.proj.Model.inventoryItems.seeds.SeedRegistry;
 import com.proj.map.FarmInOutPoint;
 
 import java.awt.*;
@@ -37,18 +39,19 @@ public class GameAssetManager {
 
     private Texture thunder;
     private Texture lanternLight;
-    private Texture spaceImageTexture;
+    private Skin stardewSkin;
 
 
     private List<FarmInOutPoint> exitPointList = new ArrayList<>();
     private HashMap<String, Texture> foragingItem = new HashMap<>();
     private ForagingLoader foragingLoader;
-    private HashMap<String, NaturalResource> resources = new HashMap<>();
+    private HashMap<String, ResourceItem> resources = new HashMap<>();
 
 
     private GameAssetManager() {
         skin = new Skin(Gdx.files.internal("skin/pixthulhu-ui.json"));
         snowflake = new TextureRegion(new Texture("snowflake.png"));
+        stardewSkin = new Skin(Gdx.files.internal("assets/LibGdx-Skin-main/NzSkin.json"));
 
         //clock
         clockTexture = new Texture("clock/clockmy.png");
@@ -65,14 +68,9 @@ public class GameAssetManager {
         thunder = new Texture("assets/thunderStorm.png");
         lanternLight = new Texture("assets/lantern.png");
         smallFont = new BitmapFont(Gdx.files.internal("smallFont/exo-small.fnt"));
-        spaceImageTexture = new Texture(Gdx.files.internal("NPCTable/npc_table.png"));
         loadFarmExitPoints();
         loadForagingItems();
         loadResources();
-    }
-
-     public Texture getSpaceImageTexture() {
-        return spaceImageTexture;
     }
 
     public static GameAssetManager getGameAssetManager() {
@@ -82,8 +80,17 @@ public class GameAssetManager {
     }
 
     public Skin getSkin() {
+        SeedRegistry seedRegistry = SeedRegistry.getInstance();
         foragingLoader = new ForagingLoader();
         return skin;
+    }
+
+    public Skin getStardewSkin() {
+        return stardewSkin;
+    }
+
+    public TextureRegion getTexture(String path) {
+        return new TextureRegion(new Texture(Gdx.files.internal(path)));
     }
 
     public TextureRegion getSnowflake() {
@@ -137,6 +144,7 @@ public class GameAssetManager {
     public Texture getLanternLight() {
         return lanternLight;
     }
+
 
     public Array<ForagingItem> getForagingCrops() {
         return foragingLoader.getForagingCrops();
@@ -270,12 +278,49 @@ public class GameAssetManager {
     }
 
     private void loadResources() {
-        TextureRegion fiber = new TextureRegion(new Texture("assets/resources/fiber.png"));
-        TextureRegion stone = new TextureRegion(new Texture("assets/resources/stone.png"));
-        TextureRegion wood = new TextureRegion(new Texture("assets/resources/wood.png"));
-        resources.put("fiber", new NaturalResource("naturalResource", "Fiber", fiber, true, 7));
-        resources.put("stone", new NaturalResource("naturalResource", "Stone", stone, true, 7));
-        resources.put("wood", new NaturalResource("naturalResource", "Wood", wood, true, 7));
+        TextureRegion fiber = new TextureRegion(new Texture("assets/resource/Fiber.png"));
+        TextureRegion stone = new TextureRegion(new Texture("assets/resource/Stone.png"));
+        TextureRegion wood = new TextureRegion(new Texture("assets/resource/Wood.png"));
+        TextureRegion coal = new TextureRegion(new Texture("assets/resource/Coal.png"));
+        TextureRegion clay = new TextureRegion(new Texture("assets/resource/Clay.png"));
+        TextureRegion battery_pack = new TextureRegion(new Texture("assets/resource/Battery_Pack.png"));
+        TextureRegion bone_fragment = new TextureRegion(new Texture("assets/resource/Bone_Fragment.png"));
+        TextureRegion cinder_shard = new TextureRegion(new Texture("assets/resource/Cinder_Shard.png"));
+        TextureRegion copper_bar = new TextureRegion(new Texture("assets/resource/Copper_Bar.png"));
+        TextureRegion copper_ore = new TextureRegion(new Texture("assets/resource/Copper_Ore.png"));
+        TextureRegion gold_bar = new TextureRegion(new Texture("assets/resource/Gold_Bar.png"));
+        TextureRegion gold_ore = new TextureRegion(new Texture("assets/resource/Gold_Ore.png"));
+        TextureRegion hard_wood = new TextureRegion(new Texture("assets/resource/Hardwood.png"));
+        TextureRegion iridium_bar = new TextureRegion(new Texture("assets/resource/Iridium_Bar.png"));
+        TextureRegion iridium_ore = new TextureRegion(new Texture("assets/resource/Iridium_Ore.png"));
+        TextureRegion iron_bar = new TextureRegion(new Texture("assets/resource/Iron_Bar.png"));
+        TextureRegion iron_ore = new TextureRegion(new Texture("assets/resource/Iron_Ore.png"));
+        TextureRegion radioactive_bar = new TextureRegion(new Texture("assets/resource/Radioactive_Bar.png"));
+        TextureRegion radioactive_ore = new TextureRegion(new Texture("assets/resource/Radioactive_Ore.png"));
+        TextureRegion refined_quartz = new TextureRegion(new Texture("assets/resource/Refined_Quartz.png"));
+
+
+        resources.put("fiber", new ResourceItem("naturalResource", "Fiber", fiber, 1, 7));
+        resources.put("stone", new ResourceItem("naturalResource", "Stone", stone, 1, 7));
+        resources.put("wood", new ResourceItem("naturalResource", "Wood", wood, 1, 7));
+        resources.put("coal", new ResourceItem("naturalResource", "Coal", coal, 1, 7));
+        resources.put("clay", new ResourceItem("naturalResource", "Clay", clay, 1, 7));
+        resources.put("battery_pack", new ResourceItem("naturalResource", "Battery_Pack", battery_pack, 1, 7));
+        resources.put("bone_fragment", new ResourceItem("naturalResource", "Bone_Fragment", bone_fragment, 1, 7));
+        resources.put("cinder_shard", new ResourceItem("naturalResource","Cinder_Shard" , cinder_shard, 1, 7));
+        resources.put("copper_bar", new ResourceItem("naturalResource", "Copper_Bar", copper_bar, 1, 7));
+        resources.put("copper_ore", new ResourceItem("naturalResource", "Copper_Ore", copper_ore, 1, 7));
+        resources.put("gold_bar", new ResourceItem("naturalResource", "Gold_Bar", gold_bar, 1, 7));
+        resources.put("gold_ore", new ResourceItem("naturalResource", "Gold_Ore", gold_ore, 1, 7));
+        resources.put("hard_wood", new ResourceItem("naturalResource", "Hardwood", hard_wood, 1, 7));
+        resources.put("iridium_bar", new ResourceItem("naturalResource", "Iridium_Bar", iridium_bar, 1, 7));
+        resources.put("iridium_ore", new ResourceItem("naturalResource", "Iridium_Ore", iridium_ore, 1, 7));
+        resources.put("iron_bar", new ResourceItem("naturalResource", "Iron_Bar", iron_bar, 1, 7));
+        resources.put("iron_ore", new ResourceItem("naturalResource", "Iron_Ore", iron_ore, 1, 7));
+        resources.put("radioactive_bar", new ResourceItem("naturalResource", "Radioactive_Bar", radioactive_bar, 1, 7));
+        resources.put("radioactive_ore", new ResourceItem("naturalResource", "Radioactive_Ore", radioactive_ore, 1, 7));
+        resources.put("refined_quartz", new ResourceItem("naturalResource", "Refined_Quartz", refined_quartz, 1, 7));
+
     }
 
     public List<FarmInOutPoint> getExitPointList() {
@@ -289,15 +334,9 @@ public class GameAssetManager {
         return foragingItem.get(forageName);
     }
 
-    public HashMap<String , NaturalResource> getNaturalResourceList() {
+    public HashMap<String , ResourceItem> getNaturalResourceList() {
         return resources;
     }
 }
-
-public void dispose() {
-        if (spaceImageTexture != null) {
-            spaceImageTexture.dispose();
-        }
-    }
 
 

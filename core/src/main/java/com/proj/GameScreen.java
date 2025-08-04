@@ -2,6 +2,7 @@ package com.proj;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.proj.Control.AnimalManager;
 import com.proj.Control.WorldController;
@@ -25,10 +27,12 @@ import com.proj.map.farmName;
 import com.proj.Control.NPCManager;
 import com.proj.Model.mapObjects.NPCObject;
 import com.badlogic.gdx.graphics.Texture;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.*;
 import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -51,6 +55,8 @@ public class GameScreen implements Screen {
     private InventoryManager inventoryManager;
     private boolean timeIsPaused = false;
     private Stage uistage;
+    private Viewport uistageViewport;
+
     private PlayerBag playerBag;
     private AnimalBuildingController animalBuildingController;
     private AnimalManager animalManager;
@@ -60,12 +66,14 @@ public class GameScreen implements Screen {
     private farmName farm;
     private Texture spaceImage;
     private boolean showSpaceImage = false;
+
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
-           this.farm = farm;
+        this.farm = farm;
         this.mapName = farm.getFarmName();
     }
-     public void setPlayer(Player player) {
+
+    public void setPlayer(Player player) {
 
         this.player = player;
 
@@ -151,11 +159,16 @@ public class GameScreen implements Screen {
                 inventoryManager = new InventoryManager();
                 animalBuildingController = new AnimalBuildingController(worldController.getGameMap());
                 animalManager = new AnimalManager();
-                spaceImage = GameAssetManager.getGameAssetManager().getSpaceImageTexture();
+//                spaceImage = GameAssetManager.getGameAssetManager().getSpaceImageTexture();
                 camera = new OrthographicCamera();
                 viewport = new FitViewport(640, 480, camera);
+                uistageViewport = new ScreenViewport();
+                uistage.setViewport(uistageViewport);
                 viewport.apply();
+                uistageViewport.apply();
                 camera.update();
+                Gdx.input.setInputProcessor(new InputMultiplexer(uistage));
+
                 mapPixelWidth = worldController.getMapWidth() * worldController.getTileWidth();
                 mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
 
@@ -221,7 +234,7 @@ public class GameScreen implements Screen {
             worldController.getSpriteBatch().begin();
 
             worldController.renderMap(camera);
-              if (npcManager != null) {
+            if (npcManager != null) {
                 for (NPCObject npc : npcManager.getNPCs()) {
                     TextureRegion texture = npc.getTextureRegion();
                     worldController.getSpriteBatch().draw(
@@ -231,7 +244,8 @@ public class GameScreen implements Screen {
                         texture.getRegionWidth() * npc.getScale(),
                         texture.getRegionHeight() * npc.getScale()
                     );
-                }}
+                }
+            }
             for (NPCObject npc : npcManager.getNPCs()) {
                 TextureRegion texture = npc.getTextureRegion();
                 worldController.getSpriteBatch().draw(
@@ -251,7 +265,7 @@ public class GameScreen implements Screen {
             if (playerBag != null) {
                 playerBag.render(worldController.getSpriteBatch(), camera);
             }
-             if (showSpaceImage && spaceImage != null) {
+            if (showSpaceImage && spaceImage != null) {
                 Matrix4 originalProjection = worldController.getSpriteBatch().getProjectionMatrix();
                 Matrix4 screenProjection = new Matrix4()
 
@@ -269,6 +283,7 @@ public class GameScreen implements Screen {
 
             worldController.getSpriteBatch().end();
 
+            uistageViewport.apply();
             uistage.act(delta);
             uistage.draw();
 
@@ -320,6 +335,7 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         try {
             viewport.update(width, height);
+            uistageViewport.update(width, height, true);
             float halfViewportWidth = viewport.getWorldWidth() / 2;
             float halfViewportHeight = viewport.getWorldHeight() / 2;
             camera.position.x = MathUtils.clamp(
@@ -366,7 +382,7 @@ public class GameScreen implements Screen {
             if (animalManager != null) {
                 animalManager.dispose();
             }
-             if (npcTexture != null) {
+            if (npcTexture != null) {
                 npcTexture.dispose();
             }
             for (Texture texture : npcTextures) {
@@ -375,6 +391,7 @@ public class GameScreen implements Screen {
                 }
             }
             npcTextures.clear();
+            uistage.dispose();
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in dispose method", e);
         }
@@ -400,6 +417,7 @@ public class GameScreen implements Screen {
 
             viewport.apply();
             camera.update();
+
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in updateCamera method", e);
         }
@@ -466,14 +484,13 @@ public class GameScreen implements Screen {
                 selectToolSlot(4);
             } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
                 selectToolSlot(5);
-            }
-            else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
+            } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
                 if (inventoryManager != null && inventoryManager.getPlayerInventory() != null) {
                     inventoryManager.getPlayerInventory().selectNoTool();
                     Gdx.app.log("GameScreen", "Selected no tool");
                 }
             }
-             if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
                 showSpaceImage = !showSpaceImage; // Toggle visibility
                 Gdx.app.log("GameScreen", "Space pressed. showSpaceImage: " + showSpaceImage);
 
@@ -552,10 +569,18 @@ public class GameScreen implements Screen {
                     int tileY = (int) (player.getPosition().y / 16);
 
                     switch (player.getDirection()) {
-                        case UP: tileY++; break;
-                        case DOWN: tileY--; break;
-                        case LEFT: tileX--; break;
-                        case RIGHT: tileX++; break;
+                        case UP:
+                            tileY++;
+                            break;
+                        case DOWN:
+                            tileY--;
+                            break;
+                        case LEFT:
+                            tileX--;
+                            break;
+                        case RIGHT:
+                            tileX++;
+                            break;
                     }
 
                     if (tool.useOnTile(tileX, tileY)) {

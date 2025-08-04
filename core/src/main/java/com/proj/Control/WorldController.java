@@ -4,11 +4,18 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.TimeAndWeather.time.*;
 import com.proj.Model.TimeAndWeather.TimeRenderer;
 import com.proj.Model.TimeAndWeather.WeatherController;
+import com.proj.Model.inventoryItems.ForagingInventoryWindow;
+import com.proj.Model.inventoryItems.SeedInventoryWindow;
+import com.proj.Model.inventoryItems.crops.CropInventoryWindow;
 import com.proj.Player;
 import com.proj.map.FarmInOutPoint;
 import com.proj.map.GameMap;
@@ -33,6 +40,12 @@ public class WorldController {
     private TimeRenderer timeRenderer;
     private Time gameTime;
     private Stage uistage;
+    private SeedInventoryWindow seedWindow;
+    private TextButton showSeedsButton;
+    private ForagingInventoryWindow foragingInventoryWindow;
+    private TextButton showForagingButton;
+    private CropInventoryWindow cropInventoryWindow;
+    private TextButton showCropButton;
 
     private ClockWidget clockWidget;
     private TimeDisplayActor timeDisplayActor;
@@ -80,6 +93,67 @@ public class WorldController {
         uistage.addActor(clockWidget);
         uistage.addActor(timeDisplayActor);
         uistage.addActor(dateDisplayActor);
+
+        Skin stardewSkin = GameAssetManager.getGameAssetManager().getStardewSkin();
+        seedWindow = new SeedInventoryWindow(stardewSkin, gameMaps.get(1).getFarmingController());
+        seedWindow.setVisible(false);
+
+        foragingInventoryWindow = new ForagingInventoryWindow(stardewSkin, gameMaps.get(1).getFarmingController());
+        foragingInventoryWindow.setVisible(false);
+
+        cropInventoryWindow = new CropInventoryWindow(stardewSkin);
+        cropInventoryWindow.setVisible(false);
+
+        uistage.addActor(seedWindow);
+        uistage.addActor(foragingInventoryWindow);
+        uistage.addActor(cropInventoryWindow);
+
+        showSeedsButton = new TextButton("Seed", stardewSkin);
+        showSeedsButton.setSize(157, 80);
+        showSeedsButton.setPosition(
+            Gdx.graphics.getWidth() - showSeedsButton.getWidth() - 1,
+            Gdx.graphics.getHeight() - showSeedsButton.getHeight() - 20
+        );
+        showSeedsButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                seedWindow.setVisible(!seedWindow.isVisible());
+            }
+        });
+        showSeedsButton.toFront();
+        uistage.addActor(showSeedsButton);
+
+        showForagingButton = new TextButton("Foraging", stardewSkin);
+        showForagingButton.setSize(157, 80);
+        showForagingButton.setPosition(
+            Gdx.graphics.getWidth() - showForagingButton.getWidth() - 1,
+            Gdx.graphics.getHeight() - showSeedsButton.getHeight() - 180
+        );
+        showForagingButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                foragingInventoryWindow.setVisible(!foragingInventoryWindow.isVisible());
+            }
+        });
+        showForagingButton.toFront();
+        uistage.addActor(showForagingButton);
+
+        showCropButton = new TextButton("Crop", stardewSkin);
+        showCropButton.setSize(157, 80);
+        showCropButton.setPosition(
+            Gdx.graphics.getWidth() - showCropButton.getWidth() - 1,
+            Gdx.graphics.getHeight() - showCropButton.getHeight() - 300
+        );
+        showCropButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                cropInventoryWindow.setVisible(!cropInventoryWindow.isVisible());
+            }
+        });
+        showCropButton.toFront();
+        uistage.addActor(showCropButton);
+
+
         positionUiElement(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         farmInOutPoints = GameAssetManager.getGameAssetManager().getExitPointList();
         currentFarmInOutPoint = findExitEnterPointsById(maps.get(landName));
@@ -167,7 +241,40 @@ public class WorldController {
 
     public void resize(int width, int height) {
         uistage.getViewport().update(width, height, true);
+        showSeedsButton.toFront();
         positionUiElement(width, height);
+
+
+        showSeedsButton.setPosition(
+            showSeedsButton.getWidth() - 14 ,
+            showSeedsButton.getHeight() + 20
+        );
+        seedWindow.centerWindow();
+
+        showForagingButton.toFront();
+        positionUiElement(width, height);
+        showForagingButton.setPosition(
+            showForagingButton.getWidth() - 14  ,
+            showForagingButton.getHeight() + 120
+        );
+        foragingInventoryWindow.centerWindow();
+
+        showCropButton.toFront();
+        positionUiElement(width, height);
+        showCropButton.setPosition(
+            showCropButton.getWidth() - 14 ,
+            showCropButton.getHeight() + 220
+        );
+        cropInventoryWindow.centerWindow();
+
+        if (seedWindow != null) {
+            seedWindow.setPosition(
+                (width - seedWindow.getWidth()) / 2,
+                (height - seedWindow.getHeight()) / 2
+            );
+        }
+
+
         weatherController.resize((int) width, (int) height);
         nightRender.resize(width, height);
     }
@@ -296,12 +403,12 @@ public class WorldController {
         ((Game) Gdx.app.getApplicationListener()).setScreen(newScreen);
     }
     private farmName getFarmNameFromString(String name) {
-        for (farmName farm : farmName.values()) {
+        for (farmName farm : com.proj.map.farmName.values()) {
             if (farm.getFarmName().equalsIgnoreCase(name)) {
                 return farm;
             }
         }
-        return farmName.STANDARD;
+        return com.proj.map.farmName.STANDARD;
     }
 
 }

@@ -8,11 +8,19 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.proj.Model.mapObjects.ForagingItem;
+import com.proj.Model.inventoryItems.ResourceItem;
+import com.proj.Model.inventoryItems.SeedItem;
+import com.proj.Model.inventoryItems.crops.CropManager;
+import com.proj.Model.inventoryItems.seeds.ItemRegistry;
+import com.proj.Model.inventoryItems.trees.TreeManager;
+import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.mapObjects.NaturalResource;
 import com.proj.Model.TimeAndWeather.time.LanternLightSystem;
+import com.proj.Control.FarmingController;
+
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -27,17 +35,36 @@ public class GameMap {
     private Point playerSpawnPoint;
     private LanternLightSystem lanternLightSystem;
     private List<Tile> foragingCropTiles;
+    private FarmingController farmingController;
+    private Season currentSeason;
+    private TiledMapTile tilledDirt;
 
 
     public GameMap(String farmName, Season season) {
         mapName = farmName;
         batch = new SpriteBatch();
         loader = new LandLoader(farmName, season);
+        this.currentSeason = season;
         tiledMap = loader.getMap();
         playerSpawnPoint = loader.getPlayerSpawnPoint();
         mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
         initializeLanternSystem();
         foragingCropTiles = new ArrayList<>();
+        this.farmingController = farmingController;
+        if (farmingController != null) {
+            farmingController.setMap(this);
+            findTilledDirt();
+            farmingController.plantSeed((SeedItem) ItemRegistry.getInstance().get("tulip_bulb"), 45,45);
+        }
+    }
+    public void findTilledDirt() {
+        try {
+            TiledMapTileSet tileSet = loader.getMap().getTileSets().getTileSet("untitled tile sheet");
+            int firstGId = tileSet.getProperties().get("firstgid", Integer.class);
+            tilledDirt = tileSet.getTile(firstGId + 681);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     public LandLoader getLandLoader() {
@@ -50,6 +77,12 @@ public class GameMap {
         mapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
         initializeLanternSystem();
     }
+    public TreeManager getTreeManager() {
+        return farmingController.getTreeManager();
+    }
+    public CropManager getCropManager() {
+        return farmingController.getCropManager();
+    }
 
 
     public void render(OrthographicCamera camera) {
@@ -59,12 +92,21 @@ public class GameMap {
 
     public void renderLandObject() {
         for (Tile tile : foragingCropTiles) {
-            ForagingItem item = (ForagingItem) tile.getLandObject();
+            com.proj.Model.inventoryItems.ForagingItem item = (com.proj.Model.inventoryItems.ForagingItem) tile.getLandObject();
             Point pos = item.getPosition();
             batch.draw(item.getTexture(),
                 pos.x * loader.getTileWidth(),
                 pos.y * loader.getTileHeight());
         }
+        if (farmingController != null) {
+            farmingController.renderAll(batch, currentSeason);
+        }
+    }
+
+    public void updateDaily(Season season) {
+        this.currentSeason = season;
+        if (farmingController == null) return;
+        farmingController.updateDaily(currentSeason);
     }
 
     public SpriteBatch getSpriteBatch() {
@@ -89,12 +131,6 @@ public class GameMap {
         lanternLightSystem.render(batch);
     }
 
-    public boolean canPlantInTile(int x, int y) {
-        Tile tile = loader.getTiles()[x][y];
-        if (tile == null) return false;
-        if (!tile.isPassable()) return false;
-        return true;
-    }
 
     public void putForagingInTile(int x, int y, LandObject foragingObject) {
         Tile tile = loader.getTiles()[x][y];
@@ -102,6 +138,14 @@ public class GameMap {
         tile.setPassable(false);
         tile.setType(TileType.FORAGING);
         foragingCropTiles.add(tile);
+    }
+
+    public boolean canPlantInTile(int x, int y) {
+        Tile tile = loader.getTiles()[x][y];
+        if (tile == null) return false;
+        if (!tile.isPassable()) return false;
+        if (!tile.isTilled()) return false;
+        return true;
     }
 
     public void removeForagings() {
@@ -129,29 +173,49 @@ public class GameMap {
         return null;
     }
 
-    public NaturalResource pickNaturalResource(Point playerPoint) {
+    public boolean hoeTile(int x, int y) {
+        Tile tile = loader.getTiles()[x][y];
+        if (tile == null) return false;
+        if (tile.isOccupied() || tile.getLandObject() != null) return false;
+        tile.setTilled(true);
+        tile.removeObject();
+        TiledMapTileLayer resourceLayer = (TiledMapTileLayer) loader.getMap().getLayers().get("Back");
+        if (resourceLayer != null) {
+            TiledMapTileLayer.Cell cell = resourceLayer.getCell(x, y);
+            if (cell == null) return false;
+            cell.setTile(tilledDirt);
+            resourceLayer.setCell(x, y, cell);
+        }
+        restoreOriginalTile(x, y);
+        if (resourceLayer == null) return false;
+        return true;
+    }
+
+    public ResourceItem pickNaturalResource(Point playerPoint) {
         Tile tile = loader.getTiles()[playerPoint.x][playerPoint.y];
         if (tile == null) return null;
         Object item = tile.getLandObject();
-        if (item instanceof NaturalResource) {
-            NaturalResource naturalResource = (NaturalResource) item;
+        if (item instanceof ResourceItem) {
+            ResourceItem naturalResource = (ResourceItem) item;
             tile.removeObject();
             tile.setPassable(true);
-            for (MapLayer layer : loader.getMap().getLayers()) {
-                if (layer instanceof TiledMapTileLayer) {
-                    TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) layer).getCell(playerPoint.x, playerPoint.y);
-                    if (cell == null) continue;
-                    int first = loader.getMap().getTileSets().getTileSet("untitled tile sheet").
-                        getProperties().get("firstgid", Integer.class);
-                    TiledMapTile tile1 = loader.getMap().getTileSets().getTileSet("untitled tile sheet").
-                        getTile(first + 227);
-                    if (tile1 == null) continue;
-                    cell.setTile(tile1);
-                }
+            TiledMapTileLayer resourceLayer = (TiledMapTileLayer) loader.getMap().getLayers().get("Paths");
+            if (resourceLayer != null) {
+                resourceLayer.setCell(playerPoint.x, playerPoint.y, null);
             }
+            restoreOriginalTile(playerPoint.x, playerPoint.y);
             return naturalResource;
         }
         return null;
+    }
+
+    private void restoreOriginalTile(int x, int y) {
+        TiledMapTileLayer backLayer = (TiledMapTileLayer) loader.getMap().getLayers().get("Back");
+        if (backLayer == null) return;
+        TiledMapTileLayer.Cell cell = loader.getOriginalGroundCells().get(new Point(x, y));
+        if (cell != null) {
+            backLayer.setCell(x, y, cell);
+        }
     }
 
     public void dispose() {
@@ -183,5 +247,14 @@ public class GameMap {
     public String getMapName() {
         return mapName;
     }
+
+    public Tile getTile(int x, int y) {
+        return loader.getTiles()[x][y];
+    }
+
+    public FarmingController getFarmingController() {
+        return farmingController;
+    }
+
 
 }
