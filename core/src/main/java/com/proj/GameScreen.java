@@ -12,6 +12,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.proj.Control.AnimalManager;
 import com.proj.Control.WorldController;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.proj.Control.AnimalBuildingController;
 import com.proj.Model.Animal;
 import com.proj.Model.Inventory.InventoryItem;
@@ -20,6 +22,13 @@ import com.proj.Model.Inventory.PlayerBag;
 import com.proj.Model.Inventory.Tool;
 import com.proj.Model.TimeAndWeather.time.Time;
 import com.proj.map.farmName;
+import com.proj.Control.NPCManager;
+import com.proj.Model.mapObjects.NPCObject;
+import com.badlogic.gdx.graphics.Texture;
+import java.util.ArrayList;
+import java.util.List;
+import java.awt.*;
+import java.util.ArrayList;
 
 public class GameScreen implements Screen {
     private Player player;
@@ -38,8 +47,97 @@ public class GameScreen implements Screen {
     private PlayerBag playerBag;
     private AnimalBuildingController animalBuildingController;
     private AnimalManager animalManager;
+    private NPCManager npcManager;
+    private Texture npcTexture;
+    private Point customSpawnPoint;
+    private farmName farm;
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
+           this.farm = farm;
+        this.mapName = farm.getFarmName();
+    }
+     public void setPlayer(Player player) {
+
+        this.player = player;
+
+        if (worldController != null) {
+
+
+
+            worldController.setPlayer(player);
+
+
+
+        }
+
+        if (camera != null && player != null) {
+
+            camera.position.set(player.getPosition().x, player.getPosition().y, 0);
+
+            camera.update();
+
+        }
+
+    }
+
+    public void setNPCManager(NPCManager npcManager) {
+
+        this.npcManager = npcManager;
+
+        if (npcManager != null && worldController != null) {
+
+            placeNPCs();
+
+        }
+
+    }
+
+    private Point getSpawnPoint() {
+
+        if (customSpawnPoint != null) {
+
+            return customSpawnPoint;
+
+        }
+
+        return worldController != null ? worldController.getPlayerSpawnPoint() : null;
+
+    }
+
+    private List<Texture> npcTextures = new ArrayList<>(); // Add this class field
+
+    private void placeNPCs() {
+        if (npcManager == null) {
+            npcManager = new NPCManager();
+        }
+        if (npcManager.getNPCs().isEmpty()) {
+            Texture leahTexture = new Texture(Gdx.files.internal("characters/leah.png"));
+            Texture georgeTexture = new Texture(Gdx.files.internal("characters/george.jpg"));
+            Texture lewisTexture = new Texture(Gdx.files.internal("characters/lewis.jpg"));
+            Texture pierreTexture = new Texture(Gdx.files.internal("characters/pierre.jpg"));
+            Texture robinTexture = new Texture(Gdx.files.internal("characters/robin.png"));
+            NPCObject leah = new NPCObject(new TextureRegion(leahTexture));
+            NPCObject alex = new NPCObject(new TextureRegion(georgeTexture));
+            NPCObject penny = new NPCObject(new TextureRegion(lewisTexture));
+            NPCObject sebastian = new NPCObject(new TextureRegion(pierreTexture));
+            NPCObject abigail = new NPCObject(new TextureRegion(robinTexture));
+            npcManager.addNPC(leah);
+            npcManager.addNPC(alex);
+            npcManager.addNPC(penny);
+            npcManager.addNPC(sebastian);
+            npcManager.addNPC(abigail);
+            npcTextures.add(leahTexture);
+            npcTextures.add(georgeTexture);
+            npcTextures.add(lewisTexture);
+            npcTextures.add(pierreTexture);
+            npcTextures.add(robinTexture);
+        }
+        npcManager.placeNPCsRandomly(
+            worldController.getMapWidth(),
+            worldController.getMapHeight(),
+            worldController.getTileWidth(),
+            worldController.getTileHeight()
+        );
     }
 
     @Override
@@ -75,6 +173,7 @@ public class GameScreen implements Screen {
                 playerBag.setScale(0.7f);
 
                 worldController.setPlayer(player);
+                placeNPCs();
                 camera.position.set(player.getPosition().x, player.getPosition().y, 0);
                 camera.update();
 
@@ -120,6 +219,27 @@ public class GameScreen implements Screen {
             worldController.getSpriteBatch().begin();
 
             worldController.renderMap(camera);
+              if (npcManager != null) {
+                for (NPCObject npc : npcManager.getNPCs()) {
+                    TextureRegion texture = npc.getTextureRegion();
+                    worldController.getSpriteBatch().draw(
+                        texture,
+                        npc.getPixelX(),
+                        npc.getPixelY(),
+                        texture.getRegionWidth() * npc.getScale(),
+                        texture.getRegionHeight() * npc.getScale()
+                    );
+                }}
+            for (NPCObject npc : npcManager.getNPCs()) {
+                TextureRegion texture = npc.getTextureRegion();
+                worldController.getSpriteBatch().draw(
+                    texture,
+                    npc.getPixelX(),
+                    npc.getPixelY(),
+                    texture.getRegionWidth() * npc.getScale(),
+                    texture.getRegionHeight() * npc.getScale()
+                );
+            }
             player.render(worldController.getSpriteBatch());
             animalManager.render(worldController.getSpriteBatch());
             if (animalBuildingController != null) {
@@ -149,6 +269,10 @@ public class GameScreen implements Screen {
             Gdx.app.error("GameScreen", "Error in render method", e);
             e.printStackTrace();
         }
+    }
+
+    public void setPlayerSpawnPoint(Point spawnPoint) {
+        this.customSpawnPoint = spawnPoint;
     }
 
 
@@ -227,6 +351,15 @@ public class GameScreen implements Screen {
             if (animalManager != null) {
                 animalManager.dispose();
             }
+             if (npcTexture != null) {
+                npcTexture.dispose();
+            }
+            for (Texture texture : npcTextures) {
+                if (texture != null) {
+                    texture.dispose();
+                }
+            }
+            npcTextures.clear();
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in dispose method", e);
         }
