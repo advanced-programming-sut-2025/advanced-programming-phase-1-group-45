@@ -93,7 +93,7 @@ public class CropInventoryWindow extends Window {
             rowTable.add(seedCell).size(iconSize + 20, iconSize + 40).pad(spacing);
 
             if ((i + 1) % COLUMNS == 0 || i == seeds.size - 1) {
-                contentTable.add(rowTable).padBottom(20).row(); // فاصله بین ردیف‌ها
+                contentTable.add(rowTable).padBottom(20).row();
                 rowTable = new Table();
                 rowTable.defaults().pad(spacing).center();
 

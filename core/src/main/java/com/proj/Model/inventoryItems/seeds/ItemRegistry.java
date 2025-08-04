@@ -4,9 +4,12 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.inventoryItems.CropItem;
+import com.proj.Model.inventoryItems.FruitItem;
 import com.proj.Model.inventoryItems.SeedItem;
 import com.proj.Model.inventoryItems.crops.CropData;
 import com.proj.Model.inventoryItems.crops.CropRegistry;
+import com.proj.Model.inventoryItems.trees.TreeData;
+import com.proj.Model.inventoryItems.trees.TreeRegistry;
 
 public class ItemRegistry {
     private static ItemRegistry instance;
@@ -29,6 +32,21 @@ public class ItemRegistry {
                 items.put(item.getId(), item);
             }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            for (TreeData td : TreeRegistry.getInstance().getAllTreeData()) {
+                if (!td.isFruitTree()) continue;
+                String fruitName = td.getName();
+                fruitName = fruitName.replaceAll(" ", "");
+                fruitName = fruitName.replaceAll("Tree", "");
+                FruitItem fruitItem = new FruitItem(fruitName.toLowerCase(), fruitName,
+                    GameAssetManager.getGameAssetManager().getTexture(td.getFruitTexturePath()),
+                    1, td.getFruitEnergy(), td.getFruitBaseSellPrice());
+                items.put(fruitItem.getId(), fruitItem);
+            }
+        }catch (Exception e) {
             e.printStackTrace();
         }
     }

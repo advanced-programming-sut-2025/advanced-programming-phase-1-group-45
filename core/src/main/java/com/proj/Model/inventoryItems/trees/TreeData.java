@@ -25,6 +25,7 @@ public class TreeData {
     private int fruitBaseSellPrice;
     private boolean isFruitEdible;
     private int fruitEnergy;
+    private String fruitTexturePath;
 
     private Array<TextureRegion> growthTextures;
     private TextureRegion fruitTexture;
@@ -88,6 +89,9 @@ public class TreeData {
     public int getFruitBaseSellPrice() { return fruitBaseSellPrice; }
     public boolean isFruitEdible() { return isFruitEdible; }
     public int getFruitEnergy() { return fruitEnergy; }
+    public String getFruitTexturePath() {
+        return fruitTexturePath = name.replaceAll("Tree", "").replaceAll(" ", "");
+    }
 
     public TextureRegion getTextureForStage(int stage) {
         if (stage < 0 || stage >= growthTextures.size) {

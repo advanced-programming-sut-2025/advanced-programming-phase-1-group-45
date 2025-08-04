@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.InventoryItemFactory;
+import com.proj.Model.inventoryItems.seeds.ItemRegistry;
 import com.proj.map.Season;
 
 import java.awt.*;
@@ -47,24 +48,20 @@ public class Tree {
         int[] countRange = data.getProductCount();
         int count = MathUtils.random(countRange[0], countRange[1]);
         hasProduct = false;
-        return InventoryItemFactory.createItem(data.getProduct(), count);
+        return ItemRegistry.getInstance().get(data.getProduct());
     }
 
     public Array<InventoryItem> chop() {
         Array<InventoryItem> items = new Array<>();
 
-        // Add chop product
         if (data.getChopProduct() != null) {
             int[] chopRange = data.getChopProductCount();
             int chopCount = MathUtils.random(chopRange[0], chopRange[1]);
             for (String item : data.getChopProduct()) {
-                items.add(InventoryItemFactory.createItem(item, chopCount));
+                items.add(ItemRegistry.getInstance().get(item));
             }
         }
-
-        // Add wood
         items.add(InventoryItemFactory.createItem("Wood", 1));
-
         return items;
     }
 

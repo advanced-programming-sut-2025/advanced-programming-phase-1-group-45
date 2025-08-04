@@ -94,7 +94,7 @@ public class ForagingInventoryWindow extends Window {
             rowTable.add(seedCell).size(iconSize + 20, iconSize + 40).pad(spacing);
 
             if ((i + 1) % COLUMNS == 0 || i == seeds.size - 1) {
-                contentTable.add(rowTable).padBottom(20).row(); // فاصله بین ردیف‌ها
+                contentTable.add(rowTable).padBottom(20).row();
                 rowTable = new Table();
                 rowTable.defaults().pad(spacing).center();
 
@@ -115,9 +115,6 @@ public class ForagingInventoryWindow extends Window {
         cell.add(icon).size(iconSize).padTop(5).row();
 
         String displayName = seed.getName();
-//        if (displayName.contains(" Seed")) {
-//            displayName = displayName.substring(0, displayName.indexOf(" Seed"));
-//        }
 
         Label nameLabel = new Label(displayName, skin, "default");
         nameLabel.setEllipsis(true);
@@ -128,12 +125,6 @@ public class ForagingInventoryWindow extends Window {
         Label countLabel = new Label(String.valueOf(seed.getQuantity()), skin, "default");
         cell.add(countLabel).padBottom(5);
 
-//        cell.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                selectSeed(seed);
-//            }
-//        });
 
         return cell;
     }

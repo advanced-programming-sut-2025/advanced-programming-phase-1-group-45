@@ -343,7 +343,7 @@
     ],
     "product": "Maple Syrup",
     "chopProduct": [
-      "Maple Seed",
+      "maple_seed",
       "Wood"
     ],
     "isFruitTree": false
@@ -386,7 +386,7 @@
     "product": "Pint Tar",
     "chopProduct": [
       "Wood",
-      "Pine Cone"
+      "pine_cone"
     ],
     "isFruitTree": false
   },
@@ -427,7 +427,7 @@
     ],
     "product": "Sap",
     "chopProduct": [
-      "Mahogany Seed",
+      "mahogany_seed",
       "Wood"
     ],
     "isFruitTree": false
@@ -462,7 +462,7 @@
       "assets/trees/Mushroom_stump.png"
     ],
     "product": "Common Mushroom",
-    "chopProduct": ["Mushroom Tree Seeds"],
+    "chopProduct": ["mushroom_tree_seed"],
     "isFruitTree": false
   },
   {
@@ -496,7 +496,7 @@
     ],
     "product": "Mystic Syrup",
     "chopProduct": [
-      "Mystic Tree Seed",
+      "mystic_tree_seed",
       "Wood"
     ],
     "isFruitTree": false
