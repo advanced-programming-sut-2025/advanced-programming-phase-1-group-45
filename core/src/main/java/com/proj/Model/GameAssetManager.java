@@ -37,6 +37,7 @@ public class GameAssetManager {
 
     private Texture thunder;
     private Texture lanternLight;
+    private Texture spaceImageTexture;
 
 
     private List<FarmInOutPoint> exitPointList = new ArrayList<>();
@@ -64,9 +65,14 @@ public class GameAssetManager {
         thunder = new Texture("assets/thunderStorm.png");
         lanternLight = new Texture("assets/lantern.png");
         smallFont = new BitmapFont(Gdx.files.internal("smallFont/exo-small.fnt"));
+        spaceImageTexture = new Texture(Gdx.files.internal("NPCTable/npc_table.png"));
         loadFarmExitPoints();
         loadForagingItems();
         loadResources();
+    }
+
+     public Texture getSpaceImageTexture() {
+        return spaceImageTexture;
     }
 
     public static GameAssetManager getGameAssetManager() {
@@ -287,5 +293,11 @@ public class GameAssetManager {
         return resources;
     }
 }
+
+public void dispose() {
+        if (spaceImageTexture != null) {
+            spaceImageTexture.dispose();
+        }
+    }
 
 
