@@ -1,4 +1,4 @@
-package com.proj.Model.inventoryItems.crops;
+package com.proj.Model.inventoryItems.inventoryItems.crops;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,7 +12,7 @@ import com.proj.Model.Inventory.InventoryManager;
 import com.proj.Model.inventoryItems.CropItem;
 
 
-public class CropInventoryWindow extends com.badlogic.gdx.scenes.scene2d.ui.Window {
+public class CropInventoryWindow extends Window {
     private final Table contentTable;
     private final Skin skin;
     private final TextButton closeButton;

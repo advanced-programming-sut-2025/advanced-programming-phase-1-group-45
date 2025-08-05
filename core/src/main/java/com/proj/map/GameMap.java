@@ -4,7 +4,6 @@ package com.proj.map;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -17,7 +16,6 @@ import com.proj.Model.inventoryItems.seeds.ItemRegistry;
 import com.proj.Model.inventoryItems.trees.TreeManager;
 import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.Model.GameAssetManager;
-import com.proj.Model.mapObjects.NaturalResource;
 import com.proj.Model.TimeAndWeather.time.LanternLightSystem;
 import com.proj.Control.FarmingController;
 
@@ -40,7 +38,7 @@ public class GameMap {
     private TiledMapTile tilledDirt;
 
 
-    public GameMap(String farmName, Season season) {
+    public GameMap(String farmName, Season season, FarmingController farmingController) {
         mapName = farmName;
         batch = new SpriteBatch();
         loader = new LandLoader(farmName, season);
@@ -57,6 +55,7 @@ public class GameMap {
             farmingController.plantSeed((SeedItem) ItemRegistry.getInstance().get("tulip_bulb"), 45,45);
         }
     }
+
     public void findTilledDirt() {
         try {
             TiledMapTileSet tileSet = loader.getMap().getTileSets().getTileSet("untitled tile sheet");

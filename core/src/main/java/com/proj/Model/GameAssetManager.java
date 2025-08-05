@@ -40,6 +40,7 @@ public class GameAssetManager {
     private Texture thunder;
     private Texture lanternLight;
     private Skin stardewSkin;
+    private Texture spaceImageTexture;
 
 
     private List<FarmInOutPoint> exitPointList = new ArrayList<>();
@@ -71,6 +72,11 @@ public class GameAssetManager {
         loadFarmExitPoints();
         loadForagingItems();
         loadResources();
+        spaceImageTexture = new Texture(Gdx.files.internal("NPCTable/npc_table.png"));
+    }
+
+    public Texture getSpaceImageTexture() {
+        return spaceImageTexture;
     }
 
     public static GameAssetManager getGameAssetManager() {
@@ -307,7 +313,7 @@ public class GameAssetManager {
         resources.put("clay", new ResourceItem("naturalResource", "Clay", clay, 1, 7));
         resources.put("battery_pack", new ResourceItem("naturalResource", "Battery_Pack", battery_pack, 1, 7));
         resources.put("bone_fragment", new ResourceItem("naturalResource", "Bone_Fragment", bone_fragment, 1, 7));
-        resources.put("cinder_shard", new ResourceItem("naturalResource","Cinder_Shard" , cinder_shard, 1, 7));
+        resources.put("cinder_shard", new ResourceItem("naturalResource", "Cinder_Shard", cinder_shard, 1, 7));
         resources.put("copper_bar", new ResourceItem("naturalResource", "Copper_Bar", copper_bar, 1, 7));
         resources.put("copper_ore", new ResourceItem("naturalResource", "Copper_Ore", copper_ore, 1, 7));
         resources.put("gold_bar", new ResourceItem("naturalResource", "Gold_Bar", gold_bar, 1, 7));
@@ -328,14 +334,20 @@ public class GameAssetManager {
     }
 
     public Texture getForagingTexture(String forageName) {
-        if(!foragingItem.containsKey(forageName)) {
+        if (!foragingItem.containsKey(forageName)) {
             return null;
         }
         return foragingItem.get(forageName);
     }
 
-    public HashMap<String , ResourceItem> getNaturalResourceList() {
+    public HashMap<String, ResourceItem> getNaturalResourceList() {
         return resources;
+    }
+
+    public void dispose() {
+        if (spaceImageTexture != null) {
+            spaceImageTexture.dispose();
+        }
     }
 }
 

@@ -1,16 +1,20 @@
-package com.proj.Model.inventoryItems.crops;
+package com.proj.Model.inventoryItems.inventoryItems.crops;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
+import com.proj.Model.Inventory.InventoryItem;
+import com.proj.Model.inventoryItems.crops.Crop;
+import com.proj.Model.inventoryItems.crops.CropData;
+import com.proj.Model.inventoryItems.crops.CropRegistry;
+import com.proj.Model.inventoryItems.crops.GiantCrop;
 import com.proj.map.GameMap;
 import com.proj.map.Season;
-import com.proj.Model.Inventory.InventoryItem;
 
 import java.awt.*;
 
 public class CropManager {
-    private final Array<Crop> crops = new Array<>();
+    private final Array<com.proj.Model.inventoryItems.crops.Crop> crops = new Array<>();
     private final Array<GiantCrop> giantCrops = new Array<>();
     private GameMap map;
 
@@ -29,7 +33,7 @@ public class CropManager {
             return false;
         }
 
-        crops.add(new Crop(data, tileX, tileY));
+        crops.add(new com.proj.Model.inventoryItems.crops.Crop(data, tileX, tileY));
         map.getTile(tileX, tileY).setOccupied(true);
         map.getTile(tileX, tileY).setPassable(false);
         checkForGiantCrops();
@@ -38,7 +42,7 @@ public class CropManager {
 
     public void updateDaily(Season season) {
         for (int i = 0; i < crops.size; i++) {
-            Crop crop = crops.get(i);
+            com.proj.Model.inventoryItems.crops.Crop crop = crops.get(i);
             checkForWater(crop);
             if (crop.getCropData().getSeason().contains(season, false)) {
                 crop.grow();
@@ -54,7 +58,7 @@ public class CropManager {
         }
     }
 
-    private void checkForWater(Crop crop) {
+    private void checkForWater(com.proj.Model.inventoryItems.crops.Crop crop) {
         if (!crop.isWatered()) {
             crop.increaseDaysWithoutWater();
         }
@@ -67,7 +71,7 @@ public class CropManager {
         crop.setIsWatered(false);
     }
 
-    private void growDaily(Crop crop, Season season) {
+    private void growDaily(com.proj.Model.inventoryItems.crops.Crop crop, Season season) {
         if (crop.getCropData().getSeason().contains(season, false)) {
             crop.grow();
         }
@@ -91,10 +95,10 @@ public class CropManager {
     }
 
     private boolean canFormGiantCrop(int x, int y) {
-        Crop crop1 = getCropAt(x, y);
-        Crop crop2 = getCropAt(x + 1, y);
-        Crop crop3 = getCropAt(x, y + 1);
-        Crop crop4 = getCropAt(x + 1, y + 1);
+        com.proj.Model.inventoryItems.crops.Crop crop1 = getCropAt(x, y);
+        com.proj.Model.inventoryItems.crops.Crop crop2 = getCropAt(x + 1, y);
+        com.proj.Model.inventoryItems.crops.Crop crop3 = getCropAt(x, y + 1);
+        com.proj.Model.inventoryItems.crops.Crop crop4 = getCropAt(x + 1, y + 1);
 
         return crop1 != null && crop2 != null && crop3 != null && crop4 != null &&
             crop1.getCropData().equals(crop2.getCropData()) &&
@@ -106,7 +110,7 @@ public class CropManager {
     }
 
     private void formGiantCrop(int x, int y) {
-        Crop baseCrop = getCropAt(x, y);
+        com.proj.Model.inventoryItems.crops.Crop baseCrop = getCropAt(x, y);
         int giantStage = Math.max(getCropAt(x, y).getStage(), getCropAt(x, y + 1).getStage());
         giantStage = Math.max(giantStage, getCropAt(x + 1, y).getStage());
         giantStage = Math.max(giantStage, getCropAt(x + 1, y + 1).getStage());
@@ -138,7 +142,7 @@ public class CropManager {
     }
 
     private void removeCropAt(int x, int y) {
-        Crop crop = getCropAt(x, y);
+        com.proj.Model.inventoryItems.crops.Crop crop = getCropAt(x, y);
         if (crop instanceof GiantCrop) {
             giantCrops.removeValue((GiantCrop) crop, true);
         } else if (crop != null) {
@@ -199,7 +203,7 @@ public class CropManager {
         if (giantCrop != null) {
             return harvestGiantCrop(giantCrop);
         }
-        Crop crop = getCropAt(tileX, tileY);
+        com.proj.Model.inventoryItems.crops.Crop crop = getCropAt(tileX, tileY);
         if (crop == null || !crop.hasProduct()) return null;
         InventoryItem item = crop.harvest();
         if (crop.getCropData().getRegrowthTime() <= 0) {
@@ -216,12 +220,12 @@ public class CropManager {
         if (giantCrop != null) {
             return chopGiantCrop(giantCrop);
         }
-        Crop crop = getCropAt(tileX, tileY);
+        com.proj.Model.inventoryItems.crops.Crop crop = getCropAt(tileX, tileY);
         if (crop == null) return null;
         return chopCrop(crop, tileX, tileY);
     }
 
-    private InventoryItem chopCrop(Crop crop, int tileX, int tileY) {
+    private InventoryItem chopCrop(com.proj.Model.inventoryItems.crops.Crop crop, int tileX, int tileY) {
         InventoryItem item = crop.chop();
         map.getTile(tileX, tileY).setOccupied(false);
         map.getTile(tileX, tileY).setPassable(true);
@@ -253,7 +257,7 @@ public class CropManager {
         int tileW = map.getTileWidth();
         int tileH = map.getTileHeight();
 
-        for (Crop crop : crops) {
+        for (com.proj.Model.inventoryItems.crops.Crop crop : crops) {
             TextureRegion tex = crop.getTexture();
 
             if (tex == null) {
@@ -278,8 +282,8 @@ public class CropManager {
     }
 
 
-    public Crop getCropAt(int x, int y) {
-        for (Crop crop : crops) {
+    public com.proj.Model.inventoryItems.crops.Crop getCropAt(int x, int y) {
+        for (com.proj.Model.inventoryItems.crops.Crop crop : crops) {
             if (crop.getX() == x && crop.getY() == y) {
                 return crop;
             }

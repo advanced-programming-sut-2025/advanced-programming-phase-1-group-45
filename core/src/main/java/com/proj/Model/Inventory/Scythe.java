@@ -5,6 +5,7 @@ import com.proj.Control.WorldController;
 import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.Model.inventoryItems.ResourceItem;
 import com.proj.Model.inventoryItems.crops.Crop;
+import com.proj.Model.inventoryItems.crops.GiantCrop;
 import com.proj.Model.inventoryItems.trees.Tree;
 import com.proj.Player;
 import com.proj.map.GameMap;
@@ -51,17 +52,15 @@ public class Scythe extends Tool {
         GameMap currentMap = WorldController.getInstance().getGameMap();
         if (currentMap.getCropManager() != null) {
             Crop crop = currentMap.getCropManager().getCropAt(tileX, tileY);
-
-            if (crop != null) {
+            GiantCrop giantCrop = currentMap.getCropManager().getGiantCropAt(tileX, tileY);
+            if (crop != null || giantCrop != null) {
                 InventoryItem item = currentMap.getCropManager().harvestAt(tileX, tileY);
                 if (item != null) {
                     InventoryManager.getInstance().getPlayerInventory().addItem(item);
-
                     return true;
                 }
             }
         }
-
         return false;
     }
 

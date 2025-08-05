@@ -1,4 +1,4 @@
-package com.proj.Model.inventoryItems.trees;
+package com.proj.Model.inventoryItems.inventoryItems.trees;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -15,9 +15,9 @@ public class TreeData {
     private Array<Season> season;
     private Array<String> texturePaths;
     private String product;
-    private int[] productCount = {1, 2};
+    private int[] productCount = {1,2};
     private Array<String> chopProduct;
-    private int[] chopProductCount = {1, 2};
+    private int[] chopProductCount = {1,2};
     private Season harvestSeason;
     private boolean isFruitTree;
     private String source;
@@ -25,7 +25,6 @@ public class TreeData {
     private int fruitBaseSellPrice;
     private boolean isFruitEdible;
     private int fruitEnergy;
-    private String fruitTexturePath;
 
     private Array<TextureRegion> growthTextures;
     private TextureRegion fruitTexture;
@@ -73,74 +72,22 @@ public class TreeData {
     }
 
     // Getters
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getGrowthStage() {
-        return growthStage;
-    }
-
-    public int[] getDaysPerStage() {
-        return daysPerStage;
-    }
-
-    public Array<Season> getSeasons() {
-        return season;
-    }
-
-    public String getProduct() {
-        return product;
-    }
-
-    public int[] getProductCount() {
-        return productCount;
-    }
-
-    public Array<String> getChopProduct() {
-        return chopProduct;
-    }
-
-    public int[] getChopProductCount() {
-        return chopProductCount;
-    }
-
-    public Season getHarvestSeason() {
-        return harvestSeason;
-    }
-
-    public boolean isFruitTree() {
-        return isFruitTree;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public int getFruitHarvestCycle() {
-        return fruitHarvestCycle;
-    }
-
-    public int getFruitBaseSellPrice() {
-        return fruitBaseSellPrice;
-    }
-
-    public boolean isFruitEdible() {
-        return isFruitEdible;
-    }
-
-    public int getFruitEnergy() {
-        return fruitEnergy;
-    }
-
-    public String getFruitTexturePath() {
-        return fruitTexturePath = "assets/trees/" + name.replaceAll("Tree", "").
-            replaceAll(" ", "") + ".png";
-    }
+    public String getId() { return id; }
+    public String getName() { return name; }
+    public int getGrowthStage() { return growthStage; }
+    public int[] getDaysPerStage() { return daysPerStage; }
+    public Array<Season> getSeasons() { return season; }
+    public String getProduct() { return product; }
+    public int[] getProductCount() { return productCount; }
+    public Array<String> getChopProduct() { return chopProduct; }
+    public int[] getChopProductCount() { return chopProductCount; }
+    public Season getHarvestSeason() { return harvestSeason; }
+    public boolean isFruitTree() { return isFruitTree; }
+    public String getSource() { return source; }
+    public int getFruitHarvestCycle() { return fruitHarvestCycle; }
+    public int getFruitBaseSellPrice() { return fruitBaseSellPrice; }
+    public boolean isFruitEdible() { return isFruitEdible; }
+    public int getFruitEnergy() { return fruitEnergy; }
 
     public TextureRegion getTextureForStage(int stage) {
         if (stage < 0 || stage >= growthTextures.size) {
