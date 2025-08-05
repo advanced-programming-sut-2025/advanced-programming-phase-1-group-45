@@ -28,9 +28,14 @@ import com.proj.Model.Inventory.Tool;
 import com.proj.Model.TimeAndWeather.time.Time;
 import com.proj.Model.mapObjects.NPCObject;
 import com.proj.map.farmName;
-
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.Color;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ArrayList;
-import java.util.List;  // Correct List import
+import java.util.List; 
 
 import java.awt.*;
 
@@ -64,6 +69,24 @@ public class GameScreen implements Screen {
     private boolean isInteracting = false;
 
     private farmName farm;
+
+    private Texture aImage;
+    private Texture sImage;
+    private Texture dImage;
+    private Texture fImage;
+    private Texture gImage;
+
+    private boolean showAImage = false;
+    private boolean showSImage = false;
+    private boolean showDImage = false;
+    private boolean showFImage = false;
+    private boolean showGImage = false;
+    private StoreManager storeManager;
+    private Store currentStore = null;
+    private boolean inStoreInterface = false;
+    private BitmapFont font;
+    private GlyphLayout glyphLayout = new GlyphLayout();
+    
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
         this.farm = farm;
@@ -163,9 +186,18 @@ public class GameScreen implements Screen {
                 }
 
                 player = new Player(worldController, startX, startY);
+                aImage = new Texture(Gdx.files.internal("NPCDialogues/george_dialogue1.png"));
+                sImage = new Texture(Gdx.files.internal("NPCDialogues/leah_dialogue1.png"));
+                dImage = new Texture(Gdx.files.internal("NPCDialogues/lewis_dialogue1.png"));
+                fImage = new Texture(Gdx.files.internal("NPCDialogues/pierre_dialogue1.png"));
+                gImage = new Texture(Gdx.files.internal("NPCDialogues/robin_dialogue1.png"));
 
                 playerBag = new PlayerBag(player, inventoryManager.getPlayerInventory());
                 playerBag.setScale(0.7f);
+                
+                font = new BitmapFont();
+                font.setColor(Color.WHITE);
+                font.getData().setScale(1.5f);
 
                 worldController.setPlayer(player);
                 placeNPCs();
@@ -260,6 +292,11 @@ public class GameScreen implements Screen {
                 // Restore original projection
                 worldController.getSpriteBatch().setProjectionMatrix(originalProjection);
             }
+            if (showAImage) drawCenteredImage(aImage);
+            if (showSImage) drawCenteredImage(sImage);
+            if (showDImage) drawCenteredImage(dImage);
+            if (showFImage) drawCenteredImage(fImage);
+            if (showGImage) drawCenteredImage(gImage);
             worldController.renderAfterPlayer();
 
             worldController.getSpriteBatch().end();
@@ -281,6 +318,19 @@ public class GameScreen implements Screen {
             Gdx.app.error("GameScreen", "Error in render method", e);
             e.printStackTrace();
         }
+    }
+
+     private void drawCenteredImage(Texture image) {
+        if (image == null) return;
+        Matrix4 originalProjection = worldController.getSpriteBatch().getProjectionMatrix();
+
+        Matrix4 screenProjection = new Matrix4()
+            .setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        worldController.getSpriteBatch().setProjectionMatrix(screenProjection);
+        float x = (Gdx.graphics.getWidth() - image.getWidth()) / 2;
+        float y = (Gdx.graphics.getHeight() - image.getHeight()) / 2;
+        worldController.getSpriteBatch().draw(image, x, y);
+        worldController.getSpriteBatch().setProjectionMatrix(originalProjection);
     }
 
 
@@ -373,15 +423,18 @@ public class GameScreen implements Screen {
             }
 
             for (Texture texture : npcTextures) {
-
                 if (texture != null) {
-
                     texture.dispose();
-
                 }
-
             }
-
+            if (aImage != null) aImage.dispose();
+            if (sImage != null) sImage.dispose();
+            if (dImage != null) dImage.dispose();
+            if (fImage != null) fImage.dispose();
+            if (gImage != null) gImage.dispose();
+            if (font != null) {
+                font.dispose();
+            }
             npcTextures.clear();
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in dispose method", e);
@@ -493,6 +546,26 @@ public class GameScreen implements Screen {
                     playerBag.toggleOpen();
                     Gdx.app.log("GameScreen", "Toggled inventory: " + (playerBag.isOpen() ? "open" : "closed"));
                 }
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
+                showAImage = !showAImage;
+                Gdx.app.log("GameScreen", "Toggled image: " + showAImage);
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.Y)) {
+                showSImage = !showSImage;
+                Gdx.app.log("GameScreen", "Toggled image: " + showSImage);
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
+                showDImage = !showDImage;
+                Gdx.app.log("GameScreen", "Toggled image: " + showDImage);
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+                showFImage = !showFImage;
+                Gdx.app.log("GameScreen", "Toggled image: " + showFImage);
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
+                showGImage = !showGImage;
+                Gdx.app.log("GameScreen", "Toggled image: " + showGImage);
             }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
