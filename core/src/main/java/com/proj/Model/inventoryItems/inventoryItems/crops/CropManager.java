@@ -120,6 +120,19 @@ public class CropManager {
         boolean giantFertilized = getCropAt(x, y).isFertilized() || getCropAt(x, y + 1).isFertilized()
             || getCropAt(x + 1, y).isFertilized() || getCropAt(x + 1, y + 1).isFertilized();
 
+//        boolean giantKood = false;
+//        Crop.FertilizerType giant = null;
+//        int deltaX[] = {0,1,0,1};
+//        int deltaY[] = {0,1,1, 0};
+//        for (int i = 0; i < deltaY.length; i++) {
+//            if(getCropAt(x + deltaX[i], y + deltaY[i]) != null) {
+//                if (getCropAt(x + deltaX[i], y + deltaY[i]).isFertilized()) {
+//                    giantKood = true;
+//                    giant = getCropAt(x + deltaX[i], y+deltaY[i]).getFertilizerType();
+//                    break;
+//                }
+//            }
+//        }
         removeCropAt(x, y);
         removeCropAt(x + 1, y);
         removeCropAt(x, y + 1);

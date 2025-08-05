@@ -11,12 +11,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.proj.Model.CropInfoWindow;
 import com.proj.Model.GameAssetManager;
+import com.proj.Model.Inventory.InventoryManager;
 import com.proj.Model.TimeAndWeather.time.*;
 import com.proj.Model.TimeAndWeather.TimeRenderer;
 import com.proj.Model.TimeAndWeather.WeatherController;
 import com.proj.Model.inventoryItems.ForagingInventoryWindow;
 import com.proj.Model.inventoryItems.SeedInventoryWindow;
 import com.proj.Model.inventoryItems.crops.CropInventoryWindow;
+import com.proj.Model.inventoryItems.seeds.ItemRegistry;
 import com.proj.Player;
 import com.proj.map.FarmInOutPoint;
 import com.proj.map.GameMap;
@@ -87,7 +89,7 @@ public class WorldController {
         this.uistage = uisatge;
         this.weatherController = new WeatherController();
         this.npcManager = new NPCManager();  // Initialize NPC manager
-        loadMaps();
+//        loadMaps();
         if (maps.containsKey(landName)) {
             currentMap = gameMaps.get(maps.get(landName));
         } else {
@@ -100,6 +102,8 @@ public class WorldController {
         uistage.addActor(clockWidget);
         uistage.addActor(timeDisplayActor);
         uistage.addActor(dateDisplayActor);
+
+        InventoryManager.getInstance().getPlayerInventory().addItem(ItemRegistry.getInstance().get("tulip_bulb"));
 
         Skin stardewSkin = GameAssetManager.getGameAssetManager().getStardewSkin();
         seedWindow = new SeedInventoryWindow(stardewSkin, gameMaps.get(1).getFarmingController());
@@ -255,6 +259,9 @@ public class WorldController {
                 gameMaps.get(mapId).updateDaily(gameTime.getSeason());
             }
             foragingManager.setGameMap(gameMap);
+        }
+        if (gameMap.getFarmingController() != null) {
+            gameMap.getFarmingController().getCropManager().update(delta);
         }
         nightRender.update(gameTime);
         gameMap.setNightMode(gameTime.getHour() >= 19);

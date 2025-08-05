@@ -31,7 +31,7 @@ public class ForagingManager {
 
 
     public void spawnDailyItems(Season currentSeason) {
-        gameMap.removeForagings();
+        gameMap.removeForaging();
         Array<ForagingItem> seasonalItems = new Array<>();
         for (ForagingItem item : foragingCrops) {
             if (item.getSeason().contains(currentSeason)) {

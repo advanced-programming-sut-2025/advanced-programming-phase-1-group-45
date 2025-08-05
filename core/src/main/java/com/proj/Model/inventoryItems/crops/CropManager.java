@@ -1,5 +1,7 @@
 package com.proj.Model.inventoryItems.crops;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
@@ -13,9 +15,13 @@ public class CropManager {
     private final Array<Crop> crops = new Array<>();
     private final Array<GiantCrop> giantCrops = new Array<>();
     private GameMap map;
+    private TextureRegion waterEffectTexture;
+    private TextureRegion fertilizeEffectTexture;
 
     public void setMap(GameMap map) {
         this.map = map;
+        waterEffectTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/drop_water.png")));
+//        fertilizeEffectTexture = new TextureRegion(new Texture(Gdx.files.internal("effects/fertilizer_bag.png")));
     }
 
     public boolean plantFromSeed(String cropId, int tileX, int tileY) {
@@ -270,13 +276,35 @@ public class CropManager {
                 drawX, drawY,
                 texW, texH
             );
+            if (crop.isShowingWaterEffect()) {
+                batch.draw(waterEffectTexture,
+                    drawX + texW / 2 - 8,
+                    drawY + texH + 5,
+                    16, 16);
+            }
+
+            if (crop.isShowingFertilizeEffect()) {
+                batch.draw(fertilizeEffectTexture,
+                    drawX + texW / 2 - 8,
+                    drawY + texH + 25,
+                    16, 16);
+            }
         }
 
         for (GiantCrop giantCrop : giantCrops) {
             renderGiantCrop(batch, giantCrop, tileW, tileH);
         }
+
     }
 
+    public void update(float delta) {
+        for (Crop crop : crops) {
+            crop.updateEffects(delta);
+        }
+        for (GiantCrop giantCrop : giantCrops) {
+            giantCrop.updateEffects(delta);
+        }
+    }
 
     public Crop getCropAt(int x, int y) {
         for (Crop crop : crops) {

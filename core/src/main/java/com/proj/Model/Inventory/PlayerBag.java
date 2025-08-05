@@ -140,8 +140,6 @@ public class PlayerBag {
             // نمایش ابزار با اندازه مناسب
             batch.draw(item.getTexture(), x, y, 32, 32);
 
-            // اضافه کردن لاگ برای دیباگ
-            Gdx.app.log("PlayerBag", "Drawing tool in hand at: " + x + ", " + y);
         } catch (Exception e) {
             Gdx.app.error("PlayerBag", "Error in renderToolInHand", e);
             e.printStackTrace();

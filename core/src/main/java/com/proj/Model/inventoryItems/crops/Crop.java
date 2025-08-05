@@ -21,6 +21,10 @@ public class Crop {
     private int daysWithoutWater = 0;
     private int daysUntilNextHarvest = 0;
     private boolean isFullyGrown = false;
+    private boolean showWaterEffect = false;
+    private float waterEffectTimer = 0f;
+    private boolean showFertilizeEffect = false;
+    private float fertilizeEffectTimer = 0f;
 
     public Crop(CropData data, int x, int y) {
         this.data = data;
@@ -57,10 +61,37 @@ public class Crop {
     public void water() {
         isWatered = true;
         daysWithoutWater = 0;
+        showWaterEffect = true;
+        waterEffectTimer = 1.0f; // نمایش افکت به مدت 1 ثانیه
     }
+
 
     public void fertilize() {
         isFertilized = true;
+    }
+
+    public void updateEffects(float delta) {
+        // به‌روزرسانی تایمرهای افکت
+        if (waterEffectTimer > 0) {
+            waterEffectTimer -= delta;
+            if (waterEffectTimer <= 0) {
+                showWaterEffect = false;
+            }
+        }
+
+        if (fertilizeEffectTimer > 0) {
+            fertilizeEffectTimer -= delta;
+            if (fertilizeEffectTimer <= 0) {
+                showFertilizeEffect = false;
+            }
+        }
+    }
+    public boolean isShowingWaterEffect() {
+        return showWaterEffect;
+    }
+
+    public boolean isShowingFertilizeEffect() {
+        return showFertilizeEffect;
     }
 
     public boolean isFullyGrown() {

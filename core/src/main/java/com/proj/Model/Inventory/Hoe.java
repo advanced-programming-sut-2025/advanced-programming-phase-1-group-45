@@ -16,8 +16,10 @@ public class Hoe extends Tool {
 
     @Override
     public boolean useOnTile(int tileX, int tileY) {
-        if (WorldController.getInstance().getGameMap().hoeTile(tileX, tileY))
+        if (WorldController.getInstance().getGameMap().hoeTile(tileX, tileY)) {
+            WorldController.getInstance().getGameMap().getTile(tileX, tileY).setTilled(true);
             return true;
+        }
         return false;
     }
 
