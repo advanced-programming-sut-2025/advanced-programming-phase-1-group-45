@@ -1,7 +1,11 @@
-package com.proj.network.client;
+package com.proj.client;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Disposable;
+import com.proj.event.GameEvent;
+import com.proj.event.LobbyEvent;
+import com.proj.event.NetworkEvent;
+import com.proj.event.NetworkEventListener;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -9,25 +13,25 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class GameClient implements Disposable {
-    private static final String TAG = "GameClient";
-    private static final long RECONNECT_DELAY = 5000;
-
+public class GameClient implements Disposable, Runnable {
+    private static final long PING_INTERVAL = 15000; // 15 ثانیه
+    
     private final String serverAddress;
     private final int serverPort;
-
-    private Socket socket;
+    private Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
-    private final AtomicBoolean connected = new AtomicBoolean(false);
+    private Thread networkThread;
     private final AtomicBoolean running = new AtomicBoolean(false);
-
-    private Thread connectionThread;
-    private Thread listenerThread;
-
-    private ClientListener listener;
+    private final List<NetworkEventListener> listeners = new ArrayList<>();
+    
+    private String username;
+    private String currentLobbyId;
+    private boolean authenticated = false;
 
     public GameClient(String serverAddress, int serverPort) {
         this.serverAddress = serverAddress;
@@ -35,264 +39,294 @@ public class GameClient implements Disposable {
     }
 
     public void connect() {
-        if (running.get()) {
-            Gdx.app.log(TAG, "Client is already running");
-            return;
-        }
-
-        running.set(true);
-        connectionThread = new Thread(this::connectionHandler);
-        connectionThread.setDaemon(true);
-        connectionThread.start();
-    }
-
-    private void connectionHandler() {
-        while (running.get()) {
-            try {
-                socket = new Socket(serverAddress, serverPort);
-                out = new PrintWriter(socket.getOutputStream(), true);
-                in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-                connected.set(true);
-                Gdx.app.log(TAG, "Connected to server");
-
-                if (listener != null) {
-                    Gdx.app.postRunnable(listener::onConnected);
-                }
-
-                startListening();
-                return;
-
-            } catch (IOException e) {
-                Gdx.app.error(TAG, "Connection failed: " + e.getMessage());
-                connected.set(false);
-
-                if (listener != null) {
-                    Gdx.app.postRunnable(listener::onConnectionFailed);
-                }
-
-                try {
-                    Thread.sleep(RECONNECT_DELAY);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }
-    }
-
-    private void startListening() {
-        listenerThread = new Thread(this::messageListener);
-        listenerThread.setDaemon(true);
-        listenerThread.start();
-    }
-
-    private void messageListener() {
+        if (running.get()) return;
+        
         try {
-            String message;
-            while (connected.get() && (message = in.readLine()) != null) {
-                processMessage(message);
+            clientSocket = new Socket(serverAddress, serverPort);
+            out = new PrintWriter(clientSocket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            
+            running.set(true);
+            networkThread = new Thread(this, "Network-Thread");
+            networkThread.start();
+            
+            startPingTask();
+            fireEvent(NetworkEvent.Type.CONNECTED, "اتصال برقرار شد");
+        } catch (IOException e) {
+            fireEvent(NetworkEvent.Type.ERROR, "خطا در اتصال: " + e.getMessage());
+            Gdx.app.error("GameClient", "Connection error", e);
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            while (running.get()) {
+                String message = in.readLine();
+                if (message == null) break;
+                
+                processIncomingMessage(message);
             }
         } catch (IOException e) {
-            Gdx.app.error(TAG, "Error reading from server: " + e.getMessage());
+            if (running.get()) {
+                fireEvent(NetworkEvent.Type.ERROR, "خطای شبکه: " + e.getMessage());
+            }
         } finally {
             disconnect();
         }
     }
 
-    private void processMessage(String jsonMessage) {
+    private void processIncomingMessage(String rawMessage) {
         try {
-            JSONObject message = new JSONObject(jsonMessage);
-            String type = message.getString("type");
-            String data = message.optString("data", "");
-
-            if (listener == null) return;
-
+            JSONObject json = new JSONObject(rawMessage);
+            String type = json.getString("type");
+            String data = json.optString("data", "");
+            
             switch (type) {
-                case "AUTH_REQUEST":
-                    listener.onAuthRequest();
-                    break;
-
                 case "AUTH_SUCCESS":
-                    listener.onAuthSuccess(data);
+                    handleAuthSuccess(data);
                     break;
-
+                    
                 case "AUTH_FAILED":
-                    listener.onAuthFailed(data);
+                    fireEvent(NetworkEvent.Type.AUTH_FAILED, data);
                     break;
-
-                case "LOBBIES_LIST":
-                    listener.onLobbiesListReceived(data);
-                    break;
-
+                    
                 case "LOBBY_CREATED":
-                    listener.onLobbyCreated(data);
+                    handleLobbyCreated(data);
                     break;
-
+                    
                 case "JOIN_SUCCESS":
-                    listener.onJoinLobbySuccess(data);
+                    handleJoinLobby(data);
                     break;
-
+                    
+                case "LOBBIES_LIST":
+                    fireLobbyListEvent(data);
+                    break;
+                    
                 case "GAME_STARTED":
-                    listener.onGameStarted(data);
+                    fireGameEvent(GameEvent.Type.STARTED, data);
                     break;
-
-                case "CHAT":
-                    listener.onChatMessage(data);
+                    
+                case "GAME_UPDATE":
+                    fireGameEvent(GameEvent.Type.UPDATE, data);
                     break;
-
+                    
                 case "PRIVATE_CHAT":
-                    listener.onPrivateChatMessage(data);
+                    handlePrivateChat(data);
                     break;
-
+                    
                 case "SYSTEM":
-                    listener.onSystemMessage(data);
+                    fireEvent(NetworkEvent.Type.SYSTEM_MESSAGE, data);
                     break;
-
-                case "ERROR":
-                    listener.onErrorMessage(data);
+                    
+                case "PONG":
+                    // پاسخ پینگ
                     break;
-
-                case "DISCONNECT":
-                    listener.onDisconnectRequest(data);
-                    disconnect();
-                    break;
-
+                    
                 default:
-                    Gdx.app.log(TAG, "Unknown message type: " + type);
+                    fireEvent(NetworkEvent.Type.UNKNOWN_MESSAGE, rawMessage);
+                    break;
             }
         } catch (Exception e) {
-            Gdx.app.error(TAG, "Error processing message: " + e.getMessage());
+            fireEvent(NetworkEvent.Type.ERROR, "خطا در پردازش پیام: " + e.getMessage());
         }
     }
 
-    public void sendAuth(String username, String password) {
+    private void handleAuthSuccess(String data) {
+        authenticated = true;
+        username = data.split(" ")[1]; // "خوش آمدید username"
+        fireEvent(NetworkEvent.Type.AUTH_SUCCESS, "احراز هویت موفق: " + username);
+    }
+
+    private void handleLobbyCreated(String jsonData) {
+        try {
+            JSONObject lobbyInfo = new JSONObject(jsonData);
+            currentLobbyId = lobbyInfo.getString("id");
+            fireLobbyEvent(LobbyEvent.Type.CREATED, lobbyInfo);
+        } catch (Exception e) {
+            fireEvent(NetworkEvent.Type.ERROR, "خطا در پردازش لابی");
+        }
+    }
+
+    private void handleJoinLobby(String jsonData) {
+        try {
+            JSONObject lobbyInfo = new JSONObject(jsonData);
+            currentLobbyId = lobbyInfo.getString("id");
+            fireLobbyEvent(LobbyEvent.Type.JOINED, lobbyInfo);
+        } catch (Exception e) {
+            fireEvent(NetworkEvent.Type.ERROR, "خطا در پیوستن به لابی");
+        }
+    }
+
+    private void handlePrivateChat(String jsonData) {
+        try {
+            JSONObject chatData = new JSONObject(jsonData);
+            fireEvent(NetworkEvent.Type.PRIVATE_MESSAGE, 
+                      chatData.getString("sender") + ": " + chatData.getString("message"));
+        } catch (Exception e) {
+            fireEvent(NetworkEvent.Type.ERROR, "خطا در پردازش پیام خصوصی");
+        }
+    }
+
+    public void authenticate(String username, String password) {
         JSONObject authData = new JSONObject();
         authData.put("username", username);
         authData.put("password", password);
-
-        JSONObject message = new JSONObject();
-        message.put("type", "AUTH");
-        message.put("data", authData);
-
-        sendMessage(message.toString());
+        sendMessage("AUTH", authData.toString());
     }
 
-    public void sendCreateLobby(String name, int maxPlayers, boolean isPrivate, String password) {
+    public void createLobby(String name, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
         JSONObject lobbyData = new JSONObject();
         lobbyData.put("name", name);
+        lobbyData.put("password", password);
         lobbyData.put("maxPlayers", maxPlayers);
         lobbyData.put("isPrivate", isPrivate);
-        lobbyData.put("password", password);
-        lobbyData.put("isVisible", true);
-
-        JSONObject message = new JSONObject();
-        message.put("type", "CREATE_LOBBY");
-        message.put("data", lobbyData);
-
-        sendMessage(message.toString());
+        lobbyData.put("isVisible", isVisible);
+        sendMessage("CREATE_LOBBY", lobbyData.toString());
     }
 
-    public void sendJoinLobby(String lobbyId, String password) {
+    public void joinLobby(String lobbyId, String password) {
         JSONObject joinData = new JSONObject();
         joinData.put("lobbyId", lobbyId);
         joinData.put("password", password);
-
-        JSONObject message = new JSONObject();
-        message.put("type", "JOIN_LOBBY");
-        message.put("data", joinData);
-
-        sendMessage(message.toString());
+        sendMessage("JOIN_LOBBY", joinData.toString());
     }
 
-    public void sendLeaveLobby() {
-        JSONObject message = new JSONObject();
-        message.put("type", "LEAVE_LOBBY");
-        message.put("data", new JSONObject());
-
-        sendMessage(message.toString());
-    }
-
-    public void sendStartGame() {
-        JSONObject message = new JSONObject();
-        message.put("type", "START_GAME");
-        message.put("data", new JSONObject());
-
-        sendMessage(message.toString());
+    public void leaveLobby() {
+        sendMessage("LEAVE_LOBBY", "");
+        currentLobbyId = null;
+        fireLobbyEvent(LobbyEvent.Type.LEFT, null);
     }
 
     public void sendChatMessage(String message, boolean isPrivate, String recipient) {
         JSONObject chatData = new JSONObject();
         chatData.put("message", message);
-
         if (isPrivate && recipient != null) {
             chatData.put("recipient", recipient);
         }
-
-        JSONObject json = new JSONObject();
-        json.put("type", "CHAT");
-        json.put("data", chatData);
-
-        sendMessage(json.toString());
+        sendMessage("CHAT", chatData.toString());
     }
 
     public void requestLobbiesList() {
-        JSONObject message = new JSONObject();
-        message.put("type", "GET_LOBBIES");
-        message.put("data", new JSONObject());
-
-        sendMessage(message.toString());
+        sendMessage("GET_LOBBIES", "");
     }
 
-    public void sendPing() {
-        JSONObject message = new JSONObject();
-        message.put("type", "PING");
-        message.put("data", new JSONObject());
-
-        sendMessage(message.toString());
+    public void sendGameAction(String actionType, JSONObject actionData) {
+        JSONObject gameAction = new JSONObject();
+        gameAction.put("action", actionType);
+        gameAction.put("data", actionData);
+        sendMessage("GAME_ACTION", gameAction.toString());
     }
 
-    private synchronized void sendMessage(String message) {
-        if (!connected.get() || out == null) {
-            Gdx.app.error(TAG, "Cannot send message - not connected to server");
-            return;
+    private void sendMessage(String type, String data) {
+        if (!running.get() || out == null) return;
+        
+        try {
+            JSONObject message = new JSONObject();
+            message.put("type", type);
+            message.put("data", data);
+            out.println(message.toString());
+        } catch (Exception e) {
+            fireEvent(NetworkEvent.Type.ERROR, "خطا در ارسال پیام");
         }
+    }
 
-        out.println(message);
-        if (out.checkError()) {
-            Gdx.app.error(TAG, "Error sending message");
-            disconnect();
-        }
+    private void startPingTask() {
+        new Thread(() -> {
+            while (running.get()) {
+                try {
+                    Thread.sleep(PING_INTERVAL);
+                    sendMessage("PING", "");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }, "Ping-Thread").start();
     }
 
     public void disconnect() {
-        connected.set(false);
         running.set(false);
-
+        authenticated = false;
+        username = null;
+        currentLobbyId = null;
+        
         try {
             if (out != null) out.close();
             if (in != null) in.close();
-            if (socket != null) socket.close();
+            if (clientSocket != null) clientSocket.close();
         } catch (IOException e) {
-            Gdx.app.error(TAG, "Error closing connection: " + e.getMessage());
+            Gdx.app.error("GameClient", "Error closing connection", e);
         }
-
-        if (listener != null) {
-            Gdx.app.postRunnable(listener::onDisconnected);
-        }
-
-        Gdx.app.log(TAG, "Disconnected from server");
-    }
-
-    public boolean isConnected() {
-        return connected.get();
-    }
-
-    public void setListener(ClientListener listener) {
-        this.listener = listener;
+        
+        fireEvent(NetworkEvent.Type.DISCONNECTED, "اتصال قطع شد");
     }
 
     @Override
     public void dispose() {
         disconnect();
+    }
+
+    // مدیریت رویدادها
+    public void addNetworkListener(NetworkEventListener listener) {
+        listeners.add(listener);
+    }
+    
+    public void removeNetworkListener(NetworkEventListener listener) {
+        listeners.remove(listener);
+    }
+    
+    private void fireEvent(NetworkEvent.Type type, String message) {
+        NetworkEvent event = new NetworkEvent(type, message);
+        for (NetworkEventListener listener : listeners) {
+            listener.handleNetworkEvent(event);
+        }
+    }
+    
+    private void fireLobbyEvent(LobbyEvent.Type type, JSONObject data) {
+        LobbyEvent event = new LobbyEvent(type, data);
+        for (NetworkEventListener listener : listeners) {
+            if (listener instanceof LobbyEventListener) {
+                ((LobbyEventListener) listener).handleLobbyEvent(event);
+            }
+        }
+    }
+    
+    private void fireGameEvent(GameEvent.Type type, String data) {
+        GameEvent event = new GameEvent(type, data);
+        for (NetworkEventListener listener : listeners) {
+            if (listener instanceof GameEventListener) {
+                ((GameEventListener) listener).handleGameEvent(event);
+            }
+        }
+    }
+    
+    private void fireLobbyListEvent(String jsonData) {
+        try {
+            JSONObject lobbiesData = new JSONObject(jsonData);
+            for (NetworkEventListener listener : listeners) {
+                if (listener instanceof LobbyListListener) {
+                    ((LobbyListListener) listener).onLobbiesReceived(lobbiesData);
+                }
+            }
+        } catch (Exception e) {
+            fireEvent(NetworkEvent.Type.ERROR, "خطا در دریافت لیست لابی‌ها");
+        }
+    }
+
+
+    public boolean isConnected() {
+        return running.get();
+    }
+    
+    public boolean isAuthenticated() {
+        return authenticated;
+    }
+    
+    public String getUsername() {
+        return username;
+    }
+    
+    public String getCurrentLobbyId() {
+        return currentLobbyId;
     }
 }
