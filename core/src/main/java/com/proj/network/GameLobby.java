@@ -1,9 +1,9 @@
-package com.proj.gameserver;
+package com.proj.network;
+
+import org.json.JSONObject;
 
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import org.json.JSONObject;
 
 public class GameLobby {
     private final String id;

@@ -1,12 +1,11 @@
-package com.proj.gameserver;
+package com.proj.network;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-import org.json.JSONObject;
-import com.proj.Database.DatabaseHelper;
 
 
 public class GameManager {

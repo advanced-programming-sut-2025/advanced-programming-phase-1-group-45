@@ -1,4 +1,4 @@
-package com.proj.gameserver;
+package com.proj.network;
 
 import org.json.JSONObject;
 

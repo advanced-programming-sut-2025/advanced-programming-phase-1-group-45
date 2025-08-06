@@ -1,4 +1,4 @@
-package com.proj.gameserver;
+package com.proj.network;
 
 public class Position {
     private float x;

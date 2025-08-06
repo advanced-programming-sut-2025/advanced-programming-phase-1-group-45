@@ -1,4 +1,4 @@
-package com.proj.gameserver;
+package com.proj.network;
 
 import java.util.Map;
 import java.util.logging.Level;

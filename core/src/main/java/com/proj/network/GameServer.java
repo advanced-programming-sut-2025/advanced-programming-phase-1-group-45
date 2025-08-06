@@ -1,7 +1,8 @@
-package com.proj.gameserver;
+package com.proj.network;
 
 import com.badlogic.gdx.Gdx;
 import com.proj.Database.DatabaseHelper;
+import com.proj.network.lobby.LobbyManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -9,11 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * سرور اصلی بازی
@@ -28,7 +25,7 @@ public class GameServer {
     private final Map<String, ClientHandler> connectedClients = new ConcurrentHashMap<>();
 
     // نگهداری اطلاعات لابی‌های بازی
-    private final Map<String, GameLobby> gameLobbies = new ConcurrentHashMap<>();
+    private LobbyManager lobbyManager;
 
     // سرویس مدیریت ترد‌ها
     private final ExecutorService threadPool;
@@ -51,6 +48,7 @@ public class GameServer {
         this.maintenanceService = Executors.newScheduledThreadPool(1);
         this.gameManager = new GameManager(this);
         this.dbHelper = new DatabaseHelper();
+        this.lobbyManager = new LobbyManager(this);
     }
 
     /**
@@ -170,17 +168,7 @@ public class GameServer {
         connectedClients.remove(username);
 
         // خروج بازیکن از لابی‌ها
-        for (GameLobby lobby : gameLobbies.values()) {
-            if (lobby.hasPlayer(username)) {
-                lobby.removePlayer(username);
-
-                // اگر لابی خالی است، آن را حذف کنیم
-                if (lobby.isEmpty() && !lobby.isGameActive()) {
-                    gameLobbies.remove(lobby.getId());
-                    Gdx.app.log("GameServer", "لابی حذف شد: " + lobby.getId());
-                }
-            }
-        }
+        lobbyManager.removePlayer(username);
 
         broadcastSystemMessage(username + " از بازی خارج شد");
         Gdx.app.log("GameServer", "کاربر حذف شد: " + username);
@@ -199,30 +187,21 @@ public class GameServer {
      * ایجاد لابی جدید
      */
     public void createLobby(String lobbyName, String owner, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
-        String lobbyId = generateLobbyId();
-        GameLobby lobby = new GameLobby(lobbyId, lobbyName, owner, maxPlayers, isPrivate, isVisible, this);
-
-        if (isPrivate) {
-            lobby.setPassword(password);
-        }
-
-        gameLobbies.put(lobbyId, lobby);
-
-        // اضافه کردن صاحب لابی به آن
+        GameLobby lobby = lobbyManager.createAndGetLobby(lobbyName, owner, password, maxPlayers, isPrivate, isVisible);
         ClientHandler ownerHandler = connectedClients.get(owner);
         if (ownerHandler != null) {
             lobby.addPlayer(owner, ownerHandler);
             ownerHandler.sendMessage("LOBBY_CREATED", lobby.getLobbyInfo().toString());
         }
 
-        Gdx.app.log("GameServer", "لابی جدید ساخته شد: " + lobbyName + " با ID: " + lobbyId);
+        Gdx.app.log("GameServer", "لابی جدید ساخته شد: " + lobbyName + " با ID: " + lobby.getId());
     }
 
     /**
      * پیوستن به لابی
      */
     public void joinLobby(String lobbyId, String username, String password) {
-        GameLobby lobby = gameLobbies.get(lobbyId);
+        GameLobby lobby = lobbyManager.getGameLobby(lobbyId);
         ClientHandler client = connectedClients.get(username);
 
         if (client == null) {
@@ -267,7 +246,7 @@ public class GameServer {
      * شروع بازی
      */
     public void startGame(String lobbyId, String username) {
-        GameLobby lobby = gameLobbies.get(lobbyId);
+        GameLobby lobby = lobbyManager.getGameLobby(lobbyId);
         ClientHandler client = connectedClients.get(username);
 
         if (client == null) {
@@ -329,7 +308,7 @@ public class GameServer {
      * یافتن لابی بازیکن
      */
     public GameLobby findPlayerLobby(String username) {
-        for (GameLobby lobby : gameLobbies.values()) {
+        for (GameLobby lobby : lobbyManager.getGameLobbies()) {
             if (lobby.hasPlayer(username)) {
                 return lobby;
             }
@@ -364,12 +343,12 @@ public class GameServer {
     private void checkInactiveLobbies() {
         long inactivityTimeout = 30 * 60 * 1000; // 30 دقیقه
 
-        for (Map.Entry<String, GameLobby> entry : new ConcurrentHashMap<>(gameLobbies).entrySet()) {
+        for (Map.Entry<String, GameLobby> entry : new ConcurrentHashMap<>(lobbyManager.getGameLobbiesMap()).entrySet()) {
             GameLobby lobby = entry.getValue();
 
             // اگر لابی خالی است یا مدت زیادی غیرفعال بوده
             if (lobby.isEmpty() || (lobby.isInactive(inactivityTimeout) && !lobby.isGameActive())) {
-                gameLobbies.remove(entry.getKey());
+                lobbyManager.getGameLobbiesMap().remove(entry.getKey());
                 Gdx.app.log("GameServer", "لابی غیرفعال حذف شد: " + entry.getKey());
             }
         }
@@ -382,7 +361,7 @@ public class GameServer {
         Gdx.app.log("GameServer", String.format(
             "آمار سرور: %d کاربر آنلاین, %d لابی فعال, %d بازی در حال اجرا",
             connectedClients.size(),
-            gameLobbies.size(),
+            lobbyManager.getGameLobbiesMap().size(),
             gameManager.getActiveGamesCount()
         ));
     }
@@ -434,7 +413,6 @@ public class GameServer {
         }
     }
 
-    // Getters
     public DatabaseHelper getDatabaseHelper() {
         return dbHelper;
     }
@@ -444,7 +422,7 @@ public class GameServer {
     }
 
     public Map<String, GameLobby> getGameLobbies() {
-        return gameLobbies;
+        return lobbyManager.getGameLobbiesMap();
     }
 
     public GameManager getGameManager() {

@@ -1,6 +1,7 @@
-package com.proj.gameserver;
+package com.proj.network;
 
 import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
