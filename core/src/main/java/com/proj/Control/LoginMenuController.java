@@ -1,11 +1,15 @@
 package com.proj.Control;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.proj.Main;
 import com.proj.View.*;
 import com.proj.Model.*;
+import com.proj.network.client.NetworkEventListener;
+import com.proj.network.event.NetworkEvent;
+import com.proj.network.lobby.LobbyScreen;
 
 public class LoginMenuController {
     private LoginMenuView view;
@@ -46,14 +50,13 @@ public class LoginMenuController {
                     String username = view.getUsername().getText();
                     String password = view.getPassword().getText();
 
+                    Main.getMain().authenticate(username, password);
+
                     if (login(username, password)) {
-                        // After successful login, go to game screen
-                        // After successful login
-                        Main.getMain().setScreen(new MainMenuView(
-                            new MainMenuController(),
-                            GameAssetManager.getGameAssetManager().getSkin()
-                        ));
-                       // Main.getMain().switchToGameScreen();// on github, not a comment
+//                        // After successful login, go to game screen
+//                        // After successful login
+                        Main.getMain().setScreen(new LobbyScreen(Main.getMain()));
+//                       // Main.getMain().switchToGameScreen();// on github, not a comment
                     }
                 }
             });
@@ -89,5 +92,6 @@ public class LoginMenuController {
 
         return true;
     }
+
 }
 

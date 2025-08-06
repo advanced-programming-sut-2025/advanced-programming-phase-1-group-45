@@ -6,26 +6,24 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameLobby {
-    private final String id;
-    private final String name;
+    private  String id;
+    private  String name;
     private String owner;
-    private final int maxPlayers;
-    private final boolean isPrivate;
-    private final boolean isVisible;
+    private  int maxPlayers;
+    private  boolean isPrivate;
+    private  boolean isVisible;
     private String password;
     private boolean gameActive = false;
     private long creationTime;
     private long lastActivityTime;
 
-    // نگهداری اتصال‌های بازیکنان
     private final Map<String, ClientHandler> players = new ConcurrentHashMap<>();
-    // نگهداری وضعیت بازیکنان در بازی
     private final Map<String, PlayerGameState> playerStates = new ConcurrentHashMap<>();
 
-    // مدیریت بازی
     private GameInstance gameInstance;
-    private final GameServer server;
+    private  GameServer server;
 
+    public GameLobby() {}
     public GameLobby(String id, String name, String owner, int maxPlayers, boolean isPrivate, boolean isVisible, GameServer server) {
         this.id = id;
         this.name = name;
@@ -227,4 +225,45 @@ public class GameLobby {
     public GameInstance getGameInstance() { return gameInstance; }
     public GameServer getGameServer() { return server; }
     public long getCreationTime() { return creationTime; }
+    public String getAdminId() { return owner; }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public void setGameInstance(GameInstance gameInstance) {
+        this.gameInstance = gameInstance;
+    }
+
+    public void setLastActivityTime(long lastActivityTime) {
+        this.lastActivityTime = lastActivityTime;
+    }
+
+    public void setCreationTime(long creationTime) {
+        this.creationTime = creationTime;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setServer(GameServer server) {
+        this.server = server;
+    }
+
+    public void setVisible(boolean visible) {
+        isVisible = visible;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
+    }
+
+    public void setMaxPlayers(int maxPlayers) {
+        this.maxPlayers = maxPlayers;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

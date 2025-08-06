@@ -9,30 +9,52 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.proj.Control.MainMenuController;
+import com.proj.Main;
 import com.proj.Model.GameAssetManager;
-import com.proj.network.GameClient;
-import com.proj.network.GameLobby;
+import com.proj.View.MainMenuView;
+import com.proj.network.client.GameClient;
+import com.proj.network.client.LobbyEventListener;
+import com.proj.network.client.NetworkEventListener;
+import com.proj.network.event.LobbyEvent;
+import com.proj.network.event.NetworkEvent;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class LobbyScreen implements Screen {
 
+import javax.swing.*;
+import java.util.ArrayList;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class LobbyScreen implements Screen, LobbyEventListener {
+
+    private  Main game;
+    private  GameClient gameClient;
     private Stage stage;
     private Table mainTable;
     private Table lobbyListTable;
     private TextButton createButton;
     private TextButton refreshButton;
-    private TextButton backButton;
     private Label titleLabel;
-    private Label currentLobbyLabel;
-    private Table currentLobbyTable;
+    private Label currentLobbyInfoLabel;
+    private Table currentLobbyInfoTable;
     private TextButton startButton;
     private TextButton leaveButton;
-
-    private String currentLobbyId;
-    private boolean isAdmin = false;
     private Skin skin;
 
-    public LobbyScreen(GameClient gameClient) {
-        this.gameClient = gameClient;
+    private String currentLobbyInfoId;
+    private boolean isAdmin = false;
+    private Map<String, LobbyInfo> lobbiesMap = new HashMap<>();
+
+    public LobbyScreen(Main game) {
+        this.game = game;
+        this.gameClient = game.getGameClient();
+        this.skin = GameAssetManager.getGameAssetManager().getStardewSkin();
+
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
@@ -40,20 +62,18 @@ public class LobbyScreen implements Screen {
         mainTable.setFillParent(true);
         stage.addActor(mainTable);
 
-        skin = GameAssetManager.getGameAssetManager().getStardewSkin();
-
-        titleLabel = new Label("Multiplayer Lobby", skin, "default");
+        titleLabel = new Label("Multiplayer LobbyInfo", skin, "default");
         mainTable.add(titleLabel).padBottom(30).colspan(3).row();
 
-        currentLobbyLabel = new Label("Your Lobby:", skin);
-        mainTable.add(currentLobbyLabel).pad(10).colspan(3).align(Align.left).row();
+        currentLobbyInfoLabel = new Label("Your LobbyInfo:", skin);
+        mainTable.add(currentLobbyInfoLabel).pad(10).colspan(3).align(Align.left).row();
 
-        currentLobbyTable = new Table(skin);
-        currentLobbyTable.setBackground("background");
-        mainTable.add(currentLobbyTable).colspan(3).fillX().padBottom(20).row();
+        currentLobbyInfoTable = new Table(skin);
+        currentLobbyInfoTable.setBackground("background");
+        mainTable.add(currentLobbyInfoTable).colspan(3).fillX().padBottom(20).row();
 
         startButton = new TextButton("Start Game", skin);
-        leaveButton = new TextButton("Leave Lobby", skin);
+        leaveButton = new TextButton("Leave LobbyInfo", skin);
 
         Table buttonTable = new Table();
         buttonTable.add(startButton).padRight(10);
@@ -68,80 +88,74 @@ public class LobbyScreen implements Screen {
         scrollPane.setFadeScrollBars(false);
         mainTable.add(scrollPane).colspan(3).fill().expand().pad(10).row();
 
-        createButton = new TextButton("Create Lobby", skin);
+        createButton = new TextButton("Create LobbyInfo", skin);
         refreshButton = new TextButton("Refresh List", skin);
-        backButton = new TextButton("Back to Menu", skin);
 
         Table bottomTable = new Table();
         bottomTable.add(createButton).padRight(10);
         bottomTable.add(refreshButton).padRight(10);
-        bottomTable.add(backButton);
         mainTable.add(bottomTable).colspan(3).pad(20).row();
 
         setupEventListeners();
+        gameClient.addLobbyListener(this);
 
-        refreshLobbyList();
-        updateCurrentLobby();
+        refreshLobbyInfoList();
+        updateCurrentLobbyInfo();
     }
 
     private void setupEventListeners() {
         createButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                showCreateLobbyDialog();
+                showCreateLobbyInfoDialog();
             }
         });
 
         refreshButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                refreshLobbyList();
+                refreshLobbyInfoList();
             }
         });
 
-        backButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-//                game.setScreen(new MainMenuScreen(game));
-            }
-        });
 
         startButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (currentLobbyId != null && isAdmin) {
-//                    NetworkManager.startGame(currentLobbyId);
+                if (currentLobbyInfoId != null && isAdmin) {
+                    gameClient.startGame(currentLobbyInfoId);
                 }
             }
         });
-
         leaveButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (currentLobbyId != null) {
-//                    NetworkManager.leaveLobby(currentLobbyId);
-                    currentLobbyId = null;
-                    updateCurrentLobby();
+                if (currentLobbyInfoId != null) {
+                    gameClient.leaveLobby();
+                    currentLobbyInfoId = null;
+                    isAdmin = false;
+                    updateCurrentLobbyInfo();
                 }
             }
         });
     }
 
-    private void showCreateLobbyDialog() {
-        Dialog dialog = new Dialog("Create New Lobby", skin) {
+    private void showCreateLobbyInfoDialog() {
+        Dialog dialog = new Dialog("Create New LobbyInfo", skin) {
             @Override
             protected void result(Object object) {
                 if ((Boolean) object) {
-                    String name = getContentTable().findActor("name").getText();
-                    boolean isPrivate = getContentTable().findActor("private").isChecked();
-                    String password = getContentTable().findActor("password").getText();
+                    String name = ((TextField)getContentTable().findActor("name")).getText();
+                    boolean isPrivate = ((CheckBox)getContentTable().findActor("private")).isChecked();
+                    String password = ((TextField)getContentTable().findActor("password")).getText();
+                    int maxPlayers = 4;
 
                     if (isPrivate && password.isEmpty()) {
                         showError("Password is required for private lobbies");
                         return;
                     }
 
-                    createLobby(name, isPrivate, password);
+                    gameClient.createLobby(name, password, maxPlayers, isPrivate, true);
                 }
             }
         };
@@ -149,12 +163,12 @@ public class LobbyScreen implements Screen {
         Table content = dialog.getContentTable();
         content.pad(15);
 
-        content.add(new Label("Lobby Name:", skin)).padRight(10);
+        content.add(new Label("LobbyInfo Name:", skin)).padRight(10);
         TextField nameField = new TextField("", skin);
         nameField.setName("name");
         content.add(nameField).width(200).row();
 
-        content.add(new Label("Lobby Type:", skin)).padRight(10);
+        content.add(new Label("LobbyInfo Type:", skin)).padRight(10);
         CheckBox privateCheckbox = new CheckBox(" Private", skin);
         privateCheckbox.setName("private");
         content.add(privateCheckbox).align(Align.left).row();
@@ -179,68 +193,26 @@ public class LobbyScreen implements Screen {
         dialog.show(stage);
     }
 
-    private void createLobby(String name, boolean isPrivate, String password) {
-        currentLobbyId = gameClient.ge.createLobby(name, isPrivate, password);
-        if (currentLobbyId != null) {
-            isAdmin = true;
-            updateCurrentLobby();
-            refreshLobbyList();
-        } else {
-            showError("Failed to create lobby");
-        }
+    private void refreshLobbyInfoList() {
+        gameClient.requestLobbiesList();
     }
 
-    private void refreshLobbyList() {
-        List<GameLobby> lobbies = NetworkManager.getPublicLobbies();
-        lobbyListTable.clear();
-
-        if (lobbies.isEmpty()) {
-            lobbyListTable.add("No public lobbies available").pad(20);
-            return;
-        }
-
-        lobbyListTable.add("Lobby Name").pad(10).width(150);
-        lobbyListTable.add("Players").pad(10).width(80);
-        lobbyListTable.add("Status").pad(10).width(100);
-        lobbyListTable.add("").pad(10).width(100).row();
-        lobbyListTable.add(new Separator()).colspan(4).fillX().padBottom(5).row();
-
-        for (LobbyInfo lobby : lobbies) {
-            if (lobby.getId().equals(currentLobbyId)) continue;
-
-            lobbyListTable.add(lobby.getName()).pad(5).left();
-            lobbyListTable.add(lobby.getPlayerCount() + "/4").pad(5);
-            lobbyListTable.add(lobby.isPrivate() ? "Private" : "Public").pad(5);
-
-            TextButton joinButton = new TextButton("Join", skin);
-            joinButton.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    joinLobby(lobby);
-                }
-            });
-
-            lobbyListTable.add(joinButton).pad(5).width(80);
-            lobbyListTable.row();
-        }
-    }
-
-    private void joinLobby(LobbyInfo lobby) {
+    private void joinLobbyInfo(LobbyInfo lobby) {
         if (lobby.isPrivate()) {
             showPasswordDialog(lobby);
         } else {
-            attemptJoinLobby(lobby.getId(), null);
+            attemptJoinLobbyInfo(lobby.getId(), "");
         }
     }
 
     private void showPasswordDialog(LobbyInfo lobby) {
-        Dialog dialog = new Dialog("Join Private Lobby", skin);
+        Dialog dialog = new Dialog("Join Private LobbyInfo", skin);
 
         Table content = dialog.getContentTable();
         content.pad(15);
 
         content.add(new Label("Enter password for:", skin)).colspan(2).row();
-        content.add(new Label(lobby.getName(), skin, "subtitle")).colspan(2).padBottom(10).row();
+        content.add(new Label(lobby.getName(), skin, "bold")).colspan(2).padBottom(10).row();
 
         content.add(new Label("Password:", skin)).padRight(10);
         TextField passwordField = new TextField("", skin);
@@ -248,67 +220,211 @@ public class LobbyScreen implements Screen {
         passwordField.setPasswordCharacter('*');
         content.add(passwordField).width(200).row();
 
-        dialog.button("Join", true);
-        dialog.button("Cancel", false);
+        TextButton joinBtn = new TextButton("Join", skin);
+        TextButton cancelBtn = new TextButton("Cancel", skin);
 
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton.equals(true)) {
-                attemptJoinLobby(lobby.getId(), passwordField.getText());
+        // Add buttons to dialog
+        dialog.getButtonTable().add(joinBtn).padRight(10);
+        dialog.getButtonTable().add(cancelBtn);
+
+        // Set result converter
+        joinBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                attemptJoinLobbyInfo(lobby.getId(), passwordField.getText());
+                dialog.hide();
             }
-            return null;
         });
+
+        cancelBtn.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                dialog.hide();
+            }
+        });
+
 
         dialog.show(stage);
     }
 
-    private void attemptJoinLobby(String lobbyId, String password) {
-        if (NetworkManager.joinLobby(lobbyId, password)) {
-            currentLobbyId = lobbyId;
-            isAdmin = false;
-            updateCurrentLobby();
-        } else {
-            showError("Failed to join lobby. Wrong password or lobby is full.");
-        }
+    private void attemptJoinLobbyInfo(String lobbyId, String password) {
+        gameClient.joinLobby(lobbyId, password);
     }
 
-    private void updateCurrentLobby() {
-        currentLobbyTable.clear();
-
-        if (currentLobbyId == null) {
-            currentLobbyTable.add("Not in any lobby").pad(20);
+    private void updateCurrentLobbyInfo() {
+        currentLobbyInfoTable.clear();
+        if (currentLobbyInfoId == null) {
+            currentLobbyInfoTable.add("Not in any lobby").pad(20);
             startButton.setVisible(false);
             leaveButton.setVisible(false);
             return;
         }
 
-        LobbyInfo lobby = NetworkManager.getLobbyInfo(currentLobbyId);
+        LobbyInfo lobby = lobbiesMap.get(currentLobbyInfoId);
         if (lobby == null) {
-            currentLobbyTable.add("Lobby information not available").pad(20);
+            currentLobbyInfoTable.add("LobbyInfo information not available").pad(20);
             return;
         }
 
-        currentLobbyTable.add(new Label("Lobby:", skin)).padRight(5);
-        currentLobbyTable.add(lobby.getName()).left().width(150).padRight(20);
+        currentLobbyInfoTable.add(new Label("LobbyInfo:", skin)).padRight(5);
+        currentLobbyInfoTable.add(lobby.getName()).left().width(150).padRight(20);
 
-        currentLobbyTable.add(new Label("Players:", skin)).padRight(5);
-        currentLobbyTable.add(lobby.getPlayerCount() + "/4").left().width(50).padRight(20);
+        currentLobbyInfoTable.add(new Label("Players:", skin)).padRight(5);
+        currentLobbyInfoTable.add(lobby.getPlayerCount() + "/" + lobby.getMaxPlayers()).left().width(50).padRight(20);
 
-        currentLobbyTable.add(new Label("Status:", skin)).padRight(5);
-        currentLobbyTable.add(lobby.isPrivate() ? "Private" : "Public").left().row();
+        currentLobbyInfoTable.add(new Label("Status:", skin)).padRight(5);
+        currentLobbyInfoTable.add(lobby.isPrivate() ? "Private" : "Public").left().row();
 
-        currentLobbyTable.add(new Separator()).colspan(6).fillX().padVertical(5).row();
+        currentLobbyInfoTable.add((CharSequence) new JPopupMenu.Separator()).colspan(6).fillX().row();
 
         for (String player : lobby.getPlayers()) {
             Label playerLabel = new Label(player, skin);
-            if (player.equals(lobby.getAdminId())) {
+            if (player.equals(lobby.getOwner())) {
                 playerLabel.setText(player + " (Admin)");
                 playerLabel.setColor(1, 0.8f, 0, 1);
             }
-            currentLobbyTable.add(playerLabel).colspan(6).align(Align.left).pad(3).row();
+            currentLobbyInfoTable.add(playerLabel).colspan(6).align(Align.left).pad(3).row();
         }
 
         startButton.setVisible(isAdmin);
         leaveButton.setVisible(true);
+    }
+
+    @Override
+    public void handleLobbyEvent(LobbyEvent event) {
+        Gdx.app.postRunnable(() -> {
+            switch (event.getType()) {
+                case LOBBIES_LIST:
+                    updateLobbiesList(event.getLobbyData());
+                    break;
+
+                case LOBBY_CREATED:
+                    handleLobbyInfoCreated(event.getLobbyData());
+                    break;
+
+                case JOINED:
+                    handleJoinSuccess(event.getLobbyData());
+                    break;
+
+                case GAME_STARTED:
+                    game.switchToGameScreen();
+                    break;
+
+                case ERROR:
+                    showError(event.getLobbyData());
+                    break;
+            }
+        });
+    }
+
+    private void updateLobbiesList(String jsonData) {
+        try {
+            JSONObject jsonLobbies = new JSONObject(jsonData);
+            lobbiesMap.clear();
+
+            for (String lobbyId : jsonLobbies.keySet()) {
+                JSONObject lobbyJson = jsonLobbies.getJSONObject(lobbyId);
+                lobbiesMap.put(lobbyId, parseLobbyInfo(lobbyId, lobbyJson));
+            }
+
+            refreshLobbyInfoListUI();
+        } catch (JSONException e) {
+            showError("Error processing lobbies list");
+        }
+    }
+
+    private LobbyInfo parseLobbyInfo(String lobbyId, JSONObject json) {
+        LobbyInfo lobby = new LobbyInfo();
+        lobby.setId(lobbyId);
+        lobby.setName(json.getString("name"));
+        lobby.setOwner(json.getString("owner"));
+        lobby.setMaxPlayers(json.getInt("maxPlayers"));
+        lobby.setPrivate(json.getBoolean("isPrivate"));
+        lobby.setGameActive(json.getBoolean("isGameActive"));
+
+        java.util.List<String> players = new ArrayList<>();
+        JSONObject playersJson = json.getJSONObject("players");
+        for (String player : playersJson.keySet()) {
+            players.add(player);
+        }
+        lobby.setPlayers(players);
+        return lobby;
+    }
+
+    private void refreshLobbyInfoListUI() {
+        lobbyListTable.clear();
+
+        if (lobbiesMap.isEmpty()) {
+            lobbyListTable.add("No public lobbies available").pad(20);
+            return;
+        }
+        lobbyListTable.add("LobbyInfo Name").pad(10).width(150);
+        lobbyListTable.add("Players").pad(10).width(80);
+        lobbyListTable.add("Status").pad(10).width(100);
+        lobbyListTable.add("").pad(10).width(100).row();
+        lobbyListTable.add((CharSequence) new JPopupMenu.Separator()).colspan(4).fillX().row();
+
+        for (LobbyInfo lobby : lobbiesMap.values()) {
+            if (lobby.getId().equals(currentLobbyInfoId)) continue;
+
+            lobbyListTable.add(lobby.getName()).pad(5).left();
+            lobbyListTable.add(lobby.getPlayerCount() + "/" + lobby.getMaxPlayers()).pad(5);
+
+            String status = lobby.isPrivate() ? "Private" : "Public";
+            if (lobby.isGameActive()) {
+                status += " (Playing)";
+            }
+            lobbyListTable.add(status).pad(5);
+
+            TextButton joinButton = new TextButton("Join", skin);
+            joinButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    joinLobbyInfo(lobby);
+                }
+            });
+
+            if (lobby.getPlayerCount() >= lobby.getMaxPlayers() || lobby.isGameActive()) {
+                joinButton.setDisabled(true);
+                joinButton.setText("Full");
+            }
+
+            lobbyListTable.add(joinButton).pad(5).width(80);
+            lobbyListTable.row();
+        }
+    }
+
+    private void handleLobbyInfoCreated(String jsonData) {
+        try {
+            JSONObject lobbyJson = new JSONObject(jsonData);
+            String lobbyId = lobbyJson.getString("id");
+
+            LobbyInfo lobby = parseLobbyInfo(lobbyId, lobbyJson);
+            lobbiesMap.put(lobbyId, lobby);
+
+            currentLobbyInfoId = lobbyId;
+            isAdmin = true;
+            updateCurrentLobbyInfo();
+            refreshLobbyInfoListUI();
+        } catch (JSONException e) {
+            showError("Error processing created lobby");
+        }
+    }
+
+    private void handleJoinSuccess(String jsonData) {
+        try {
+            JSONObject lobbyJson = new JSONObject(jsonData);
+            String lobbyId = lobbyJson.getString("id");
+
+            LobbyInfo lobby = parseLobbyInfo(lobbyId, lobbyJson);
+            lobbiesMap.put(lobbyId, lobby);
+
+            currentLobbyInfoId = lobbyId;
+            isAdmin = lobby.getOwner().equals(gameClient.getUsername());
+            updateCurrentLobbyInfo();
+        } catch (JSONException e) {
+            showError("Error processing joined lobby");
+        }
     }
 
     private void showError(String message) {
@@ -336,7 +452,49 @@ public class LobbyScreen implements Screen {
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {}
-    @Override public void dispose() {
+
+    @Override
+    public void dispose() {
         stage.dispose();
+    }
+
+    @Override
+    public void handleNetworkEvent(NetworkEvent event) {
+
+    }
+
+    public class LobbyInfo {
+        private String id;
+        private String name;
+        private String owner;
+        private int playerCount;
+        private int maxPlayers;
+        private boolean isPrivate;
+        private boolean isGameActive;
+        private java.util.List<String> players = new ArrayList<>();
+
+        // Getters and Setters
+        public String getId() { return id; }
+        public void setId(String id) { this.id = id; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+
+        public String getOwner() { return owner; }
+        public void setOwner(String owner) { this.owner = owner; }
+
+        public int getPlayerCount() { return playerCount; }
+        public void setPlayerCount(int playerCount) { this.playerCount = playerCount; }
+
+        public int getMaxPlayers() { return maxPlayers; }
+        public void setMaxPlayers(int maxPlayers) { this.maxPlayers = maxPlayers; }
+
+        public boolean isPrivate() { return isPrivate; }
+        public void setPrivate(boolean isPrivate) { this.isPrivate = isPrivate; }
+
+        public boolean isGameActive() { return isGameActive; }
+        public void setGameActive(boolean isGameActive) { this.isGameActive = isGameActive; }
+
+        public java.util.List<String> getPlayers() { return players; }
+        public void setPlayers(List<String> players) { this.players = players; }
     }
 }

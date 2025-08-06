@@ -11,10 +11,16 @@ import com.proj.Model.GameAssetManager;
 import com.proj.View.SignupMenuView;
 import com.proj.View.EntranceScreen;
 import com.proj.map.farmName;
+import com.proj.network.event.NetworkEvent;
+import com.proj.network.client.GameClient;
+import com.proj.network.client.NetworkEventListener;
 
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
+/**
+ * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
+ */
 public class Main extends Game {
+    private GameClient gameClient;
     private static Main main;
     private static SpriteBatch batch;
     private Music backgroundMusic;
@@ -22,6 +28,10 @@ public class Main extends Game {
     private static final String MUSIC_VOLUME_KEY = "volume";
     private static final float DEFAULT_VOLUME = 0.5f;
     public static Texture menuBackground;
+
+    private static final String SERVER_ADDRESS = "127.0.0.1";
+    private static final int SERVER_PORT = 8080;
+
     /*@Override
     public void create() {
         main = this;
@@ -42,6 +52,7 @@ public class Main extends Game {
 
         //showAuthScreen();
         //setScreen(new GameScreen());
+        initializeNetworkClient();
         setScreen(new EntranceScreen(this));
 
         loadMusic();
@@ -124,6 +135,44 @@ public class Main extends Game {
         super.dispose();
     }
 
+    private void initializeNetworkClient() {
+        gameClient = new GameClient(SERVER_ADDRESS, SERVER_PORT);
+        gameClient.connect();
+        gameClient.addNetworkListener(new NetworkEventListener() {
+            @Override
+            public void handleNetworkEvent(NetworkEvent event) {
+                switch (event.getType()) {
+                    case CONNECTED:
+                        Gdx.app.log("NETWORK", "CONNECTED TO SERVER");
+                        break;
+                    case DISCONNECTED:
+                        Gdx.app.log("NETWORK", "DISCONNECTED FROM SERVER");
+                        break;
+                    case AUTH_SUCCESS:
+                        handleAuthSuccess();
+                        break;
+                    case AUTH_FAILED:
+                        Gdx.app.log("NETWORK", "AUTH FAILED: " + event.getMessage());
+                        break;
+                    case ERROR:
+                        Gdx.app.log("NETWORK", "ERROR: " + event.getMessage());
+                        break;
+
+                }
+            }
+        });
+    }
+
+    public void authenticate(String username, String password) {
+        gameClient.authenticate(username, password);
+    }
+
+    private void handleAuthSuccess() {
+        Gdx.app.postRunnable(() -> {
+            switchToGameScreen();
+        });
+    }
+
     public static Main getMain() {
         return main;
     }
@@ -147,7 +196,12 @@ public class Main extends Game {
     private float loadMusicVolume() {
         return Gdx.app.getPreferences(PREFS_NAME).getFloat(MUSIC_VOLUME_KEY, DEFAULT_VOLUME);
     }
+
     public Music getBackgroundMusic() {
         return backgroundMusic;
+    }
+
+    public GameClient getGameClient() {
+        return gameClient;
     }
 }

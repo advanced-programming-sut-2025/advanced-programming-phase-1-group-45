@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.proj.Control.LoginMenuController;
 import com.proj.Main;
+import com.proj.network.client.NetworkEventListener;
+import com.proj.network.event.NetworkEvent;
 
 public class LoginMenuView implements Screen {
     private Stage stage;

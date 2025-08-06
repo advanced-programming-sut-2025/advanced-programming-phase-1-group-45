@@ -1,11 +1,10 @@
-package com.proj.client;
+package com.proj.network.client;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Disposable;
-import com.proj.event.GameEvent;
-import com.proj.event.LobbyEvent;
-import com.proj.event.NetworkEvent;
-import com.proj.event.NetworkEventListener;
+import com.proj.network.event.GameEvent;
+import com.proj.network.event.LobbyEvent;
+import com.proj.network.event.NetworkEvent;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -19,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameClient implements Disposable, Runnable {
     private static final long PING_INTERVAL = 15000; // 15 ثانیه
-    
+
     private final String serverAddress;
     private final int serverPort;
     private Socket clientSocket;
@@ -28,7 +27,7 @@ public class GameClient implements Disposable, Runnable {
     private Thread networkThread;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final List<NetworkEventListener> listeners = new ArrayList<>();
-    
+
     private String username;
     private String currentLobbyId;
     private boolean authenticated = false;
@@ -40,20 +39,20 @@ public class GameClient implements Disposable, Runnable {
 
     public void connect() {
         if (running.get()) return;
-        
+
         try {
             clientSocket = new Socket(serverAddress, serverPort);
             out = new PrintWriter(clientSocket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            
+
             running.set(true);
             networkThread = new Thread(this, "Network-Thread");
             networkThread.start();
-            
+
             startPingTask();
-            fireEvent(NetworkEvent.Type.CONNECTED, "اتصال برقرار شد");
+            fireEvent(NetworkEvent.Type.CONNECTED, "connected");
         } catch (IOException e) {
-            fireEvent(NetworkEvent.Type.ERROR, "خطا در اتصال: " + e.getMessage());
+            fireEvent(NetworkEvent.Type.ERROR, "connection error: " + e.getMessage());
             Gdx.app.error("GameClient", "Connection error", e);
         }
     }
@@ -64,12 +63,12 @@ public class GameClient implements Disposable, Runnable {
             while (running.get()) {
                 String message = in.readLine();
                 if (message == null) break;
-                
+
                 processIncomingMessage(message);
             }
         } catch (IOException e) {
             if (running.get()) {
-                fireEvent(NetworkEvent.Type.ERROR, "خطای شبکه: " + e.getMessage());
+                fireEvent(NetworkEvent.Type.ERROR, "network error: " + e.getMessage());
             }
         } finally {
             disconnect();
@@ -81,70 +80,70 @@ public class GameClient implements Disposable, Runnable {
             JSONObject json = new JSONObject(rawMessage);
             String type = json.getString("type");
             String data = json.optString("data", "");
-            
+
             switch (type) {
                 case "AUTH_SUCCESS":
                     handleAuthSuccess(data);
                     break;
-                    
+
                 case "AUTH_FAILED":
                     fireEvent(NetworkEvent.Type.AUTH_FAILED, data);
                     break;
-                    
+
                 case "LOBBY_CREATED":
                     handleLobbyCreated(data);
                     break;
-                    
+
                 case "JOIN_SUCCESS":
                     handleJoinLobby(data);
                     break;
-                    
+
                 case "LOBBIES_LIST":
                     fireLobbyListEvent(data);
                     break;
-                    
+
                 case "GAME_STARTED":
                     fireGameEvent(GameEvent.Type.STARTED, data);
                     break;
-                    
+
                 case "GAME_UPDATE":
                     fireGameEvent(GameEvent.Type.UPDATE, data);
                     break;
-                    
+
                 case "PRIVATE_CHAT":
                     handlePrivateChat(data);
                     break;
-                    
+
                 case "SYSTEM":
                     fireEvent(NetworkEvent.Type.SYSTEM_MESSAGE, data);
                     break;
-                    
+
                 case "PONG":
                     // پاسخ پینگ
                     break;
-                    
+
                 default:
                     fireEvent(NetworkEvent.Type.UNKNOWN_MESSAGE, rawMessage);
                     break;
             }
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "خطا در پردازش پیام: " + e.getMessage());
+            fireEvent(NetworkEvent.Type.ERROR, "error in processing message: " + e.getMessage());
         }
     }
 
     private void handleAuthSuccess(String data) {
         authenticated = true;
         username = data.split(" ")[1]; // "خوش آمدید username"
-        fireEvent(NetworkEvent.Type.AUTH_SUCCESS, "احراز هویت موفق: " + username);
+        fireEvent(NetworkEvent.Type.AUTH_SUCCESS, "successful" + username);
     }
 
     private void handleLobbyCreated(String jsonData) {
         try {
             JSONObject lobbyInfo = new JSONObject(jsonData);
             currentLobbyId = lobbyInfo.getString("id");
-            fireLobbyEvent(LobbyEvent.Type.CREATED, lobbyInfo);
+            fireLobbyEvent(LobbyEvent.Type.LOBBY_CREATED, jsonData);
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "خطا در پردازش لابی");
+            fireEvent(NetworkEvent.Type.ERROR, "error in processing lobby: " + e.getMessage());
         }
     }
 
@@ -152,19 +151,19 @@ public class GameClient implements Disposable, Runnable {
         try {
             JSONObject lobbyInfo = new JSONObject(jsonData);
             currentLobbyId = lobbyInfo.getString("id");
-            fireLobbyEvent(LobbyEvent.Type.JOINED, lobbyInfo);
+            fireLobbyEvent(LobbyEvent.Type.JOINED, jsonData);
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "خطا در پیوستن به لابی");
+            fireEvent(NetworkEvent.Type.ERROR, "error in join lobby: " + e.getMessage());
         }
     }
 
     private void handlePrivateChat(String jsonData) {
         try {
             JSONObject chatData = new JSONObject(jsonData);
-            fireEvent(NetworkEvent.Type.PRIVATE_MESSAGE, 
-                      chatData.getString("sender") + ": " + chatData.getString("message"));
+            fireEvent(NetworkEvent.Type.PRIVATE_MESSAGE,
+                chatData.getString("sender") + ": " + chatData.getString("message"));
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "خطا در پردازش پیام خصوصی");
+            fireEvent(NetworkEvent.Type.ERROR, "error in processing chat: " + e.getMessage());
         }
     }
 
@@ -173,6 +172,12 @@ public class GameClient implements Disposable, Runnable {
         authData.put("username", username);
         authData.put("password", password);
         sendMessage("AUTH", authData.toString());
+    }
+
+    public void startGame(String lobbyId) {
+        JSONObject gameData = new JSONObject();
+        gameData.put("lobbyId", lobbyId);
+        sendMessage("START_GAME", gameData.toString());
     }
 
     public void createLobby(String name, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
@@ -220,14 +225,14 @@ public class GameClient implements Disposable, Runnable {
 
     private void sendMessage(String type, String data) {
         if (!running.get() || out == null) return;
-        
+
         try {
             JSONObject message = new JSONObject();
             message.put("type", type);
             message.put("data", data);
             out.println(message.toString());
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "خطا در ارسال پیام");
+            fireEvent(NetworkEvent.Type.ERROR, "error in sending message");
         }
     }
 
@@ -249,7 +254,7 @@ public class GameClient implements Disposable, Runnable {
         authenticated = false;
         username = null;
         currentLobbyId = null;
-        
+
         try {
             if (out != null) out.close();
             if (in != null) in.close();
@@ -257,8 +262,8 @@ public class GameClient implements Disposable, Runnable {
         } catch (IOException e) {
             Gdx.app.error("GameClient", "Error closing connection", e);
         }
-        
-        fireEvent(NetworkEvent.Type.DISCONNECTED, "اتصال قطع شد");
+
+        fireEvent(NetworkEvent.Type.DISCONNECTED, "connection disconnected");
     }
 
     @Override
@@ -270,19 +275,23 @@ public class GameClient implements Disposable, Runnable {
     public void addNetworkListener(NetworkEventListener listener) {
         listeners.add(listener);
     }
-    
+
+    public void addLobbyListener(LobbyEventListener listener) {
+        listeners.add(listener);
+    }
+
     public void removeNetworkListener(NetworkEventListener listener) {
         listeners.remove(listener);
     }
-    
+
     private void fireEvent(NetworkEvent.Type type, String message) {
         NetworkEvent event = new NetworkEvent(type, message);
         for (NetworkEventListener listener : listeners) {
             listener.handleNetworkEvent(event);
         }
     }
-    
-    private void fireLobbyEvent(LobbyEvent.Type type, JSONObject data) {
+
+    private void fireLobbyEvent(LobbyEvent.Type type, String data) {
         LobbyEvent event = new LobbyEvent(type, data);
         for (NetworkEventListener listener : listeners) {
             if (listener instanceof LobbyEventListener) {
@@ -290,7 +299,7 @@ public class GameClient implements Disposable, Runnable {
             }
         }
     }
-    
+
     private void fireGameEvent(GameEvent.Type type, String data) {
         GameEvent event = new GameEvent(type, data);
         for (NetworkEventListener listener : listeners) {
@@ -299,7 +308,7 @@ public class GameClient implements Disposable, Runnable {
             }
         }
     }
-    
+
     private void fireLobbyListEvent(String jsonData) {
         try {
             JSONObject lobbiesData = new JSONObject(jsonData);
@@ -309,7 +318,7 @@ public class GameClient implements Disposable, Runnable {
                 }
             }
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "خطا در دریافت لیست لابی‌ها");
+            fireEvent(NetworkEvent.Type.ERROR, "error in recieving lobbies");
         }
     }
 
@@ -317,15 +326,15 @@ public class GameClient implements Disposable, Runnable {
     public boolean isConnected() {
         return running.get();
     }
-    
+
     public boolean isAuthenticated() {
         return authenticated;
     }
-    
+
     public String getUsername() {
         return username;
     }
-    
+
     public String getCurrentLobbyId() {
         return currentLobbyId;
     }
