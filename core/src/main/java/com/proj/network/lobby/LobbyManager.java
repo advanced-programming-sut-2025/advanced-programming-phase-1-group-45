@@ -34,10 +34,10 @@ public class LobbyManager {
             if (lobby.hasPlayer(username)) {
                 lobby.removePlayer(username);
 
-                // اگر لابی خالی است، آن را حذف کنیم
+            
                 if (lobby.isEmpty() && !lobby.isGameActive()) {
                     gameLobbies.remove(lobby.getId());
-                    Gdx.app.log("GameServer", "لابی حذف شد: " + lobby.getId());
+                    Gdx.app.log("GameServer", "lobby was deleted" + lobby.getId());
                 }
             }
         }
@@ -57,15 +57,13 @@ public class LobbyManager {
     }
 
     private void checkInactiveLobbies() {
-        long inactivityTimeout = 30 * 60 * 1000; // 30 دقیقه
+        long inactivityTimeout = 30 * 60 * 1000; // 30 minutes
 
         for (Map.Entry<String, GameLobby> entry : new ConcurrentHashMap<>(gameLobbies).entrySet()) {
             GameLobby lobby = entry.getValue();
-
-            // اگر لابی خالی است یا مدت زیادی غیرفعال بوده
             if (lobby.isEmpty() || (lobby.isInactive(inactivityTimeout) && !lobby.isGameActive())) {
                 gameLobbies.remove(entry.getKey());
-                Gdx.app.log("GameServer", "لابی غیرفعال حذف شد: " + entry.getKey());
+                Gdx.app.log("GameServer", "lobby was deleted " + entry.getKey());
             }
         }
     }
