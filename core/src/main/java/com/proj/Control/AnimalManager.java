@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.proj.Model.Animal;
+import com.proj.Model.Animal.Animal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +26,17 @@ public class AnimalManager {
     private BitmapFont font;
     private GlyphLayout layout;
     private Texture whitePixelTexture;
+
+    private Animal feedingAnimal = null;
+    private float feedingTime = 0;
+    private static final float FEEDING_DURATION = 2.0f;
+
+    private Animal pettingAnimal = null;
+    private float pettingTime = 0;
+    private static final float PETTING_DURATION = 2.0f;
+
+    private Texture hayHopperTexture;
+    private Texture hayHopperFullTexture;
 
     public AnimalManager() {
         loadTextures();
@@ -66,6 +77,9 @@ public class AnimalManager {
             productTextures.put("Rabbit_Wool", new Texture(Gdx.files.internal("assets/Animals/AnimalProducts/Rabbit_Wool.png")));
             productTextures.put("Truffle", new Texture(Gdx.files.internal("assets/Animals/AnimalProducts/Truffle.png")));
             productTextures.put("Dinosaur_Egg", new Texture(Gdx.files.internal("assets/Animals/AnimalProducts/Dinosaur_Egg.png")));
+
+            hayHopperTexture = new Texture(Gdx.files.internal("assets/Animals/Hay_Hopper.png"));
+            hayHopperFullTexture = new Texture(Gdx.files.internal("assets/Animals/Hay_Hopper_Full.png"));
         } catch (Exception e) {
             Gdx.app.error("AnimalManager", "Error loading textures", e);
         }
@@ -74,6 +88,24 @@ public class AnimalManager {
     public void update(float delta) {
         for (Animal animal : animals) {
             animal.update(delta);
+        }
+
+        if (feedingAnimal != null) {
+            feedingTime += delta;
+            if (feedingTime >= FEEDING_DURATION) {
+                feedingAnimal.feed();
+                feedingAnimal = null;
+                feedingTime = 0;
+            }
+        }
+
+        if (pettingAnimal != null) {
+            pettingTime += delta;
+            if (pettingTime >= PETTING_DURATION) {
+                pettingAnimal.pet();
+                pettingAnimal = null;
+                pettingTime = 0;
+            }
         }
 
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
@@ -97,9 +129,9 @@ public class AnimalManager {
 
         if (selectedAnimal != null) {
             if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-                selectedAnimal.pet();
+                startPetting(selectedAnimal);
             } else if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
-                selectedAnimal.feed();
+                startFeeding(selectedAnimal);
             } else if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
                 selectedAnimal.setOutside(!selectedAnimal.isOutside());
             } else if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
@@ -124,9 +156,9 @@ public class AnimalManager {
         float menuY = selectedAnimal.getY() + 50;
 
         if (isClickOnButton(mouseX, mouseY, menuX + 10, menuY + 10, 80, 20)) {
-            selectedAnimal.pet();
+            startPetting(selectedAnimal);
         } else if (isClickOnButton(mouseX, mouseY, menuX + 110, menuY + 10, 80, 20)) {
-            selectedAnimal.feed();
+            startFeeding(selectedAnimal);
         } else if (isClickOnButton(mouseX, mouseY, menuX + 10, menuY + 35, 180, 20)) {
             selectedAnimal.setOutside(!selectedAnimal.isOutside());
         } else if (selectedAnimal.hasProduct() && isClickOnButton(mouseX, mouseY, menuX + 10, menuY + 60, 80, 20)) {
@@ -211,12 +243,45 @@ public class AnimalManager {
             }
         }
 
+        if (feedingAnimal != null) {
+            renderFeedingAnimation(batch);
+        }
+
+        if (pettingAnimal != null) {
+            renderPettingAnimation(batch);
+        }
+
         if (showingAnimalMenu && selectedAnimal != null) {
             renderAnimalMenu(batch);
         }
 
         if (showingBuyMenu) {
             renderBuyMenu(batch);
+        }
+    }
+
+    private void renderFeedingAnimation(SpriteBatch batch) {
+        if (feedingAnimal != null) {
+            Texture animalTexture = animalTextures.get(feedingAnimal.getType().toLowerCase());
+            if (animalTexture != null) {
+                batch.draw(animalTexture, feedingAnimal.getX(), feedingAnimal.getY());
+
+                Texture hopperTexture = feedingTime < FEEDING_DURATION/2 ? hayHopperFullTexture : hayHopperTexture;
+                batch.draw(hopperTexture,
+                    feedingAnimal.getX() + animalTexture.getWidth()/2 - hopperTexture.getWidth()/2,
+                    feedingAnimal.getY() - hopperTexture.getHeight());
+            }
+        }
+    }
+
+    private void renderPettingAnimation(SpriteBatch batch) {
+        if (pettingAnimal != null) {
+            Texture animalTexture = animalTextures.get(pettingAnimal.getType().toLowerCase());
+            if (animalTexture != null) {
+                batch.setColor(1, 1, 1, 0.8f + 0.2f * (float)Math.sin(pettingTime * 10));
+                batch.draw(animalTexture, pettingAnimal.getX(), pettingAnimal.getY());
+                batch.setColor(1, 1, 1, 1);
+            }
         }
     }
 
@@ -304,7 +369,7 @@ public class AnimalManager {
             y -= buttonHeight + 5;
             renderBuyButton(batch, "Cow - 1500g", buttonX, y, buttonWidth, buttonHeight, "cow");
             y -= buttonHeight + 5;
-            renderBuyButton(batch, "Duck - 1200g", buttonX, y, buttonWidth, buttonHeight, "duck");
+            renderBuyButton(batch, "Duck - 1100g", buttonX, y, buttonWidth, buttonHeight, "duck");
             y -= buttonHeight + 5;
             renderBuyButton(batch, "Goat - 1300g", buttonX, y, buttonWidth, buttonHeight, "goat");
             y -= buttonHeight + 5;
@@ -414,7 +479,7 @@ public class AnimalManager {
     public void feedAnimal(String name) {
         Animal animal = findAnimalByName(name);
         if (animal != null) {
-            animal.feed();
+            startFeeding(animal);
         } else {
             System.out.println("Animal not found: " + name);
         }
@@ -423,7 +488,7 @@ public class AnimalManager {
     public void petAnimal(String name) {
         Animal animal = findAnimalByName(name);
         if (animal != null) {
-            animal.pet();
+            startPetting(animal);
         } else {
             System.out.println("Animal not found: " + name);
         }
@@ -495,6 +560,16 @@ public class AnimalManager {
         showingBuyMenu = true;
     }
 
+    public void startFeeding(Animal animal) {
+        feedingAnimal = animal;
+        feedingTime = 0;
+    }
+
+    public void startPetting(Animal animal) {
+        pettingAnimal = animal;
+        pettingTime = 0;
+    }
+
     public Animal getSelectedAnimal() {
         return selectedAnimal;
     }
@@ -511,6 +586,12 @@ public class AnimalManager {
         }
         if (whitePixelTexture != null) {
             whitePixelTexture.dispose();
+        }
+        if (hayHopperTexture != null) {
+            hayHopperTexture.dispose();
+        }
+        if (hayHopperFullTexture != null) {
+            hayHopperFullTexture.dispose();
         }
     }
 }

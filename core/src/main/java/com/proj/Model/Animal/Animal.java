@@ -1,6 +1,4 @@
-package com.proj.Model;
-
-import com.badlogic.gdx.Gdx;
+package com.proj.Model.Animal;
 
 public class Animal {
     private String name;
@@ -15,6 +13,14 @@ public class Animal {
     private String product;
     private boolean hasProduct = false;
     private String productQuality = "regular";
+    private boolean free = false;
+    public enum Direction {
+        UP, DOWN, LEFT, RIGHT
+    }
+
+    private Direction direction = Direction.DOWN;
+    private float stateTime = 0;
+    private float lastMoveTime = 0;
 
     public Animal(String name, String type) {
         this.name = name;
@@ -74,6 +80,8 @@ public class Animal {
     }
 
     public void update(float delta) {
+        stateTime += delta;
+
         if (isMoving) {
             float dx = targetX - x;
             float dy = targetY - y;
@@ -92,6 +100,12 @@ public class Animal {
             float ratio = speed / distance;
             x += dx * ratio;
             y += dy * ratio;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                direction = dx > 0 ? Direction.RIGHT : Direction.LEFT;
+            } else {
+                direction = dy > 0 ? Direction.UP : Direction.DOWN;
+            }
         }
     }
 
@@ -119,6 +133,8 @@ public class Animal {
                     product = "Goat_Large_Milk";
                 } else if (type.equalsIgnoreCase("chicken")) {
                     product = "Large_Egg";
+                } else if (type.equalsIgnoreCase("duck")) {
+                    product = Math.random() > 0.5 ? "Duck_Egg" : "Duck_Feather";
                 }
             } else if (qualityValue >= 0.7f) {
                 productQuality = "gold";
@@ -216,6 +232,38 @@ public class Animal {
         return product;
     }
 
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
+    public boolean isMoving() {
+        return isMoving;
+    }
+
+    public void setMoving(boolean moving) {
+        isMoving = moving;
+    }
+
+    public float getStateTime() {
+        return stateTime;
+    }
+
+    public void setStateTime(float stateTime) {
+        this.stateTime = stateTime;
+    }
+
+    public float getLastMoveTime() {
+        return lastMoveTime;
+    }
+
+    public void setLastMoveTime(float lastMoveTime) {
+        this.lastMoveTime = lastMoveTime;
+    }
+
     public void resetDailyStatus() {
         isPetToday = false;
         isFedToday = false;
@@ -236,5 +284,22 @@ public class Animal {
         }
 
         produceProduct();
+    }
+
+
+    public boolean isFree() {
+        return free;
+    }
+
+    public void setFree(boolean free) {
+        this.free = free;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setX(float x) {
+        this.x = x;
     }
 }

@@ -19,12 +19,8 @@ import com.proj.Control.AnimalManager;
 import com.proj.Control.NPCManager;
 import com.proj.Control.WorldController;
 import com.proj.Control.AnimalBuildingController;
-<<<<<<< HEAD
 import com.proj.Model.Animal.Animal;
-=======
-import com.proj.Model.Animal;
 import com.proj.Model.GameAssetManager;
->>>>>>> 6df390d926023038f57e41db95c9993750569ba5
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.Inventory.InventoryManager;
 import com.proj.Model.Inventory.PlayerBag;
@@ -39,7 +35,7 @@ import com.badlogic.gdx.graphics.Color;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
-import java.util.List; 
+import java.util.List;
 
 import java.awt.*;
 
@@ -85,12 +81,12 @@ public class GameScreen implements Screen {
     private boolean showDImage = false;
     private boolean showFImage = false;
     private boolean showGImage = false;
-    private StoreManager storeManager;
-    private Store currentStore = null;
+    //private StoreManager storeManager;
+    //private Store currentStore = null;
     private boolean inStoreInterface = false;
     private BitmapFont font;
     private GlyphLayout glyphLayout = new GlyphLayout();
-    
+
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
         this.farm = farm;
@@ -198,7 +194,7 @@ public class GameScreen implements Screen {
 
                 playerBag = new PlayerBag(player, inventoryManager.getPlayerInventory());
                 playerBag.setScale(0.7f);
-                
+
                 font = new BitmapFont();
                 font.setColor(Color.WHITE);
                 font.getData().setScale(1.5f);
@@ -315,12 +311,10 @@ public class GameScreen implements Screen {
                 handleToolUse();
             }
 
-<<<<<<< HEAD
             if (animalBuildingController != null) {
                 animalBuildingController.updateCameraPosition(camera.position.x, camera.position.y);
             }
-=======
->>>>>>> 6df390d926023038f57e41db95c9993750569ba5
+
         } catch (Exception e) {
             if (worldController.getSpriteBatch().isDrawing()) {
                 worldController.getSpriteBatch().end();
