@@ -264,7 +264,7 @@ public class LobbyScreen implements Screen {
     private void attemptJoinLobby(String lobbyId, String password) {
         if (NetworkManager.joinLobby(lobbyId, password)) {
             currentLobbyId = lobbyId;
-            isAdmin = false; // فقط سازنده ادمین است
+            isAdmin = false;
             updateCurrentLobby();
         } else {
             showError("Failed to join lobby. Wrong password or lobby is full.");
@@ -302,7 +302,7 @@ public class LobbyScreen implements Screen {
             Label playerLabel = new Label(player, skin);
             if (player.equals(lobby.getAdminId())) {
                 playerLabel.setText(player + " (Admin)");
-                playerLabel.setColor(1, 0.8f, 0, 1); // رنگ متمایز برای ادمین
+                playerLabel.setColor(1, 0.8f, 0, 1);
             }
             currentLobbyTable.add(playerLabel).colspan(6).align(Align.left).pad(3).row();
         }
