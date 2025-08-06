@@ -7,11 +7,10 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.utils.Array;
 import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.Model.GameAssetManager;
-import com.proj.Model.inventoryItems.ResourceItem;
-import com.proj.map.GameMap;
-import com.proj.map.Season;
-import com.proj.map.Tile;
-import com.proj.map.TileType;
+import com.proj.Map.GameMap;
+import com.proj.Map.Season;
+import com.proj.Map.Tile;
+import com.proj.Map.TileType;
 
 import java.awt.*;
 import java.util.*;

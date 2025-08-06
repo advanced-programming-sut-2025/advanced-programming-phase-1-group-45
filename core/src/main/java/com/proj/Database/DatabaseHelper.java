@@ -126,4 +126,43 @@ public class DatabaseHelper {
             return null;
         }
     }
+    public void saveGameResult(String gameId, String winner) {
+        String sql = "INSERT INTO game_results (game_id, winner, timestamp) VALUES (?, ?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1, gameId);
+            pstmt.setString(2, winner);
+            pstmt.setLong(3, System.currentTimeMillis());
+            pstmt.executeUpdate();
+            Gdx.app.log("Database", "Game result saved: " + gameId + ", winner: " + winner);
+        } catch (SQLException e) {
+            Gdx.app.error("Database", "Error saving game result: " + e.getMessage());
+        }
+    }
+
+    public void createGameResultsTable() {
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS game_results ("
+            + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + "game_id TEXT NOT NULL,"
+            + "winner TEXT,"
+            + "timestamp BIGINT NOT NULL)";
+
+        executeUpdate(createTableSQL);
+        Gdx.app.log("Database", "Game results table created");
+    }
+
+    @Override
+    public void connect() {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection(DB_URL);
+            Gdx.app.log("Database", "Connected to SQLite database");
+            createUserTable();
+            createGameResultsTable();
+        } catch (Exception e) {
+            Gdx.app.error("Database", "Connection error: " + e.getMessage());
+        }
+    }
+
+
 }

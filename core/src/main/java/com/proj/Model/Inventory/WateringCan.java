@@ -2,7 +2,7 @@ package com.proj.Model.Inventory;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.proj.Control.WorldController;
-import com.proj.map.GameMap;
+import com.proj.Map.GameMap;
 
 public class WateringCan extends Tool {
     private int waterAmount;

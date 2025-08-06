@@ -9,9 +9,8 @@ import com.badlogic.gdx.utils.Array;
 import com.proj.Model.TimeAndWeather.Weather;
 import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.Model.inventoryItems.ResourceItem;
-import com.proj.Model.inventoryItems.crops.CropRegistry;
 import com.proj.Model.inventoryItems.seeds.SeedRegistry;
-import com.proj.map.FarmInOutPoint;
+import com.proj.Map.FarmInOutPoint;
 
 import java.awt.*;
 import java.util.ArrayList;

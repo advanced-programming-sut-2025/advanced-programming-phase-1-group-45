@@ -2,7 +2,7 @@ package com.proj.Model.inventoryItems.seeds;
 
 import com.badlogic.gdx.utils.Array;
 import com.proj.Model.inventoryItems.SeedItem;
-import com.proj.map.Season;
+import com.proj.Map.Season;
 
 public class SeedData {
     private String id;

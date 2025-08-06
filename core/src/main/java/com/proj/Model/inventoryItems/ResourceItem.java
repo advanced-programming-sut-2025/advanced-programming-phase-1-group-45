@@ -3,7 +3,7 @@ package com.proj.Model.inventoryItems;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.Inventory.InventoryItemType;
-import com.proj.map.LandObject;
+import com.proj.Map.LandObject;
 
 public class ResourceItem extends InventoryItem implements LandObject {
     private int sellPrice;

@@ -2,12 +2,9 @@ package com.proj.Model.inventoryItems.crops;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.utils.Array;
 import com.proj.Model.GameAssetManager;
-import com.proj.map.Season;
-
-import java.util.ArrayList;
+import com.proj.Map.Season;
 
 public class CropData {
     private String name;

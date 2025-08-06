@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.proj.Model.inventoryItems.ForagingItem;
-import com.proj.map.Season;
+import com.proj.Map.Season;
 
 import java.util.Arrays;
 

@@ -27,13 +27,11 @@ import com.proj.Model.Inventory.PlayerBag;
 import com.proj.Model.Inventory.Tool;
 import com.proj.Model.TimeAndWeather.time.Time;
 import com.proj.Model.mapObjects.NPCObject;
-import com.proj.map.farmName;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.proj.Map.farmName;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.Color;
-import java.util.HashMap;
-import java.util.Map;
+
 import java.util.ArrayList;
 import java.util.List;
 

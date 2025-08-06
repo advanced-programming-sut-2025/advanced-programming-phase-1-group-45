@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.proj.Model.GameAssetManager;
-import com.proj.map.Season;
+import com.proj.Map.Season;
 
 public class TreeData {
     private String id;

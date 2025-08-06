@@ -6,11 +6,9 @@ import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.Model.inventoryItems.ResourceItem;
 import com.proj.Model.inventoryItems.crops.Crop;
 import com.proj.Model.inventoryItems.crops.GiantCrop;
-import com.proj.Model.inventoryItems.trees.Tree;
-import com.proj.Player;
-import com.proj.map.GameMap;
-import com.proj.map.Tile;
-import com.proj.map.TileType;
+import com.proj.Map.GameMap;
+import com.proj.Map.Tile;
+import com.proj.Map.TileType;
 
 import java.awt.*;
 
