@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 import org.json.JSONObject;
+import com.proj.Database.DatabaseHelper;
 
 
 public class GameManager {
@@ -113,7 +114,7 @@ public class GameManager {
         return activeGames.get(gameId);
     }
 
-    /
+
     public void checkInactiveGames() {
         long currentTime = System.currentTimeMillis();
         long inactivityTimeout = 10 * 60 * 1000; // 10 دقیقه

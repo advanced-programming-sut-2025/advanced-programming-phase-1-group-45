@@ -12,7 +12,8 @@ public class DatabaseHelper {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(DB_URL);
             Gdx.app.log("Database", "Connected to SQLite database");
-            createUserTable();// add our table here
+            createUserTable();
+            createGameResultsTable();
         } catch (Exception e) {
             Gdx.app.error("Database", "Connection error: " + e.getMessage());
         }
@@ -151,18 +152,7 @@ public class DatabaseHelper {
         Gdx.app.log("Database", "Game results table created");
     }
 
-    @Override
-    public void connect() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection(DB_URL);
-            Gdx.app.log("Database", "Connected to SQLite database");
-            createUserTable();
-            createGameResultsTable();
-        } catch (Exception e) {
-            Gdx.app.error("Database", "Connection error: " + e.getMessage());
-        }
-    }
+
 
 
 }

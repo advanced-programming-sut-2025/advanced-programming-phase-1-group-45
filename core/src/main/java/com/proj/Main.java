@@ -10,7 +10,7 @@ import com.proj.Control.SignupMenuController;
 import com.proj.Model.GameAssetManager;
 import com.proj.View.SignupMenuView;
 import com.proj.View.EntranceScreen;
-import com.proj.Map.farmName;
+import com.proj.map.farmName;
 
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */

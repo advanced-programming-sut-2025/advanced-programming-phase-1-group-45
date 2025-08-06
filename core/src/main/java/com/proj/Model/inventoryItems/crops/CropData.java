@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.proj.Model.GameAssetManager;
-import com.proj.Map.Season;
+import com.proj.map.Season;
 
 public class CropData {
     private String name;

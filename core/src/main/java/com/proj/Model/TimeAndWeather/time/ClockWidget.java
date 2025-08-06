@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.TimeAndWeather.Weather;
-import com.proj.Map.Season;
+import com.proj.map.Season;
 
 public class ClockWidget extends Group {
     private final Time timer;

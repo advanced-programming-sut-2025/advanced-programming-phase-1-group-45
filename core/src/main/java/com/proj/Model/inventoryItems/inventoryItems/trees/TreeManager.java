@@ -7,8 +7,8 @@ import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.inventoryItems.trees.Tree;
 import com.proj.Model.inventoryItems.trees.TreeData;
 import com.proj.Model.inventoryItems.trees.TreeRegistry;
-import com.proj.Map.GameMap;
-import com.proj.Map.Season;
+import com.proj.map.GameMap;
+import com.proj.map.Season;
 
 public class TreeManager {
     private final Array<com.proj.Model.inventoryItems.trees.Tree> trees = new Array<>();
