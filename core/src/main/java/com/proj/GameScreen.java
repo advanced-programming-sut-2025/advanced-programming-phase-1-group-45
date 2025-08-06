@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.proj.Control.AnimalManager;
 import com.proj.Control.WorldController;
 import com.proj.Control.AnimalBuildingController;
-import com.proj.Model.Animal;
+import com.proj.Model.Animal.Animal;
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.Inventory.InventoryManager;
 import com.proj.Model.Inventory.PlayerBag;
@@ -142,6 +142,10 @@ public class GameScreen implements Screen {
                     !animalBuildingController.isPlacingCoop())) {
                 handleToolUse();
             }
+
+            if (animalBuildingController != null) {
+                animalBuildingController.updateCameraPosition(camera.position.x, camera.position.y);
+            }
         } catch (Exception e) {
             if (worldController.getSpriteBatch().isDrawing()) {
                 worldController.getSpriteBatch().end();
@@ -160,21 +164,28 @@ public class GameScreen implements Screen {
     private void handleAnimalBuildingInput() {
         if (animalBuildingController == null) return;
 
+        // اگر در حال انتخاب ساختمان برای حیوان هستیم، کلیدها B و K برای قرار دادن ساختمان جدید کار نکنند
+        if (animalBuildingController.selectingBuildingForAnimal) {
+            return;
+        }
+
+        // شروع قرار دادن قفس
         if (Gdx.input.isKeyJustPressed(Input.Keys.K) &&
             !animalBuildingController.isPlacingCoop() &&
             !animalBuildingController.isPlacingBarn()) {
             animalBuildingController.startPlacingCoop(player.getPosition().x, player.getPosition().y);
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
-            if (!animalBuildingController.isPlacingBarn() && !animalBuildingController.isPlacingCoop()) {
-                animalBuildingController.startPlacingBarn(player.getPosition().x, player.getPosition().y);
-                System.out.println("Barn placement started at: " + player.getPosition().x + ", " + player.getPosition().y);
-            } else if (animalManager != null) {
-                animalManager.showBuyMenu();
-            }
+        // شروع قرار دادن طویله
+        if (Gdx.input.isKeyJustPressed(Input.Keys.B) &&
+            !animalBuildingController.isPlacingBarn() &&
+            !animalBuildingController.isPlacingCoop()) {
+            animalBuildingController.startPlacingBarn(player.getPosition().x, player.getPosition().y);
         }
     }
+
+
+
 
 
     @Override
@@ -262,10 +273,9 @@ public class GameScreen implements Screen {
             if (animalBuildingController != null &&
                 (animalBuildingController.isPlacingBarn() ||
                     animalBuildingController.isPlacingCoop() ||
-                    animalBuildingController.isShowingInterior())) {
-                System.out.println("Skipping player movement - placing building: " +
-                    animalBuildingController.isPlacingBarn() + ", " +
-                    animalBuildingController.isPlacingCoop());
+                    animalBuildingController.isShowingInterior() ||
+                    animalBuildingController.isShowingAnimalList())) {  // اضافه کردن این شرط
+                System.out.println("Skipping player movement - special state active");
                 return;
             }
 
@@ -306,23 +316,29 @@ public class GameScreen implements Screen {
                 moved = true;
             }
 
-            if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
-                selectToolSlot(0);
-            } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
-                selectToolSlot(1);
-            } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
-                selectToolSlot(2);
-            } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
-                selectToolSlot(3);
-            } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)) {
-                selectToolSlot(4);
-            } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
-                selectToolSlot(5);
-            }
-            else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
-                if (inventoryManager != null && inventoryManager.getPlayerInventory() != null) {
-                    inventoryManager.getPlayerInventory().selectNoTool();
-                    Gdx.app.log("GameScreen", "Selected no tool");
+            if (animalBuildingController != null && animalBuildingController.isShowingAnimalList()) {
+                // اگر لیست حیوانات نمایش داده می‌شود، کلیدهای عددی را برای انتخاب ابزار پردازش نکن
+                Gdx.app.log("GameScreen", "Animal list is showing, skipping tool selection");
+            } else {
+                // انتخاب ابزار فقط زمانی که لیست حیوانات نمایش داده نمی‌شود
+                if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+                    selectToolSlot(0);
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+                    selectToolSlot(1);
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
+                    selectToolSlot(2);
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_4)) {
+                    selectToolSlot(3);
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_5)) {
+                    selectToolSlot(4);
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
+                    selectToolSlot(5);
+                }
+                else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
+                    if (inventoryManager != null && inventoryManager.getPlayerInventory() != null) {
+                        inventoryManager.getPlayerInventory().selectNoTool();
+                        Gdx.app.log("GameScreen", "Selected no tool");
+                    }
                 }
             }
 
