@@ -11,9 +11,12 @@ public class Tile {
     private boolean passable = false;
     private boolean hasForaging = false;
     private String foraging;
-
+    private boolean isOccupied = false;
     private boolean isHomeGate = false;
-
+    private boolean tilled = false;
+    private boolean watered = false;
+    private boolean fertilized = false;
+    private boolean thundered = false;
 
     public Tile(Point location, TileType type) {
         this.location = location;
@@ -32,12 +35,21 @@ public class Tile {
     public void setObject(LandObject landObject) {
         this.landObject = landObject;
     }
+
     public void removeObject() {
         landObject = null;
     }
 
     public void setPassable(boolean passable) {
         this.passable = passable;
+    }
+
+    public void setOccupied(boolean occupied) {
+        this.isOccupied = occupied;
+    }
+
+    public boolean isOccupied() {
+        return isOccupied;
     }
 
     public void setType(TileType type) {
@@ -63,4 +75,37 @@ public class Tile {
     public LandObject getLandObject() {
         return landObject;
     }
+
+    public void setTilled(boolean tilled) {
+        this.tilled = tilled;
+    }
+
+    public boolean isTilled() {
+        return tilled;
+    }
+
+    public void setWatered(boolean watered) {
+        this.watered = watered;
+    }
+
+    public boolean isWatered() {
+        return watered;
+    }
+
+    public void setFertilized(boolean fertilized) {
+        this.fertilized = fertilized;
+    }
+
+    public boolean isFertilized() {
+        return fertilized;
+    }
+
+    public void setThundered(boolean thundered) {
+        this.thundered = thundered;
+    }
+
+    public boolean isThundered() {
+        return thundered;
+    }
+
 }

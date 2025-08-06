@@ -1,0 +1,329 @@
+[
+    {
+      "id" : "jazz_seed",
+      "name": "Jazz Seed",
+      "season": ["SPRING"],
+      "texturePath" : "assets/crops/Jazz_Seeds.png",
+      "crop_id" : "blue_jazz"
+    },
+    {
+      "id" : "carrot_seed",
+      "name": "Carrot Seed",
+      "season": ["SPRING"],
+      "texturePath" : "assets/crops/Carrot_Seeds.png",
+      "crop_id" : "carrot"
+    },
+    {
+      "id": "cauliflower_seed",
+      "name": "Cauliflower Seed",
+      "season": ["SPRING"],
+      "texturePath" : "assets/crops/Cauliflower_Seeds.png",
+      "crop_id" : "cauliflower"
+    },
+    {
+      "id": "coffee_bean",
+      "name": "Coffee Bean",
+      "season": ["SPRING"],
+      "texturePath" : "assets/crops/Coffee_Bean.png",
+      "crop_id" : "coffee"
+    },
+    {
+      "id":"garlic_seed",
+      "name": "Garlic Seed",
+      "season": ["SPRING"],
+      "texturePath": "assets/crops/Garlic_Seeds.png",
+      "crop_id": "garlic"
+    },
+    {
+      "id":"bean_starter",
+      "name": "Bean Starter",
+      "season": ["SPRING"],
+      "texturePath":"assets/crops/Bean_Starter.png"
+    },
+    {
+      "id":"kale_seed",
+      "name": "Kale Seed",
+      "season": ["SPRING"],
+      "texturePath":"assets/crops/Kale_Seeds.png",
+      "crop_id":"kale"
+    },
+    {
+      "id":"parsnip_seeds",
+      "name": "Parsnip Seed",
+      "season": ["SPRING"],
+      "texturePath":"assets/crops/Parsnip_Seeds.png",
+      "crop_id":"parsnip"
+    },
+    {
+      "id":"potato_seed",
+      "name": "Potato Seed",
+      "season": ["SPRING"],
+      "texturePath":"assets/crops/Potato_Seeds.png",
+      "crop_id":"potato"
+    },
+    {
+      "id":"rhubarb_seeds",
+      "name": "Rhubarb Seed",
+      "season": ["SPRING"],
+      "texturePath":"assets/crops/Rhubarb_Seeds.png",
+      "crop_id":"rhubarb"
+    },
+    {
+      "id":"strawberry_seed",
+      "name": "Strawberry Seed",
+      "season": ["SPRING"],
+      "texturePath":"assets/crops/Strawberry_Seeds.png",
+      "crop_id":"strawberry"
+    },
+    {
+      "id": "tulip_bulb",
+      "name": "Tulip Bulb",
+      "season": ["SPRING"],
+      "texturePath":"assets/crops/Tulip_Bulb.png",
+      "crop_id":"tulip"
+    },
+    {
+      "id" : "rice_shoot",
+      "name": "Rice Shoot",
+      "season": ["SPRING"],
+      "texturePath":"assets/crops/Rice_Shoot.png",
+      "crop_id": "rice"
+    },
+    {
+      "id" : "blueberry_seed",
+      "name": "Blueberry Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Blueberry_Seeds.png",
+      "crop_id":"blueberry"
+    },
+    {
+      "id":"corn_seed",
+      "name": "Corn Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Corn_Seeds.png",
+      "crop_id":"corn"
+    },
+    {
+      "id": "hops_starter",
+      "name": "Hops Starter",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Hops_Starter.png",
+      "crop_id":"hops"
+    },
+    {
+      "id":"pepper_seed",
+      "name": "Pepper Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Pepper_Seeds.png",
+      "crop_id":"hot_pepper"
+    },
+    {
+      "id":"melon_seed",
+      "name": "Melon Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Melon_Seeds.png",
+      "crop_id":"melon"
+    },
+    {
+      "id": "poppy_seed",
+      "name": "Poppy Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Poppy_Seeds.png",
+      "crop_id":"poppy"
+    },
+    {
+      "id":"radish_seed",
+      "name": "Radish Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Radish_Seeds.png",
+      "crop_id":"radish"
+    },
+    {
+      "id":"red_cabbage_seed",
+      "name": "Red Cabbage Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Red_Cabbage_Seeds.png",
+      "crop_id":"red_cabbage"
+    },
+    {
+      "id":"starfruit_seed",
+      "name": "Starfruit Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Starfruit_Seeds.png",
+      "crop_id":"starfruit"
+    },
+    {
+      "id": "spangle_seed",
+      "name": "Spangle Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Spangle_Seeds.png",
+      "crop_id":"spangle"
+    },
+    {
+      "id" : "summer_squash",
+      "name": "SUMMER Squash Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Summer_Squash_Seeds.png",
+      "crop_id":"summer_squash"
+    },
+    {
+      "id": "sunflower_seed",
+      "name": "Sunflower Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Sunflower_Seeds.png",
+      "crop_id":"sunflower"
+    },
+    {
+      "id" : "tomato_seed",
+      "name": "Tomato Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Tomato_Seeds.png",
+      "crop_id":"tomato"
+    },
+    {
+      "id": "wheat_seed",
+      "name": "Wheat Seed",
+      "season": ["SUMMER"],
+      "texturePath":"assets/crops/Wheat_Seeds.png",
+      "crop_id":"wheat"
+    },
+    {
+      "id": "amaranth_seed",
+      "name": "Amaranth Seed",
+      "season": ["FALL"],
+      "texturePath":"assets/crops/Amaranth_Seeds.png",
+      "crop_id":"amaranth"
+    },
+    {
+      "id": "artichoke_seed",
+      "name": "Artichoke Seed",
+      "season": ["FALL"],
+      "texturePath":"assets/crops/Artichoke_Seeds.png",
+      "crop_id":"artichoke"
+    },
+    {
+      "id": "beet_seed",
+      "name": "Beet Seed",
+      "season": ["FALL"],
+      "texturePath":"assets/crops/Beet_Seeds.png",
+      "crop_id":"beet"
+    },
+    {
+      "id": "bok_choy_seed",
+      "name": "Bok Choy Seed",
+      "season": ["FALL"],
+      "texturePath":"assets/crops/Bok_Choy_Seeds.png",
+      "crop_id":"bok_choy"
+    },
+    {
+      "id": "broccoli_seed",
+      "name": "Broccoli Seed",
+      "season": ["FALL"],
+      "texturePath":"assets/crops/Broccoli_Seeds.png",
+      "crop_id":"broccoli"
+    },
+    {
+      "id": "cranberry_seed",
+      "name": "Cranberry Seed",
+      "season": ["FALL"],
+      "texturePath":"assets/crops/Cranberry_Seeds.png",
+      "crop_id":"cranberry"
+    },
+    {
+      "id": "eggplant_seed",
+      "name": "Eggplant Seed",
+      "season": ["FALL"],
+      "texturePath":"assets/crops/Eggplant_Seeds.png",
+      "crop_id":"eggplant"
+    },
+    {
+      "id": "fairy_seed",
+      "name": "Fairy Seed",
+      "season": ["FALL"],
+      "texturePath":"assets/crops/Fairy_Seeds.png",
+      "crop_id":"fairy"
+    },
+    {
+      "id": "grape_starter",
+      "name": "Grape Starter",
+      "season": ["FALL"],
+      "texturePath":"assets/crops/Grape_Starter.png",
+      "crop_id":"grape"
+    },
+    {
+      "id": "pumpkin_seed",
+      "name": "Pumpkin Seed",
+      "season": ["FALL"],
+      "texturePath":"assets/crops/Pumpkin_Seeds.png",
+      "crop_id":"pumpkin"
+    },
+    {
+      "id": "yam_seed",
+      "name": "Yam Seed",
+      "season": ["FALL"],
+      "texturePath":"assets/crops/Yam_Seeds.png",
+      "crop_id":"yam"
+    },
+    {
+      "id": "rare_seed",
+      "name": "Rare Seed",
+      "season": ["FALL"],
+      "texturePath": "assets/crops/Rare_Seed.png"
+    },
+    {
+      "id": "powdermelon_seed",
+      "name": "Powdermelon Seed",
+      "season": ["WINTER"],
+      "texturePath":"assets/crops/Powdermelon_Seeds.png",
+      "crop_id":"powdermelon"
+    },
+    {
+      "id": "ancient_seed",
+      "name": "Ancient Seed",
+      "season": ["SPRING", "SUMMER", "FALL", "WINTER"],
+      "texturePath":"assets/crops/Ancient_Seeds.png",
+      "crop_id":"ancient_fruit"
+    },
+    {
+      "id": "mixed_seed",
+      "name": "Mixed Seed",
+      "season": ["SPRING", "SUMMER", "FALL", "WINTER"],
+      "texturePath": "assets/crops/Mixed_Seeds.png"
+    },
+    {
+      "id" : "acorn",
+      "name": "Acorn",
+      "season": ["SPRING", "SUMMER", "FALL", "WINTER"],
+      "texturePath":"assets/trees/Acorn.png",
+      "tree_id":"ancient_fruit"
+    },
+    {
+      "id" : "maple_seed",
+      "name": "Maple Seed",
+      "season": ["SPRING", "SUMMER", "FALL", "WINTER"],
+      "texturePath":"assets/trees/Maple_Seed.png",
+      "tree_id":"maple_tree"
+    },
+    {
+      "id": "pine_cone",
+      "name": "Pine Cone",
+      "season": ["SPRING", "SUMMER", "FALL", "WINTER"],
+      "texturePath":"assets/trees/Pine_Cone.png",
+      "tree_id":"pine_tree"
+    },
+    {
+      "id": "mahogany_seed",
+      "name": "Mahogany Seed",
+      "season": ["SPRING", "SUMMER", "FALL", "WINTER"],
+      "texturePath":"assets/trees/Mahogany_Seed.png",
+      "tree_id":"mahogany_tree"
+    },
+    {
+      "id" : "mushroom_tree_seed",
+      "name": "Mushroom Tree Seed",
+      "season": ["SPRING", "SUMMER", "FALL", "WINTER"],
+      "texturePath":"assets/trees/Mushroom_Tree_Seed.png",
+      "tree_id":"mushroom_tree"
+    }
+  ]
+

@@ -1,6 +1,7 @@
 package com.proj.Model.Inventory;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.proj.Control.WorldController;
 
 public class Hoe extends Tool {
 
@@ -15,9 +16,11 @@ public class Hoe extends Tool {
 
     @Override
     public boolean useOnTile(int tileX, int tileY) {
-        // Logic for using hoe on a tile
-        // For example, convert GRASS to DIRT
-        return true;
+        if (WorldController.getInstance().getGameMap().hoeTile(tileX, tileY)) {
+            WorldController.getInstance().getGameMap().getTile(tileX, tileY).setTilled(true);
+            return true;
+        }
+        return false;
     }
 
     @Override

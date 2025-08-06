@@ -21,17 +21,19 @@ public class MainMenuView implements Screen {
     private final TextButton loadGameButton;
     private final TextButton exitButton;
     private Image backgroundImage;
+    private final TextButton backButton;
 
     public MainMenuView(MainMenuController controller, Skin skin) {
         this.controller = controller;
         this.table = new Table();
 
         // Create UI elements
-        this.titleLabel = new Label("Stardew Valley", skin, "title");
+        this.titleLabel = new Label("Main menu", skin, "title");
         this.profileButton = new TextButton("Profile", skin);
         this.newGameButton = new TextButton("New Game", skin);
         this.loadGameButton = new TextButton("Load Last Game", skin);
         this.exitButton = new TextButton("Exit", skin);
+        this.backButton = new TextButton("Back", skin);
 
         backgroundImage = new Image(Main.menuBackground);
 
@@ -52,6 +54,7 @@ public class MainMenuView implements Screen {
         table.add(newGameButton).width(420).padBottom(20).row();
         table.add(loadGameButton).width(420).padBottom(20).row();
         table.add(exitButton).width(420);
+        table.add(backButton).width(420).padBottom(20).row();
 
         // Set up background
         backgroundImage.setFillParent(true);

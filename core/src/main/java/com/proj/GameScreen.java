@@ -2,24 +2,46 @@ package com.proj;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.proj.Control.AnimalManager;
+import com.proj.Control.NPCManager;
 import com.proj.Control.WorldController;
 import com.proj.Control.AnimalBuildingController;
+<<<<<<< HEAD
 import com.proj.Model.Animal.Animal;
+=======
+import com.proj.Model.Animal;
+import com.proj.Model.GameAssetManager;
+>>>>>>> 6df390d926023038f57e41db95c9993750569ba5
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.Inventory.InventoryManager;
 import com.proj.Model.Inventory.PlayerBag;
 import com.proj.Model.Inventory.Tool;
 import com.proj.Model.TimeAndWeather.time.Time;
+import com.proj.Model.mapObjects.NPCObject;
 import com.proj.map.farmName;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.Color;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.List; 
+
+import java.awt.*;
 
 public class GameScreen implements Screen {
     private Player player;
@@ -35,11 +57,104 @@ public class GameScreen implements Screen {
     private InventoryManager inventoryManager;
     private boolean timeIsPaused = false;
     private Stage uistage;
+    private Viewport uistageViewport;
     private PlayerBag playerBag;
     private AnimalBuildingController animalBuildingController;
     private AnimalManager animalManager;
+
+    private NPCManager npcManager;
+    private Texture npcTexture;
+    private Point customSpawnPoint;
+
+    private Texture spaceImage;
+    private boolean showSpaceImage = false;
+
+    private NPCObject currentInteractingNPC;
+    private boolean isInteracting = false;
+
+    private farmName farm;
+
+    private Texture aImage;
+    private Texture sImage;
+    private Texture dImage;
+    private Texture fImage;
+    private Texture gImage;
+
+    private boolean showAImage = false;
+    private boolean showSImage = false;
+    private boolean showDImage = false;
+    private boolean showFImage = false;
+    private boolean showGImage = false;
+    private StoreManager storeManager;
+    private Store currentStore = null;
+    private boolean inStoreInterface = false;
+    private BitmapFont font;
+    private GlyphLayout glyphLayout = new GlyphLayout();
+    
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
+        this.farm = farm;
+        this.mapName = farm.getFarmName();
+    }
+    public void setPlayer(Player player) {
+        this.player = player;
+        if (worldController != null) {
+
+            worldController.setPlayer(player);
+
+        }
+        if (camera != null && player != null) {
+            camera.position.set(player.getPosition().x, player.getPosition().y, 0);
+            camera.update();
+        }
+    }
+    public void setNPCManager(NPCManager npcManager) {
+        this.npcManager = npcManager;
+        if (npcManager != null && worldController != null) {
+            placeNPCs();
+        }
+    }
+    private Point getSpawnPoint() {
+        if (customSpawnPoint != null) {
+            return customSpawnPoint;
+        }
+        return worldController != null ? worldController.getPlayerSpawnPoint() : null;
+    }
+    private List<Texture> npcTextures = new ArrayList<>(); // Add this class field
+    private void placeNPCs() {
+        if (npcManager == null) {
+            npcManager = new NPCManager();
+        }
+        if (npcManager.getNPCs().isEmpty()) {
+            Texture leahTexture = new Texture(Gdx.files.internal("characters/leah.png"));
+            Texture georgeTexture = new Texture(Gdx.files.internal("characters/george.jpg"));
+            Texture lewisTexture = new Texture(Gdx.files.internal("characters/lewis.jpg"));
+            Texture pierreTexture = new Texture(Gdx.files.internal("characters/pierre.jpg"));
+            Texture robinTexture = new Texture(Gdx.files.internal("characters/robin.png"));
+            NPCObject leah = new NPCObject(new TextureRegion(leahTexture));
+            NPCObject alex = new NPCObject(new TextureRegion(georgeTexture));
+            NPCObject penny = new NPCObject(new TextureRegion(lewisTexture));
+            NPCObject sebastian = new NPCObject(new TextureRegion(pierreTexture));
+            NPCObject abigail = new NPCObject(new TextureRegion(robinTexture));
+
+            npcManager.addNPC(leah);
+            npcManager.addNPC(alex);
+            npcManager.addNPC(penny);
+            npcManager.addNPC(sebastian);
+            npcManager.addNPC(abigail);
+            npcTextures.add(leahTexture);
+            npcTextures.add(georgeTexture);
+            npcTextures.add(lewisTexture);
+            npcTextures.add(pierreTexture);
+            npcTextures.add(robinTexture);
+
+        }
+        npcManager.placeNPCsRandomly(
+            worldController.getMapWidth(),
+            worldController.getMapHeight(),
+            worldController.getTileWidth(),
+            worldController.getTileHeight()
+        );
     }
 
     @Override
@@ -52,10 +167,15 @@ public class GameScreen implements Screen {
                 inventoryManager = new InventoryManager();
                 animalBuildingController = new AnimalBuildingController(worldController.getGameMap());
                 animalManager = new AnimalManager();
+                spaceImage = GameAssetManager.getGameAssetManager().getSpaceImageTexture();
                 camera = new OrthographicCamera();
                 viewport = new FitViewport(640, 480, camera);
+                uistageViewport = new ScreenViewport();
+                uistage.setViewport(uistageViewport);
                 viewport.apply();
+                uistageViewport.apply();
                 camera.update();
+                Gdx.input.setInputProcessor(new InputMultiplexer(uistage));
                 mapPixelWidth = worldController.getMapWidth() * worldController.getTileWidth();
                 mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
 
@@ -70,11 +190,21 @@ public class GameScreen implements Screen {
                 }
 
                 player = new Player(worldController, startX, startY);
+                aImage = new Texture(Gdx.files.internal("NPCDialogues/george_dialogue1.png"));
+                sImage = new Texture(Gdx.files.internal("NPCDialogues/leah_dialogue1.png"));
+                dImage = new Texture(Gdx.files.internal("NPCDialogues/lewis_dialogue1.png"));
+                fImage = new Texture(Gdx.files.internal("NPCDialogues/pierre_dialogue1.png"));
+                gImage = new Texture(Gdx.files.internal("NPCDialogues/robin_dialogue1.png"));
 
                 playerBag = new PlayerBag(player, inventoryManager.getPlayerInventory());
                 playerBag.setScale(0.7f);
+                
+                font = new BitmapFont();
+                font.setColor(Color.WHITE);
+                font.getData().setScale(1.5f);
 
                 worldController.setPlayer(player);
+                placeNPCs();
                 camera.position.set(player.getPosition().x, player.getPosition().y, 0);
                 camera.update();
 
@@ -120,6 +250,26 @@ public class GameScreen implements Screen {
             worldController.getSpriteBatch().begin();
 
             worldController.renderMap(camera);
+            if (npcManager != null) {
+
+                for (NPCObject npc : npcManager.getNPCs()) {
+
+                    TextureRegion texture = npc.getTextureRegion();
+
+                    worldController.getSpriteBatch().draw(
+
+                        texture,
+
+                        npc.getPixelX(),
+
+                        npc.getPixelY(),
+
+                        texture.getRegionWidth() * npc.getScale(),
+
+                        texture.getRegionHeight() * npc.getScale()
+
+                    );
+                }}
             player.render(worldController.getSpriteBatch());
             animalManager.render(worldController.getSpriteBatch());
             if (animalBuildingController != null) {
@@ -129,11 +279,33 @@ public class GameScreen implements Screen {
             if (playerBag != null) {
                 playerBag.render(worldController.getSpriteBatch(), camera);
             }
+            if (showSpaceImage && spaceImage != null) {
+                // Save current projection matrix
+                Matrix4 originalProjection = worldController.getSpriteBatch().getProjectionMatrix();
 
+                // Switch to screen coordinates
+                Matrix4 screenProjection = new Matrix4()
+                    .setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                worldController.getSpriteBatch().setProjectionMatrix(screenProjection);
+
+                // Draw centered
+                float x = (Gdx.graphics.getWidth() - spaceImage.getWidth()) / 2;
+                float y = (Gdx.graphics.getHeight() - spaceImage.getHeight()) / 2;
+                worldController.getSpriteBatch().draw(spaceImage, x, y);
+
+                // Restore original projection
+                worldController.getSpriteBatch().setProjectionMatrix(originalProjection);
+            }
+            if (showAImage) drawCenteredImage(aImage);
+            if (showSImage) drawCenteredImage(sImage);
+            if (showDImage) drawCenteredImage(dImage);
+            if (showFImage) drawCenteredImage(fImage);
+            if (showGImage) drawCenteredImage(gImage);
             worldController.renderAfterPlayer();
 
             worldController.getSpriteBatch().end();
 
+            uistageViewport.apply();
             uistage.act(delta);
             uistage.draw();
 
@@ -143,9 +315,12 @@ public class GameScreen implements Screen {
                 handleToolUse();
             }
 
+<<<<<<< HEAD
             if (animalBuildingController != null) {
                 animalBuildingController.updateCameraPosition(camera.position.x, camera.position.y);
             }
+=======
+>>>>>>> 6df390d926023038f57e41db95c9993750569ba5
         } catch (Exception e) {
             if (worldController.getSpriteBatch().isDrawing()) {
                 worldController.getSpriteBatch().end();
@@ -155,9 +330,28 @@ public class GameScreen implements Screen {
         }
     }
 
+     private void drawCenteredImage(Texture image) {
+        if (image == null) return;
+        Matrix4 originalProjection = worldController.getSpriteBatch().getProjectionMatrix();
+
+        Matrix4 screenProjection = new Matrix4()
+            .setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        worldController.getSpriteBatch().setProjectionMatrix(screenProjection);
+        float x = (Gdx.graphics.getWidth() - image.getWidth()) / 2;
+        float y = (Gdx.graphics.getHeight() - image.getHeight()) / 2;
+        worldController.getSpriteBatch().draw(image, x, y);
+        worldController.getSpriteBatch().setProjectionMatrix(originalProjection);
+    }
+
 
     private void renderPlayer() {
         player.render(worldController.getSpriteBatch());
+    }
+
+    public void setPlayerSpawnPoint(Point spawnPoint) {
+
+        this.customSpawnPoint = spawnPoint;
+
     }
 
 
@@ -192,6 +386,7 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         try {
             viewport.update(width, height);
+            uistageViewport.update(width, height, true);
             float halfViewportWidth = viewport.getWorldWidth() / 2;
             float halfViewportHeight = viewport.getWorldHeight() / 2;
             camera.position.x = MathUtils.clamp(
@@ -238,6 +433,26 @@ public class GameScreen implements Screen {
             if (animalManager != null) {
                 animalManager.dispose();
             }
+            if (npcTexture != null) {
+
+                npcTexture.dispose();
+
+            }
+
+            for (Texture texture : npcTextures) {
+                if (texture != null) {
+                    texture.dispose();
+                }
+            }
+            if (aImage != null) aImage.dispose();
+            if (sImage != null) sImage.dispose();
+            if (dImage != null) dImage.dispose();
+            if (fImage != null) fImage.dispose();
+            if (gImage != null) gImage.dispose();
+            if (font != null) {
+                font.dispose();
+            }
+            npcTextures.clear();
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in dispose method", e);
         }
@@ -342,10 +557,45 @@ public class GameScreen implements Screen {
                 }
             }
 
+            // ADD THIS SPACE KEY HANDLING
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                showSpaceImage = !showSpaceImage; // Toggle visibility
+                Gdx.app.log("GameScreen", "Space pressed. showSpaceImage: " + showSpaceImage);
+            }
+
             if (Gdx.input.isKeyJustPressed(Input.Keys.T)) {
                 if (playerBag != null) {
                     playerBag.toggleOpen();
                     Gdx.app.log("GameScreen", "Toggled inventory: " + (playerBag.isOpen() ? "open" : "closed"));
+                }
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
+                showAImage = !showAImage;
+                Gdx.app.log("GameScreen", "Toggled image: " + showAImage);
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.Y)) {
+                showSImage = !showSImage;
+                Gdx.app.log("GameScreen", "Toggled image: " + showSImage);
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
+                showDImage = !showDImage;
+                Gdx.app.log("GameScreen", "Toggled image: " + showDImage);
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.J)) {
+                showFImage = !showFImage;
+                Gdx.app.log("GameScreen", "Toggled image: " + showFImage);
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.H)) {
+                showGImage = !showGImage;
+                Gdx.app.log("GameScreen", "Toggled image: " + showGImage);
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+                if (isInteracting) {
+                    // Close current interaction
+                    isInteracting = false;
+                    currentInteractingNPC = null;
+                } else {
                 }
             }
 

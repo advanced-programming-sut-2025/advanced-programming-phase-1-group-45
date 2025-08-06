@@ -1,6 +1,8 @@
 package com.proj.Model.Inventory;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.proj.Control.WorldController;
+import com.proj.map.GameMap;
 
 public class WateringCan extends Tool {
     private int waterAmount;
@@ -30,7 +32,12 @@ public class WateringCan extends Tool {
 
     @Override
     public boolean useOnTile(int tileX, int tileY) {
-        // Logic for using watering can on a tile - watering crops
+        try {
+            GameMap map = WorldController.getInstance().getGameMap();
+            map.getFarmingController().getCropManager().getCropAt(tileX, tileY).water();
+        } catch (Exception e) {
+            System.err.println("Error in waterAt: " + e.getMessage());
+        }
         if (waterAmount > 0) {
             waterAmount--;
             return true;

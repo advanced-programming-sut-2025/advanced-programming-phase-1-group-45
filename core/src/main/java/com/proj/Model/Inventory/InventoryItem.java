@@ -9,6 +9,7 @@ public abstract class InventoryItem {
     private int quantity;
     private boolean stackable;
     private int maxStackSize;
+    private InventoryItemType type;
 
     public InventoryItem(String id, String name, TextureRegion texture, boolean stackable, int maxStackSize) {
         this.id = id;
@@ -17,6 +18,14 @@ public abstract class InventoryItem {
         this.quantity = 1;
         this.stackable = stackable;
         this.maxStackSize = maxStackSize > 0 ? maxStackSize : 1;
+    }
+
+    public void setInventoryItemType(InventoryItemType type) {
+        this.type = type;
+    }
+
+    public InventoryItemType getInventoryItemType() {
+        return type;
     }
 
     public String getId() {
@@ -60,6 +69,7 @@ public abstract class InventoryItem {
     public int getMaxStackSize() {
         return maxStackSize;
     }
+
 
     public abstract void use();
 }

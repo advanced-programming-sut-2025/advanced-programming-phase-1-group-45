@@ -5,9 +5,8 @@ import com.badlogic.gdx.maps.tiled.*;
 import com.proj.Model.GameAssetManager;
 
 import java.awt.*;
-import java.util.*;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class LandLoader {
     private String landName;
@@ -48,6 +47,9 @@ public class LandLoader {
         if (Arrays.stream(farmName.values()).anyMatch(name -> name.getFarmName().equals(landName))) {
             findPlayerSpawnPoint();
         }
+
+        saveOriginalTiles();
+
     }
 
     public void changeSeason(Season newSeason) {
@@ -256,4 +258,22 @@ public class LandLoader {
         return playerSpawnPoint;
     }
 
+    private TiledMapTileLayer BackLayer;
+    private Map<Point, TiledMapTileLayer.Cell> backCells = new HashMap<>();
+
+    private void saveOriginalTiles() {
+        TiledMapTileLayer groundLayer = (TiledMapTileLayer) map.getLayers().get("Back");
+        for (int x = 0; x < mapWidth; x++) {
+            for (int y = 0; y < mapHeight; y++) {
+                TiledMapTileLayer.Cell cell = groundLayer.getCell(x, y);
+                if (cell != null) {
+                    backCells.put(new Point(x, y), cell);
+                }
+            }
+        }
+    }
+
+    public Map<Point, TiledMapTileLayer.Cell> getOriginalGroundCells() {
+        return backCells;
+    }
 }

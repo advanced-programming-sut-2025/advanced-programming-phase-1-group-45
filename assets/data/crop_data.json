@@ -1,0 +1,1118 @@
+[
+  {
+    "name": "Blue Jazz",
+    "growthStages": [
+      1,
+      2,
+      2,
+      2
+    ],
+    "totalGrowthTime": 7,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 50,
+    "isEdible": true,
+    "energy": 45,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Blue_Jazz_Stage_1",
+      "assets/crops/Blue_Jazz_Stage_2",
+      "assets/crops/Blue_Jazz_Stage_3",
+      "assets/crops/Blue_Jazz_Stage_4",
+      "assets/crops/Blue_Jazz_Stage_5"
+    ]
+  },
+  {
+    "name": "Carrot",
+    "growthStages": [
+      1,
+      1,
+      1
+    ],
+    "totalGrowthTime": 3,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 35,
+    "isEdible": true,
+    "energy": 75,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Carrot_Stage_1",
+      "assets/crops/Carrot_Stage_2",
+      "assets/crops/Carrot_Stage_3",
+      "assets/crops/Carrot_Stage_4"
+    ]
+  },
+  {
+    "name": "Cauliflower",
+    "growthStages": [
+      1,
+      2,
+      4,
+      4,
+      1
+    ],
+    "totalGrowthTime": 12,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 175,
+    "isEdible": true,
+    "energy": 75,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": true,
+    "texturePaths": [
+      "assets/crops/Cauliflower_Stage_1",
+      "assets/crops/Cauliflower_Stage_2",
+      "assets/crops/Cauliflower_Stage_3",
+      "assets/crops/Cauliflower_Stage_4",
+      "assets/crops/Cauliflower_Stage_5",
+      "assets/crops/Cauliflower_Stage_6"
+    ]
+  },
+  {
+    "name": "Coffee Bean",
+    "growthStages": [
+      1,
+      2,
+      2,
+      3,
+      2
+    ],
+    "totalGrowthTime": 10,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 2,
+    "baseSellPrice": 15,
+    "isEdible": false,
+    "energy": null,
+    "season": [
+      "SPRING",
+      "SUMMER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Coffee_Stage_1",
+      "assets/crops/Coffee_Stage_2",
+      "assets/crops/Coffee_Stage_3",
+      "assets/crops/Coffee_Stage_4",
+      "assets/crops/Coffee_Stage_5",
+      "assets/crops/Coffee_Stage_6"
+    ]
+  },
+  {
+    "name": "Garlic",
+    "growthStages": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "totalGrowthTime": 4,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 60,
+    "isEdible": true,
+    "energy": 20,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Garlic_Stage_1",
+      "assets/crops/Garlic_Stage_2",
+      "assets/crops/Garlic_Stage_3",
+      "assets/crops/Garlic_Stage_4",
+      "assets/crops/Garlic_Stage_5"
+    ]
+  },
+  {
+    "name": "Green Bean",
+    "growthStages": [
+      1,
+      1,
+      1,
+      3,
+      4
+    ],
+    "totalGrowthTime": 10,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 3,
+    "baseSellPrice": 40,
+    "isEdible": true,
+    "energy": 25,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Green_Bean_Stage_1",
+      "assets/crops/Green_Bean_Stage_2",
+      "assets/crops/Green_Bean_Stage_3",
+      "assets/crops/Green_Bean_Stage_4",
+      "assets/crops/Green_Bean_Stage_5",
+      "assets/crops/Green_Bean_Stage_6"
+    ]
+  },
+  {
+    "name": "Kale",
+    "growthStages": [
+      1,
+      2,
+      2,
+      1
+    ],
+    "totalGrowthTime": 6,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 110,
+    "isEdible": true,
+    "energy": 50,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Kale_Stage_1",
+      "assets/crops/Kale_Stage_2",
+      "assets/crops/Kale_Stage_3",
+      "assets/crops/Kale_Stage_4",
+      "assets/crops/Kale_Stage_5"
+    ]
+  },
+  {
+    "name": "Parsnip",
+    "growthStages": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "totalGrowthTime": 4,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 35,
+    "isEdible": true,
+    "energy": 25,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Parsnip_Stage_1",
+      "assets/crops/Parsnip_Stage_2",
+      "assets/crops/Parsnip_Stage_3",
+      "assets/crops/Parsnip_Stage_4",
+      "assets/crops/Parsnip_Stage_5"
+    ]
+  },
+  {
+    "name": "Potato",
+    "growthStages": [
+      1,
+      1,
+      1,
+      2,
+      1
+    ],
+    "totalGrowthTime": 6,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 80,
+    "isEdible": true,
+    "energy": 25,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Potato_Stage_1",
+      "assets/crops/Potato_Stage_2",
+      "assets/crops/Potato_Stage_3",
+      "assets/crops/Potato_Stage_4",
+      "assets/crops/Potato_Stage_5",
+      "assets/crops/Potato_Stage_6"
+    ]
+  },
+  {
+    "name": "Rhubarb",
+    "growthStages": [
+      2,
+      2,
+      2,
+      3,
+      4
+    ],
+    "totalGrowthTime": 13,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 220,
+    "isEdible": false,
+    "energy": null,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Rhubarb_Stage_1",
+      "assets/crops/Rhubarb_Stage_2",
+      "assets/crops/Rhubarb_Stage_3",
+      "assets/crops/Rhubarb_Stage_4",
+      "assets/crops/Rhubarb_Stage_5",
+      "assets/crops/Rhubarb_Stage_6"
+    ]
+  },
+  {
+    "name": "Strawberry",
+    "growthStages": [
+      1,
+      1,
+      2,
+      2,
+      2
+    ],
+    "totalGrowthTime": 8,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 4,
+    "baseSellPrice": 120,
+    "isEdible": true,
+    "energy": 50,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Strawberry_Stage_1",
+      "assets/crops/Strawberry_Stage_2",
+      "assets/crops/Strawberry_Stage_3",
+      "assets/crops/Strawberry_Stage_4",
+      "assets/crops/Strawberry_Stage_5",
+      "assets/crops/Strawberry_Stage_6"
+    ]
+  },
+  {
+    "name": "Tulip",
+    "growthStages": [
+      1,
+      1,
+      2,
+      2
+    ],
+    "totalGrowthTime": 6,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 30,
+    "isEdible": true,
+    "energy": 45,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Tulip_Stage_1",
+      "assets/crops/Tulip_Stage_2",
+      "assets/crops/Tulip_Stage_3",
+      "assets/crops/Tulip_Stage_4",
+      "assets/crops/Tulip_Stage_5"
+    ]
+  },
+  {
+    "name": "Unmilled Rice",
+    "growthStages": [
+      1,
+      2,
+      2,
+      3
+    ],
+    "totalGrowthTime": 8,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 30,
+    "isEdible": true,
+    "energy": 3,
+    "season": [
+      "SPRING"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Unmilled_Rice_Stage_1",
+      "assets/crops/Unmilled_Rice_Stage_2",
+      "assets/crops/Unmilled_Rice_Stage_3",
+      "assets/crops/Unmilled_Rice_Stage_4",
+      "assets/crops/Unmilled_Rice_Stage_5"
+    ]
+  },
+  {
+    "name": "Blueberry",
+    "growthStages": [
+      1,
+      3,
+      3,
+      4,
+      2
+    ],
+    "totalGrowthTime": 13,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 4,
+    "baseSellPrice": 50,
+    "isEdible": true,
+    "energy": 25,
+    "season": [
+      "SUMMER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Blueberry_Stage_1",
+      "assets/crops/Blueberry_Stage_2",
+      "assets/crops/Blueberry_Stage_3",
+      "assets/crops/Blueberry_Stage_4",
+      "assets/crops/Blueberry_Stage_5",
+      "assets/crops/Blueberry_Stage_6"
+    ]
+  },
+  {
+    "name": "Corn",
+    "growthStages": [
+      2,
+      3,
+      3,
+      3,
+      3
+    ],
+    "totalGrowthTime": 14,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 4,
+    "baseSellPrice": 50,
+    "isEdible": true,
+    "energy": 25,
+    "season": [
+      "SUMMER",
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Corn_Stage_1",
+      "assets/crops/Corn_Stage_2",
+      "assets/crops/Corn_Stage_3",
+      "assets/crops/Corn_Stage_4",
+      "assets/crops/Corn_Stage_5",
+      "assets/crops/Corn_Stage_6"
+    ]
+  },
+  {
+    "name": "Hops",
+    "growthStages": [
+      1,
+      1,
+      2,
+      3,
+      4
+    ],
+    "totalGrowthTime": 11,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 1,
+    "baseSellPrice": 25,
+    "isEdible": true,
+    "energy": 45,
+    "season": [
+      "SUMMER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Hops_Stage_1",
+      "assets/crops/Hops_Stage_2",
+      "assets/crops/Hops_Stage_3",
+      "assets/crops/Hops_Stage_4",
+      "assets/crops/Hops_Stage_5",
+      "assets/crops/Hops_Stage_6"
+    ]
+  },
+  {
+    "name": "Hot Pepper",
+    "growthStages": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "totalGrowthTime": 5,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 3,
+    "baseSellPrice": 40,
+    "isEdible": true,
+    "energy": 13,
+    "season": [
+      "SUMMER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Hot_Pepper_Stage_1",
+      "assets/crops/Hot_Pepper_Stage_2",
+      "assets/crops/Hot_Pepper_Stage_3",
+      "assets/crops/Hot_Pepper_Stage_4",
+      "assets/crops/Hot_Pepper_Stage_5",
+      "assets/crops/Hot_Pepper_Stage_6"
+    ]
+  },
+  {
+    "name": "Melon",
+    "growthStages": [
+      1,
+      2,
+      3,
+      3,
+      3
+    ],
+    "totalGrowthTime": 12,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 250,
+    "isEdible": true,
+    "energy": 113,
+    "season": [
+      "SUMMER"
+    ],
+    "canBecomeGiant": true,
+    "texturePaths": [
+      "assets/crops/Melon_Stage_1",
+      "assets/crops/Melon_Stage_2",
+      "assets/crops/Melon_Stage_3",
+      "assets/crops/Melon_Stage_4",
+      "assets/crops/Melon_Stage_5",
+      "assets/crops/Melon_Stage_6"
+    ]
+  },
+  {
+    "name": "Poppy",
+    "growthStages": [
+      1,
+      2,
+      2,
+      2
+    ],
+    "totalGrowthTime": 7,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 140,
+    "isEdible": true,
+    "energy": 45,
+    "season": [
+      "SUMMER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Poppy_Stage_1",
+      "assets/crops/Poppy_Stage_2",
+      "assets/crops/Poppy_Stage_3",
+      "assets/crops/Poppy_Stage_4",
+      "assets/crops/Poppy_Stage_5"
+    ]
+  },
+  {
+    "name": "Radish",
+    "growthStages": [
+      2,
+      1,
+      2,
+      1
+    ],
+    "totalGrowthTime": 6,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 90,
+    "isEdible": true,
+    "energy": 45,
+    "season": [
+      "SUMMER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Radish_Stage_1",
+      "assets/crops/Radish_Stage_2",
+      "assets/crops/Radish_Stage_3",
+      "assets/crops/Radish_Stage_4",
+      "assets/crops/Radish_Stage_5"
+    ]
+  },
+  {
+    "name": "Red Cabbage",
+    "growthStages": [
+      2,
+      1,
+      2,
+      2,
+      2
+    ],
+    "totalGrowthTime": 9,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 260,
+    "isEdible": true,
+    "energy": 75,
+    "season": [
+      "SUMMER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Red_Cabbage_Stage_1",
+      "assets/crops/Red_Cabbage_Stage_2",
+      "assets/crops/Red_Cabbage_Stage_3",
+      "assets/crops/Red_Cabbage_Stage_4",
+      "assets/crops/Red_Cabbage_Stage_5",
+      "assets/crops/Red_Cabbage_Stage_6"
+    ]
+  },
+  {
+    "name": "Starfruit",
+    "growthStages": [
+      2,
+      3,
+      2,
+      3,
+      3
+    ],
+    "totalGrowthTime": 13,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 750,
+    "isEdible": true,
+    "energy": 125,
+    "season": [
+      "SUMMER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Starfruit_Stage_1",
+      "assets/crops/Starfruit_Stage_2",
+      "assets/crops/Starfruit_Stage_3",
+      "assets/crops/Starfruit_Stage_4",
+      "assets/crops/Starfruit_Stage_5",
+      "assets/crops/Starfruit_Stage_6"
+    ]
+  },
+  {
+    "name": "Summer Spangle",
+    "growthStages": [
+      1,
+      2,
+      3,
+      1
+    ],
+    "totalGrowthTime": 8,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 90,
+    "isEdible": true,
+    "energy": 45,
+    "season": [
+      "SUMMER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Summer_Spangle_Stage_1",
+      "assets/crops/Summer_Spangle_Stage_2",
+      "assets/crops/Summer_Spangle_Stage_3",
+      "assets/crops/Summer_Spangle_Stage_4",
+      "assets/crops/Summer_Spangle_Stage_5"
+    ]
+  },
+  {
+    "name": "Summer Squash",
+    "growthStages": [
+      1,
+      1,
+      1,
+      2,
+      1
+    ],
+    "totalGrowthTime": 6,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 3,
+    "baseSellPrice": 45,
+    "isEdible": true,
+    "energy": 63,
+    "season": [
+      "SUMMER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Summer_Squash_Stage_1",
+      "assets/crops/Summer_Squash_Stage_2",
+      "assets/crops/Summer_Squash_Stage_3",
+      "assets/crops/Summer_Squash_Stage_4",
+      "assets/crops/Summer_Squash_Stage_5",
+      "assets/crops/Summer_Squash_Stage_6"
+    ]
+  },
+  {
+    "name": "Sunflower",
+    "growthStages": [
+      1,
+      2,
+      3,
+      2
+    ],
+    "totalGrowthTime": 8,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 80,
+    "isEdible": true,
+    "energy": 45,
+    "season": [
+      "SUMMER",
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Sunflower_Stage_1",
+      "assets/crops/Sunflower_Stage_2",
+      "assets/crops/Sunflower_Stage_3",
+      "assets/crops/Sunflower_Stage_4",
+      "assets/crops/Sunflower_Stage_5"
+    ]
+  },
+  {
+    "name": "Tomato",
+    "growthStages": [
+      2,
+      2,
+      2,
+      2,
+      3
+    ],
+    "totalGrowthTime": 11,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 4,
+    "baseSellPrice": 60,
+    "isEdible": true,
+    "energy": 20,
+    "season": [
+      "SUMMER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Tomato_Stage_1",
+      "assets/crops/Tomato_Stage_2",
+      "assets/crops/Tomato_Stage_3",
+      "assets/crops/Tomato_Stage_4",
+      "assets/crops/Tomato_Stage_5",
+      "assets/crops/Tomato_Stage_6"
+    ]
+  },
+  {
+    "name": "Wheat",
+    "growthStages": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "totalGrowthTime": 4,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 25,
+    "isEdible": false,
+    "energy": null,
+    "season": [
+      "SUMMER",
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Wheat_Stage_1",
+      "assets/crops/Wheat_Stage_2",
+      "assets/crops/Wheat_Stage_3",
+      "assets/crops/Wheat_Stage_4",
+      "assets/crops/Wheat_Stage_5"
+    ]
+  },
+  {
+    "name": "Amaranth",
+    "growthStages": [
+      1,
+      2,
+      2,
+      2
+    ],
+    "totalGrowthTime": 7,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 150,
+    "isEdible": true,
+    "energy": 50,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Amaranth_Stage_1",
+      "assets/crops/Amaranth_Stage_2",
+      "assets/crops/Amaranth_Stage_3",
+      "assets/crops/Amaranth_Stage_4",
+      "assets/crops/Amaranth_Stage_5"
+    ]
+  },
+  {
+    "name": "Artichoke",
+    "growthStages": [
+      2,
+      2,
+      1,
+      2,
+      1
+    ],
+    "totalGrowthTime": 8,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 160,
+    "isEdible": true,
+    "energy": 30,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Artichoke_Stage_1",
+      "assets/crops/Artichoke_Stage_2",
+      "assets/crops/Artichoke_Stage_3",
+      "assets/crops/Artichoke_Stage_4",
+      "assets/crops/Artichoke_Stage_5",
+      "assets/crops/Artichoke_Stage_6"
+    ]
+  },
+  {
+    "name": "Beet",
+    "growthStages": [
+      1,
+      1,
+      2,
+      2
+    ],
+    "totalGrowthTime": 6,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 100,
+    "isEdible": true,
+    "energy": 30,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Beet_Stage_1",
+      "assets/crops/Beet_Stage_2",
+      "assets/crops/Beet_Stage_3",
+      "assets/crops/Beet_Stage_4",
+      "assets/crops/Beet_Stage_5"
+    ]
+  },
+  {
+    "name": "Bok Choy",
+    "growthStages": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "totalGrowthTime": 4,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 80,
+    "isEdible": true,
+    "energy": 25,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Bok_Choy_Stage_1",
+      "assets/crops/Bok_Choy_Stage_2",
+      "assets/crops/Bok_Choy_Stage_3",
+      "assets/crops/Bok_Choy_Stage_4",
+      "assets/crops/Bok_Choy_Stage_5"
+    ]
+  },
+  {
+    "name": "Broccoli",
+    "growthStages": [
+      2,
+      2,
+      2,
+      2
+    ],
+    "totalGrowthTime": 8,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 4,
+    "baseSellPrice": 70,
+    "isEdible": true,
+    "energy": 63,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Broccoli_Stage_1",
+      "assets/crops/Broccoli_Stage_2",
+      "assets/crops/Broccoli_Stage_3",
+      "assets/crops/Broccoli_Stage_4",
+      "assets/crops/Broccoli_Stage_5"
+    ]
+  },
+  {
+    "name": "Cranberry",
+    "growthStages": [
+      1,
+      2,
+      1,
+      1,
+      2
+    ],
+    "totalGrowthTime": 7,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 5,
+    "baseSellPrice": 75,
+    "isEdible": true,
+    "energy": 38,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Cranberry_Stage_1",
+      "assets/crops/Cranberry_Stage_2",
+      "assets/crops/Cranberry_Stage_3",
+      "assets/crops/Cranberry_Stage_4",
+      "assets/crops/Cranberry_Stage_5",
+      "assets/crops/Cranberry_Stage_6"
+    ]
+  },
+  {
+    "name": "Eggplant",
+    "growthStages": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "totalGrowthTime": 5,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 5,
+    "baseSellPrice": 60,
+    "isEdible": true,
+    "energy": 20,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Eggplant_Stage_1",
+      "assets/crops/Eggplant_Stage_2",
+      "assets/crops/Eggplant_Stage_3",
+      "assets/crops/Eggplant_Stage_4",
+      "assets/crops/Eggplant_Stage_5"
+    ]
+  },
+  {
+    "name": "Fairy Rose",
+    "growthStages": [
+      1,
+      4,
+      4,
+      3
+    ],
+    "totalGrowthTime": 12,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 290,
+    "isEdible": true,
+    "energy": 45,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Fairy_Rose_Stage_1",
+      "assets/crops/Fairy_Rose_Stage_2",
+      "assets/crops/Fairy_Rose_Stage_3",
+      "assets/crops/Fairy_Rose_Stage_4",
+      "assets/crops/Fairy_Rose_Stage_5"
+    ]
+  },
+  {
+    "name": "Grape",
+    "growthStages": [
+      1,
+      1,
+      2,
+      3,
+      3
+    ],
+    "totalGrowthTime": 10,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 3,
+    "baseSellPrice": 80,
+    "isEdible": true,
+    "energy": 38,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Grape_Stage_1",
+      "assets/crops/Grape_Stage_2",
+      "assets/crops/Grape_Stage_3",
+      "assets/crops/Grape_Stage_4",
+      "assets/crops/Grape_Stage_5",
+      "assets/crops/Grape_Stage_6"
+    ]
+  },
+  {
+    "name": "Pumpkin",
+    "growthStages": [
+      1,
+      2,
+      3,
+      4,
+      3
+    ],
+    "totalGrowthTime": 13,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 320,
+    "isEdible": false,
+    "energy": null,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": true,
+    "texturePaths": [
+      "assets/crops/Pumpkin_Stage_1",
+      "assets/crops/Pumpkin_Stage_2",
+      "assets/crops/Pumpkin_Stage_3",
+      "assets/crops/Pumpkin_Stage_4",
+      "assets/crops/Pumpkin_Stage_5",
+      "assets/crops/Pumpkin_Stage_6"
+    ]
+  },
+  {
+    "name": "Yam",
+    "growthStages": [
+      1,
+      3,
+      3,
+      3
+    ],
+    "totalGrowthTime": 10,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 160,
+    "isEdible": true,
+    "energy": 45,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Yam_Stage_1",
+      "assets/crops/Yam_Stage_2",
+      "assets/crops/Yam_Stage_3",
+      "assets/crops/Yam_Stage_4",
+      "assets/crops/Yam_Stage_5"
+    ]
+  },
+  {
+    "name": "Sweet Gem Berry",
+    "growthStages": [
+      2,
+      4,
+      6,
+      6,
+      5
+    ],
+    "totalGrowthTime": 23,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 3000,
+    "isEdible": false,
+    "energy": null,
+    "season": [
+      "FALL"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Sweet_Gem_Berry_Stage_1",
+      "assets/crops/Sweet_Gem_Berry_Stage_2",
+      "assets/crops/Sweet_Gem_Berry_Stage_3",
+      "assets/crops/Sweet_Gem_Berry_Stage_4",
+      "assets/crops/Sweet_Gem_Berry_Stage_5",
+      "assets/crops/Sweet_Gem_Berry_Stage_6"
+    ]
+  },
+  {
+    "name": "Powdermelon",
+    "growthStages": [
+      1,
+      2,
+      1,
+      2,
+      1
+    ],
+    "totalGrowthTime": 7,
+    "isOneTimeHarvest": true,
+    "regrowthTime": null,
+    "baseSellPrice": 60,
+    "isEdible": true,
+    "energy": 63,
+    "season": [
+      "WINTER"
+    ],
+    "canBecomeGiant": true,
+    "texturePaths": [
+      "assets/crops/Powdermelon_Stage_1",
+      "assets/crops/Powdermelon_Stage_2",
+      "assets/crops/Powdermelon_Stage_3",
+      "assets/crops/Powdermelon_Stage_4",
+      "assets/crops/Powdermelon_Stage_5",
+      "assets/crops/Powdermelon_Stage_6"
+    ]
+  },
+  {
+    "name": "Ancient Fruit",
+    "growthStages": [
+      2,
+      7,
+      7,
+      7,
+      5
+    ],
+    "totalGrowthTime": 28,
+    "isOneTimeHarvest": false,
+    "regrowthTime": 7,
+    "baseSellPrice": 550,
+    "isEdible": false,
+    "energy": null,
+    "season": [
+      "SPRING",
+      "SUMMER",
+      "FALL",
+      "WINTER"
+    ],
+    "canBecomeGiant": false,
+    "texturePaths": [
+      "assets/crops/Ancient_Fruit_Stage_1",
+      "assets/crops/Ancient_Fruit_Stage_2",
+      "assets/crops/Ancient_Fruit_Stage_3",
+      "assets/crops/Ancient_Fruit_Stage_4",
+      "assets/crops/Ancient_Fruit_Stage_5",
+      "assets/crops/Ancient_Fruit_Stage_6"
+    ]
+  }
+]
+

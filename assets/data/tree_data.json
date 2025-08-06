@@ -1,0 +1,505 @@
+[
+  {
+    "id": "apricot_tree",
+    "name": "Apricot Tree",
+    "source": "Apricot Sapling",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 1,
+    "fruitBaseSellPrice": 59,
+    "isFruitEdible": true,
+    "fruitEnergy": 38,
+    "season": [
+      "SPRING"
+    ],
+    "texturePaths": [
+      "assets/trees/Apricot_Stage_1.png",
+      "assets/trees/Apricot_Stage_2.png",
+      "assets/trees/Apricot_Stage_3.png",
+      "assets/trees/Apricot_Stage_4.png",
+      "assets/trees/Apricot_Stage_5_Fruit.png",
+      "assets/trees/Apricot_Stage_5.png",
+      "assets/trees/Apricot_Stage_5 (1).png",
+      "assets/trees/Apricot_Stage_5 (2).png",
+      "assets/trees/Apricot_Stage_5 (3).png",
+      "assets/trees/ApricotTreeLightning.png"
+    ],
+    "product": "Apricot",
+    "chopProduct": ["Wood"],
+    "isFruitTree": true
+  },
+  {
+    "id": "cherry_tree",
+    "name": "Cherry Tree",
+    "source": "Cherry Sapling",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 1,
+    "fruitBaseSellPrice": 80,
+    "isFruitEdible": true,
+    "fruitEnergy": 38,
+    "season": [
+      "SPRING"
+    ],
+    "texturePaths": [
+      "assets/trees/Cherry_Stage_1.png",
+      "assets/trees/Cherry_Stage_2.png",
+      "assets/trees/Cherry_Stage_3.png",
+      "assets/trees/Cherry_Stage_4.png",
+      "assets/trees/Cherry_Stage_5_Fruit.png",
+      "assets/trees/Cherry_Stage_5.png",
+      "assets/trees/Cherry_Stage_5 (1).png",
+      "assets/trees/Cherry_Stage_5 (2).png",
+      "assets/trees/Cherry_Stage_5 (3).png",
+      "assets/trees/CherryTreeLightning.png"
+    ],
+    "product": "Cherry",
+    "chopProduct": ["Wood"],
+    "isFruitTree": true
+  },
+  {
+    "id": "banana_tree",
+    "name": "Banana Tree",
+    "source": "Banana Sapling",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 1,
+    "fruitBaseSellPrice": 150,
+    "isFruitEdible": true,
+    "fruitEnergy": 75,
+    "season": [
+      "SUMMER"
+    ],
+    "texturePaths": [
+      "assets/trees/Banana_Stage_1.png",
+      "assets/trees/Banana_Stage_2.png",
+      "assets/trees/Banana_Stage_3.png",
+      "assets/trees/Banana_Stage_4.png",
+      "assets/trees/Banana_Stage_5_Fruit.png",
+      "assets/trees/Banana_Stage_5.png",
+      "assets/trees/Banana_Stage_5 (1).png",
+      "assets/trees/Banana_Stage_5 (2).png",
+      "assets/trees/Banana_Stage_5 (3).png",
+      "assets/trees/BananaTreeLightning.png"
+    ],
+    "product": "Banana",
+    "chopProduct": ["Wood"],
+    "isFruitTree": true
+  },
+  {
+    "id": "mango_tree",
+    "name": "Mango Tree",
+    "source": "Mango Sapling",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 1,
+    "fruitBaseSellPrice": 130,
+    "isFruitEdible": true,
+    "fruitEnergy": 100,
+    "season": [
+      "SUMMER"
+    ],
+    "texturePaths": [
+      "assets/trees/Mango_Stage_1.png",
+      "assets/trees/Mango_Stage_2.png",
+      "assets/trees/Mango_Stage_3.png",
+      "assets/trees/Mango_Stage_4.png",
+      "assets/trees/Mango_Stage_5_Fruit.png",
+      "assets/trees/Mango_Stage_5.png",
+      "assets/trees/Mango_Stage_5 (1).png",
+      "assets/trees/Mango_Stage_5 (2).png",
+      "assets/trees/Mango_Stage_5 (3).png",
+      "assets/trees/MangoTreeLightning.png"
+    ],
+    "product": "Mango",
+    "chopProduct": ["Wood"],
+    "isFruitTree": true
+  },
+  {
+    "id": "orange_tree",
+    "name": "Orange Tree",
+    "source": "Orange Sapling",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 1,
+    "fruitBaseSellPrice": 100,
+    "isFruitEdible": true,
+    "fruitEnergy": 38,
+    "season": [
+      "SUMMER"
+    ],
+    "texturePaths": [
+      "assets/trees/Orange_Stage_1.png",
+      "assets/trees/Orange_Stage_2.png",
+      "assets/trees/Orange_Stage_3.png",
+      "assets/trees/Orange_Stage_4.png",
+      "assets/trees/Orange_Stage_5_Fruit.png",
+      "assets/trees/Orange_Stage_5.png",
+      "assets/trees/Orange_Stage_5 (1).png",
+      "assets/trees/Orange_Stage_5 (2).png",
+      "assets/trees/Orange_Stage_5 (3).png",
+      "assets/trees/OrangeTreeLightning.png"
+    ],
+    "product": "Orange",
+    "chopProduct": ["Wood"],
+    "isFruitTree": true
+  },
+  {
+    "id": "peach_tree",
+    "name": "Peach Tree",
+    "source": "Peach Sapling",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 1,
+    "fruitBaseSellPrice": 140,
+    "isFruitEdible": true,
+    "fruitEnergy": 38,
+    "season": [
+      "SUMMER"
+    ],
+    "texturePaths": [
+      "assets/trees/Peach_Stage_1.png",
+      "assets/trees/Peach_Stage_2.png",
+      "assets/trees/Peach_Stage_3.png",
+      "assets/trees/Peach_Stage_4.png",
+      "assets/trees/Peach_Stage_5_Fruit.png",
+      "assets/trees/Peach_Stage_5.png",
+      "assets/trees/Peach_Stage_5 (1).png",
+      "assets/trees/Peach_Stage_5 (2).png",
+      "assets/trees/Peach_Stage_5 (3).png",
+      "assets/trees/PeachTreeLightning.png"
+    ],
+    "product": "Peach",
+    "chopProduct": ["Wood"],
+    "isFruitTree": true
+  },
+  {
+    "id": "apple_tree",
+    "name": "Apple Tree",
+    "source": "Apple Sapling",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 1,
+    "fruitBaseSellPrice": 100,
+    "isFruitEdible": true,
+    "fruitEnergy": 38,
+    "season": [
+      "FALL"
+    ],
+    "texturePaths": [
+      "assets/trees/Apple_Stage_1.png",
+      "assets/trees/Apple_Stage_2.png",
+      "assets/trees/Apple_Stage_3.png",
+      "assets/trees/Apple_Stage_4.png",
+      "assets/trees/Apple_Stage_5_Fruit.png",
+      "assets/trees/Apple_Stage_5.png",
+      "assets/trees/Apple_Stage_5 (1).png",
+      "assets/trees/Apple_Stage_5 (2).png",
+      "assets/trees/Apple_Stage_5 (3).png",
+      "assets/trees/AppleTreeLightning.png"
+    ],
+    "product": "Apple",
+    "chopProduct": ["Wood"],
+    "isFruitTree": true
+  },
+  {
+    "id": "pomegranate_tree",
+    "name": "Pomegranate Tree",
+    "source": "Pomegranate Sapling",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 1,
+    "fruitBaseSellPrice": 140,
+    "isFruitEdible": true,
+    "fruitEnergy": 38,
+    "season": [
+      "FALL"
+    ],
+    "texturePaths": [
+      "assets/trees/Pomegranate_Stage_1.png",
+      "assets/trees/Pomegranate_Stage_2.png",
+      "assets/trees/Pomegranate_Stage_3.png",
+      "assets/trees/Pomegranate_Stage_4.png",
+      "assets/trees/Pomegranate_Stage_5_Fruit.png",
+      "assets/trees/Pomegranate_Stage_5.png",
+      "assets/trees/Pomegranate_Stage_5 (1).png",
+      "assets/trees/Pomegranate_Stage_5 (2).png",
+      "assets/trees/Pomegranate_Stage_5 (3).png",
+      "assets/trees/PomegranateTreeLightning.png"
+    ],
+    "product": "Pomegranate",
+    "chopProduct": ["Wood"],
+    "isFruitTree": true
+  },
+  {
+    "id": "oak_tree",
+    "name": "Oak Tree",
+    "source": "Acorn",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 7,
+    "fruitBaseSellPrice": 150,
+    "isFruitEdible": false,
+
+    "season": [
+      "SPRING",
+      "SUMMER",
+      "FALL",
+      "WINTER"
+    ],
+    "texturePaths": [
+      "assets/trees/Oak_Stage_1.png",
+      "assets/trees/Oak_Stage_2.png",
+      "assets/trees/Oak_Stage_3.png",
+      "assets/trees/Oak_Stage_4.png",
+      "assets/trees/Oak_Stage_5.png",
+      "assets/trees/Oak_Stage_5 (1).png",
+      "assets/trees/Oak_Stage_5 (2).png",
+      "assets/trees/Oak_Stage_5 (3).png"
+    ],
+    "product": "Oak Resin",
+    "chopProduct": ["Wood"],
+    "isFruitTree": false
+  },
+  {
+    "id": "maple_tree",
+    "name": "Maple Tree",
+    "source": "Maple Seed",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 9,
+    "fruitBaseSellPrice": 200,
+    "isFruitEdible": false,
+
+    "season": [
+      "SPRING",
+      "SUMMER",
+      "FALL",
+      "WINTER"
+    ],
+    "texturePaths": [
+      "assets/trees/Maple_Stage_1.png",
+      "assets/trees/Maple_Stage_2.png",
+      "assets/trees/Maple_Stage_3.png",
+      "assets/trees/Maple_Stage_4.png",
+      "assets/trees/Maple_Stage_5.png",
+      "assets/trees/Maple_Stage_5 (1).png",
+      "assets/trees/Maple_Stage_5 (2).png",
+      "assets/trees/Maple_Stage_5 (3).png",
+      "assets/trees/Maple_stump_Spring.png",
+      "assets/trees/Maple_stump_Summer.png",
+      "assets/trees/Maple_stump_Fall.png",
+      "assets/trees/Maple_stump_Winter.png"
+    ],
+    "product": "Maple Syrup",
+    "chopProduct": [
+      "maple_seed",
+      "Wood"
+    ],
+    "isFruitTree": false
+  },
+  {
+    "id": "pine_tree",
+    "name": "Pine Tree",
+    "source": "Pine Cone",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 6,
+    "fruitBaseSellPrice": 100,
+    "isFruitEdible": false,
+
+    "season": [
+      "SPRING",
+      "SUMMER",
+      "FALL",
+      "WINTER"
+    ],
+    "texturePaths": [
+      "assets/trees/Pine_Stage_1.png",
+      "assets/trees/Pine_Stage_2.png",
+      "assets/trees/Pine_Stage_3.png",
+      "assets/trees/Pine_Stage_4.png",
+      "assets/trees/Pine_Stage_5.png",
+      "assets/trees/Pine_Stage_5 (1).png",
+      "assets/trees/Pine_Stage_5 (2).png",
+      "assets/trees/Pine_Stage_5 (3).png",
+      "assets/trees/Pine_stump_Spring.png",
+      "assets/trees/Pine_stump_Summer.png",
+      "assets/trees/Pine_stump_Fall.png",
+      "assets/trees/Pine_stump_Winter.png"
+    ],
+    "product": "Pint Tar",
+    "chopProduct": [
+      "Wood",
+      "pine_cone"
+    ],
+    "isFruitTree": false
+  },
+  {
+    "id": "mahogany_tree",
+    "name": "Mahogany Tree",
+    "source": "Mahogany Seed",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 1,
+    "fruitBaseSellPrice": 2,
+    "isFruitEdible": true,
+
+    "season": [
+      "SPRING",
+      "SUMMER",
+      "FALL",
+      "WINTER"
+    ],
+    "texturePaths": [
+      "assets/trees/Mahogany_Stage_1.png",
+      "assets/trees/Mahogany_Stage_2.png",
+      "assets/trees/Mahogany_Stage_3.png",
+      "assets/trees/Mahogany_Stage_4.png",
+      "assets/trees/Mahogany_Stage_5.png",
+      "assets/trees/Mahogany_Stage_5 (1).png",
+      "assets/trees/Mahogany_Stage_5 (2).png",
+      "assets/trees/Mahogany_Stage_5 (3).png",
+      "assets/trees/Mahogany_stump_Spring.png",
+      "assets/trees/Mahogany_stump_Summer.png",
+      "assets/trees/Mahogany_stump_Fall.png",
+      "assets/trees/Mahogany_stump_Winter.png"
+    ],
+    "product": "Sap",
+    "chopProduct": [
+      "mahogany_seed",
+      "Wood"
+    ],
+    "isFruitTree": false
+  },
+  {
+    "id": "mushroom_tree",
+    "name": "Mushroom Tree",
+    "source": "Mushroom Tree Seeds",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 1,
+    "fruitBaseSellPrice": 40,
+    "isFruitEdible": true,
+    "fruitEnergy": 38,
+    "season": [
+      "SPRING",
+      "SUMMER",
+      "FALL",
+      "WINTER"
+    ],
+    "texturePaths": [
+      "assets/trees/MushroomTree_Stage_1.png",
+      "assets/trees/MushroomTree_Stage_2.png",
+      "assets/trees/MushroomTree_Stage_3.png",
+      "assets/trees/MushroomTree_Stage_4.png",
+      "assets/trees/MushroomTree_Stage_5.png",
+      "assets/trees/Mushroom_stump.png"
+    ],
+    "product": "Common Mushroom",
+    "chopProduct": ["mushroom_tree_seed"],
+    "isFruitTree": false
+  },
+  {
+    "id": "mystic_tree",
+    "name": "Mystic Tree",
+    "source": "Mystic Tree Seed",
+
+    "growthStage": 5,  "daysPerStage": [
+      7,
+      7,
+      7,
+      7
+    ],
+    "fruitHarvestCycle": 7,
+    "fruitBaseSellPrice": 1000,
+    "isFruitEdible": true,
+    "fruitEnergy": 500,
+    "season": [
+      "SPRING",
+      "SUMMER",
+      "FALL",
+      "WINTER"
+    ],
+    "texturePaths": [
+      "assets/trees/Mystic_Tree_Stage_1.png",
+      "assets/trees/Mystic_Tree_Stage_2.png",
+      "assets/trees/Mystic_Tree_Stage_3.png",
+      "assets/trees/Mystic_Tree_Stage_4.png",
+      "assets/trees/Mystic_Tree_Stage_5.png",
+      "assets/trees/Mystic_Tree_stump.png"
+    ],
+    "product": "Mystic Syrup",
+    "chopProduct": [
+      "mystic_tree_seed",
+      "Wood"
+    ],
+    "isFruitTree": false
+  }
+]
+
