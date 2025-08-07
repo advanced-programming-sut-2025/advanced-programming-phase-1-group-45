@@ -402,32 +402,26 @@ public class AnimalBuildingController {
             }
         }
 
-        if (waitingForBuildingSelection && selectedAnimalType != null) {
+        if ( selectedAnimalType != null) {
             // انتخاب طویله با کلید B
-            if (Gdx.input.isKeyJustPressed(Input.Keys.B)) {
-                if (barnCount > 0) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
                     placeSelectedAnimalInBuilding(true, 0);
-                    selectingBuildingForAnimal = false; // بازنشانی حالت
-                } else {
-                    System.out.println("هیچ طویله‌ای وجود ندارد!");
-                    selectedAnimalType = null;
-                    waitingForBuildingSelection = false;
-                    selectingBuildingForAnimal = false; // بازنشانی حالت
-                }
+                    selectingBuildingForAnimal = false;
+                    showingInterior = true;
+                    showingBarnInterior = true;
+
+
                 return;
             }
 
             // انتخاب قفس با کلید K
-            if (Gdx.input.isKeyJustPressed(Input.Keys.K)) {
-                if (coopCount > 0) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
+
                     placeSelectedAnimalInBuilding(false, 0);
-                    selectingBuildingForAnimal = false; // بازنشانی حالت
-                } else {
-                    System.out.println("هیچ قفسی وجود ندارد!");
-                    selectedAnimalType = null;
-                    waitingForBuildingSelection = false;
-                    selectingBuildingForAnimal = false; // بازنشانی حالت
-                }
+                    selectingBuildingForAnimal = false;
+                    showingInterior = true;
+                    showingCoopInterior = true;
+
                 return;
             }
 
