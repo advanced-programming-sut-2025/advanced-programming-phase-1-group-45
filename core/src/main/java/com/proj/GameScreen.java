@@ -93,6 +93,7 @@ public class GameScreen implements Screen {
         this.farm = farm;
         this.mapName = farm.getFarmName();
     }
+
     public void setPlayer(Player player) {
         this.player = player;
         if (worldController != null) {
@@ -105,19 +106,23 @@ public class GameScreen implements Screen {
             camera.update();
         }
     }
+
     public void setNPCManager(NPCManager npcManager) {
         this.npcManager = npcManager;
         if (npcManager != null && worldController != null) {
             placeNPCs();
         }
     }
+
     private Point getSpawnPoint() {
         if (customSpawnPoint != null) {
             return customSpawnPoint;
         }
         return worldController != null ? worldController.getPlayerSpawnPoint() : null;
     }
+
     private List<Texture> npcTextures = new ArrayList<>(); // Add this class field
+
     private void placeNPCs() {
         if (npcManager == null) {
             npcManager = new NPCManager();
@@ -278,7 +283,8 @@ public class GameScreen implements Screen {
                         texture.getRegionHeight() * npc.getScale()
 
                     );
-                }}
+                }
+            }
             player.render(worldController.getSpriteBatch());
             animalManager.render(worldController.getSpriteBatch());
             if (animalBuildingController != null) {
@@ -340,7 +346,7 @@ public class GameScreen implements Screen {
         }
     }
 
-     private void drawCenteredImage(Texture image) {
+    private void drawCenteredImage(Texture image) {
         if (image == null) return;
         Matrix4 originalProjection = worldController.getSpriteBatch().getProjectionMatrix();
 
@@ -387,9 +393,6 @@ public class GameScreen implements Screen {
             animalBuildingController.startPlacingBarn(player.getPosition().x, player.getPosition().y);
         }
     }
-
-
-
 
 
     @Override
@@ -561,8 +564,7 @@ public class GameScreen implements Screen {
                     selectToolSlot(4);
                 } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
                     selectToolSlot(5);
-                }
-                else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
                     if (inventoryManager != null && inventoryManager.getPlayerInventory() != null) {
                         inventoryManager.getPlayerInventory().selectNoTool();
                         Gdx.app.log("GameScreen", "Selected no tool");
@@ -678,10 +680,18 @@ public class GameScreen implements Screen {
                     int tileY = (int) (player.getPosition().y / 16);
 
                     switch (player.getDirection()) {
-                        case UP: tileY++; break;
-                        case DOWN: tileY--; break;
-                        case LEFT: tileX--; break;
-                        case RIGHT: tileX++; break;
+                        case UP:
+                            tileY++;
+                            break;
+                        case DOWN:
+                            tileY--;
+                            break;
+                        case LEFT:
+                            tileX--;
+                            break;
+                        case RIGHT:
+                            tileX++;
+                            break;
                     }
 
                     if (tool.useOnTile(tileX, tileY)) {
