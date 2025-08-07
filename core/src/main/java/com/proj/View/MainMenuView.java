@@ -30,7 +30,7 @@ public class MainMenuView implements Screen {
         // Create UI elements
         this.titleLabel = new Label("Main menu", skin, "title");
         this.profileButton = new TextButton("Profile", skin);
-        this.newGameButton = new TextButton("New Game", skin);
+        this.newGameButton = new TextButton("change info", skin);
         this.loadGameButton = new TextButton("Load Last Game", skin);
         this.exitButton = new TextButton("Exit", skin);
         this.backButton = new TextButton("Back", skin);
