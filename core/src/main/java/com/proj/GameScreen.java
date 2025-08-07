@@ -31,6 +31,7 @@ import com.proj.map.farmName;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.Color;
+import com.proj.Model.EnergyBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,8 @@ import java.awt.*;
 
 public class GameScreen implements Screen {
     private Player player;
+    private EnergyBar energyBar;
+    private OrthographicCamera hudCamera;
     private OrthographicCamera camera;
     private String mapName;
     private Time gameTime;
@@ -162,6 +165,8 @@ public class GameScreen implements Screen {
                 animalBuildingController = new AnimalBuildingController(worldController.getGameMap());
                 animalManager = new AnimalManager();
                 spaceImage = GameAssetManager.getGameAssetManager().getSpaceImageTexture();
+                hudCamera = new OrthographicCamera();
+                hudCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 camera = new OrthographicCamera();
                 viewport = new FitViewport(640, 480, camera);
                 uistageViewport = new ScreenViewport();
@@ -184,6 +189,14 @@ public class GameScreen implements Screen {
                 }
 
                 player = new Player(worldController, startX, startY);
+                player = new Player(worldController, startX, startY);
+                energyBar = new EnergyBar(
+                    player,
+                    Gdx.graphics.getWidth() - 10,
+                    50,
+                    60,  // width
+                    105   // height
+                );
                 aImage = new Texture(Gdx.files.internal("NPCDialogues/george_dialogue1.png"));
                 sImage = new Texture(Gdx.files.internal("NPCDialogues/leah_dialogue1.png"));
                 dImage = new Texture(Gdx.files.internal("NPCDialogues/lewis_dialogue1.png"));
@@ -205,6 +218,7 @@ public class GameScreen implements Screen {
                 initialized = true;
 
                 Gdx.app.log("GameScreen", "Game initialized successfully");
+                Gdx.app.log("EnergyBar", "Position: " + (Gdx.graphics.getWidth() - 250) + ", " + (Gdx.graphics.getHeight() - 40));
 
                 inventoryManager.getPlayerInventory().selectNoTool();
             } catch (Exception e) {
@@ -242,6 +256,7 @@ public class GameScreen implements Screen {
             inventoryManager.update(delta, player);
             animalManager.update(delta);
             worldController.getSpriteBatch().begin();
+            worldController.getSpriteBatch().setProjectionMatrix(camera.combined);
 
             worldController.renderMap(camera);
             if (npcManager != null) {
@@ -296,7 +311,10 @@ public class GameScreen implements Screen {
             if (showFImage) drawCenteredImage(fImage);
             if (showGImage) drawCenteredImage(gImage);
             worldController.renderAfterPlayer();
-
+            worldController.getSpriteBatch().end();
+            worldController.getSpriteBatch().setProjectionMatrix(hudCamera.combined);
+            worldController.getSpriteBatch().begin();
+            energyBar.render(worldController.getSpriteBatch());
             worldController.getSpriteBatch().end();
 
             uistageViewport.apply();
@@ -393,6 +411,9 @@ public class GameScreen implements Screen {
             );
             camera.update();
             worldController.resize(width, height);
+            hudCamera.setToOrtho(false, width, height);
+            hudCamera.update();
+            energyBar.setPosition(width - 250, height - 250);
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in resize method", e);
         }
