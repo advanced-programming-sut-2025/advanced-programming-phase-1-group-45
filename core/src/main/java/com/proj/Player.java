@@ -269,4 +269,12 @@ public class Player {
         position.set(worldX, worldY);
     }
 
+    public float getCurrentEnergy() {
+        return currentEnergy;
+    }
+
+    public float getMaxEnergy() {
+        return maxEnergy;
+    }
+
 }
