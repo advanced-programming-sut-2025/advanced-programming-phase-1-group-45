@@ -1,6 +1,5 @@
 package com.proj.Database;
 
-import com.badlogic.gdx.Gdx;
 import java.sql.*;
 
 public class DatabaseHelper {
@@ -11,11 +10,12 @@ public class DatabaseHelper {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(DB_URL);
-            Gdx.app.log("Database", "Connected to SQLite database");
+            System.err.println("Database" + "Connected to SQLite database");
             createUserTable();
             createGameResultsTable();
         } catch (Exception e) {
-            Gdx.app.error("Database", "Connection error: " + e.getMessage());
+//            System.err.println("Database" +  "Connection error: " + e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 
@@ -23,10 +23,10 @@ public class DatabaseHelper {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                Gdx.app.log("Database", "Disconnected from database");
+                System.err.println("Database" +  "Disconnected from database");
             }
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Disconnection error: " + e.getMessage());
+            System.err.println("Database" +  "Disconnection error: " + e.getMessage());
         }
     }
 
@@ -39,14 +39,14 @@ public class DatabaseHelper {
             + "security_answer TEXT NOT NULL)";
 
         executeUpdate(createTableSQL);
-        Gdx.app.log("Database", "User table created");
+        System.err.println("Database" +  "User table created");
     }
 
     public void executeUpdate(String query) {
         try (Statement stmt = connection.createStatement()) {
             stmt.executeUpdate(query);
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Update error: " + e.getMessage() + "\nQuery: " + query);
+            System.err.println("Database" +  "Update error: " + e.getMessage() + "\nQuery: " + query);
         }
     }
 
@@ -54,7 +54,7 @@ public class DatabaseHelper {
         try {
             return connection.createStatement().executeQuery(query);
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Query error: " + e.getMessage() + "\nQuery: " + query);
+            System.err.println("Database" +  "Query error: " + e.getMessage() + "\nQuery: " + query);
             return null;
         }
     }
@@ -67,7 +67,7 @@ public class DatabaseHelper {
     //all these methods for checking signup part:
     // Add a new user
     public boolean addUser(String username, String password, String securityQuestion) {
-        String sql = "INSERT INTO users (username, password, security_question) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO users (username, password, security_answer) VALUES (?, ?, ?)";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, username);
@@ -76,7 +76,7 @@ public class DatabaseHelper {
             pstmt.executeUpdate();
             return true;
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Error adding user: " + e.getMessage());
+            System.err.println("Database" +  "Error adding user: " + e.getMessage());
             return false;
         }
     }
@@ -90,7 +90,7 @@ public class DatabaseHelper {
             pstmt.setString(1, username);
             return pstmt.executeQuery();
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Error getting user: " + e.getMessage());
+            System.err.println("Database" +  "Error getting user: " + e.getMessage());
             return null;
         }
     }
@@ -105,7 +105,7 @@ public class DatabaseHelper {
             ResultSet rs = pstmt.executeQuery();
             return rs.next(); // Returns true if a match was found
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Verification error: " + e.getMessage());
+            System.err.println("Database" +  "Verification error: " + e.getMessage());
             return false;
         }
     }
@@ -123,7 +123,7 @@ public class DatabaseHelper {
                 return null;
             }
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Security answer error: " + e.getMessage());
+            System.err.println("Database" +  "Security answer error: " + e.getMessage());
             return null;
         }
     }
@@ -135,9 +135,9 @@ public class DatabaseHelper {
             pstmt.setString(2, winner);
             pstmt.setLong(3, System.currentTimeMillis());
             pstmt.executeUpdate();
-            Gdx.app.log("Database", "Game result saved: " + gameId + ", winner: " + winner);
+            System.err.println("Database" +  "Game result saved: " + gameId + ", winner: " + winner);
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Error saving game result: " + e.getMessage());
+            System.err.println("Database" +  "Error saving game result: " + e.getMessage());
         }
     }
 
@@ -149,10 +149,7 @@ public class DatabaseHelper {
             + "timestamp BIGINT NOT NULL)";
 
         executeUpdate(createTableSQL);
-        Gdx.app.log("Database", "Game results table created");
+        System.err.println("Database" +  "Game results table created");
     }
-
-
-
 
 }

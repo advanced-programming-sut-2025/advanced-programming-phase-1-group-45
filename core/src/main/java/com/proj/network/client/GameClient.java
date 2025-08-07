@@ -183,10 +183,11 @@ public class GameClient implements Disposable, Runnable {
         }
     }
 
-    public void authenticate(String username, String password) {
+    public void authenticate(String username, String password, String securityQuestion) {
         JSONObject authData = new JSONObject();
         authData.put("username", username);
         authData.put("password", password);
+        authData.put("securityQuestion", securityQuestion);
         sendMessage("AUTH", authData.toString());
     }
 
@@ -203,6 +204,7 @@ public class GameClient implements Disposable, Runnable {
         lobbyData.put("maxPlayers", maxPlayers);
         lobbyData.put("isPrivate", isPrivate);
         lobbyData.put("isVisible", isVisible);
+        System.err.println("GAme Client " +  "Creating a new lobby: " + lobbyData.toString());
         sendMessage("CREATE_LOBBY", lobbyData.toString());
     }
 
@@ -245,7 +247,7 @@ public class GameClient implements Disposable, Runnable {
             JSONObject message = new JSONObject();
             message.put("type", type);
             message.put("data", data);
-            out.println(message.toString());
+            out.println(message);
         } catch (Exception e) {
             fireEvent(NetworkEvent.Type.ERROR, "error in sending message");
         }

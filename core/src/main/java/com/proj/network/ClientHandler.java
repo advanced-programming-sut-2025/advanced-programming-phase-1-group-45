@@ -30,14 +30,14 @@ public class ClientHandler implements Runnable {
             this.out = new PrintWriter(socket.getOutputStream(), true);
             this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
-            Gdx.app.error("ClientHandler", "eror in input or output", e);
+            System.err.println("ClientHandler  " + "eror in input or output" + e);
         }
     }
 
     @Override
     public void run() {
         try {
-            if (!authenticate()) {
+            if (!signUp()) {
                 return;
             }
 
@@ -47,20 +47,24 @@ public class ClientHandler implements Runnable {
                 try {
                     JSONObject jsonInput = new JSONObject(inputLine);
                     String type = jsonInput.getString("type");
-                    JSONObject data = jsonInput.getJSONObject("data");
-
-                    processMessage(type, data);
+                    Object data = jsonInput.get("data");
+                    if(data instanceof JSONObject) {
+                        processMessage(type, (JSONObject) data);
+                    } else if (data instanceof String) {
+                        JSONObject dataInput = new JSONObject((String)data);
+                        processMessage(type, dataInput);
+                    }
 
                 } catch (JSONException e) {
-                    Gdx.app.error("ClientHandler", "error JSON: " + e.getMessage());
+                    System.err.println("ClientHandler  " + "error JSON: " + e.getMessage());
                     sendMessage("ERROR", "error format");
                 } catch (Exception e) {
-                    Gdx.app.error("ClientHandler", "error massage: " + e.getMessage(), e);
+                    System.err.println("ClientHandler  " + "error massage: " + e.getMessage() + e);
                     sendMessage("ERROR", "error at request");
                 }
             }
         } catch (IOException e) {
-            Gdx.app.log("ClientHandler", "connection stop", e);
+            System.err.println("ClientHandler " + "connection stop" + e);
         } finally {
             if (username != null) {
                 server.removeClient(username);
@@ -69,8 +73,8 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private boolean authenticate() throws IOException {
-        sendMessage("AUTH_REQUEST", "enter name ");
+    private boolean signUp() throws IOException {
+        sendMessage("AUTH_REQUEST", "Please enter your credentials");
 
         String response = in.readLine();
         if (response == null) {
@@ -80,38 +84,112 @@ public class ClientHandler implements Runnable {
         try {
             JSONObject authData = new JSONObject(response);
 
-            if (!authData.has("data") || !authData.getJSONObject("data").has("username") ||
-                !authData.getJSONObject("data").has("password")) {
-                sendMessage("AUTH_FAILED", "problem");
+            // Handle both string and object formats for "data"
+            Object dataObj = authData.get("data");
+            JSONObject credentials;
+
+            if (dataObj instanceof String) {
+                // Parse the string as JSON object
+                credentials = new JSONObject((String) dataObj);
+            } else if (dataObj instanceof JSONObject) {
+                credentials = (JSONObject) dataObj;
+            } else {
+                sendMessage("AUTH_FAILED", "Invalid credentials format");
                 return false;
             }
 
-            String username = authData.getJSONObject("data").getString("username");
-            String password = authData.getJSONObject("data").getString("password");
+            // Validate required fields
+            if (!credentials.has("username") || !credentials.has("password")) {
+                sendMessage("AUTH_FAILED", "Missing username or password");
+                return false;
+            }
 
-            boolean authenticated = server.getDatabaseHelper().verifyUser(username, password);
+            String username = credentials.getString("username");
+            String password = credentials.getString("password");
+            String securityQuestion = credentials.getString("securityQuestion");
+
+            boolean authenticated = server.getDatabaseHelper().addUser(username, password, securityQuestion);
 
             if (authenticated) {
+                // Handle existing connections
                 if (server.getConnectedClients().containsKey(username)) {
                     ClientHandler existingClient = server.getConnectedClients().get(username);
-                    existingClient.sendMessage("DISCONNECT", "your connection another device");
+                    existingClient.sendMessage("DISCONNECT", "You've been disconnected because you logged in from another device");
                     existingClient.shutdown();
                 }
-
                 this.username = username;
                 server.registerClient(username, this);
-                sendMessage("AUTH_SUCCESS", "wellcome " + username);
+                sendMessage("AUTH_SUCCESS", "Welcome " + username);
                 return true;
             } else {
-                sendMessage("AUTH_FAILED", "wrong name or pass");
+                sendMessage("AUTH_FAILED", "Invalid format");
                 return false;
             }
         } catch (JSONException e) {
-            sendMessage("AUTH_FAILED", "فرمت اطلاعات احراز هویت نامعتبر است");
-            Gdx.app.error("ClientHandler", "خطا در پردازش اطلاعات احراز هویت", e);
+            sendMessage("AUTH_FAILED", "Invalid authentication format");
+            System.err.println("ClientHandler error in authenticate: " + e.getMessage());
             return false;
         }
     }
+
+//    private boolean authenticate() throws IOException {
+//        sendMessage("AUTH_REQUEST", "Please enter your credentials");
+//
+//        String response = in.readLine();
+//        if (response == null) {
+//            return false;
+//        }
+//
+//        try {
+//            JSONObject authData = new JSONObject(response);
+//
+//            // Handle both string and object formats for "data"
+//            Object dataObj = authData.get("data");
+//            JSONObject credentials;
+//
+//            if (dataObj instanceof String) {
+//                // Parse the string as JSON object
+//                credentials = new JSONObject((String) dataObj);
+//            } else if (dataObj instanceof JSONObject) {
+//                credentials = (JSONObject) dataObj;
+//            } else {
+//                sendMessage("AUTH_FAILED", "Invalid credentials format");
+//                return false;
+//            }
+//
+//            // Validate required fields
+//            if (!credentials.has("username") || !credentials.has("password")) {
+//                sendMessage("AUTH_FAILED", "Missing username or password");
+//                return false;
+//            }
+//
+//            String username = credentials.getString("username");
+//            String password = credentials.getString("password");
+//
+//            boolean authenticated = server.getDatabaseHelper().verifyUser(username, password);
+//
+//            if (authenticated) {
+//                // Handle existing connections
+//                if (server.getConnectedClients().containsKey(username)) {
+//                    ClientHandler existingClient = server.getConnectedClients().get(username);
+//                    existingClient.sendMessage("DISCONNECT", "You've been disconnected because you logged in from another device");
+//                    existingClient.shutdown();
+//                }
+//
+//                this.username = username;
+//                server.registerClient(username, this);
+//                sendMessage("AUTH_SUCCESS", "Welcome " + username);
+//                return true;
+//            } else {
+//                sendMessage("AUTH_FAILED", "Invalid username or password");
+//                return false;
+//            }
+//        } catch (JSONException e) {
+//            sendMessage("AUTH_FAILED", "Invalid authentication format");
+//            System.err.println("ClientHandler error in authenticate: " + e.getMessage());
+//            return false;
+//        }
+//    }
 
     private void processMessage(String type, JSONObject data) {
         switch (type) {
@@ -194,6 +272,10 @@ public class ClientHandler implements Runnable {
             if (!data.has("name") || !data.has("maxPlayers") ||
                 !data.has("isPrivate") || !data.has("isVisible")) {
                 sendMessage("ERROR", "Lobby creation information are incomplete");
+                System.err.println("GAme Client " +  "Creating a new lobby: " + data.toString());
+
+                System.err.println("ClientHandler  information Are bad");
+
                 return;
             }
 
@@ -202,6 +284,8 @@ public class ClientHandler implements Runnable {
             int maxPlayers = data.getInt("maxPlayers");
             boolean isPrivate = data.getBoolean("isPrivate");
             boolean isVisible = data.getBoolean("isVisible");
+
+            System.err.println("ClientHandler  information Are good");
 
             if (name.trim().isEmpty()) {
                 sendMessage("ERROR", "Lobby name must not be empty");
@@ -220,10 +304,11 @@ public class ClientHandler implements Runnable {
 
             server.createLobby(name, username, password, maxPlayers, isPrivate, isVisible);
 
+            System.out.println("createLobby");
 
         } catch (Exception e) {
             sendMessage("ERROR", "error in creating lobby: " + e.getMessage());
-            Gdx.app.error("ClientHandler", "error in create lobby: ", e);
+            System.err.println("ClientHandler  " + "error in create lobby: " + e);
         }
     }
 
@@ -241,7 +326,7 @@ public class ClientHandler implements Runnable {
 
         } catch (Exception e) {
             sendMessage("ERROR", "error in join lobby: " + e.getMessage());
-            Gdx.app.error("ClientHandler", "error in join lobby", e);
+            System.err.println("ClientHandler  " + "error in join lobby" + e);
         }
     }
 
@@ -272,7 +357,7 @@ public class ClientHandler implements Runnable {
 
         } catch (Exception e) {
             sendMessage("ERROR", "خطا در شروع بازی: " + e.getMessage());
-            Gdx.app.error("ClientHandler", "خطا در شروع بازی", e);
+            System.err.println("ClientHandler  " + "خطا در شروع بازی" + e);
         }
     }
 
@@ -288,7 +373,7 @@ public class ClientHandler implements Runnable {
 
         } catch (Exception e) {
             sendMessage("ERROR", "خطا در پردازش اکشن بازی: " + e.getMessage());
-            Gdx.app.error("ClientHandler", "خطا در پردازش اکشن بازی", e);
+            System.err.println("ClientHandler  " + "خطا در پردازش اکشن بازی" + e);
         }
     }
 
@@ -304,11 +389,11 @@ public class ClientHandler implements Runnable {
             out.println(response.toString());
 
             if (out.checkError()) {
-                Gdx.app.error("ClientHandler", "خطا در ارسال پیام به کلاینت: " + username);
+                System.err.println("ClientHandler  " + "خطا در ارسال پیام به کلاینت: " + username);
                 shutdown();
             }
         } catch (Exception e) {
-            Gdx.app.error("ClientHandler", "خطا در ساخت پیام JSON", e);
+            System.err.println("ClientHandler  " + "خطا در ساخت پیام JSON" + e);
         }
     }
 
@@ -348,7 +433,7 @@ public class ClientHandler implements Runnable {
                 if (in != null) in.close();
                 if (clientSocket != null && !clientSocket.isClosed()) clientSocket.close();
             } catch (IOException e) {
-                Gdx.app.error("ClientHandler", "خطا در بستن اتصال کلاینت", e);
+                System.err.println("ClientHandler  " + "خطا در بستن اتصال کلاینت" + e);
             }
         }
     }

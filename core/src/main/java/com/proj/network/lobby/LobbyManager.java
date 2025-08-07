@@ -25,6 +25,8 @@ public class LobbyManager {
         }
 
         gameLobbies.put(lobbyId, lobby);
+
+        System.out.println("Lobby Manager : createLobby");
         return lobby;
     }
 
@@ -34,7 +36,7 @@ public class LobbyManager {
             if (lobby.hasPlayer(username)) {
                 lobby.removePlayer(username);
 
-            
+
                 if (lobby.isEmpty() && !lobby.isGameActive()) {
                     gameLobbies.remove(lobby.getId());
                     Gdx.app.log("GameServer", "lobby was deleted" + lobby.getId());

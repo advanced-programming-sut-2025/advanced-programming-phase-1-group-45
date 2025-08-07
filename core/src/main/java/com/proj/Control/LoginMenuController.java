@@ -51,10 +51,6 @@ public class LoginMenuController {
                     String password = view.getPassword().getText();
 
                     if (login(username, password)) {
-
-                        Main.getMain().getGameClient().connect();
-                        Main.getMain().authenticate(username, password);
-
 //                        // After successful login, go to lobby screen
 //                        // After successful login
                         Main.getMain().setScreen(new LobbyScreen(Main.getMain()));

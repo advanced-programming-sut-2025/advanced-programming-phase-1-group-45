@@ -72,6 +72,14 @@ public class SignupMenuController {
 
                     if (signup(username, password, securityAnswer)) {
                         // Switch directly to login screen after successful registration
+                        try {
+                            Main.getMain().getGameClient().connect();
+                            Main.getMain().authenticate(username, password, securityAnswer);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            System.exit(0);
+                        }
+
                         Main.getMain().setScreen(new LoginMenuView(
                             new LoginMenuController(),
                             skin

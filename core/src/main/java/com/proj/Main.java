@@ -163,14 +163,14 @@ public class Main extends Game {
         });
     }
 
-    public void authenticate(String username, String password) {
-        gameClient.authenticate(username, password);
+    public void authenticate(String username, String password, String securityQuestion) {
+        gameClient.authenticate(username, password, securityQuestion);
     }
 
     private void handleAuthSuccess() {
-        Gdx.app.postRunnable(() -> {
-            switchToGameScreen();
-        });
+//        Gdx.app.postRunnable(() -> {
+//            switchToGameScreen();
+//        });
     }
 
     public static Main getMain() {
