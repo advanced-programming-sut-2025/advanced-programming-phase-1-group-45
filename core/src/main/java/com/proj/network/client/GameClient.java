@@ -82,6 +82,9 @@ public class GameClient implements Disposable, Runnable {
             String data = json.optString("data", "");
 
             switch (type) {
+                case "AUTH_REQUEST":
+                    fireEvent(NetworkEvent.Type.AUTH_REQUEST, data);
+                    break;
                 case "AUTH_SUCCESS":
                     handleAuthSuccess(data);
                     break;
@@ -96,6 +99,10 @@ public class GameClient implements Disposable, Runnable {
 
                 case "JOIN_SUCCESS":
                     handleJoinLobby(data);
+                    break;
+
+                case "LEAVE_SUCCESS" :
+                    handleLeaveLobby(data);
                     break;
 
                 case "LOBBIES_LIST":
@@ -147,11 +154,20 @@ public class GameClient implements Disposable, Runnable {
         }
     }
 
+    private void handleLeaveLobby(String jsonData) {
+        try {
+            JSONObject lobbyInfo = new JSONObject(jsonData);
+            fireLobbyEvent(LobbyEvent.Type.LEFT, null);
+        } catch (Exception e) {
+            fireEvent(NetworkEvent.Type.ERROR, "error in processing lobby: " + e.getMessage());
+        }
+    }
+
     private void handleJoinLobby(String jsonData) {
         try {
             JSONObject lobbyInfo = new JSONObject(jsonData);
             currentLobbyId = lobbyInfo.getString("id");
-            fireLobbyEvent(LobbyEvent.Type.JOINED, jsonData);
+            fireLobbyEvent(LobbyEvent.Type.JOIN_SUCCESS, jsonData);
         } catch (Exception e) {
             fireEvent(NetworkEvent.Type.ERROR, "error in join lobby: " + e.getMessage());
         }
@@ -200,7 +216,6 @@ public class GameClient implements Disposable, Runnable {
     public void leaveLobby() {
         sendMessage("LEAVE_LOBBY", "");
         currentLobbyId = null;
-        fireLobbyEvent(LobbyEvent.Type.LEFT, null);
     }
 
     public void sendChatMessage(String message, boolean isPrivate, String recipient) {
@@ -318,7 +333,7 @@ public class GameClient implements Disposable, Runnable {
                 }
             }
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "error in recieving lobbies");
+            fireEvent(NetworkEvent.Type.ERROR, "error in receiving lobbies");
         }
     }
 

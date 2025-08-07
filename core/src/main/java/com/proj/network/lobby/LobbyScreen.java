@@ -15,6 +15,7 @@ import com.proj.Model.GameAssetManager;
 import com.proj.View.MainMenuView;
 import com.proj.network.client.GameClient;
 import com.proj.network.client.LobbyEventListener;
+import com.proj.network.client.LobbyListListener;
 import com.proj.network.client.NetworkEventListener;
 import com.proj.network.event.LobbyEvent;
 import com.proj.network.event.NetworkEvent;
@@ -30,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LobbyScreen implements Screen, LobbyEventListener {
+public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListener {
 
     private  Main game;
     private  GameClient gameClient;
@@ -294,16 +295,17 @@ public class LobbyScreen implements Screen, LobbyEventListener {
     public void handleLobbyEvent(LobbyEvent event) {
         Gdx.app.postRunnable(() -> {
             switch (event.getType()) {
-                case LOBBIES_LIST:
-                    updateLobbiesList(event.getLobbyData());
-                    break;
-
                 case LOBBY_CREATED:
                     handleLobbyInfoCreated(event.getLobbyData());
                     break;
 
-                case JOINED:
+                case JOIN_SUCCESS:
                     handleJoinSuccess(event.getLobbyData());
+                    break;
+
+                case LEFT:
+                    refreshLobbyInfoList();
+                    refreshLobbyInfoListUI();
                     break;
 
                 case GAME_STARTED:
@@ -326,7 +328,6 @@ public class LobbyScreen implements Screen, LobbyEventListener {
                 JSONObject lobbyJson = jsonLobbies.getJSONObject(lobbyId);
                 lobbiesMap.put(lobbyId, parseLobbyInfo(lobbyId, lobbyJson));
             }
-
             refreshLobbyInfoListUI();
         } catch (JSONException e) {
             showError("Error processing lobbies list");
@@ -338,6 +339,7 @@ public class LobbyScreen implements Screen, LobbyEventListener {
         lobby.setId(lobbyId);
         lobby.setName(json.getString("name"));
         lobby.setOwner(json.getString("owner"));
+        lobby.setPlayerCount(json.getInt("playerCount"));
         lobby.setMaxPlayers(json.getInt("maxPlayers"));
         lobby.setPrivate(json.getBoolean("isPrivate"));
         lobby.setGameActive(json.getBoolean("isGameActive"));
@@ -461,6 +463,11 @@ public class LobbyScreen implements Screen, LobbyEventListener {
     @Override
     public void handleNetworkEvent(NetworkEvent event) {
 
+    }
+
+    @Override
+    public void onLobbiesReceived(JSONObject lobbiesData) {
+        updateLobbiesList(lobbiesData.toString());
     }
 
     public class LobbyInfo {

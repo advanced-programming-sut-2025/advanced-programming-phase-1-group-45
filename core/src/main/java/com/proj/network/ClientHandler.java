@@ -50,11 +50,12 @@ public class ClientHandler implements Runnable {
                     JSONObject data = jsonInput.getJSONObject("data");
 
                     processMessage(type, data);
+
                 } catch (JSONException e) {
                     Gdx.app.error("ClientHandler", "error JSON: " + e.getMessage());
                     sendMessage("ERROR", "error format");
                 } catch (Exception e) {
-                    Gdx.app.error("ClientHandler", "eror massage: " + e.getMessage(), e);
+                    Gdx.app.error("ClientHandler", "error massage: " + e.getMessage(), e);
                     sendMessage("ERROR", "error at request");
                 }
             }
@@ -192,7 +193,7 @@ public class ClientHandler implements Runnable {
         try {
             if (!data.has("name") || !data.has("maxPlayers") ||
                 !data.has("isPrivate") || !data.has("isVisible")) {
-                sendMessage("ERROR", "اطلاعات ایجاد لابی ناقص است");
+                sendMessage("ERROR", "Lobby creation information are incomplete");
                 return;
             }
 
@@ -203,32 +204,33 @@ public class ClientHandler implements Runnable {
             boolean isVisible = data.getBoolean("isVisible");
 
             if (name.trim().isEmpty()) {
-                sendMessage("ERROR", "نام لابی نمی‌تواند خالی باشد");
+                sendMessage("ERROR", "Lobby name must not be empty");
                 return;
             }
 
             if (maxPlayers < 2 || maxPlayers > 8) {
-                sendMessage("ERROR", "تعداد بازیکنان باید بین 2 تا 8 باشد");
+                sendMessage("ERROR", "Players number should be between 2 and 8");
                 return;
             }
 
             if (isPrivate && password.trim().isEmpty()) {
-                sendMessage("ERROR", "لابی خصوصی نیاز به رمز عبور دارد");
+                sendMessage("ERROR", "Private Lobby should have a password");
                 return;
             }
 
             server.createLobby(name, username, password, maxPlayers, isPrivate, isVisible);
 
+
         } catch (Exception e) {
-            sendMessage("ERROR", "خطا در ایجاد لابی: " + e.getMessage());
-            Gdx.app.error("ClientHandler", "خطا در ایجاد لابی", e);
+            sendMessage("ERROR", "error in creating lobby: " + e.getMessage());
+            Gdx.app.error("ClientHandler", "error in create lobby: ", e);
         }
     }
 
     private void joinLobby(JSONObject data) {
         try {
             if (!data.has("lobbyId")) {
-                sendMessage("ERROR", "شناسه لابی مشخص نشده است");
+                sendMessage("ERROR", "Should send lobby ID in the message");
                 return;
             }
 
@@ -238,8 +240,8 @@ public class ClientHandler implements Runnable {
             server.joinLobby(lobbyId, username, password);
 
         } catch (Exception e) {
-            sendMessage("ERROR", "خطا در پیوستن به لابی: " + e.getMessage());
-            Gdx.app.error("ClientHandler", "خطا در پیوستن به لابی", e);
+            sendMessage("ERROR", "error in join lobby: " + e.getMessage());
+            Gdx.app.error("ClientHandler", "error in join lobby", e);
         }
     }
 
@@ -247,14 +249,14 @@ public class ClientHandler implements Runnable {
         GameLobby lobby = server.findPlayerLobby(username);
         if (lobby != null) {
             lobby.removePlayer(username);
-            sendMessage("SUCCESS", "شما از لابی خارج شدید");
+            sendMessage("LEAVE_SUCCESS", "You left the lobby");
 
             if (lobby.isEmpty()) {
                 server.getGameLobbies().remove(lobby.getId());
-                server.broadcastSystemMessage("لابی " + lobby.getName() + " حذف شد");
+                server.broadcastSystemMessage("Lobby: " + lobby.getName() + " was removed");
             }
         } else {
-            sendMessage("ERROR", "شما در هیچ لابی‌ای نیستید");
+            sendMessage("ERROR", "You are not in any lobby");
         }
     }
 

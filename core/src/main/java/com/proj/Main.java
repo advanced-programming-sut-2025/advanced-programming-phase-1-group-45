@@ -137,7 +137,7 @@ public class Main extends Game {
 
     private void initializeNetworkClient() {
         gameClient = new GameClient(SERVER_ADDRESS, SERVER_PORT);
-        gameClient.connect();
+//        gameClient.connect();
         gameClient.addNetworkListener(new NetworkEventListener() {
             @Override
             public void handleNetworkEvent(NetworkEvent event) {
@@ -205,3 +205,4 @@ public class Main extends Game {
         return gameClient;
     }
 }
+

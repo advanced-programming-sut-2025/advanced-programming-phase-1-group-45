@@ -5,7 +5,7 @@ import org.json.JSONObject;
 public class LobbyEvent {
     public enum Type {
         LOBBY_CREATED,
-        JOINED,
+        JOIN_SUCCESS,
         LEFT,
         LOBBIES_LIST,
         GAME_STARTED,

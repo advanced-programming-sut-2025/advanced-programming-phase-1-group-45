@@ -194,7 +194,7 @@ public class GameServer {
             ownerHandler.sendMessage("LOBBY_CREATED", lobby.getLobbyInfo().toString());
         }
 
-        Gdx.app.log("GameServer", "لابی جدید ساخته شد: " + lobbyName + " با ID: " + lobby.getId());
+        Gdx.app.log("GameServer", "lobby created:  " + lobbyName + " با ID: " + lobby.getId());
     }
 
     /**
@@ -205,41 +205,40 @@ public class GameServer {
         ClientHandler client = connectedClients.get(username);
 
         if (client == null) {
-            Gdx.app.error("GameServer", "کاربر یافت نشد: " + username);
+            Gdx.app.error("GameServer", "Username not found: " + username);
             return;
         }
 
         if (lobby == null) {
-            client.sendMessage("ERROR", "لابی مورد نظر یافت نشد");
+            client.sendMessage("ERROR", "Lobby not found");
             return;
         }
 
         if (lobby.isFull()) {
-            client.sendMessage("ERROR", "لابی پر است");
+            client.sendMessage("ERROR", "Lobby is full: " + lobby.getId());
             return;
         }
 
         if (lobby.isGameActive() && !lobby.hasPlayer(username)) {
-            client.sendMessage("ERROR", "بازی در این لابی شروع شده است");
+            client.sendMessage("ERROR", "The game in this lobby is already active");
             return;
         }
 
         if (lobby.isPrivate() && !lobby.checkPassword(password)) {
-            client.sendMessage("ERROR", "رمز عبور اشتباه است");
+            client.sendMessage("ERROR", "Incorrect password");
             return;
         }
 
-        // بررسی اگر بازیکن قبلاً در لابی دیگری است
         GameLobby currentLobby = findPlayerLobby(username);
         if (currentLobby != null && !currentLobby.getId().equals(lobbyId)) {
             currentLobby.removePlayer(username);
         }
 
         lobby.addPlayer(username, client);
-        client.sendMessage("JOIN_SUCCESS", lobby.getLobbyInfo().toString());
+        client.sendMessage("JOIN_SUCCESS", lobby.getId());
 
         // اطلاع به سایر بازیکنان لابی
-        lobby.broadcastMessage("SYSTEM", username + " به لابی پیوست");
+        lobby.broadcastMessage("SYSTEM", username + "Joined lobby");
     }
 
     /**
