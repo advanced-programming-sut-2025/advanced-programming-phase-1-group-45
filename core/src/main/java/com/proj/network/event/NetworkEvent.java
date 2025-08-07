@@ -4,6 +4,7 @@ public class NetworkEvent {
     public enum Type {
         CONNECTED,
         DISCONNECTED,
+        AUTH_REQUEST,
         AUTH_SUCCESS,
         AUTH_FAILED,
         SYSTEM_MESSAGE,

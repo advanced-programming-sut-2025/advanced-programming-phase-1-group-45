@@ -137,7 +137,7 @@ public class Main extends Game {
 
     private void initializeNetworkClient() {
         gameClient = new GameClient(SERVER_ADDRESS, SERVER_PORT);
-        gameClient.connect();
+//        gameClient.connect();
         gameClient.addNetworkListener(new NetworkEventListener() {
             @Override
             public void handleNetworkEvent(NetworkEvent event) {
@@ -163,14 +163,14 @@ public class Main extends Game {
         });
     }
 
-    public void authenticate(String username, String password) {
-        gameClient.authenticate(username, password);
+    public void authenticate(String username, String password, String securityQuestion) {
+        gameClient.authenticate(username, password, securityQuestion);
     }
 
     private void handleAuthSuccess() {
-        Gdx.app.postRunnable(() -> {
-            switchToGameScreen();
-        });
+//        Gdx.app.postRunnable(() -> {
+//            switchToGameScreen();
+//        });
     }
 
     public static Main getMain() {
@@ -205,3 +205,4 @@ public class Main extends Game {
         return gameClient;
     }
 }
+
