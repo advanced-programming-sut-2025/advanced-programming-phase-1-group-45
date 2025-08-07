@@ -17,7 +17,10 @@ public class MainMenuController {
         view.getProfileButton().addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Placeholder: Switch to profile screen
+                com.proj.Model.Character newCharacter = new com.proj.Model.Character();
+                AvatarCreationController controller = new AvatarCreationController(newCharacter);
+
+                Main.getMain().setScreen(new AvatarCreationView(controller, newCharacter, skin));
                 System.out.println("Profile button clicked");
             }
         });
@@ -27,7 +30,8 @@ public class MainMenuController {
         view.getNewGameButton().addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Main.getMain().switchToGameScreen();// kar nemikoneeeee
+                //Main.getMain().switchToGameScreen();// kar nemikoneeeee
+                Main.getMain().setScreen(new ChangeInfoMenuView(new ChangeInfoController(), skin));
             }
         });
     }
