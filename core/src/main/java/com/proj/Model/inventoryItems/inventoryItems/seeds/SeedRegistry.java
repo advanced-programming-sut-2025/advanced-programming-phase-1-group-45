@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.proj.Model.inventoryItems.seeds.SeedData;
-import com.proj.map.Season;
+import com.proj.Map.Season;
 
 public class SeedRegistry {
     private static SeedRegistry instance;

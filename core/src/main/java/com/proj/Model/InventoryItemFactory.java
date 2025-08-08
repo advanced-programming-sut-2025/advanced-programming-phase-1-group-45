@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.proj.Model.Inventory.*;
 import com.proj.Model.inventoryItems.FruitItem;
 import com.proj.Model.inventoryItems.ResourceItem;
-import com.proj.map.Season;
+import com.proj.Map.Season;
 
 import java.util.HashMap;
 import java.util.Map;

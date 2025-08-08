@@ -5,7 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.proj.Model.inventoryItems.crops.CropData;
-import com.proj.map.Season;
+import com.proj.Map.Season;
 
 public class CropRegistry {
     private static CropRegistry instance;

@@ -10,7 +10,7 @@ import com.proj.Control.SignupMenuController;
 import com.proj.Model.GameAssetManager;
 import com.proj.View.SignupMenuView;
 import com.proj.View.EntranceScreen;
-import com.proj.map.farmName;
+import com.proj.Map.farmName;
 import com.proj.network.event.NetworkEvent;
 import com.proj.network.client.GameClient;
 import com.proj.network.client.NetworkEventListener;

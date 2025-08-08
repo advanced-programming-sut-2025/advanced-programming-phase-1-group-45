@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.proj.Control.AvatarCreationController;
 import com.proj.Model.Character;
-import com.proj.map.farmName;
+import com.proj.Map.farmName;
 
 public class AvatarCreationView implements Screen {
     private Stage stage;

@@ -2,7 +2,7 @@ package com.proj.Model.mapObjects;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.proj.Model.Inventory.InventoryItem;
-import com.proj.map.LandObject;
+import com.proj.Map.LandObject;
 
 import java.awt.*;
 
