@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import java.util.List;
+
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
@@ -84,23 +86,23 @@ public class CookingScreen implements Screen {
 
     private void updateRecipeDisplay(Table recipesTable) {
         recipesTable.clear();
-        Array<CookingRecipe> recipes = new Array<>((Array) cookingManager.getAvailableRecipes());
 
-        if (recipes.size == 0) {
-            recipesTable.add(new Label("No recipes available.", skin)).
-// CookingScreen.java (continued)
-    row();
+        List<CookingRecipe> recipesList = cookingManager.getAvailableRecipes();
+
+        if (recipesList.isEmpty()) {
+            recipesTable.add(new Label("No recipes available.", skin)).row();
             return;
         }
 
         float iconSize = 64;
 
-        for (CookingRecipe recipe : recipes) {
+        for (CookingRecipe recipe : recipesList) {
             Table recipeEntry = new Table(skin);
-            recipeEntry.setBackground("default-round");
+            // حذف تنظیم پس‌زمینه
             recipeEntry.pad(10);
 
-            Label recipeNameLabel = new Label(recipe.getRecipeName(), skin, "default-font", "white");
+            // استفاده از سازنده ساده‌تر Label
+            Label recipeNameLabel = new Label(recipe.getRecipeName(), skin);
             if (!recipe.isLearned()) {
                 recipeNameLabel.setColor(Color.GRAY);
                 recipeNameLabel.setText(recipe.getRecipeName() + " (Locked)");
@@ -189,6 +191,7 @@ public class CookingScreen implements Screen {
             recipesTable.add(recipeEntry).expandX().fillX().padBottom(15).row();
         }
     }
+
 
     @Override
     public void show() {

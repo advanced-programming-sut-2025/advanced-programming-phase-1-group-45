@@ -20,11 +20,11 @@ import com.proj.Model.inventoryItems.SeedInventoryWindow;
 import com.proj.Model.inventoryItems.crops.CropInventoryWindow;
 import com.proj.Model.inventoryItems.seeds.ItemRegistry;
 import com.proj.Player;
-import com.proj.map.FarmInOutPoint;
-import com.proj.map.GameMap;
-import com.proj.map.Season;
+import com.proj.Map.FarmInOutPoint;
+import com.proj.Map.GameMap;
+import com.proj.Map.Season;
 import com.proj.GameScreen;
-import com.proj.map.farmName;
+import com.proj.Map.farmName;
 
 import java.awt.*;
 import java.util.ArrayList;

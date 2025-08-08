@@ -6,7 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.InventoryItemFactory;
 import com.proj.Model.inventoryItems.seeds.ItemRegistry;
-import com.proj.map.Season;
+import com.proj.Map.Season;
 
 import java.awt.*;
 

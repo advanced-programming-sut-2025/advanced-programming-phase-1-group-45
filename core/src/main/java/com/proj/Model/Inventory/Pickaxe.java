@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.proj.Control.WorldController;
 import com.proj.Model.inventoryItems.ResourceItem;
 import com.proj.Model.inventoryItems.crops.Crop;
-import com.proj.map.GameMap;
-import com.proj.map.Tile;
-import com.proj.map.TileType;
+import com.proj.Map.GameMap;
+import com.proj.Map.Tile;
+import com.proj.Map.TileType;
 
 import java.awt.*;
 

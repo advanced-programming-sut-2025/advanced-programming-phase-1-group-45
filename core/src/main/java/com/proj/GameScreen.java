@@ -4,9 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
@@ -28,10 +27,9 @@ import com.proj.Model.Inventory.PlayerBag;
 import com.proj.Model.Inventory.Tool;
 import com.proj.Model.TimeAndWeather.time.Time;
 import com.proj.Model.mapObjects.NPCObject;
-import com.proj.map.farmName;
+import com.proj.Map.farmName;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.Color;
 import com.proj.Model.EnergyBar;
 
 import java.util.ArrayList;
@@ -91,6 +89,13 @@ public class GameScreen implements Screen {
 
     public Refrigerator refrigerator;
     public CookingManager cookingManager;
+
+    private boolean showRefrigeratorUI = false;
+    private int selectedPlayerSlot = -1;
+    private int selectedRefrigeratorSlot = -1;
+    private String transferMessage = "";
+    private float messageTimer = 0;
+
 
 
     public GameScreen(farmName farm) {
@@ -343,6 +348,16 @@ public class GameScreen implements Screen {
 
             uistageViewport.apply();
             uistage.act(delta);
+            // رندر کردن رابط کاربری یخچال
+            if (showRefrigeratorUI) {
+                renderRefrigeratorUI();
+            }
+
+// کاهش تایمر پیام
+            if (messageTimer > 0) {
+                messageTimer -= delta;
+            }
+
             uistage.draw();
 
             if (animalBuildingController == null ||
@@ -657,15 +672,123 @@ public class GameScreen implements Screen {
             }
 
 
+            // باز/بسته کردن رابط کاربری یخچال
             if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
-                StorageScreen storageScreen = new StorageScreen(
-                    (Main)Gdx.app.getApplicationListener(),
-                    GameAssetManager.getGameAssetManager().getSkin(),
-                    player
-                );
-                ((Main)Gdx.app.getApplicationListener()).setScreen(storageScreen);
-                Gdx.app.log("GameScreen", "Opening storage screen.");
+                showRefrigeratorUI = !showRefrigeratorUI;
+                selectedPlayerSlot = -1;
+                selectedRefrigeratorSlot = -1;
+                if (showRefrigeratorUI) {
+                    Gdx.app.log("GameScreen", "Refrigerator UI opened");
+                } else {
+                    Gdx.app.log("GameScreen", "Refrigerator UI closed");
+                }
             }
+
+// اگر رابط کاربری یخچال باز است
+            if (showRefrigeratorUI) {
+                // انتخاب آیتم با کلیک موس
+                if (Gdx.input.justTouched()) {
+                    int mouseX = Gdx.input.getX();
+                    int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+                    // بررسی کلیک در موجودی کوله
+                    if (mouseY > Gdx.graphics.getHeight() / 2) {
+                        int itemsPerRow = 5;
+                        int itemWidth = 200;
+                        int itemHeight = 40;
+                        int startX = 20;
+                        int startY = Gdx.graphics.getHeight() - 100;
+
+                        int col = (mouseX - startX) / itemWidth;
+                        int row = (startY - mouseY) / itemHeight;
+
+                        if (col >= 0 && col < itemsPerRow && row >= 0) {
+                            int slot = row * itemsPerRow + col;
+                            if (slot < inventoryManager.getPlayerInventory().getCapacity() &&
+                                inventoryManager.getPlayerInventory().getItem(slot) != null) {
+                                selectedPlayerSlot = slot;
+                                selectedRefrigeratorSlot = -1;
+                            }
+                        }
+                    }
+                    // بررسی کلیک در موجودی یخچال
+                    else {
+                        int itemsPerRow = 5;
+                        int itemWidth = 200;
+                        int itemHeight = 40;
+                        int startX = 20;
+                        int startY = Gdx.graphics.getHeight() / 2 - 40;
+
+                        int col = (mouseX - startX) / itemWidth;
+                        int row = (startY - mouseY) / itemHeight;
+
+                        if (col >= 0 && col < itemsPerRow && row >= 0) {
+                            int slot = row * itemsPerRow + col;
+                            if (slot < refrigerator.getInventory().getCapacity() &&
+                                refrigerator.getInventory().getItem(slot) != null) {
+                                selectedRefrigeratorSlot = slot;
+                                selectedPlayerSlot = -1;
+                            }
+                        }
+                    }
+                }
+
+                // انتقال آیتم از کوله به یخچال
+                if (Gdx.input.isKeyJustPressed(Input.Keys.T) && selectedPlayerSlot != -1) {
+                    InventoryItem selectedItem = inventoryManager.getPlayerInventory().getItem(selectedPlayerSlot);
+                    if (selectedItem != null) {
+                        InventoryItem transferItem = new InventoryItem(selectedItem.getId(), selectedItem.getName(),
+                            selectedItem.getTexture(), selectedItem.isStackable(), selectedItem.getMaxStackSize()) {
+                            @Override
+                            public void use() {}
+                        };
+                        transferItem.setQuantity(1);
+
+                        if (refrigerator.getInventory().addItem(transferItem)) {
+                            selectedItem.decreaseQuantity(1);
+                            if (selectedItem.getQuantity() <= 0) {
+                                inventoryManager.getPlayerInventory().removeItem(selectedPlayerSlot);
+                            }
+                            transferMessage = "Transferred " + transferItem.getName() + " to refrigerator";
+                            messageTimer = 3.0f;
+                        } else {
+                            transferMessage = "Refrigerator is full";
+                            messageTimer = 3.0f;
+                        }
+                    }
+                }
+
+                // انتقال آیتم از یخچال به کوله
+                if (Gdx.input.isKeyJustPressed(Input.Keys.F) && selectedRefrigeratorSlot != -1) {
+                    InventoryItem selectedItem = refrigerator.getInventory().getItem(selectedRefrigeratorSlot);
+                    if (selectedItem != null) {
+                        InventoryItem transferItem = new InventoryItem(selectedItem.getId(), selectedItem.getName(),
+                            selectedItem.getTexture(), selectedItem.isStackable(), selectedItem.getMaxStackSize()) {
+                            @Override
+                            public void use() {}
+                        };
+                        transferItem.setQuantity(1);
+
+                        if (inventoryManager.getPlayerInventory().addItem(transferItem)) {
+                            selectedItem.decreaseQuantity(1);
+                            if (selectedItem.getQuantity() <= 0) {
+                                refrigerator.getInventory().removeItem(selectedRefrigeratorSlot);
+                            }
+                            transferMessage = "Transferred " + transferItem.getName() + " to player inventory";
+                            messageTimer = 3.0f;
+                        } else {
+                            transferMessage = "Inventory is full";
+                            messageTimer = 3.0f;
+                        }
+                    }
+                }
+
+                // جلوگیری از پردازش سایر ورودی‌ها وقتی رابط کاربری یخچال باز است
+                return;
+            }
+
+
+
 
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
@@ -797,6 +920,115 @@ public class GameScreen implements Screen {
         inventoryManager.getPlayerInventory().addItem(new FoodItem("Pizza", "Pizza", 150, null, 0));
         inventoryManager.getPlayerInventory().addItem(new FoodItem("TripleShotEspresso", "Triple Shot Espresso", 200, "Max Energy +100", 5));
     }
+
+    private void renderRefrigeratorUI() {
+        if (!showRefrigeratorUI) return;
+
+        worldController.getSpriteBatch().begin();
+        worldController.getSpriteBatch().setProjectionMatrix(hudCamera.combined);
+
+        // رسم پس‌زمینه نیمه‌شفاف
+        Texture whitePixel = new Texture(1, 1, Pixmap.Format.RGBA8888);
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(0, 0, 0, 0.7f);
+        pixmap.fill();
+        whitePixel.draw(pixmap, 0, 0);
+        pixmap.dispose();
+
+        worldController.getSpriteBatch().draw(whitePixel, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        whitePixel.dispose();
+
+        // رسم عنوان
+        font.draw(worldController.getSpriteBatch(), "Refrigerator Contents", 20, Gdx.graphics.getHeight() - 20);
+        font.draw(worldController.getSpriteBatch(), "Press R to close", Gdx.graphics.getWidth() - 150, Gdx.graphics.getHeight() - 20);
+
+        // رسم خط جدا کننده
+        worldController.getSpriteBatch().setColor(1, 1, 1, 0.5f);
+        worldController.getSpriteBatch().draw(whitePixel, 20, Gdx.graphics.getHeight() - 40, Gdx.graphics.getWidth() - 40, 2);
+        worldController.getSpriteBatch().setColor(1, 1, 1, 1);
+
+        // رسم موجودی کوله
+        font.draw(worldController.getSpriteBatch(), "Player Inventory:", 20, Gdx.graphics.getHeight() - 60);
+        int x = 20;
+        int y = Gdx.graphics.getHeight() - 100;
+        int itemsPerRow = 5;
+        int count = 0;
+
+        for (int i = 0; i < inventoryManager.getPlayerInventory().getCapacity(); i++) {
+            InventoryItem item = inventoryManager.getPlayerInventory().getItem(i);
+            if (item != null) {
+                // رسم آیتم
+                if (item.getTexture() != null) {
+                    worldController.getSpriteBatch().draw(item.getTexture(), x, y, 32, 32);
+                }
+
+                // رسم نام و تعداد
+                font.draw(worldController.getSpriteBatch(), item.getName() + " x" + item.getQuantity(), x + 40, y + 16);
+
+                // رسم کادر انتخاب
+                if (i == selectedPlayerSlot) {
+                    worldController.getSpriteBatch().setColor(1, 1, 0, 0.5f);
+                    worldController.getSpriteBatch().draw(whitePixel, x - 2, y - 2, 36, 36);
+                    worldController.getSpriteBatch().setColor(1, 1, 1, 1);
+                }
+
+                count++;
+                if (count % itemsPerRow == 0) {
+                    y -= 40;
+                    x = 20;
+                } else {
+                    x += 200;
+                }
+            }
+        }
+
+        // رسم موجودی یخچال
+        font.draw(worldController.getSpriteBatch(), "Refrigerator Contents:", 20, Gdx.graphics.getHeight() / 2);
+        x = 20;
+        y = Gdx.graphics.getHeight() / 2 - 40;
+        count = 0;
+
+        for (int i = 0; i < refrigerator.getInventory().getCapacity(); i++) {
+            InventoryItem item = refrigerator.getInventory().getItem(i);
+            if (item != null) {
+                // رسم آیتم
+                if (item.getTexture() != null) {
+                    worldController.getSpriteBatch().draw(item.getTexture(), x, y, 32, 32);
+                }
+
+                // رسم نام و تعداد
+                font.draw(worldController.getSpriteBatch(), item.getName() + " x" + item.getQuantity(), x + 40, y + 16);
+
+                // رسم کادر انتخاب
+                if (i == selectedRefrigeratorSlot) {
+                    worldController.getSpriteBatch().setColor(1, 1, 0, 0.5f);
+                    worldController.getSpriteBatch().draw(whitePixel, x - 2, y - 2, 36, 36);
+                    worldController.getSpriteBatch().setColor(1, 1, 1, 1);
+                }
+
+                count++;
+                if (count % itemsPerRow == 0) {
+                    y -= 40;
+                    x = 20;
+                } else {
+                    x += 200;
+                }
+            }
+        }
+
+        // رسم راهنما
+        font.draw(worldController.getSpriteBatch(), "Click on items to select them", 20, 60);
+        font.draw(worldController.getSpriteBatch(), "Press T to transfer from player to refrigerator", 20, 40);
+        font.draw(worldController.getSpriteBatch(), "Press F to transfer from refrigerator to player", 20, 20);
+
+        // رسم پیام انتقال
+        if (messageTimer > 0) {
+            font.draw(worldController.getSpriteBatch(), transferMessage, Gdx.graphics.getWidth() / 2 - 100, 80);
+        }
+
+        worldController.getSpriteBatch().end();
+    }
+
 
 
 
