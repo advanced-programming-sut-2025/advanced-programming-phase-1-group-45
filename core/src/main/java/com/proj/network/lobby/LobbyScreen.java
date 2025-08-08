@@ -43,6 +43,8 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
     private boolean isAdmin = false;
     private Map<String, LobbyInfo> lobbiesMap = new HashMap<>();
 
+
+
     public LobbyScreen(Main game) {
         this.game = game;
         this.gameClient = game.getGameClient();
@@ -139,9 +141,9 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
             @Override
             protected void result(Object object) {
                 if ((Boolean) object) {
-                    String name = ((TextField)getContentTable().findActor("name")).getText();
-                    boolean isPrivate = ((CheckBox)getContentTable().findActor("private")).isChecked();
-                    String password = ((TextField)getContentTable().findActor("password")).getText();
+                    String name = ((TextField) getContentTable().findActor("name")).getText();
+                    boolean isPrivate = ((CheckBox) getContentTable().findActor("private")).isChecked();
+                    String password = ((TextField) getContentTable().findActor("password")).getText();
                     int maxPlayers = 4;
 
                     if (isPrivate && password.isEmpty()) {
@@ -281,29 +283,29 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
 
     @Override
     public void handleLobbyEvent(LobbyEvent event) {
-        Gdx.app.postRunnable(() -> {
-            switch (event.getType()) {
-                case LOBBY_CREATED:
-                    handleLobbyCreated(event.getLobbyData());
-                    break;
+        switch (event.getType()) {
+            case LOBBY_CREATED:
+                System.out.println("LobbyScreen : Lobby created");
+                handleLobbyCreated(event.getLobbyData());
+                break;
 
-                case JOIN_SUCCESS:
-                    handleJoinSuccess(event.getLobbyData());
-                    break;
+            case JOIN_SUCCESS:
+                handleJoinSuccess(event.getLobbyData());
+                break;
 
-                case LEFT:
-                    handleLeaveLobby();
-                    break;
+            case LEFT:
+                handleLeaveLobby();
+                break;
 
-                case GAME_STARTED:
-                    game.switchToGameScreen();
-                    break;
+            case GAME_STARTED:
+                game.switchToGameScreen();
+                break;
 
-                case ERROR:
-                    showError(event.getLobbyData());
-                    break;
-            }
-        });
+            case ERROR:
+                showError(event.getLobbyData());
+                break;
+        }
+
     }
 
     private void handleLeaveLobby() {
@@ -410,6 +412,8 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
 
             currentLobbyId = lobby.getId();
             isAdmin = true;
+
+            refreshLobbyList();
             updateCurrentLobbyInfo();
             refreshLobbyListUI();
         } catch (JSONException e) {
@@ -454,16 +458,20 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
     }
 
     @Override
-    public void show() {}
+    public void show() {
+    }
 
     @Override
-    public void pause() {}
+    public void pause() {
+    }
 
     @Override
-    public void resume() {}
+    public void resume() {
+    }
 
     @Override
-    public void hide() {}
+    public void hide() {
+    }
 
     @Override
     public void dispose() {
@@ -488,28 +496,68 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         private List<String> players = new ArrayList<>();
 
         // Getters and Setters
-        public String getId() { return id; }
-        public void setId(String id) { this.id = id; }
+        public String getId() {
+            return id;
+        }
 
-        public String getName() { return name; }
-        public void setName(String name) { this.name = name; }
+        public void setId(String id) {
+            this.id = id;
+        }
 
-        public String getOwner() { return owner; }
-        public void setOwner(String owner) { this.owner = owner; }
+        public String getName() {
+            return name;
+        }
 
-        public int getPlayerCount() { return playerCount; }
-        public void setPlayerCount(int playerCount) { this.playerCount = playerCount; }
+        public void setName(String name) {
+            this.name = name;
+        }
 
-        public int getMaxPlayers() { return maxPlayers; }
-        public void setMaxPlayers(int maxPlayers) { this.maxPlayers = maxPlayers; }
+        public String getOwner() {
+            return owner;
+        }
 
-        public boolean isPrivate() { return isPrivate; }
-        public void setPrivate(boolean isPrivate) { this.isPrivate = isPrivate; }
+        public void setOwner(String owner) {
+            this.owner = owner;
+        }
 
-        public boolean isGameActive() { return isGameActive; }
-        public void setGameActive(boolean isGameActive) { this.isGameActive = isGameActive; }
+        public int getPlayerCount() {
+            return playerCount;
+        }
 
-        public List<String> getPlayers() { return players; }
-        public void setPlayers(List<String> players) { this.players = players; }
+        public void setPlayerCount(int playerCount) {
+            this.playerCount = playerCount;
+        }
+
+        public int getMaxPlayers() {
+            return maxPlayers;
+        }
+
+        public void setMaxPlayers(int maxPlayers) {
+            this.maxPlayers = maxPlayers;
+        }
+
+        public boolean isPrivate() {
+            return isPrivate;
+        }
+
+        public void setPrivate(boolean isPrivate) {
+            this.isPrivate = isPrivate;
+        }
+
+        public boolean isGameActive() {
+            return isGameActive;
+        }
+
+        public void setGameActive(boolean isGameActive) {
+            this.isGameActive = isGameActive;
+        }
+
+        public List<String> getPlayers() {
+            return players;
+        }
+
+        public void setPlayers(List<String> players) {
+            this.players = players;
+        }
     }
 }

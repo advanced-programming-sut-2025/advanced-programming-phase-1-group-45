@@ -65,6 +65,7 @@ public class GameClient implements Disposable, Runnable {
     public void addLobbyListener(LobbyEventListener listener) {
         lobbyListeners.add(listener);
     }
+
     public void addLobbyListListener(LobbyListListener listener) {
         lobbyListListeners.add(listener);
     }
@@ -116,6 +117,7 @@ public class GameClient implements Disposable, Runnable {
                     break;
 
                 case "LOBBY_CREATED":
+                    System.err.println("GameClient lobby has been created");
                     handleLobbyCreated(data);
                     break;
 
@@ -349,10 +351,8 @@ public class GameClient implements Disposable, Runnable {
 
     private void fireLobbyEvent(LobbyEvent.Type type, JSONObject data) {
         LobbyEvent event = new LobbyEvent(type, data.toString());
-        for (NetworkEventListener listener : listeners) {
-            if (listener instanceof LobbyEventListener) {
-                ((LobbyEventListener) listener).handleLobbyEvent(event);
-            }
+        for (LobbyEventListener listener : lobbyListeners) {
+            (listener).handleLobbyEvent(event);
         }
     }
 
