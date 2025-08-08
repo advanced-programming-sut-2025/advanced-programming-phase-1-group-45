@@ -7,6 +7,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.proj.Control.SignupMenuController;
+import com.proj.Model.Cooking.Refrigerator;
 import com.proj.Model.GameAssetManager;
 import com.proj.View.SignupMenuView;
 import com.proj.View.EntranceScreen;
@@ -54,7 +55,7 @@ public class Main extends Game {
         batch = new SpriteBatch();
         menuBackground = new Texture(Gdx.files.internal("menu_bg.png"));
         dbHelper = new DatabaseHelper();
-        dbHelper.connect(); 
+        dbHelper.connect();
         Session.initialize(dbHelper);
 
         //showAuthScreen();
