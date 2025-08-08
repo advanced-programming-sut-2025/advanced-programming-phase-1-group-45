@@ -11,6 +11,9 @@ public class User {
     private int avatar;
     private String nickname;  
     private static final Map<String, User> users = new HashMap<>();
+    private String email;
+    private String gender;
+    private int id;
 
     public String getUsername() {
         return username;
@@ -124,4 +127,21 @@ public class User {
     public static User getUser(String username) {
         return users.get(username);
     }
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 }
