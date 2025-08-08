@@ -2,6 +2,7 @@ package com.proj.Control;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.proj.Main;
 import com.proj.Model.GameAssetManager;
@@ -11,9 +12,11 @@ import com.proj.View.MainMenuView;
 
 public class MainMenuController {
     private MainMenuView view;
+    private Skin skin;
 
     public void setView(MainMenuView view) {
         this.view = view;
+        this.skin = GameAssetManager.getGameAssetManager().getSkin();
     }
 
     public void handleProfileButton() {
@@ -23,7 +26,7 @@ public class MainMenuController {
                 com.proj.Model.Character newCharacter = new com.proj.Model.Character();
                 AvatarCreationController controller = new AvatarCreationController(newCharacter);
 
-                Main.getMain().setScreen(new AvatarCreationView(controller, newCharacter, GameAssetManager.getGameAssetManager().getSkin()));
+                Main.getMain().setScreen(new AvatarCreationView(controller, newCharacter, skin));
                 System.out.println("Profile button clicked");
             }
         });
@@ -33,8 +36,10 @@ public class MainMenuController {
         view.getNewGameButton().addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                //Main.getMain().switchToGameScreen();// kar nemikoneeeee
-                Main.getMain().setScreen(new ChangeInfoMenuView(new ChangeInfoController(), GameAssetManager.getGameAssetManager().getSkin()));
+                Main.getMain().setScreen(new ChangeInfoMenuView(
+                    new ChangeInfoController(), // Controller will use Session.getDatabaseHelper()
+                    skin
+                ));
             }
         });
     }
@@ -43,7 +48,6 @@ public class MainMenuController {
         view.getLoadGameButton().addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Placeholder: Load game logic
                 System.out.println("Load last game clicked");
             }
         });
