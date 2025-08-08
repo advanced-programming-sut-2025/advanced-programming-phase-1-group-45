@@ -3,7 +3,7 @@ package com.proj.Model.TimeAndWeather.time;
 import com.badlogic.gdx.math.MathUtils;
 import com.proj.Model.TimeAndWeather.DayOfWeek;
 import com.proj.Model.TimeAndWeather.Weather;
-import com.proj.Map.Season;
+import com.proj.map.Season;
 
 public class Time {
     private int day;

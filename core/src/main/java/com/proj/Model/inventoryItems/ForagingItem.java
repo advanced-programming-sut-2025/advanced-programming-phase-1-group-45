@@ -2,8 +2,8 @@ package com.proj.Model.inventoryItems;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.proj.Model.Inventory.InventoryItem;
-import com.proj.Map.LandObject;
-import com.proj.Map.Season;
+import com.proj.map.LandObject;
+import com.proj.map.Season;
 
 import java.awt.*;
 import java.util.Arrays;

@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.proj.Model.Inventory.InventoryItem;
-import com.proj.Map.GameMap;
-import com.proj.Map.Season;
+import com.proj.map.GameMap;
+import com.proj.map.Season;
 
 public class TreeManager {
     private final Array<Tree> trees = new Array<>();

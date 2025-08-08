@@ -5,8 +5,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.proj.Map.GameMap;
-import com.proj.Map.Season;
+import com.proj.map.GameMap;
+import com.proj.map.Season;
 import com.proj.Model.Inventory.InventoryItem;
 
 import java.awt.*;

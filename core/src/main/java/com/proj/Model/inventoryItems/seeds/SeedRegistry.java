@@ -5,7 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.proj.Map.Season;
+import com.proj.map.Season;
 
 public class SeedRegistry {
     private static SeedRegistry instance;

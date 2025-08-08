@@ -7,8 +7,8 @@ import com.proj.Model.inventoryItems.crops.CropManager;
 import com.proj.Model.inventoryItems.seeds.SeedSelectionListener;
 import com.proj.Model.inventoryItems.trees.TreeManager;
 import com.proj.PlayerDirection;
-import com.proj.Map.GameMap;
-import com.proj.Map.Season;
+import com.proj.map.GameMap;
+import com.proj.map.Season;
 
 public class FarmingController implements SeedSelectionListener {
     private GameMap gameMap;
