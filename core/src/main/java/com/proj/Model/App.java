@@ -20,4 +20,7 @@ public class App {
         }
         return null;
     }
+    public static List<User> getUsers() {
+        return users;
+    }
 }
