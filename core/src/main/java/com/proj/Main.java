@@ -14,6 +14,7 @@ import com.proj.map.farmName;
 import com.proj.network.event.NetworkEvent;
 import com.proj.network.client.GameClient;
 import com.proj.network.client.NetworkEventListener;
+import com.proj.Database.DatabaseHelper;
 
 
 /**
@@ -31,6 +32,7 @@ public class Main extends Game {
 
     private static final String SERVER_ADDRESS = "127.0.0.1";
     private static final int SERVER_PORT = 8080;
+    private DatabaseHelper dbHelper;
 
     /*@Override
     public void create() {
@@ -49,6 +51,9 @@ public class Main extends Game {
         main = this;
         batch = new SpriteBatch();
         menuBackground = new Texture(Gdx.files.internal("menu_bg.png"));
+        dbHelper = new DatabaseHelper();
+        dbHelper.connect(); 
+        Session.initialize(dbHelper);
 
         //showAuthScreen();
         //setScreen(new GameScreen());
