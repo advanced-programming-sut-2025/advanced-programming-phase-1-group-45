@@ -98,7 +98,9 @@ public class ClientHandler implements Runnable {
                 return false;
             }
 
-            boolean authenticated = server.getDatabaseHelper().addUser(username, password, securityQuestion);
+           // boolean authenticated = server.getDatabaseHelper().addUser(username, password, securityQuestion);
+              boolean authenticated = server.getDatabaseHelper().verifyUser(username, password);
+
 
             if (authenticated) {
                 // Handle existing connections
