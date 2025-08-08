@@ -4,6 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.proj.Main;
+import com.proj.Model.GameAssetManager;
+import com.proj.View.AvatarCreationView;
+import com.proj.View.ChangeInfoMenuView;
 import com.proj.View.MainMenuView;
 
 public class MainMenuController {
@@ -20,7 +23,7 @@ public class MainMenuController {
                 com.proj.Model.Character newCharacter = new com.proj.Model.Character();
                 AvatarCreationController controller = new AvatarCreationController(newCharacter);
 
-                Main.getMain().setScreen(new AvatarCreationView(controller, newCharacter, skin));
+                Main.getMain().setScreen(new AvatarCreationView(controller, newCharacter, GameAssetManager.getGameAssetManager().getSkin()));
                 System.out.println("Profile button clicked");
             }
         });
@@ -31,7 +34,7 @@ public class MainMenuController {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 //Main.getMain().switchToGameScreen();// kar nemikoneeeee
-                Main.getMain().setScreen(new ChangeInfoMenuView(new ChangeInfoController(), skin));
+                Main.getMain().setScreen(new ChangeInfoMenuView(new ChangeInfoController(), GameAssetManager.getGameAssetManager().getSkin()));
             }
         });
     }
