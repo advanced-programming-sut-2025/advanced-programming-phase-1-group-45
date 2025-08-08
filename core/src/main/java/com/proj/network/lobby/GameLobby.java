@@ -1,17 +1,23 @@
-package com.proj.network;
+package com.proj.network.lobby;
 
+import com.proj.network.ClientHandler;
+import com.proj.network.GameInstance;
+import com.proj.network.GameServer;
+import com.proj.network.PlayerGameState;
+import com.proj.network.message.JsonBuilder;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameLobby {
-    private  String id;
-    private  String name;
+    private String id;
+    private String name;
     private String owner;
-    private  int maxPlayers;
-    private  boolean isPrivate;
-    private  boolean isVisible;
+    private int maxPlayers;
+    private boolean isPrivate;
+    private boolean isVisible;
     private String password;
     private boolean gameActive = false;
     private long creationTime;
@@ -21,9 +27,11 @@ public class GameLobby {
     private final Map<String, PlayerGameState> playerStates = new ConcurrentHashMap<>();
 
     private GameInstance gameInstance;
-    private  GameServer server;
+    private GameServer server;
 
-    public GameLobby() {}
+    public GameLobby() {
+    }
+
     public GameLobby(String id, String name, String owner, int maxPlayers, boolean isPrivate, boolean isVisible, GameServer server) {
         this.id = id;
         this.name = name;
@@ -57,7 +65,7 @@ public class GameLobby {
             playerStates.put(username, state);
 
             // ارسال وضعیت فعلی بازی به بازیکن جدید
-            handler.sendMessage("GAME_STATE", gameInstance.getGameState().toString());
+            handler.sendMessage("GAME_STATE", gameInstance.getGameState());
         }
 
         // اطلاع‌رسانی به همه بازیکنان
@@ -95,7 +103,15 @@ public class GameLobby {
      */
     public void broadcastMessage(String type, String message) {
         for (ClientHandler handler : players.values()) {
-            handler.sendMessage(type, message);
+            handler.sendMessage(type, new JSONObject(message));
+        }
+    }
+
+    public void broadcastRaw(String message) {
+        for (ClientHandler handler : players.values()) {
+            if (!handler.isTimedOut()) {
+                handler.sendRaw(message);
+            }
         }
     }
 
@@ -162,24 +178,16 @@ public class GameLobby {
      * دریافت اطلاعات لابی به صورت JSON
      */
     public JSONObject getLobbyInfo() {
-        JSONObject info = new JSONObject();
-        info.put("id", id);
-        info.put("name", name);
-        info.put("owner", owner);
-        info.put("maxPlayers", maxPlayers);
-        info.put("playerCount", players.size());
-        info.put("isPrivate", isPrivate);
-        info.put("isVisible", isVisible);
-        info.put("isGameActive", gameActive);
-
-        // اضافه کردن لیست بازیکنان
-        JSONObject playersObj = new JSONObject();
-        for (String playerName : players.keySet()) {
-            playersObj.put(playerName, true);
-        }
-        info.put("players", playersObj);
-
-        return info;
+        return new JsonBuilder()
+            .put("id", id)
+            .put("name", name)
+            .put("owner", owner)
+            .put("playerCount", getPlayerCount())
+            .put("maxPlayers", maxPlayers)
+            .put("isPrivate", isPrivate)
+            .put("isGameActive", isGameActive())
+            .put("players", new JSONArray(players.keySet()))
+            .build();
     }
 
     /**
@@ -207,25 +215,81 @@ public class GameLobby {
     }
 
     // Getters and setters
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public String getOwner() { return owner; }
-    public int getMaxPlayers() { return maxPlayers; }
-    public boolean isPrivate() { return isPrivate; }
-    public boolean isVisible() { return isVisible; }
-    public boolean isGameActive() { return gameActive; }
-    public void setGameActive(boolean active) { this.gameActive = active; }
-    public int getPlayerCount() { return players.size(); }
-    public Map<String, ClientHandler> getPlayers() { return players; }
-    public void setPassword(String password) { this.password = password; }
-    public boolean hasPlayer(String username) { return players.containsKey(username); }
-    public boolean isEmpty() { return players.isEmpty(); }
-    public boolean isFull() { return players.size() >= maxPlayers; }
-    public PlayerGameState getPlayerState(String username) { return playerStates.get(username); }
-    public GameInstance getGameInstance() { return gameInstance; }
-    public GameServer getGameServer() { return server; }
-    public long getCreationTime() { return creationTime; }
-    public String getAdminId() { return owner; }
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public boolean isVisible() {
+        return isVisible;
+    }
+
+    public boolean isGameActive() {
+        return gameActive;
+    }
+
+    public void setGameActive(boolean active) {
+        this.gameActive = active;
+    }
+
+    public int getPlayerCount() {
+        return players.size();
+    }
+
+    public Map<String, ClientHandler> getPlayers() {
+        return players;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean hasPlayer(String username) {
+        return players.containsKey(username);
+    }
+
+    public boolean isEmpty() {
+        return players.isEmpty();
+    }
+
+    public boolean isFull() {
+        return players.size() >= maxPlayers;
+    }
+
+    public PlayerGameState getPlayerState(String username) {
+        return playerStates.get(username);
+    }
+
+    public GameInstance getGameInstance() {
+        return gameInstance;
+    }
+
+    public GameServer getGameServer() {
+        return server;
+    }
+
+    public long getCreationTime() {
+        return creationTime;
+    }
+
+    public String getAdminId() {
+        return owner;
+    }
 
     public void setOwner(String owner) {
         this.owner = owner;

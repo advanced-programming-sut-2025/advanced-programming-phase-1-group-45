@@ -5,6 +5,9 @@ import com.badlogic.gdx.utils.Disposable;
 import com.proj.network.event.GameEvent;
 import com.proj.network.event.LobbyEvent;
 import com.proj.network.event.NetworkEvent;
+import com.proj.network.message.*;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -17,7 +20,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameClient implements Disposable, Runnable {
-    private static final long PING_INTERVAL = 15000; // 15 ثانیه
+    private static final long PING_INTERVAL = 15000; // 15 seconds
 
     private final String serverAddress;
     private final int serverPort;
@@ -27,6 +30,8 @@ public class GameClient implements Disposable, Runnable {
     private Thread networkThread;
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final List<NetworkEventListener> listeners = new ArrayList<>();
+    List<LobbyEventListener> lobbyListeners = new ArrayList<>();
+    List<LobbyListListener> lobbyListListeners = new ArrayList<>();
 
     private String username;
     private String currentLobbyId;
@@ -50,11 +55,18 @@ public class GameClient implements Disposable, Runnable {
             networkThread.start();
 
             startPingTask();
-            fireEvent(NetworkEvent.Type.CONNECTED, "connected");
+            fireEvent(NetworkEvent.Type.CONNECTED, "Connected to server");
         } catch (IOException e) {
-            fireEvent(NetworkEvent.Type.ERROR, "connection error: " + e.getMessage());
+            fireEvent(NetworkEvent.Type.ERROR, "Connection error: " + e.getMessage());
             Gdx.app.error("GameClient", "Connection error", e);
         }
+    }
+
+    public void addLobbyListener(LobbyEventListener listener) {
+        lobbyListeners.add(listener);
+    }
+    public void addLobbyListListener(LobbyListListener listener) {
+        lobbyListListeners.add(listener);
     }
 
     @Override
@@ -63,12 +75,11 @@ public class GameClient implements Disposable, Runnable {
             while (running.get()) {
                 String message = in.readLine();
                 if (message == null) break;
-
                 processIncomingMessage(message);
             }
         } catch (IOException e) {
             if (running.get()) {
-                fireEvent(NetworkEvent.Type.ERROR, "network error: " + e.getMessage());
+                fireEvent(NetworkEvent.Type.ERROR, "Network error: " + e.getMessage());
             }
         } finally {
             disconnect();
@@ -77,20 +88,31 @@ public class GameClient implements Disposable, Runnable {
 
     private void processIncomingMessage(String rawMessage) {
         try {
-            JSONObject json = new JSONObject(rawMessage);
-            String type = json.getString("type");
-            String data = json.optString("data", "");
+            // Use the NetworkMessage factory for safe parsing
+            NetworkMessage message = NetworkMessage.parse(rawMessage);
+            dispatchMessage(message);
+        } catch (Exception e) {
+            fireEvent(NetworkEvent.Type.ERROR, "Invalid message format: " + e.getMessage());
+        }
+    }
+
+    private void dispatchMessage(NetworkMessage message) {
+        try {
+            String type = message.getType();
+            JSONObject data = message.getData();
 
             switch (type) {
                 case "AUTH_REQUEST":
-                    fireEvent(NetworkEvent.Type.AUTH_REQUEST, data);
+                    fireEvent(NetworkEvent.Type.AUTH_REQUEST, data.toString());
                     break;
+
                 case "AUTH_SUCCESS":
                     handleAuthSuccess(data);
                     break;
 
                 case "AUTH_FAILED":
-                    fireEvent(NetworkEvent.Type.AUTH_FAILED, data);
+                    fireEvent(NetworkEvent.Type.AUTH_FAILED,
+                        JsonParser.getString(data, "message", "Authentication failed"));
                     break;
 
                 case "LOBBY_CREATED":
@@ -101,8 +123,8 @@ public class GameClient implements Disposable, Runnable {
                     handleJoinLobby(data);
                     break;
 
-                case "LEAVE_SUCCESS" :
-                    handleLeaveLobby(data);
+                case "LEAVE_SUCCESS":
+                    handleLeaveLobby();
                     break;
 
                 case "LOBBIES_LIST":
@@ -122,134 +144,153 @@ public class GameClient implements Disposable, Runnable {
                     break;
 
                 case "SYSTEM":
-                    fireEvent(NetworkEvent.Type.SYSTEM_MESSAGE, data);
+                    fireEvent(NetworkEvent.Type.SYSTEM_MESSAGE,
+                        JsonParser.getString(data, "message", "System message"));
                     break;
 
                 case "PONG":
-                    // پاسخ پینگ
+                    // Ping response - no action needed
+                    break;
+
+                case "ERROR":
+                    handleError(data);
                     break;
 
                 default:
-                    fireEvent(NetworkEvent.Type.UNKNOWN_MESSAGE, rawMessage);
+                    fireEvent(NetworkEvent.Type.UNKNOWN_MESSAGE, message.toString());
                     break;
             }
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "error in processing message: " + e.getMessage());
+            fireEvent(NetworkEvent.Type.ERROR, "Error handling message: " + e.getMessage());
         }
     }
 
-    private void handleAuthSuccess(String data) {
-        authenticated = true;
-        username = data.split(" ")[1]; // "خوش آمدید username"
-        fireEvent(NetworkEvent.Type.AUTH_SUCCESS, "successful" + username);
-    }
-
-    private void handleLobbyCreated(String jsonData) {
+    private void handleAuthSuccess(JSONObject data) {
         try {
-            JSONObject lobbyInfo = new JSONObject(jsonData);
-            currentLobbyId = lobbyInfo.getString("id");
-            fireLobbyEvent(LobbyEvent.Type.LOBBY_CREATED, jsonData);
+            this.username = JsonParser.getString(data, "username", "");
+            if (!username.isEmpty()) {
+                this.authenticated = true;
+                fireEvent(NetworkEvent.Type.AUTH_SUCCESS, "Welcome " + username);
+            } else {
+                fireEvent(NetworkEvent.Type.ERROR, "Authentication succeeded but no username provided");
+            }
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "error in processing lobby: " + e.getMessage());
+            fireEvent(NetworkEvent.Type.ERROR, "Invalid auth success data: " + e.getMessage());
         }
     }
 
-    private void handleLeaveLobby(String jsonData) {
+    private void handleLobbyCreated(JSONObject data) {
         try {
-            JSONObject lobbyInfo = new JSONObject(jsonData);
-            fireLobbyEvent(LobbyEvent.Type.LEFT, null);
+            currentLobbyId = JsonParser.getString(data, "id", "");
+            fireLobbyEvent(LobbyEvent.Type.LOBBY_CREATED, data);
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "error in processing lobby: " + e.getMessage());
+            fireEvent(NetworkEvent.Type.ERROR, "Error processing lobby creation: " + e.getMessage());
         }
     }
 
-    private void handleJoinLobby(String jsonData) {
+    private void handleJoinLobby(JSONObject data) {
         try {
-            JSONObject lobbyInfo = new JSONObject(jsonData);
-            currentLobbyId = lobbyInfo.getString("id");
-            fireLobbyEvent(LobbyEvent.Type.JOIN_SUCCESS, jsonData);
+            currentLobbyId = JsonParser.getString(data, "id", "");
+            fireLobbyEvent(LobbyEvent.Type.JOIN_SUCCESS, data);
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "error in join lobby: " + e.getMessage());
+            fireEvent(NetworkEvent.Type.ERROR, "Error joining lobby: " + e.getMessage());
         }
     }
 
-    private void handlePrivateChat(String jsonData) {
+    private void handleLeaveLobby() {
+        currentLobbyId = null;
+        fireLobbyEvent(LobbyEvent.Type.LEFT, null);
+    }
+
+    private void handlePrivateChat(JSONObject data) {
         try {
-            JSONObject chatData = new JSONObject(jsonData);
-            fireEvent(NetworkEvent.Type.PRIVATE_MESSAGE,
-                chatData.getString("sender") + ": " + chatData.getString("message"));
+            String sender = JsonParser.getString(data, "sender", "Unknown");
+            String message = JsonParser.getString(data, "message", "");
+            fireEvent(NetworkEvent.Type.PRIVATE_MESSAGE, sender + ": " + message);
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "error in processing chat: " + e.getMessage());
+            fireEvent(NetworkEvent.Type.ERROR, "Error processing private chat: " + e.getMessage());
+        }
+    }
+
+    private void handleError(JSONObject data) {
+        try {
+            String code = JsonParser.getString(data, "code", "UNKNOWN_ERROR");
+            String message = JsonParser.getString(data, "message", "An error occurred");
+            fireEvent(NetworkEvent.Type.ERROR, "[" + code + "] " + message);
+        } catch (Exception e) {
+            fireEvent(NetworkEvent.Type.ERROR, "Error processing error message: " + e.getMessage());
         }
     }
 
     public void authenticate(String username, String password, String securityQuestion) {
-        JSONObject authData = new JSONObject();
-        authData.put("username", username);
-        authData.put("password", password);
-        authData.put("securityQuestion", securityQuestion);
-        sendMessage("AUTH", authData.toString());
+        AuthRequest request = new AuthRequest(username, password, securityQuestion);
+        sendMessage("AUTH", request.toJson());
     }
 
     public void startGame(String lobbyId) {
-        JSONObject gameData = new JSONObject();
-        gameData.put("lobbyId", lobbyId);
-        sendMessage("START_GAME", gameData.toString());
+        JSONObject data = JsonBuilder.create()
+            .put("lobbyId", lobbyId)
+            .build();
+        sendMessage("START_GAME", data);
     }
 
-    public void createLobby(String name, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
-        JSONObject lobbyData = new JSONObject();
-        lobbyData.put("name", name);
-        lobbyData.put("password", password);
-        lobbyData.put("maxPlayers", maxPlayers);
-        lobbyData.put("isPrivate", isPrivate);
-        lobbyData.put("isVisible", isVisible);
-        System.err.println("GAme Client " +  "Creating a new lobby: " + lobbyData.toString());
-        sendMessage("CREATE_LOBBY", lobbyData.toString());
+    public void createLobby(String name, String password, int maxPlayers,
+                            boolean isPrivate, boolean isVisible) {
+        JSONObject data = JsonBuilder.create()
+            .put("name", name)
+            .put("password", password)
+            .put("maxPlayers", maxPlayers)
+            .put("isPrivate", isPrivate)
+            .put("isVisible", isVisible)
+            .build();
+
+        sendMessage("CREATE_LOBBY", data);
     }
 
     public void joinLobby(String lobbyId, String password) {
-        JSONObject joinData = new JSONObject();
-        joinData.put("lobbyId", lobbyId);
-        joinData.put("password", password);
-        sendMessage("JOIN_LOBBY", joinData.toString());
+        JSONObject data = JsonBuilder.create()
+            .put("lobbyId", lobbyId)
+            .put("password", password)
+            .build();
+
+        sendMessage("JOIN_LOBBY", data);
     }
 
     public void leaveLobby() {
-        sendMessage("LEAVE_LOBBY", "");
-        currentLobbyId = null;
+        sendMessage("LEAVE_LOBBY", JsonBuilder.empty());
     }
 
     public void sendChatMessage(String message, boolean isPrivate, String recipient) {
-        JSONObject chatData = new JSONObject();
-        chatData.put("message", message);
-        if (isPrivate && recipient != null) {
-            chatData.put("recipient", recipient);
-        }
-        sendMessage("CHAT", chatData.toString());
+        JSONObject data = JsonBuilder.create()
+            .put("message", message)
+            .putIf(isPrivate && recipient != null, "recipient", recipient)
+            .build();
+
+        sendMessage("CHAT", data);
     }
 
     public void requestLobbiesList() {
-        sendMessage("GET_LOBBIES", "");
+        sendMessage("GET_LOBBIES", JsonBuilder.empty());
     }
 
     public void sendGameAction(String actionType, JSONObject actionData) {
-        JSONObject gameAction = new JSONObject();
-        gameAction.put("action", actionType);
-        gameAction.put("data", actionData);
-        sendMessage("GAME_ACTION", gameAction.toString());
+        JSONObject data = JsonBuilder.create()
+            .put("action", actionType)
+            .put("data", actionData)
+            .build();
+
+        sendMessage("GAME_ACTION", data);
     }
 
-    private void sendMessage(String type, String data) {
+    private void sendMessage(String type, JSONObject data) {
         if (!running.get() || out == null) return;
 
         try {
-            JSONObject message = new JSONObject();
-            message.put("type", type);
-            message.put("data", data);
-            out.println(message);
+            NetworkMessage message = new NetworkMessage(type, data != null ? data : JsonBuilder.empty());
+            out.println(message.toJsonString());
+            out.flush();
         } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "error in sending message");
+            fireEvent(NetworkEvent.Type.ERROR, "Error sending message: " + e.getMessage());
         }
     }
 
@@ -258,7 +299,7 @@ public class GameClient implements Disposable, Runnable {
             while (running.get()) {
                 try {
                     Thread.sleep(PING_INTERVAL);
-                    sendMessage("PING", "");
+                    sendMessage("PING", JsonBuilder.empty());
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -267,20 +308,20 @@ public class GameClient implements Disposable, Runnable {
     }
 
     public void disconnect() {
-        running.set(false);
-        authenticated = false;
-        username = null;
-        currentLobbyId = null;
+        if (running.compareAndSet(true, false)) {
+            try {
+                if (out != null) out.close();
+                if (in != null) in.close();
+                if (clientSocket != null) clientSocket.close();
+            } catch (IOException e) {
+                Gdx.app.error("GameClient", "Error closing connection", e);
+            }
 
-        try {
-            if (out != null) out.close();
-            if (in != null) in.close();
-            if (clientSocket != null) clientSocket.close();
-        } catch (IOException e) {
-            Gdx.app.error("GameClient", "Error closing connection", e);
+            authenticated = false;
+            username = null;
+            currentLobbyId = null;
+            fireEvent(NetworkEvent.Type.DISCONNECTED, "Disconnected from server");
         }
-
-        fireEvent(NetworkEvent.Type.DISCONNECTED, "connection disconnected");
     }
 
     @Override
@@ -288,13 +329,11 @@ public class GameClient implements Disposable, Runnable {
         disconnect();
     }
 
-    // مدیریت رویدادها
+    // Event management
     public void addNetworkListener(NetworkEventListener listener) {
-        listeners.add(listener);
-    }
-
-    public void addLobbyListener(LobbyEventListener listener) {
-        listeners.add(listener);
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
     }
 
     public void removeNetworkListener(NetworkEventListener listener) {
@@ -308,8 +347,8 @@ public class GameClient implements Disposable, Runnable {
         }
     }
 
-    private void fireLobbyEvent(LobbyEvent.Type type, String data) {
-        LobbyEvent event = new LobbyEvent(type, data);
+    private void fireLobbyEvent(LobbyEvent.Type type, JSONObject data) {
+        LobbyEvent event = new LobbyEvent(type, data.toString());
         for (NetworkEventListener listener : listeners) {
             if (listener instanceof LobbyEventListener) {
                 ((LobbyEventListener) listener).handleLobbyEvent(event);
@@ -317,8 +356,8 @@ public class GameClient implements Disposable, Runnable {
         }
     }
 
-    private void fireGameEvent(GameEvent.Type type, String data) {
-        GameEvent event = new GameEvent(type, data);
+    private void fireGameEvent(GameEvent.Type type, JSONObject data) {
+        GameEvent event = new GameEvent(type, data.toString());
         for (NetworkEventListener listener : listeners) {
             if (listener instanceof GameEventListener) {
                 ((GameEventListener) listener).handleGameEvent(event);
@@ -326,19 +365,13 @@ public class GameClient implements Disposable, Runnable {
         }
     }
 
-    private void fireLobbyListEvent(String jsonData) {
-        try {
-            JSONObject lobbiesData = new JSONObject(jsonData);
-            for (NetworkEventListener listener : listeners) {
-                if (listener instanceof LobbyListListener) {
-                    ((LobbyListListener) listener).onLobbiesReceived(lobbiesData);
-                }
+    private void fireLobbyListEvent(JSONObject data) {
+        for (LobbyListListener listener : lobbyListListeners) {
+            if (listener instanceof LobbyListListener) {
+                ((LobbyListListener) listener).onLobbiesReceived(data);
             }
-        } catch (Exception e) {
-            fireEvent(NetworkEvent.Type.ERROR, "error in receiving lobbies");
         }
     }
-
 
     public boolean isConnected() {
         return running.get();

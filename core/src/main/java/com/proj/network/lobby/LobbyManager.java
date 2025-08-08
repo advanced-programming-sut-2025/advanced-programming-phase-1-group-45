@@ -2,7 +2,6 @@ package com.proj.network.lobby;
 
 
 import com.badlogic.gdx.Gdx;
-import com.proj.network.GameLobby;
 import com.proj.network.GameServer;
 
 import java.util.*;

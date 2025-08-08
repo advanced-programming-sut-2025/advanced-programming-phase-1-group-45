@@ -1,10 +1,12 @@
 package com.proj.network;
 
-import com.badlogic.gdx.Gdx;
 import com.proj.Database.DatabaseHelper;
+import com.proj.network.lobby.GameLobby;
 import com.proj.network.lobby.LobbyManager;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -12,35 +14,20 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.*;
 
-/**
- * سرور اصلی بازی
- */
 public class GameServer {
     private static final int PORT = 8080;
     private static final int MAX_PLAYERS = 100;
     private static final int THREAD_POOL_SIZE = 10;
     private static final int MAINTENANCE_INTERVAL_SECONDS = 60;
 
-    // نگهداری نشست‌های بازیکنان
     private final Map<String, ClientHandler> connectedClients = new ConcurrentHashMap<>();
-
-    // نگهداری اطلاعات لابی‌های بازی
-    private LobbyManager lobbyManager;
-
-    // سرویس مدیریت ترد‌ها
+    private final LobbyManager lobbyManager;
     private final ExecutorService threadPool;
     private final ScheduledExecutorService maintenanceService;
-
-    // سوکت سرور
-    private ServerSocket serverSocket;
-
-    // مدیریت کننده بازی
     private final GameManager gameManager;
-
-    // مدیریت کننده پایگاه داده
     private final DatabaseHelper dbHelper;
 
-    // وضعیت سرور
+    private ServerSocket serverSocket;
     private boolean running = false;
 
     public GameServer() {
@@ -51,9 +38,6 @@ public class GameServer {
         this.lobbyManager = new LobbyManager(this);
     }
 
-    /**
-     * شروع سرور بازی
-     */
     public void start() {
         if (running) {
             System.err.println("GameServer " +  "server is already running");
@@ -61,25 +45,19 @@ public class GameServer {
         }
 
         try {
-            // اتصال به پایگاه داده
             dbHelper.connect();
-
-            // راه‌اندازی سوکت سرور
             serverSocket = new ServerSocket();
             serverSocket.setReuseAddress(true);
             serverSocket.bind(new InetSocketAddress(PORT));
 
             running = true;
             System.err.println("GameServer " +  "Game server started on port " + PORT);
-            // شروع ترد مدیریت بازی
+
             Thread gameUpdateThread = new Thread(new GameUpdateTask(this));
             gameUpdateThread.setDaemon(true);
             gameUpdateThread.start();
 
-            // زمانبندی وظایف نگهداری سرور
             scheduleMaintenanceTasks();
-
-            // پذیرش اتصالات جدید
             acceptConnections();
 
         } catch (IOException e) {
@@ -89,31 +67,19 @@ public class GameServer {
         }
     }
 
-    /**
-     * زمانبندی وظایف نگهداری سرور
-     */
     private void scheduleMaintenanceTasks() {
         maintenanceService.scheduleAtFixedRate(() -> {
             try {
-                // بررسی اتصال‌های قطع شده
                 checkDisconnectedClients();
-
-                // بررسی لابی‌های غیرفعال
                 checkInactiveLobbies();
-
-                // بررسی بازی‌های غیرفعال
                 gameManager.checkInactiveGames();
-
-                // ارسال آمار سرور
                 logServerStats();
             } catch (Exception e) {
-                System.err.println("GameServer " +  "Error in maintenance tasks" +  e);            }
+                System.err.println("GameServer " +  "Error in maintenance tasks" +  e);
+            }
         }, MAINTENANCE_INTERVAL_SECONDS, MAINTENANCE_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
 
-    /**
-     * پذیرش اتصالات جدید
-     */
     private void acceptConnections() {
         try {
             while (running && !serverSocket.isClosed()) {
@@ -127,7 +93,6 @@ public class GameServer {
                     continue;
                 }
 
-                // ایجاد هندلر جدید برای کلاینت
                 ClientHandler clientHandler = new ClientHandler(clientSocket, this);
                 threadPool.execute(clientHandler);
             }
@@ -138,52 +103,51 @@ public class GameServer {
         }
     }
 
-    /**
-     * ارسال پیام پر بودن سرور
-     */
     private void sendServerFullMessage(Socket socket) {
         try {
-            java.io.PrintWriter out = new java.io.PrintWriter(socket.getOutputStream(), true);
-            out.println("{\"type\":\"ERROR\",\"data\":\"Server is full. Please try again later.\"}");
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+            JSONObject response = new JSONObject();
+            response.put("type", "ERROR");
+
+            JSONObject data = new JSONObject();
+            data.put("code", "SERVER_FULL");
+            data.put("message", "Server is full. Please try again later.");
+
+            response.put("data", data);
+            out.println(response.toString());
         } catch (IOException e) {
             System.err.println("GameServer " +  "Error sending server full message" + e);
         }
     }
 
-    /**
-     * ثبت کلاینت جدید
-     */
     public void registerClient(String username, ClientHandler handler) {
         connectedClients.put(username, handler);
         broadcastSystemMessage(username + " joined the game");
         System.err.println("GameServer " +  "User registered: " + username);
     }
 
-    /**
-     * حذف کلاینت
-     */
     public void removeClient(String username) {
         connectedClients.remove(username);
-
-        // خروج بازیکن از لابی‌ها
         lobbyManager.removePlayer(username);
-
         broadcastSystemMessage(username + " left the game");
         System.err.println("GameServer " +  "User removed: " + username);
     }
 
-    /**
-     * ارسال پیام سیستمی به همه کاربران
-     */
     public void broadcastSystemMessage(String message) {
+        JSONObject messageObj = new JSONObject();
+        messageObj.put("type", "SYSTEM");
+
+        JSONObject data = new JSONObject();
+        data.put("message", message);
+        messageObj.put("data", data);
+
+        String jsonMessage = messageObj.toString();
+
         for (ClientHandler handler : connectedClients.values()) {
-            handler.sendMessage("SYSTEM", message);
+            handler.sendRaw(jsonMessage);
         }
     }
 
-    /**
-     * ایجاد لابی جدید
-     */
     public void createLobby(String lobbyName, String owner, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
         System.err.println("GameServer " +  "Creating a new lobby: " + lobbyName);
 
@@ -191,15 +155,17 @@ public class GameServer {
         ClientHandler ownerHandler = connectedClients.get(owner);
         if (ownerHandler != null) {
             lobby.addPlayer(owner, ownerHandler);
-            ownerHandler.sendMessage("LOBBY_CREATED", lobby.getLobbyInfo().toString());
+
+            JSONObject response = new JSONObject();
+            response.put("type", "LOBBY_CREATED");
+            response.put("data", lobby.getLobbyInfo());
+
+            ownerHandler.sendRaw(response.toString());
         }
 
         System.err.println("GameServer " +  "Lobby created: " + lobbyName + " with ID: " + lobby.getId());
     }
 
-    /**
-     * پیوستن به لابی
-     */
     public void joinLobby(String lobbyId, String username, String password) {
         GameLobby lobby = lobbyManager.getGameLobby(lobbyId);
         ClientHandler client = connectedClients.get(username);
@@ -209,23 +175,39 @@ public class GameServer {
             return;
         }
 
+        JSONObject errorResponse = new JSONObject();
+        errorResponse.put("type", "ERROR");
+        JSONObject errorData = new JSONObject();
+
         if (lobby == null) {
-            client.sendMessage("ERROR", "Lobby not found");
+            errorData.put("code", "LOBBY_NOT_FOUND");
+            errorData.put("message", "Lobby not found");
+            errorResponse.put("data", errorData);
+            client.sendRaw(errorResponse.toString());
             return;
         }
 
         if (lobby.isFull()) {
-            client.sendMessage("ERROR", "Lobby is full: " + lobby.getId());
+            errorData.put("code", "LOBBY_FULL");
+            errorData.put("message", "Lobby is full: " + lobby.getId());
+            errorResponse.put("data", errorData);
+            client.sendRaw(errorResponse.toString());
             return;
         }
 
         if (lobby.isGameActive() && !lobby.hasPlayer(username)) {
-            client.sendMessage("ERROR", "The game in this lobby is already active");
+            errorData.put("code", "GAME_ACTIVE");
+            errorData.put("message", "The game in this lobby is already active");
+            errorResponse.put("data", errorData);
+            client.sendRaw(errorResponse.toString());
             return;
         }
 
         if (lobby.isPrivate() && !lobby.checkPassword(password)) {
-            client.sendMessage("ERROR", "Incorrect password");
+            errorData.put("code", "INVALID_PASSWORD");
+            errorData.put("message", "Incorrect password");
+            errorResponse.put("data", errorData);
+            client.sendRaw(errorResponse.toString());
             return;
         }
 
@@ -235,15 +217,23 @@ public class GameServer {
         }
 
         lobby.addPlayer(username, client);
-        client.sendMessage("JOIN_SUCCESS", lobby.getId());
 
-        // اطلاع به سایر بازیکنان لابی
-        lobby.broadcastMessage("SYSTEM", username + "Joined lobby");
+        JSONObject successResponse = new JSONObject();
+        successResponse.put("type", "JOIN_SUCCESS");
+        successResponse.put("data", lobby.getLobbyInfo());
+        client.sendRaw(successResponse.toString());
+
+        // Broadcast to lobby
+        JSONObject broadcast = new JSONObject();
+        broadcast.put("type", "PLAYER_JOINED");
+
+        JSONObject broadcastData = new JSONObject();
+        broadcastData.put("username", username);
+        broadcast.put("data", broadcastData);
+
+        lobby.broadcastRaw(broadcast.toString());
     }
 
-    /**
-     * شروع بازی
-     */
     public void startGame(String lobbyId, String username) {
         GameLobby lobby = lobbyManager.getGameLobby(lobbyId);
         ClientHandler client = connectedClients.get(username);
@@ -253,58 +243,83 @@ public class GameServer {
             return;
         }
 
+        JSONObject errorResponse = new JSONObject();
+        errorResponse.put("type", "ERROR");
+        JSONObject errorData = new JSONObject();
+
         if (lobby == null) {
-            client.sendMessage("ERROR", "Lobby not found");
+            errorData.put("code", "LOBBY_NOT_FOUND");
+            errorData.put("message", "Lobby not found");
+            errorResponse.put("data", errorData);
+            client.sendRaw(errorResponse.toString());
             return;
         }
 
         if (!lobby.getOwner().equals(username)) {
-            client.sendMessage("ERROR", "Only lobby owner can start the game");
+            errorData.put("code", "NOT_OWNER");
+            errorData.put("message", "Only lobby owner can start the game");
+            errorResponse.put("data", errorData);
+            client.sendRaw(errorResponse.toString());
             return;
         }
 
         if (lobby.getPlayerCount() < 2) {
-            client.sendMessage("ERROR", "Minimum 2 players required to start");
+            errorData.put("code", "MIN_PLAYERS");
+            errorData.put("message", "Minimum 2 players required to start");
+            errorResponse.put("data", errorData);
+            client.sendRaw(errorResponse.toString());
             return;
         }
 
         if (lobby.isGameActive()) {
-            client.sendMessage("ERROR", "Game already started");
+            errorData.put("code", "ALREADY_STARTED");
+            errorData.put("message", "Game already started");
+            errorResponse.put("data", errorData);
+            client.sendRaw(errorResponse.toString());
             return;
         }
 
-        // شروع بازی
         boolean success = gameManager.startGame(lobby);
 
         if (success) {
-            lobby.broadcastMessage("GAME_STARTED", "Game started");
+            JSONObject broadcast = new JSONObject();
+            broadcast.put("type", "GAME_STARTED");
+
+            JSONObject data = new JSONObject();
+            data.put("message", "Game started");
+            broadcast.put("data", data);
+
+            lobby.broadcastRaw(broadcast.toString());
         } else {
-            client.sendMessage("ERROR", "Error starting game");
+            errorData.put("code", "START_FAILED");
+            errorData.put("message", "Error starting game");
+            errorResponse.put("data", errorData);
+            client.sendRaw(errorResponse.toString());
         }
     }
 
-    /**
-     * پردازش اکشن بازی
-     */
     public void processGameAction(String username, String action, String actionData) {
-        // یافتن لابی بازیکن
         GameLobby playerLobby = findPlayerLobby(username);
 
         if (playerLobby == null || !playerLobby.isGameActive()) {
             ClientHandler client = connectedClients.get(username);
             if (client != null) {
-                client.sendMessage("ERROR", "You are not in any active game");
+                JSONObject error = new JSONObject();
+                error.put("type", "ERROR");
+
+                JSONObject errorData = new JSONObject();
+                errorData.put("code", "NOT_IN_GAME");
+                errorData.put("message", "You are not in any active game");
+                error.put("data", errorData);
+
+                client.sendRaw(error.toString());
             }
             return;
         }
 
-        // پردازش اکشن بازی
         gameManager.processGameAction(playerLobby, username, action, actionData);
     }
 
-    /**
-     * یافتن لابی بازیکن
-     */
     public GameLobby findPlayerLobby(String username) {
         for (GameLobby lobby : lobbyManager.getGameLobbies()) {
             if (lobby.hasPlayer(username)) {
@@ -314,16 +329,10 @@ public class GameServer {
         return null;
     }
 
-    /**
-     * تولید شناسه منحصر به فرد برای لابی
-     */
     private String generateLobbyId() {
         return "lobby_" + UUID.randomUUID().toString().substring(0, 8);
     }
 
-    /**
-     * بررسی اتصال‌های قطع شده
-     */
     private void checkDisconnectedClients() {
         for (Map.Entry<String, ClientHandler> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
             ClientHandler handler = entry.getValue();
@@ -335,16 +344,11 @@ public class GameServer {
         }
     }
 
-    /**
-     * بررسی لابی‌های غیرفعال
-     */
     private void checkInactiveLobbies() {
-        long inactivityTimeout = 30 * 60 * 1000; // 30 دقیقه
+        long inactivityTimeout = 30 * 60 * 1000;
 
         for (Map.Entry<String, GameLobby> entry : new ConcurrentHashMap<>(lobbyManager.getGameLobbiesMap()).entrySet()) {
             GameLobby lobby = entry.getValue();
-
-            // اگر لابی خالی است یا مدت زیادی غیرفعال بوده
             if (lobby.isEmpty() || (lobby.isInactive(inactivityTimeout) && !lobby.isGameActive())) {
                 lobbyManager.getGameLobbiesMap().remove(entry.getKey());
                 System.err.println("GameServer " +  "Inactive lobby removed: " + entry.getKey());
@@ -352,9 +356,6 @@ public class GameServer {
         }
     }
 
-    /**
-     * ثبت آمار سرور
-     */
     private void logServerStats() {
         System.err.println("GameServer " +  String.format(
             "Server stats: %d online users, %d active lobbies, %d running games",
@@ -364,9 +365,6 @@ public class GameServer {
         ));
     }
 
-    /**
-     * بستن سرور
-     */
     public void shutdown() {
         if (!running) {
             return;
@@ -375,21 +373,17 @@ public class GameServer {
         running = false;
 
         try {
-            // اطلاع به همه کاربران
             broadcastSystemMessage("Server is shutting down");
 
-            // بستن همه اتصالات
             for (ClientHandler handler : connectedClients.values()) {
                 handler.shutdown();
             }
             connectedClients.clear();
 
-            // بستن سوکت سرور
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
             }
 
-            // بستن سرویس‌های ترد
             threadPool.shutdown();
             try {
                 if (!threadPool.awaitTermination(5, TimeUnit.SECONDS)) {
@@ -401,10 +395,7 @@ public class GameServer {
             }
 
             maintenanceService.shutdownNow();
-
-            // بستن اتصال پایگاه داده
             dbHelper.disconnect();
-
 
             System.err.println("GameServer" +  "Server closed successfully");
         } catch (IOException e) {

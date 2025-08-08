@@ -1,5 +1,6 @@
 package com.proj.network;
 
+import com.proj.network.lobby.GameLobby;
 import org.json.JSONObject;
 
 import java.util.HashMap;

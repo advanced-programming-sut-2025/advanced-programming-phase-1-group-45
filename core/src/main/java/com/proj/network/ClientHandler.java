@@ -1,6 +1,11 @@
 package com.proj.network;
 
 import com.badlogic.gdx.Gdx;
+import com.proj.network.lobby.GameLobby;
+import com.proj.network.message.JsonBuilder;
+import com.proj.network.message.JsonParser;
+import com.proj.network.message.NetworkMessage;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,7 +15,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
-
+import com.proj.network.message.JsonBuilder;
 
 public class ClientHandler implements Runnable {
     private final Socket clientSocket;
@@ -30,7 +35,7 @@ public class ClientHandler implements Runnable {
             this.out = new PrintWriter(socket.getOutputStream(), true);
             this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
-            System.err.println("ClientHandler  " + "eror in input or output" + e);
+            System.err.println("ClientHandler initialization error: " + e.getMessage());
         }
     }
 
@@ -45,26 +50,17 @@ public class ClientHandler implements Runnable {
             while (running.get() && (inputLine = in.readLine()) != null) {
                 updateLastActivity();
                 try {
-                    JSONObject jsonInput = new JSONObject(inputLine);
-                    String type = jsonInput.getString("type");
-                    Object data = jsonInput.get("data");
-                    if(data instanceof JSONObject) {
-                        processMessage(type, (JSONObject) data);
-                    } else if (data instanceof String) {
-                        JSONObject dataInput = new JSONObject((String)data);
-                        processMessage(type, dataInput);
-                    }
-
-                } catch (JSONException e) {
-                    System.err.println("ClientHandler  " + "error JSON: " + e.getMessage());
-                    sendMessage("ERROR", "error format");
+                    NetworkMessage message = NetworkMessage.parse(inputLine);
+                    processMessage(message);
+                } catch (IOException e) {
+                    sendError("INVALID_FORMAT", "Invalid message format");
                 } catch (Exception e) {
-                    System.err.println("ClientHandler  " + "error massage: " + e.getMessage() + e);
-                    sendMessage("ERROR", "error at request");
+                    System.err.println("Message processing error: " + e.getMessage());
+                    sendError("PROCESSING_ERROR", "Error processing request");
                 }
             }
         } catch (IOException e) {
-            System.err.println("ClientHandler " + "connection stop" + e);
+            System.err.println("Connection error: " + e.getMessage());
         } finally {
             if (username != null) {
                 server.removeClient(username);
@@ -74,7 +70,11 @@ public class ClientHandler implements Runnable {
     }
 
     private boolean signUp() throws IOException {
-        sendMessage("AUTH_REQUEST", "Please enter your credentials");
+        // Send structured auth request
+        JSONObject requestData = JsonBuilder.create()
+            .put("message", "Please enter your credentials")
+            .build();
+        sendMessage("AUTH_REQUEST", requestData);
 
         String response = in.readLine();
         if (response == null) {
@@ -82,31 +82,21 @@ public class ClientHandler implements Runnable {
         }
 
         try {
-            JSONObject authData = new JSONObject(response);
-
-            // Handle both string and object formats for "data"
-            Object dataObj = authData.get("data");
-            JSONObject credentials;
-
-            if (dataObj instanceof String) {
-                // Parse the string as JSON object
-                credentials = new JSONObject((String) dataObj);
-            } else if (dataObj instanceof JSONObject) {
-                credentials = (JSONObject) dataObj;
-            } else {
-                sendMessage("AUTH_FAILED", "Invalid credentials format");
+            NetworkMessage authMessage = NetworkMessage.parse(response);
+            if (!"AUTH".equals(authMessage.getType())) {
+                sendError("AUTH_FAILED", "Invalid request type");
                 return false;
             }
 
-            // Validate required fields
-            if (!credentials.has("username") || !credentials.has("password")) {
-                sendMessage("AUTH_FAILED", "Missing username or password");
+            JSONObject credentials = authMessage.getData();
+            String username = JsonParser.getString(credentials, "username", "");
+            String password = JsonParser.getString(credentials, "password", "");
+            String securityQuestion = JsonParser.getString(credentials, "securityQuestion", "");
+
+            if (username.isEmpty() || password.isEmpty()) {
+                sendError("AUTH_FAILED", "Missing username or password");
                 return false;
             }
-
-            String username = credentials.getString("username");
-            String password = credentials.getString("password");
-            String securityQuestion = credentials.getString("securityQuestion");
 
             boolean authenticated = server.getDatabaseHelper().addUser(username, password, securityQuestion);
 
@@ -114,84 +104,34 @@ public class ClientHandler implements Runnable {
                 // Handle existing connections
                 if (server.getConnectedClients().containsKey(username)) {
                     ClientHandler existingClient = server.getConnectedClients().get(username);
-                    existingClient.sendMessage("DISCONNECT", "You've been disconnected because you logged in from another device");
+                    existingClient.sendMessage("DISCONNECT", JsonBuilder.create()
+                        .put("message", "You've been disconnected because you logged in from another device")
+                        .build());
                     existingClient.shutdown();
                 }
                 this.username = username;
                 server.registerClient(username, this);
-                sendMessage("AUTH_SUCCESS", "Welcome " + username);
+
+                // Send structured auth success
+                sendMessage("AUTH_SUCCESS", JsonBuilder.create()
+                    .put("message", "Welcome " + username)
+                    .put("username", username)
+                    .build());
                 return true;
             } else {
-                sendMessage("AUTH_FAILED", "Invalid format");
+                sendError("AUTH_FAILED", "Registration failed");
                 return false;
             }
-        } catch (JSONException e) {
-            sendMessage("AUTH_FAILED", "Invalid authentication format");
-            System.err.println("ClientHandler error in authenticate: " + e.getMessage());
+        } catch (Exception e) {
+            sendError("AUTH_FAILED", "Invalid authentication format");
             return false;
         }
     }
 
-//    private boolean authenticate() throws IOException {
-//        sendMessage("AUTH_REQUEST", "Please enter your credentials");
-//
-//        String response = in.readLine();
-//        if (response == null) {
-//            return false;
-//        }
-//
-//        try {
-//            JSONObject authData = new JSONObject(response);
-//
-//            // Handle both string and object formats for "data"
-//            Object dataObj = authData.get("data");
-//            JSONObject credentials;
-//
-//            if (dataObj instanceof String) {
-//                // Parse the string as JSON object
-//                credentials = new JSONObject((String) dataObj);
-//            } else if (dataObj instanceof JSONObject) {
-//                credentials = (JSONObject) dataObj;
-//            } else {
-//                sendMessage("AUTH_FAILED", "Invalid credentials format");
-//                return false;
-//            }
-//
-//            // Validate required fields
-//            if (!credentials.has("username") || !credentials.has("password")) {
-//                sendMessage("AUTH_FAILED", "Missing username or password");
-//                return false;
-//            }
-//
-//            String username = credentials.getString("username");
-//            String password = credentials.getString("password");
-//
-//            boolean authenticated = server.getDatabaseHelper().verifyUser(username, password);
-//
-//            if (authenticated) {
-//                // Handle existing connections
-//                if (server.getConnectedClients().containsKey(username)) {
-//                    ClientHandler existingClient = server.getConnectedClients().get(username);
-//                    existingClient.sendMessage("DISCONNECT", "You've been disconnected because you logged in from another device");
-//                    existingClient.shutdown();
-//                }
-//
-//                this.username = username;
-//                server.registerClient(username, this);
-//                sendMessage("AUTH_SUCCESS", "Welcome " + username);
-//                return true;
-//            } else {
-//                sendMessage("AUTH_FAILED", "Invalid username or password");
-//                return false;
-//            }
-//        } catch (JSONException e) {
-//            sendMessage("AUTH_FAILED", "Invalid authentication format");
-//            System.err.println("ClientHandler error in authenticate: " + e.getMessage());
-//            return false;
-//        }
-//    }
+    private void processMessage(NetworkMessage message) {
+        String type = message.getType();
+        JSONObject data = message.getData();
 
-    private void processMessage(String type, JSONObject data) {
         switch (type) {
             case "CHAT":
                 processChatMessage(data);
@@ -222,111 +162,107 @@ public class ClientHandler implements Runnable {
                 break;
 
             case "PING":
-                sendMessage("PONG", "");
+                sendMessage("PONG", JsonBuilder.empty());
                 break;
 
             default:
-                Gdx.app.log("ClientHandler", "نوع پیام ناشناخته: " + type);
-                sendMessage("ERROR", "نوع پیام نامعتبر است");
+                Gdx.app.log("ClientHandler", "Unknown message type: " + type);
+                sendError("UNKNOWN_TYPE", "Invalid message type");
                 break;
         }
     }
 
     private void processChatMessage(JSONObject data) {
-        if (!data.has("message")) {
-            sendMessage("ERROR", "پیام چت خالی است");
+        String messageText = JsonParser.getString(data, "message", "");
+        if (messageText.trim().isEmpty()) {
             return;
         }
 
-        String message = data.getString("message");
-        if (message.trim().isEmpty()) {
-            return;
+        // Truncate long messages
+        if (messageText.length() > 200) {
+            messageText = messageText.substring(0, 200) + "...";
         }
 
-        if (message.length() > 200) {
-            message = message.substring(0, 200) + "...";
-        }
-
-        if (data.has("recipient")) {
-            String recipient = data.getString("recipient");
+        String recipient = JsonParser.getString(data, "recipient", null);
+        if (recipient != null) {
+            // Private message
             ClientHandler recipientHandler = server.getConnectedClients().get(recipient);
-
             if (recipientHandler != null) {
-                JSONObject privateMsg = new JSONObject();
-                privateMsg.put("sender", username);
-                privateMsg.put("message", message);
-                privateMsg.put("isPrivate", true);
+                JSONObject privateMsg = JsonBuilder.create()
+                    .put("sender", username)
+                    .put("message", messageText)
+                    .put("isPrivate", true)
+                    .build();
 
-                recipientHandler.sendMessage("PRIVATE_CHAT", privateMsg.toString());
-                sendMessage("PRIVATE_CHAT", privateMsg.toString()); // ارسال به فرستنده
+                recipientHandler.sendMessage("PRIVATE_CHAT", privateMsg);
+                // Also send a copy to the sender
+                sendMessage("PRIVATE_CHAT", privateMsg);
             } else {
-                sendMessage("ERROR", "کاربر " + recipient + " آنلاین نیست");
+                sendError("USER_OFFLINE", "User " + recipient + " is not online");
             }
         } else {
-            server.broadcastSystemMessage(username + ": " + message);
+            // Broadcast public message
+            JSONObject publicMsg = JsonBuilder.create()
+                .put("sender", username)
+                .put("message", messageText)
+                .put("isPrivate", false)
+                .build();
+            server.broadcastSystemMessage("CHAT" + messageText);
+        }
+    }
+
+    public void sendRaw(String message) {
+        if (!running.get() || out == null) return;
+        out.println(message);
+        out.flush();
+
+        if (out.checkError()) {
+            shutdown();
         }
     }
 
     private void createLobby(JSONObject data) {
+        String name = JsonParser.getString(data, "name", "");
+        int maxPlayers = JsonParser.getInt(data, "maxPlayers", 4);
+        boolean isPrivate = JsonParser.getBoolean(data, "isPrivate", false);
+        boolean isVisible = JsonParser.getBoolean(data, "isVisible", true);
+        String password = JsonParser.getString(data, "password", "");
+
+        if (name.trim().isEmpty()) {
+            sendError("LOBBY_CREATION_FAILED", "Lobby name must not be empty");
+            return;
+        }
+
+        if (maxPlayers < 2 || maxPlayers > 8) {
+            sendError("LOBBY_CREATION_FAILED", "Players number should be between 2 and 8");
+            return;
+        }
+
+        if (isPrivate && password.isEmpty()) {
+            sendError("LOBBY_CREATION_FAILED", "Private Lobby should have a password");
+            return;
+        }
+
         try {
-            if (!data.has("name") || !data.has("maxPlayers") ||
-                !data.has("isPrivate") || !data.has("isVisible")) {
-                sendMessage("ERROR", "Lobby creation information are incomplete");
-                System.err.println("GAme Client " +  "Creating a new lobby: " + data.toString());
-
-                System.err.println("ClientHandler  information Are bad");
-
-                return;
-            }
-
-            String name = data.getString("name");
-            String password = data.optString("password", "");
-            int maxPlayers = data.getInt("maxPlayers");
-            boolean isPrivate = data.getBoolean("isPrivate");
-            boolean isVisible = data.getBoolean("isVisible");
-
-            System.err.println("ClientHandler  information Are good");
-
-            if (name.trim().isEmpty()) {
-                sendMessage("ERROR", "Lobby name must not be empty");
-                return;
-            }
-
-            if (maxPlayers < 2 || maxPlayers > 8) {
-                sendMessage("ERROR", "Players number should be between 2 and 8");
-                return;
-            }
-
-            if (isPrivate && password.trim().isEmpty()) {
-                sendMessage("ERROR", "Private Lobby should have a password");
-                return;
-            }
-
             server.createLobby(name, username, password, maxPlayers, isPrivate, isVisible);
-
-            System.out.println("createLobby");
-
         } catch (Exception e) {
-            sendMessage("ERROR", "error in creating lobby: " + e.getMessage());
-            System.err.println("ClientHandler  " + "error in create lobby: " + e);
+            sendError("LOBBY_CREATION_FAILED", "Error creating lobby: " + e.getMessage());
         }
     }
 
     private void joinLobby(JSONObject data) {
+        String lobbyId = JsonParser.getString(data, "lobbyId", "");
+        String password = JsonParser.getString(data, "password", "");
+
+        if (lobbyId.isEmpty()) {
+            sendError("JOIN_FAILED", "Lobby ID is required");
+            return;
+        }
+
         try {
-            if (!data.has("lobbyId")) {
-                sendMessage("ERROR", "Should send lobby ID in the message");
-                return;
-            }
-
-            String lobbyId = data.getString("lobbyId");
-            String password = data.optString("password", "");
-
             server.joinLobby(lobbyId, username, password);
-
         } catch (Exception e) {
-            sendMessage("ERROR", "error in join lobby: " + e.getMessage());
-            System.err.println("ClientHandler  " + "error in join lobby" + e);
+            sendError("JOIN_FAILED", "Error joining lobby: " + e.getMessage());
         }
     }
 
@@ -334,82 +270,80 @@ public class ClientHandler implements Runnable {
         GameLobby lobby = server.findPlayerLobby(username);
         if (lobby != null) {
             lobby.removePlayer(username);
-            sendMessage("LEAVE_SUCCESS", "You left the lobby");
+            sendMessage("LEAVE_SUCCESS", JsonBuilder.create()
+                .put("message", "You left the lobby")
+                .build());
 
             if (lobby.isEmpty()) {
                 server.getGameLobbies().remove(lobby.getId());
                 server.broadcastSystemMessage("Lobby: " + lobby.getName() + " was removed");
             }
         } else {
-            sendMessage("ERROR", "You are not in any lobby");
+            sendError("NOT_IN_LOBBY", "You are not in any lobby");
         }
     }
 
     private void startGame(JSONObject data) {
+        String lobbyId = JsonParser.getString(data, "lobbyId", "");
+        if (lobbyId.isEmpty()) {
+            sendError("GAME_START_FAILED", "Lobby ID is required");
+            return;
+        }
+
         try {
-            if (!data.has("lobbyId")) {
-                sendMessage("ERROR", "شناسه لابی مشخص نشده است");
-                return;
-            }
-
-            String lobbyId = data.getString("lobbyId");
             server.startGame(lobbyId, username);
-
         } catch (Exception e) {
-            sendMessage("ERROR", "خطا در شروع بازی: " + e.getMessage());
-            System.err.println("ClientHandler  " + "خطا در شروع بازی" + e);
+            sendError("GAME_START_FAILED", "Error starting game: " + e.getMessage());
         }
     }
 
     private void processGameAction(JSONObject data) {
+        String action = JsonParser.getString(data, "action", "");
+        if (action.isEmpty()) {
+            sendError("GAME_ACTION_FAILED", "Action type is required");
+            return;
+        }
+
         try {
-            if (!data.has("action")) {
-                sendMessage("ERROR", "نوع اکشن مشخص نشده است");
-                return;
-            }
-
-            String action = data.getString("action");
             server.processGameAction(username, action, data.toString());
-
         } catch (Exception e) {
-            sendMessage("ERROR", "خطا در پردازش اکشن بازی: " + e.getMessage());
-            System.err.println("ClientHandler  " + "خطا در پردازش اکشن بازی" + e);
+            sendError("GAME_ACTION_FAILED", "Error processing game action: " + e.getMessage());
         }
     }
 
-    public synchronized void sendMessage(String type, String data) {
+    public synchronized void sendMessage(String type, JSONObject data) {
         if (!running.get() || out == null) {
             return;
         }
 
         try {
-            JSONObject response = new JSONObject();
-            response.put("type", type);
-            response.put("data", data);
-            out.println(response.toString());
+            NetworkMessage message = new NetworkMessage(type, data != null ? data : JsonBuilder.empty());
+            out.println(message.toJsonString());
+            out.flush();
 
             if (out.checkError()) {
-                System.err.println("ClientHandler  " + "خطا در ارسال پیام به کلاینت: " + username);
+                System.err.println("Error sending to client: " + username);
                 shutdown();
             }
         } catch (Exception e) {
-            System.err.println("ClientHandler  " + "خطا در ساخت پیام JSON" + e);
+            System.err.println("Failed to send message to client: " + e.getMessage());
         }
     }
 
+    private void sendError(String code, String message) {
+        JSONObject error = JsonBuilder.create()
+            .put("code", code)
+            .put("message", message)
+            .build();
+        sendMessage("ERROR", error);
+    }
+
     private void sendLobbiesList() {
-        JSONObject lobbiesData = new JSONObject();
+        JSONArray lobbiesArray = new JSONArray();
 
         for (GameLobby lobby : server.getGameLobbies().values()) {
             if (lobby.isVisible() || lobby.hasPlayer(username)) {
-                JSONObject lobbyInfo = new JSONObject();
-                lobbyInfo.put("id", lobby.getId());
-                lobbyInfo.put("name", lobby.getName());
-                lobbyInfo.put("owner", lobby.getOwner());
-                lobbyInfo.put("playerCount", lobby.getPlayerCount());
-                lobbyInfo.put("maxPlayers", lobby.getMaxPlayers());
-                lobbyInfo.put("isPrivate", lobby.isPrivate());
-                lobbyInfo.put("isGameActive", lobby.isGameActive());
+                JSONObject lobbyInfo = lobby.getLobbyInfo();
 
                 if (lobby.hasPlayer(username)) {
                     JSONObject players = new JSONObject();
@@ -418,12 +352,14 @@ public class ClientHandler implements Runnable {
                     }
                     lobbyInfo.put("players", players);
                 }
-
-                lobbiesData.put(lobby.getId(), lobbyInfo);
+                lobbiesArray.put(lobbyInfo);
             }
         }
 
-        sendMessage("LOBBIES_LIST", lobbiesData.toString());
+        JSONObject data = JsonBuilder.create()
+            .put("lobbies", lobbiesArray)
+            .build();
+        sendMessage("LOBBIES_LIST", data);
     }
 
     public synchronized void shutdown() {
@@ -433,7 +369,7 @@ public class ClientHandler implements Runnable {
                 if (in != null) in.close();
                 if (clientSocket != null && !clientSocket.isClosed()) clientSocket.close();
             } catch (IOException e) {
-                System.err.println("ClientHandler  " + "خطا در بستن اتصال کلاینت" + e);
+                System.err.println("Error closing client connection: " + e.getMessage());
             }
         }
     }

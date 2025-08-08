@@ -1,5 +1,7 @@
 package com.proj.network;
 
+import com.proj.network.lobby.GameLobby;
+
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -9,32 +9,24 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.proj.Control.MainMenuController;
 import com.proj.Main;
 import com.proj.Model.GameAssetManager;
-import com.proj.View.MainMenuView;
 import com.proj.network.client.GameClient;
 import com.proj.network.client.LobbyEventListener;
 import com.proj.network.client.LobbyListListener;
-import com.proj.network.client.NetworkEventListener;
 import com.proj.network.event.LobbyEvent;
 import com.proj.network.event.NetworkEvent;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
-import javax.swing.*;
-import java.util.ArrayList;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListener {
 
-    private  Main game;
-    private  GameClient gameClient;
+    private Main game;
+    private GameClient gameClient;
     private Stage stage;
     private Table mainTable;
     private Table lobbyListTable;
@@ -42,12 +34,12 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
     private TextButton refreshButton;
     private Label titleLabel;
     private Label currentLobbyInfoLabel;
-    private Table currentLobbyInfoTable;
+    private Table currentLobbyTable;
     private TextButton startButton;
     private TextButton leaveButton;
     private Skin skin;
 
-    private String currentLobbyInfoId;
+    private String currentLobbyId;
     private boolean isAdmin = false;
     private Map<String, LobbyInfo> lobbiesMap = new HashMap<>();
 
@@ -63,18 +55,18 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         mainTable.setFillParent(true);
         stage.addActor(mainTable);
 
-        titleLabel = new Label("Multiplayer LobbyInfo", skin, "default");
+        titleLabel = new Label("Multiplayer Lobby", skin, "default");
         mainTable.add(titleLabel).padBottom(30).colspan(3).row();
 
-        currentLobbyInfoLabel = new Label("Your LobbyInfo:", skin);
+        currentLobbyInfoLabel = new Label("Your Lobby:", skin);
         mainTable.add(currentLobbyInfoLabel).pad(10).colspan(3).align(Align.left).row();
 
-        currentLobbyInfoTable = new Table(skin);
-        currentLobbyInfoTable.setBackground("background");
-        mainTable.add(currentLobbyInfoTable).colspan(3).fillX().padBottom(20).row();
+        currentLobbyTable = new Table(skin);
+        currentLobbyTable.setBackground("background");
+        mainTable.add(currentLobbyTable).colspan(3).fillX().padBottom(20).row();
 
         startButton = new TextButton("Start Game", skin);
-        leaveButton = new TextButton("Leave LobbyInfo", skin);
+        leaveButton = new TextButton("Leave Lobby", skin);
 
         Table buttonTable = new Table();
         buttonTable.add(startButton).padRight(10);
@@ -89,7 +81,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         scrollPane.setFadeScrollBars(false);
         mainTable.add(scrollPane).colspan(3).fill().expand().pad(10).row();
 
-        createButton = new TextButton("Create LobbyInfo", skin);
+        createButton = new TextButton("Create Lobby", skin);
         refreshButton = new TextButton("Refresh List", skin);
 
         Table bottomTable = new Table();
@@ -99,41 +91,42 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
 
         setupEventListeners();
         gameClient.addLobbyListener(this);
+        gameClient.addLobbyListListener(this);
 
-//        refreshLobbyInfoList();
-//        updateCurrentLobbyInfo();
+        refreshLobbyList();
+        updateCurrentLobbyInfo();
     }
 
     private void setupEventListeners() {
         createButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                showCreateLobbyInfoDialog();
+                showCreateLobbyDialog();
             }
         });
 
         refreshButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                refreshLobbyInfoList();
+                refreshLobbyList();
             }
         });
 
+        startButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (currentLobbyId != null && isAdmin) {
+                    gameClient.startGame(currentLobbyId);
+                }
+            }
+        });
 
-//        startButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                if (currentLobbyInfoId != null && isAdmin) {
-//                    gameClient.startGame(currentLobbyInfoId);
-//                }
-//            }
-//        });
         leaveButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (currentLobbyInfoId != null) {
+                if (currentLobbyId != null) {
                     gameClient.leaveLobby();
-                    currentLobbyInfoId = null;
+                    currentLobbyId = null;
                     isAdmin = false;
                     updateCurrentLobbyInfo();
                 }
@@ -141,8 +134,8 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         });
     }
 
-    private void showCreateLobbyInfoDialog() {
-        Dialog dialog = new Dialog("Create New LobbyInfo", skin) {
+    private void showCreateLobbyDialog() {
+        Dialog dialog = new Dialog("Create New Lobby", skin) {
             @Override
             protected void result(Object object) {
                 if ((Boolean) object) {
@@ -155,7 +148,6 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
                         showError("Password is required for private lobbies");
                         return;
                     }
-                    System.err.println("creating lobby");
                     gameClient.createLobby(name, password, maxPlayers, isPrivate, true);
                 }
             }
@@ -164,12 +156,12 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         Table content = dialog.getContentTable();
         content.pad(15);
 
-        content.add(new Label("LobbyInfo Name:", skin)).padRight(10);
+        content.add(new Label("Lobby Name:", skin)).padRight(10);
         TextField nameField = new TextField("", skin);
         nameField.setName("name");
         content.add(nameField).width(200).row();
 
-        content.add(new Label("LobbyInfo Type:", skin)).padRight(10);
+        content.add(new Label("Lobby Type:", skin)).padRight(10);
         CheckBox privateCheckbox = new CheckBox(" Private", skin);
         privateCheckbox.setName("private");
         content.add(privateCheckbox).align(Align.left).row();
@@ -194,20 +186,20 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         dialog.show(stage);
     }
 
-    private void refreshLobbyInfoList() {
+    private void refreshLobbyList() {
         gameClient.requestLobbiesList();
     }
 
-    private void joinLobbyInfo(LobbyInfo lobby) {
+    private void joinLobby(LobbyInfo lobby) {
         if (lobby.isPrivate()) {
             showPasswordDialog(lobby);
         } else {
-            attemptJoinLobbyInfo(lobby.getId(), "");
+            attemptJoinLobby(lobby.getId(), "");
         }
     }
 
     private void showPasswordDialog(LobbyInfo lobby) {
-        Dialog dialog = new Dialog("Join Private LobbyInfo", skin);
+        Dialog dialog = new Dialog("Join Private Lobby", skin);
 
         Table content = dialog.getContentTable();
         content.pad(15);
@@ -221,18 +213,17 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         passwordField.setPasswordCharacter('*');
         content.add(passwordField).width(200).row();
 
+        Table buttonTable = dialog.getButtonTable();
         TextButton joinBtn = new TextButton("Join", skin);
         TextButton cancelBtn = new TextButton("Cancel", skin);
 
-        // Add buttons to dialog
-        dialog.getButtonTable().add(joinBtn).padRight(10);
-        dialog.getButtonTable().add(cancelBtn);
+        buttonTable.add(joinBtn).padRight(10);
+        buttonTable.add(cancelBtn);
 
-        // Set result converter
         joinBtn.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                attemptJoinLobbyInfo(lobby.getId(), passwordField.getText());
+                attemptJoinLobby(lobby.getId(), passwordField.getText());
                 dialog.hide();
             }
         });
@@ -244,38 +235,36 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
             }
         });
 
-
         dialog.show(stage);
     }
 
-    private void attemptJoinLobbyInfo(String lobbyId, String password) {
+    private void attemptJoinLobby(String lobbyId, String password) {
         gameClient.joinLobby(lobbyId, password);
     }
 
     private void updateCurrentLobbyInfo() {
-        currentLobbyInfoTable.clear();
-        if (currentLobbyInfoId == null) {
-            currentLobbyInfoTable.add("Not in any lobby").pad(20);
+        currentLobbyTable.clear();
+        if (currentLobbyId == null) {
+            currentLobbyTable.add("Not in any lobby").pad(20);
             startButton.setVisible(false);
             leaveButton.setVisible(false);
             return;
         }
 
-        LobbyInfo lobby = lobbiesMap.get(currentLobbyInfoId);
+        LobbyInfo lobby = lobbiesMap.get(currentLobbyId);
         if (lobby == null) {
-            currentLobbyInfoTable.add("LobbyInfo information not available").pad(20);
+            currentLobbyTable.add("Lobby information not available").pad(20);
             return;
         }
 
-        currentLobbyInfoTable.add(new Label("LobbyInfo:", skin)).padRight(5);
-        currentLobbyInfoTable.add(lobby.getName()).left().width(150).padRight(20);
+        currentLobbyTable.add(new Label("Lobby:", skin)).padRight(10);
+        currentLobbyTable.add(lobby.getName()).left().width(150).padRight(20);
 
-        currentLobbyInfoTable.add(new Label("Players:", skin)).padRight(5);
-        currentLobbyInfoTable.add(lobby.getPlayerCount() + "/" + lobby.getMaxPlayers()).left().width(50).padRight(20);
+        currentLobbyTable.add(new Label("Players:", skin)).padRight(10);
+        currentLobbyTable.add(lobby.getPlayerCount() + "/" + lobby.getMaxPlayers()).left().width(50).padRight(20);
 
-        currentLobbyInfoTable.add(new Label("Status:", skin)).padRight(5);
-        currentLobbyInfoTable.add(lobby.isPrivate() ? "Private" : "Public").left().row();
-
+        currentLobbyTable.add(new Label("Status:", skin)).padRight(10);
+        currentLobbyTable.add(lobby.isPrivate() ? "Private" : "Public").left().row();
 
         for (String player : lobby.getPlayers()) {
             Label playerLabel = new Label(player, skin);
@@ -283,7 +272,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
                 playerLabel.setText(player + " (Admin)");
                 playerLabel.setColor(1, 0.8f, 0, 1);
             }
-            currentLobbyInfoTable.add(playerLabel).colspan(6).align(Align.left).pad(3).row();
+            currentLobbyTable.add(playerLabel).colspan(6).align(Align.left).pad(3).row();
         }
 
         startButton.setVisible(isAdmin);
@@ -295,7 +284,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         Gdx.app.postRunnable(() -> {
             switch (event.getType()) {
                 case LOBBY_CREATED:
-                    handleLobbyInfoCreated(event.getLobbyData());
+                    handleLobbyCreated(event.getLobbyData());
                     break;
 
                 case JOIN_SUCCESS:
@@ -303,8 +292,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
                     break;
 
                 case LEFT:
-                    refreshLobbyInfoList();
-                    refreshLobbyInfoListUI();
+                    handleLeaveLobby();
                     break;
 
                 case GAME_STARTED:
@@ -318,24 +306,38 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         });
     }
 
-    private void updateLobbiesList(String jsonData) {
-        try {
-            JSONObject jsonLobbies = new JSONObject(jsonData);
-            lobbiesMap.clear();
+    private void handleLeaveLobby() {
+        currentLobbyId = null;
+        isAdmin = false;
+        refreshLobbyList();
+        updateCurrentLobbyInfo();
+        refreshLobbyListUI();
+    }
 
-            for (String lobbyId : jsonLobbies.keySet()) {
-                JSONObject lobbyJson = jsonLobbies.getJSONObject(lobbyId);
-                lobbiesMap.put(lobbyId, parseLobbyInfo(lobbyId, lobbyJson));
+    @Override
+    public void onLobbiesReceived(JSONObject lobbiesData) {
+        Gdx.app.postRunnable(() -> updateLobbiesList(lobbiesData));
+    }
+
+    private void updateLobbiesList(JSONObject lobbiesData) {
+        try {
+            lobbiesMap.clear();
+            JSONArray lobbiesArray = lobbiesData.getJSONArray("lobbies");
+
+            for (int i = 0; i < lobbiesArray.length(); i++) {
+                JSONObject lobbyJson = lobbiesArray.getJSONObject(i);
+                LobbyInfo lobby = parseLobbyInfo(lobbyJson);
+                lobbiesMap.put(lobby.getId(), lobby);
             }
-            refreshLobbyInfoListUI();
+            refreshLobbyListUI();
         } catch (JSONException e) {
-            showError("Error processing lobbies list");
+            showError("Error loading lobbies: " + e.getMessage());
         }
     }
 
-    private LobbyInfo parseLobbyInfo(String lobbyId, JSONObject json) {
+    private LobbyInfo parseLobbyInfo(JSONObject json) throws JSONException {
         LobbyInfo lobby = new LobbyInfo();
-        lobby.setId(lobbyId);
+        lobby.setId(json.getString("id"));
         lobby.setName(json.getString("name"));
         lobby.setOwner(json.getString("owner"));
         lobby.setPlayerCount(json.getInt("playerCount"));
@@ -343,29 +345,35 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         lobby.setPrivate(json.getBoolean("isPrivate"));
         lobby.setGameActive(json.getBoolean("isGameActive"));
 
-        java.util.List<String> players = new ArrayList<>();
-        JSONObject playersJson = json.getJSONObject("players");
-        for (String player : playersJson.keySet()) {
-            players.add(player);
+        List<String> players = new ArrayList<>();
+        if (json.has("players")) {
+            JSONObject playersJson = json.getJSONObject("players");
+            for (String player : playersJson.keySet()) {
+                players.add(player);
+            }
         }
         lobby.setPlayers(players);
         return lobby;
     }
 
-    private void refreshLobbyInfoListUI() {
+    private void refreshLobbyListUI() {
         lobbyListTable.clear();
 
         if (lobbiesMap.isEmpty()) {
             lobbyListTable.add("No public lobbies available").pad(20);
             return;
         }
-        lobbyListTable.add("LobbyInfo Name").pad(10).width(150);
-        lobbyListTable.add("Players").pad(10).width(80);
-        lobbyListTable.add("Status").pad(10).width(100);
-        lobbyListTable.add("").pad(10).width(100).row();
 
+        // Header row
+        lobbyListTable.add("Name").pad(20).width(100);
+        lobbyListTable.add("Players").pad(20).width(100);
+        lobbyListTable.add("Status").pad(20).width(150);
+        lobbyListTable.add("").pad(20).width(150).row();
+
+        // Lobby rows
         for (LobbyInfo lobby : lobbiesMap.values()) {
-            if (lobby.getId().equals(currentLobbyInfoId)) continue;
+            // Skip current lobby
+            if (lobby.getId().equals(currentLobbyId)) continue;
 
             lobbyListTable.add(lobby.getName()).pad(5).left();
             lobbyListTable.add(lobby.getPlayerCount() + "/" + lobby.getMaxPlayers()).pad(5);
@@ -380,7 +388,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
             joinButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    joinLobbyInfo(lobby);
+                    joinLobby(lobby);
                 }
             });
 
@@ -394,37 +402,33 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         }
     }
 
-    private void handleLobbyInfoCreated(String jsonData) {
+    private void handleLobbyCreated(String jsonData) {
         try {
             JSONObject lobbyJson = new JSONObject(jsonData);
-            String lobbyId = lobbyJson.getString("id");
+            LobbyInfo lobby = parseLobbyInfo(lobbyJson);
+            lobbiesMap.put(lobby.getId(), lobby);
 
-            LobbyInfo lobby = parseLobbyInfo(lobbyId, lobbyJson);
-            lobbiesMap.put(lobbyId, lobby);
-
-            currentLobbyInfoId = lobbyId;
+            currentLobbyId = lobby.getId();
             isAdmin = true;
             updateCurrentLobbyInfo();
-            refreshLobbyInfoList();
-            refreshLobbyInfoListUI();
+            refreshLobbyListUI();
         } catch (JSONException e) {
-            showError("Error processing created lobby");
+            showError("Error creating lobby: " + e.getMessage());
         }
     }
 
     private void handleJoinSuccess(String jsonData) {
         try {
             JSONObject lobbyJson = new JSONObject(jsonData);
-            String lobbyId = lobbyJson.getString("id");
+            LobbyInfo lobby = parseLobbyInfo(lobbyJson);
+            lobbiesMap.put(lobby.getId(), lobby);
 
-            LobbyInfo lobby = parseLobbyInfo(lobbyId, lobbyJson);
-            lobbiesMap.put(lobbyId, lobby);
-
-            currentLobbyInfoId = lobbyId;
+            currentLobbyId = lobby.getId();
             isAdmin = lobby.getOwner().equals(gameClient.getUsername());
             updateCurrentLobbyInfo();
+            refreshLobbyListUI();
         } catch (JSONException e) {
-            showError("Error processing joined lobby");
+            showError("Error joining lobby: " + e.getMessage());
         }
     }
 
@@ -449,24 +453,28 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         stage.getViewport().update(width, height, true);
     }
 
-    @Override public void show() {}
-    @Override public void pause() {}
-    @Override public void resume() {}
-    @Override public void hide() {}
+    @Override
+    public void show() {}
+
+    @Override
+    public void pause() {}
+
+    @Override
+    public void resume() {}
+
+    @Override
+    public void hide() {}
 
     @Override
     public void dispose() {
+//        gameClient.removeLobbyListener(this);
+//        gameClient.removeLobbyListListener(this);
         stage.dispose();
     }
 
     @Override
     public void handleNetworkEvent(NetworkEvent event) {
-
-    }
-
-    @Override
-    public void onLobbiesReceived(JSONObject lobbiesData) {
-        updateLobbiesList(lobbiesData.toString());
+        // Handle network events if needed
     }
 
     public class LobbyInfo {
@@ -477,11 +485,12 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         private int maxPlayers;
         private boolean isPrivate;
         private boolean isGameActive;
-        private java.util.List<String> players = new ArrayList<>();
+        private List<String> players = new ArrayList<>();
 
         // Getters and Setters
         public String getId() { return id; }
         public void setId(String id) { this.id = id; }
+
         public String getName() { return name; }
         public void setName(String name) { this.name = name; }
 
@@ -500,7 +509,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         public boolean isGameActive() { return isGameActive; }
         public void setGameActive(boolean isGameActive) { this.isGameActive = isGameActive; }
 
-        public java.util.List<String> getPlayers() { return players; }
+        public List<String> getPlayers() { return players; }
         public void setPlayers(List<String> players) { this.players = players; }
     }
 }
