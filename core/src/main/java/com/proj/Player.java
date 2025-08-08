@@ -41,6 +41,14 @@ public class Player {
     private final float WIDTH = 32;
     private final float HEIGHT = 32;
 
+
+    private float eatingAnimationTimer = 0f;
+    private static final float EATING_ANIM_DURATION = 0.5f;
+    private boolean isEating = false;
+
+    private com.proj.Model.Cooking.Buff activeBuff;
+    private float buffRemainingTime;
+
     public Player(WorldController worldController, float startX, float startY) {
         this.worldController = worldController;
         this.position = new Vector2(startX, startY);
@@ -132,6 +140,22 @@ public class Player {
             }
         } else {
             frameIndex = 0;
+        }
+
+        if (isEating) {
+            eatingAnimationTimer += delta;
+            if (eatingAnimationTimer >= EATING_ANIM_DURATION) {
+                isEating = false;
+                eatingAnimationTimer = 0;
+            }
+        }
+
+        if (activeBuff != null) {
+            buffRemainingTime -= delta;
+            if (buffRemainingTime <= 0) {
+                activeBuff = null;
+                Gdx.app.log("Player", "Buff expired.");
+            }
         }
     }
 
@@ -275,6 +299,44 @@ public class Player {
 
     public float getMaxEnergy() {
         return maxEnergy;
+    }
+
+
+
+    public void startEatingAnimation() {
+        isEating = true;
+        eatingAnimationTimer = 0;
+    }
+
+    public void applyBuff(com.proj.Model.Cooking.Buff buff) {
+        this.activeBuff = buff;
+        this.buffRemainingTime = buff.durationHours * 3600;
+        Gdx.app.log("Player", "Buff applied: " + buff.effect + " for " + buff.durationHours + " hours.");
+
+        if (buff.effect.contains("Max Energy")) {
+            try {
+                // فرض می‌کنیم فرمت "Max Energy +X" است
+                int energyIncrease = Integer.parseInt(buff.effect.split("\\+")[1].trim());
+                this.maxEnergy += energyIncrease;
+                this.currentEnergy = Math.min(this.currentEnergy + energyIncrease, this.maxEnergy); // انرژی فعلی هم افزایش یابد
+                Gdx.app.log("Player", "Max Energy increased by: " + energyIncrease);
+            } catch (NumberFormatException e) {
+                Gdx.app.error("Player", "Failed to parse Max Energy buff value: " + buff.effect);
+            }
+        }
+        // می‌توانید باف‌های دیگر را نیز اینجا مدیریت کنید (مثلاً Farming, Foraging, Fishing, Mining)
+    }
+
+    public com.proj.Model.Cooking.Buff getActiveBuff() {
+        return activeBuff;
+    }
+
+    public float getBuffRemainingTime() {
+        return buffRemainingTime;
+    }
+
+    public boolean isEating() {
+        return isEating;
     }
 
 }

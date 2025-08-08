@@ -47,6 +47,12 @@ public class GameAssetManager {
     private ForagingLoader foragingLoader;
     private HashMap<String, ResourceItem> resources = new HashMap<>();
 
+    private HashMap<String, TextureRegion> foodTextures;
+    private TextureRegion refrigeratorTexture;
+    private TextureRegion buffIconTexture;
+    private TextureRegion eatingEffectTexture;
+    private TextureRegion defaultIngredientTexture;
+
 
     private GameAssetManager() {
         skin = new Skin(Gdx.files.internal("skin/pixthulhu-ui.json"));
@@ -72,7 +78,13 @@ public class GameAssetManager {
         loadForagingItems();
         loadResources();
         spaceImageTexture = new Texture(Gdx.files.internal("NPCTable/npc_table.png"));
+        loadFoodTextures();
+        loadObjectTextures();
+        loadEffectTextures();
+
+        defaultIngredientTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/foraging/Leek.png")));
     }
+
 
     public Texture getSpaceImageTexture() {
         return spaceImageTexture;
@@ -347,7 +359,89 @@ public class GameAssetManager {
         if (spaceImageTexture != null) {
             spaceImageTexture.dispose();
         }
+        if (buffIconTexture != null && buffIconTexture.getTexture() != null) {
+            buffIconTexture.getTexture().dispose();
+        }
+
+        if (eatingEffectTexture != null && eatingEffectTexture.getTexture() != null) {
+            eatingEffectTexture.getTexture().dispose();
+        }
+
+        if (refrigeratorTexture != null && refrigeratorTexture.getTexture() != null) {
+            refrigeratorTexture.getTexture().dispose();
+        }
+
+        if (defaultIngredientTexture != null && defaultIngredientTexture.getTexture() != null) {
+            defaultIngredientTexture.getTexture().dispose();
+        }
+
+        for (TextureRegion texture : foodTextures.values()) {
+            if (texture != null && texture.getTexture() != null) {
+                texture.getTexture().dispose();
+            }
+        }
     }
+
+
+
+    private void loadEffectTextures() {
+        buffIconTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/food/Burnt.png")));
+        eatingEffectTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/food/Oil_of_Garlic_Buff.png")));
+    }
+
+    private void loadFoodTextures() {
+        foodTextures = new HashMap<>();
+        foodTextures.put("FriedEgg", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Fried_Egg.png"))));
+        foodTextures.put("BakedFish", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Baked_Fish.png"))));
+        foodTextures.put("Salad", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Salad.png"))));
+        foodTextures.put("Omelet", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Omelet.png"))));
+        foodTextures.put("PumpkinPie", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Pumpkin_Pie.png"))));
+        foodTextures.put("Spaghetti", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Spaghetti.png"))));
+        foodTextures.put("Pizza", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Pizza.png"))));
+        foodTextures.put("Tortilla", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Tortilla.png"))));
+        foodTextures.put("MakiRoll", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Maki_Roll.png"))));
+        foodTextures.put("TripleShotEspresso", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Triple_Shot_Espresso.png"))));
+        foodTextures.put("Cookie", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Cookie.png"))));
+        foodTextures.put("HashBrowns", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Hashbrowns.png"))));
+        foodTextures.put("Pancakes", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Pancakes.png"))));
+        foodTextures.put("FruitSalad", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Fruit_Salad.png"))));
+        foodTextures.put("RedPlate", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Red_Plate.png"))));
+        foodTextures.put("Bread", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Bread.png"))));
+        foodTextures.put("SalmonDinner", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Salmon_Dinner.png"))));
+        foodTextures.put("VegetableMedley", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Vegetable_Medley.png"))));
+        foodTextures.put("FarmersLunch", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Farmer%27s_Lunch.png"))));
+        foodTextures.put("SurvivalBurger", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Survival_Burger.png"))));
+        foodTextures.put("DishOTheSea", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Dish_O%27_The_Sea.png"))));
+        foodTextures.put("SeaformPudding", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Seafoam_Pudding.png"))));
+        foodTextures.put("MinersTreat", new TextureRegion(new Texture(Gdx.files.internal("assets/food/Miner%27s_Treat.png"))));
+    }
+
+
+    private void loadObjectTextures() {
+        refrigeratorTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/food/refrigerator.jpg")));
+    }
+
+    public TextureRegion getFoodTexture(String foodId) {
+        return foodTextures.getOrDefault(foodId, foodTextures.get("FriedEgg"));
+    }
+
+    public TextureRegion getIngredientTexture(String ingredientId) {
+        return defaultIngredientTexture;
+    }
+
+    public TextureRegion getRefrigeratorTexture() {
+        return refrigeratorTexture;
+    }
+
+    public TextureRegion getBuffIconTexture() {
+        return buffIconTexture;
+    }
+
+    public TextureRegion getEatingEffectTexture() {
+        return eatingEffectTexture;
+    }
+
+
 }
 
 

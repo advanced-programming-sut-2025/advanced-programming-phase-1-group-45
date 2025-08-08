@@ -20,6 +20,7 @@ import com.proj.Control.NPCManager;
 import com.proj.Control.WorldController;
 import com.proj.Control.AnimalBuildingController;
 import com.proj.Model.Animal.Animal;
+import com.proj.Model.Cooking.*;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.Inventory.InventoryManager;
@@ -51,7 +52,7 @@ public class GameScreen implements Screen {
     private int mapPixelWidth;
     private int mapPixelHeight;
     private boolean initialized = false;
-    private InventoryManager inventoryManager;
+    public InventoryManager inventoryManager;
     private boolean timeIsPaused = false;
     private Stage uistage;
     private Viewport uistageViewport;
@@ -87,6 +88,10 @@ public class GameScreen implements Screen {
     private boolean inStoreInterface = false;
     private BitmapFont font;
     private GlyphLayout glyphLayout = new GlyphLayout();
+
+    public Refrigerator refrigerator;
+    public CookingManager cookingManager;
+
 
     public GameScreen(farmName farm) {
         mapName = farm.getFarmName();
@@ -195,6 +200,10 @@ public class GameScreen implements Screen {
 
                 player = new Player(worldController, startX, startY);
                 player = new Player(worldController, startX, startY);
+
+                refrigerator = new Refrigerator(player.getPosition().x + 50, player.getPosition().y + 50);
+                cookingManager = new CookingManager(inventoryManager.getPlayerInventory(), refrigerator.getInventory());
+
                 energyBar = new EnergyBar(
                     player,
                     Gdx.graphics.getWidth() - 10,
@@ -221,7 +230,7 @@ public class GameScreen implements Screen {
                 camera.update();
 
                 initialized = true;
-
+                addInitialIngredients();
                 Gdx.app.log("GameScreen", "Game initialized successfully");
                 Gdx.app.log("EnergyBar", "Position: " + (Gdx.graphics.getWidth() - 250) + ", " + (Gdx.graphics.getHeight() - 40));
 
@@ -321,6 +330,15 @@ public class GameScreen implements Screen {
             worldController.getSpriteBatch().setProjectionMatrix(hudCamera.combined);
             worldController.getSpriteBatch().begin();
             energyBar.render(worldController.getSpriteBatch());
+            if (player.getActiveBuff() != null) {
+                Buff activeBuff = player.getActiveBuff();
+                TextureRegion buffIcon = GameAssetManager.getGameAssetManager().getBuffIconTexture();
+                if (buffIcon != null) {
+                    worldController.getSpriteBatch().draw(buffIcon, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 50, 32, 32);
+                }
+                String buffText = activeBuff.effect + " (" + (int)player.getBuffRemainingTime() + "s)";
+                font.draw(worldController.getSpriteBatch(), buffText, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 60);
+            }
             worldController.getSpriteBatch().end();
 
             uistageViewport.apply();
@@ -548,7 +566,6 @@ public class GameScreen implements Screen {
             }
 
             if (animalBuildingController != null && animalBuildingController.isShowingAnimalList()) {
-                // اگر لیست حیوانات نمایش داده می‌شود، کلیدهای عددی را برای انتخاب ابزار پردازش نکن
                 Gdx.app.log("GameScreen", "Animal list is showing, skipping tool selection");
             } else {
                 // انتخاب ابزار فقط زمانی که لیست حیوانات نمایش داده نمی‌شود
@@ -638,6 +655,49 @@ public class GameScreen implements Screen {
                     connectAnimalToBuilding(animalManager.getSelectedAnimal(), isBarn, buildingIndex);
                 }
             }
+
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+                StorageScreen storageScreen = new StorageScreen(
+                    (Main)Gdx.app.getApplicationListener(),
+                    GameAssetManager.getGameAssetManager().getSkin(),
+                    player
+                );
+                ((Main)Gdx.app.getApplicationListener()).setScreen(storageScreen);
+                Gdx.app.log("GameScreen", "Opening storage screen.");
+            }
+
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+                InventoryItem selectedItem = inventoryManager.getPlayerInventory().getSelectedItem();
+                if (selectedItem instanceof FoodItem) {
+                    FoodItem food = (FoodItem) selectedItem;
+                    if (food.getQuantity() > 0) {
+                        food.use(player);
+                        food.decreaseQuantity(1);
+                        if (food.getQuantity() <= 0) {
+                            inventoryManager.getPlayerInventory().removeItem(inventoryManager.getPlayerInventory().getSelectedSlot());
+                        }
+                    } else {
+                        Gdx.app.log("GameScreen", "No " + food.getName() + " left to eat.");
+                    }
+                } else {
+                    Gdx.app.log("GameScreen", "Selected item is not edible.");
+                }
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
+                CookingScreen cookingScreen = new CookingScreen(
+                    (Main)Gdx.app.getApplicationListener(),
+                    GameAssetManager.getGameAssetManager().getSkin(),
+                    inventoryManager,
+                    cookingManager,
+                    player
+                );
+                ((Main)Gdx.app.getApplicationListener()).setScreen(cookingScreen);
+                Gdx.app.log("GameScreen", "Opening cooking screen.");
+            }
+
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Error in handleInput method", e);
         }
@@ -709,4 +769,36 @@ public class GameScreen implements Screen {
             Gdx.app.error("GameScreen", "Error in handleToolUse method", e);
         }
     }
+
+
+
+    private void addInitialIngredients() {
+        String[] basicIngredients = {
+            "Egg", "Milk", "Wheat", "Wheat Flour", "Sugar", "Tomato", "Cheese",
+            "Corn", "Rice", "Fiber", "Coffee", "Potato", "Oil", "Blueberry",
+            "Melon", "Apricot", "Red Cabbage", "Radish", "Amaranth", "Kale",
+            "Beet", "Parsnip", "Carrot", "Eggplant", "Sardine", "Salmon",
+            "Flounder", "Midnight Carp", "Leek", "Dandelion", "Pumpkin"
+        };
+
+        TextureRegion tempTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/foraging/Leek.png")));
+
+        for (String ingredient : basicIngredients) {
+            InventoryItem item = new InventoryItem(ingredient, ingredient, tempTexture, true, 99) {
+                @Override
+                public void use() {
+                }
+            };
+            item.setQuantity(1);
+            refrigerator.getInventory().addItem(item);
+        }
+
+        inventoryManager.getPlayerInventory().addItem(new FoodItem("FriedEgg", "Fried Egg", 50, null, 0));
+        inventoryManager.getPlayerInventory().addItem(new FoodItem("Pizza", "Pizza", 150, null, 0));
+        inventoryManager.getPlayerInventory().addItem(new FoodItem("TripleShotEspresso", "Triple Shot Espresso", 200, "Max Energy +100", 5));
+    }
+
+
+
+
 }
