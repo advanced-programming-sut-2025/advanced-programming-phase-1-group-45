@@ -16,12 +16,11 @@ public class LoginMenuView implements Screen {
     private final Table table;
     private final Label errorMessage;
     private final Label menuTitle;
-    private final TextField username;
-    private final TextField password;
+    private final TextField usernameField;
+    private final TextField passwordField;
     private final TextButton loginButton;
     private final TextButton forgotPasswordButton;
     private Image backgroundImage;
-
     private final LoginMenuController controller;
 
     public LoginMenuView(LoginMenuController controller, Skin skin) {
@@ -33,18 +32,18 @@ public class LoginMenuView implements Screen {
         table.center();
 
         menuTitle = new Label("Login Menu", skin);
-        username = new TextField("", skin);
-        username.setMessageText("Username");
+        usernameField = new TextField("", skin);
+        usernameField.setMessageText("Username or Email");  // Updated hint text
 
-        password = new TextField("", skin);
-        password.setMessageText("Password");
-        password.setPasswordMode(true);
+        passwordField = new TextField("", skin);
+        passwordField.setMessageText("Password");
+        passwordField.setPasswordMode(true);
 
         loginButton = new TextButton("Login", skin);
-        forgotPasswordButton = new TextButton("Forget Password?", skin);
+        forgotPasswordButton = new TextButton("Forgot Password?", skin);
 
         errorMessage = new Label("", skin);
-        errorMessage.setColor(1, 0, 0, 1);
+        errorMessage.setColor(1, 0, 0, 1);  // Red color for errors
         backgroundImage = new Image(Main.menuBackground);
     }
 
@@ -53,21 +52,33 @@ public class LoginMenuView implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
+        // Clear existing actors if any
+        stage.clear();
+
+        // Build UI layout
+        table.clear();
         table.row().pad(10, 0, 10, 0);
-        table.add(errorMessage);
+        table.add(errorMessage).colspan(2);
         table.row().pad(10);
-        table.add(menuTitle);
+        table.add(menuTitle).colspan(2);
         table.row().pad(10);
-        table.add(username).width(300);
+        //table.add(new Label("Username/Email:", skin)).right().padRight(10);
+        table.add(usernameField).width(300);
         table.row().pad(10);
-        table.add(password).width(300);
-        table.row().pad(10);
-        table.add(loginButton);
-        table.row().pad(10);
-        table.add(forgotPasswordButton);
+        //table.add(new Label("Password:", skin)).right().padRight(10);
+        table.add(passwordField).width(300);
+        table.row().pad(15);
+        table.add(loginButton).colspan(2).width(150);
+        table.row().pad(5);
+        table.add(forgotPasswordButton).colspan(2);
+
         backgroundImage.setFillParent(true);
         stage.addActor(backgroundImage);
         stage.addActor(table);
+
+        // Setup event handlers
+        controller.handleLoginButton();
+        controller.handleForgetPasswordButton();
     }
 
     @Override
@@ -75,21 +86,25 @@ public class LoginMenuView implements Screen {
         ScreenUtils.clear(0.7f, 0.6f, 0.7f, 1);
         stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
         stage.draw();
-
-        controller.handleLoginButton();
-        controller.handleForgetPasswordButton();
     }
 
-    public TextField getUsername() { return username; }
-    public TextField getPassword() { return password; }
+    // Getters
+    public TextField getUsername() { return usernameField; }
+    public TextField getPassword() { return passwordField; }
     public TextButton getLoginButton() { return loginButton; }
     public TextButton getForgotPasswordButton() { return forgotPasswordButton; }
     public Label getErrorMessage() { return errorMessage; }
 
-    @Override public void resize(int width, int height) {}
+    // Other lifecycle methods
+    @Override public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
+    }
     @Override public void pause() {}
     @Override public void resume() {}
-    @Override public void hide() {}
-    @Override public void dispose() {}
-
+    @Override public void hide() {
+        Gdx.input.setInputProcessor(null);
+    }
+    @Override public void dispose() {
+        stage.dispose();
+    }
 }
