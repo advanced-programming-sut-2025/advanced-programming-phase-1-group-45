@@ -32,4 +32,18 @@ public class Authenticator {
         return null;
     }
 
+     public static boolean isEmailValid(String email) {
+        return email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
+    }
+
+    public static User getUserByUsernameOrEmail(String identifier) {
+        for (User user : App.getUsers()) {
+            if (user.getUsername().equals(identifier) ||
+                user.getEmail().equals(identifier)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
 }
