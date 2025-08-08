@@ -22,6 +22,9 @@ public class SignupMenuView implements Screen {
     private final SignupMenuController controller;
     private Image backgroundImage;
     private final TextButton generatePasswordButton;
+    private final TextField emailField; // NEW
+    private final TextField nicknameField; // NEW
+    private final SelectBox<String> genderSelectBox;
 
 
     public SignupMenuView(SignupMenuController controller, Skin skin) {
@@ -46,6 +49,16 @@ public class SignupMenuView implements Screen {
         this.errorMessage = new Label("", skin);
         errorMessage.setColor(1, 0, 0, 1);
         backgroundImage = new Image(Main.menuBackground);
+
+        this.emailField = new TextField("", skin);
+        emailField.setMessageText("enter Email");
+
+        this.nicknameField = new TextField("", skin);
+        nicknameField.setMessageText("enter Nickname");
+
+        this.genderSelectBox = new SelectBox<>(skin);
+        genderSelectBox.setItems("Male", "Female", "Non-binary", "Prefer not to say");
+        genderSelectBox.setSelected("Prefer not to say");
 
         controller.setView(this);
     }
@@ -72,9 +85,17 @@ public class SignupMenuView implements Screen {
         table.add(signUpButton).width(300);
         table.row().pad(10, 0, 10, 0);
         table.add(guestButton).width(300);
-        table.row().pad(10, 0, 10, 0); 
+        table.row().pad(10, 0, 10, 0);
         table.add(generatePasswordButton).width(500); // NEW BUTTON
-        
+        table.row().pad(10, 0, 10, 0);
+        table.add(emailField).width(400); // NEW
+        table.row().pad(10, 0, 10, 0);
+        table.add(nicknameField).width(400); // NEW
+        table.row().pad(10, 0, 10, 0);
+        //table.add(new Label("Gender:", new Skin())).left(); // NEW
+        table.row().pad(5, 0, 10, 0);
+        table.add(genderSelectBox).width(400).left(); // NEW
+
         backgroundImage.setFillParent(true);
         stage.addActor(backgroundImage);
         stage.addActor(table);
@@ -113,5 +134,16 @@ public class SignupMenuView implements Screen {
     public Label getErrorMessage() { return errorMessage; }
     public TextButton getGeneratePasswordButton() {//new
         return generatePasswordButton;
+    }
+    public TextField getEmailField() {
+        return emailField;
+    }
+
+    public TextField getNicknameField() {
+        return nicknameField;
+    }
+
+    public SelectBox<String> getGenderSelectBox() {
+        return genderSelectBox;
     }
 }
