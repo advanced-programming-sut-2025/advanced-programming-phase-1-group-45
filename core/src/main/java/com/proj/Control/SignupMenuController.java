@@ -1,35 +1,26 @@
 package com.proj.Control;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.proj.Database.DatabaseHelper;
 import com.proj.Main;
 import com.proj.View.*;
 import com.proj.Model.*;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.graphics.Color;
 
-//help
 public class SignupMenuController {
     private SignupMenuView view;
     private Skin skin;
+    private final DatabaseHelper dbHelper = new DatabaseHelper();
 
     public void setView(SignupMenuView view) {
         this.view = view;
         this.skin = GameAssetManager.getGameAssetManager().getSkin();
+        dbHelper.connect();
     }
-
-    /*public void handleGuestButton() {
-        if (view != null) {
-            view.getGuestButton().addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    Main.getMain().getScreen().dispose();
-                    Main.getMain().setScreen(new PreGameMenuView(new PreGameMenuController(), skin));
-                }
-            });
-        }
-    }*/
     public void handleGuestButton() {
         if (view != null) {
             view.getGuestButton().addListener(new ClickListener() {
@@ -42,25 +33,6 @@ public class SignupMenuController {
         }
     }
 
-
-    /*public void handleSignupMenuButton() {
-        if (view != null) {
-            view.getSignUpButton().addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    String username = view.getUsername().getText();
-                    String password = view.getPassword().getText();
-                    String securityAnswer = view.getSecurityQuestion().getText();
-
-                    if (signup(username, password, securityAnswer)) {
-                        Main.getMain().getScreen().dispose();
-                        Main.getMain().setScreen(new LoginMenuView(new LoginMenuController(), skin));
-                    }
-                }
-            });
-        }
-    }*/
-
     public void handleSignupMenuButton() {
         if (view != null) {
             view.getSignUpButton().addListener(new ClickListener() {
@@ -69,17 +41,14 @@ public class SignupMenuController {
                     String username = view.getUsername().getText();
                     String password = view.getPassword().getText();
                     String securityAnswer = view.getSecurityQuestion().getText();
+                    // NEW FIELDS
+                    String email = view.getEmailField().getText();
+                    String nickname = view.getNicknameField().getText();
+                    String gender = view.getGenderSelectBox().getSelected();
 
-                    if (signup(username, password, securityAnswer)) {
-                        // Switch directly to login screen after successful registration
-                        try {
-                            Main.getMain().getGameClient().connect();
-                            Main.getMain().authenticate(username, password, securityAnswer);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            System.exit(0);
-                        }
-
+                    // UPDATED METHOD CALL
+                    if (signup(username, password, securityAnswer, email, nickname, gender)) {
+                        Main.getMain().getGameClient().connect();
                         Main.getMain().setScreen(new LoginMenuView(
                             new LoginMenuController(),
                             skin
@@ -91,23 +60,18 @@ public class SignupMenuController {
     }
 
 
-    public boolean signup(String username, String password, String securityAnswer) {
-        if (!Authenticator.isUsernameUnique(username)) {
-            view.getErrorMessage().setText("Username is already taken!");
-            return false;
-        }
-        else if (!Authenticator.isPasswordStrong(password)) {
-            view.getErrorMessage().setText("Password is weak!");
-            return false;
-        }
-        else {
-            User user = new User();
-            user.setUsername(username);
-            user.setPassword(password);
-            user.setSecurityAnswer(securityAnswer);
+    public boolean signup(String username, String password, String securityAnswer,
+                          String email, String nickname, String gender) {
+        // Add user to database
+        boolean success = dbHelper.addUser(username, password, securityAnswer,
+            email, nickname, gender);
 
-            App.addUser(user);
+        if (success) {
+            Gdx.app.log("Signup", "User registered successfully: " + username);
             return true;
+        } else {
+            view.getErrorMessage().setText("Registration failed! Check logs for details.");
+            return false;
         }
     }
 
