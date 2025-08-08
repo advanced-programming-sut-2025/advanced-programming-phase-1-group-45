@@ -29,6 +29,8 @@ public class Main extends Game {
     private static final String MUSIC_VOLUME_KEY = "volume";
     private static final float DEFAULT_VOLUME = 0.5f;
     public static Texture menuBackground;
+    public GameScreen gameScreen;
+    public Refrigerator refrigerator;
 
     private static final String SERVER_ADDRESS = "127.0.0.1";
     private static final int SERVER_PORT = 8080;
@@ -208,6 +210,14 @@ public class Main extends Game {
 
     public GameClient getGameClient() {
         return gameClient;
+    }
+
+     public Refrigerator getRefrigerator() {
+        return refrigerator;
+    }
+
+    public GameScreen getGameScreen() {
+        return gameScreen;
     }
 }
 
