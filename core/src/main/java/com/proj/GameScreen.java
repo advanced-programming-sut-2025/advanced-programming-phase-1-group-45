@@ -27,7 +27,7 @@ import com.proj.Model.Inventory.PlayerBag;
 import com.proj.Model.Inventory.Tool;
 import com.proj.Model.TimeAndWeather.time.Time;
 import com.proj.Model.mapObjects.NPCObject;
-import com.proj.Map.farmName;
+import com.proj.map.farmName;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.proj.Model.EnergyBar;

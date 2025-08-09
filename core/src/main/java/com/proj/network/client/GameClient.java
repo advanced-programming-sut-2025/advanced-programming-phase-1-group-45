@@ -5,9 +5,10 @@ import com.badlogic.gdx.utils.Disposable;
 import com.proj.network.event.GameEvent;
 import com.proj.network.event.LobbyEvent;
 import com.proj.network.event.NetworkEvent;
-import com.proj.network.message.*;
-import org.json.JSONArray;
-import org.json.JSONException;
+import com.proj.network.message.AuthRequest;
+import com.proj.network.message.JsonBuilder;
+import com.proj.network.message.JsonParser;
+import com.proj.network.message.NetworkMessage;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -51,8 +52,10 @@ public class GameClient implements Disposable, Runnable {
             in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
             running.set(true);
-            networkThread = new Thread(this, "Network-Thread");
-            networkThread.start();
+            if (networkThread == null || !networkThread.isAlive()) {
+                networkThread = new Thread(this, "Network-Thread");
+                networkThread.start();
+            }
 
             startPingTask();
             fireEvent(NetworkEvent.Type.CONNECTED, "Connected to server");
@@ -62,12 +65,28 @@ public class GameClient implements Disposable, Runnable {
         }
     }
 
-    public void addLobbyListener(LobbyEventListener listener) {
-        lobbyListeners.add(listener);
+    public void addLobbyEventListener(LobbyEventListener listener) {
+        if (!lobbyListeners.contains(listener)) {
+            lobbyListeners.add(listener);
+        }
     }
 
     public void addLobbyListListener(LobbyListListener listener) {
-        lobbyListListeners.add(listener);
+        if (!lobbyListListeners.contains(listener)) {
+            lobbyListListeners.add(listener);
+        }
+    }
+
+    public void removeLobbyEventListener(LobbyEventListener listener) {
+        lobbyListeners.remove(listener);
+    }
+
+    public void removeLobbyListListener(LobbyListListener listener) {
+        lobbyListListeners.remove(listener);
+    }
+
+    public void removeNetworkEventListener(NetworkEventListener listener) {
+        listeners.remove(listener);
     }
 
     @Override
@@ -117,14 +136,15 @@ public class GameClient implements Disposable, Runnable {
                     break;
 
                 case "LOBBY_CREATED":
-                    System.err.println("GameClient lobby has been created");
                     handleLobbyCreated(data);
                     break;
 
                 case "JOIN_SUCCESS":
                     handleJoinLobby(data);
                     break;
-
+                case "LOBBY_ADDED" :
+                    handleLobbyAdded(data);
+                    break;
                 case "LEAVE_SUCCESS":
                     handleLeaveLobby();
                     break;
@@ -190,6 +210,14 @@ public class GameClient implements Disposable, Runnable {
         }
     }
 
+    private void handleLobbyAdded(JSONObject data) {
+        try {
+            fireLobbyEvent(LobbyEvent.Type.LOBBY_ADDED, data);
+        } catch (Exception e) {
+            fireEvent(NetworkEvent.Type.ERROR, "Error processing lobby added: " + e.getMessage());
+        }
+    }
+
     private void handleJoinLobby(JSONObject data) {
         try {
             currentLobbyId = JsonParser.getString(data, "id", "");
@@ -201,7 +229,7 @@ public class GameClient implements Disposable, Runnable {
 
     private void handleLeaveLobby() {
         currentLobbyId = null;
-        fireLobbyEvent(LobbyEvent.Type.LEFT, null);
+        fireLobbyEvent(LobbyEvent.Type.LEFT, JsonBuilder.empty());
     }
 
     private void handlePrivateChat(JSONObject data) {
@@ -224,8 +252,8 @@ public class GameClient implements Disposable, Runnable {
         }
     }
 
-    public void authenticate(String username, String password, String securityQuestion) {
-        AuthRequest request = new AuthRequest(username, password, securityQuestion);
+    public void login(String username, String password) {
+        AuthRequest request = new AuthRequest(username, password);
         sendMessage("AUTH", request.toJson());
     }
 
@@ -252,6 +280,7 @@ public class GameClient implements Disposable, Runnable {
     public void joinLobby(String lobbyId, String password) {
         JSONObject data = JsonBuilder.create()
             .put("lobbyId", lobbyId)
+            .put("password", password)
             .put("password", password)
             .build();
 
@@ -351,8 +380,10 @@ public class GameClient implements Disposable, Runnable {
 
     private void fireLobbyEvent(LobbyEvent.Type type, JSONObject data) {
         LobbyEvent event = new LobbyEvent(type, data.toString());
-        for (LobbyEventListener listener : lobbyListeners) {
-            (listener).handleLobbyEvent(event);
+        for (NetworkEventListener listener : lobbyListeners) {
+            if (listener instanceof LobbyEventListener) {
+                ((LobbyEventListener) listener).handleLobbyEvent(event);
+            }
         }
     }
 
@@ -367,9 +398,7 @@ public class GameClient implements Disposable, Runnable {
 
     private void fireLobbyListEvent(JSONObject data) {
         for (LobbyListListener listener : lobbyListListeners) {
-            if (listener instanceof LobbyListListener) {
-                ((LobbyListListener) listener).onLobbiesReceived(data);
-            }
+            (listener).onLobbiesReceived(data);
         }
     }
 

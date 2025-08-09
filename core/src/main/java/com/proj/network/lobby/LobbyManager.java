@@ -15,7 +15,7 @@ public class LobbyManager {
         this.server = server;
     }
 
-    public GameLobby createAndGetLobby(String lobbyName, String owner, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
+    public synchronized GameLobby createAndGetLobby(String lobbyName, String owner, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
         String lobbyId = generateLobbyId();
         GameLobby lobby = new GameLobby(lobbyId, lobbyName, owner, maxPlayers, isPrivate, isVisible, server);
 
@@ -26,6 +26,7 @@ public class LobbyManager {
         gameLobbies.put(lobbyId, lobby);
 
         System.out.println("Lobby Manager : createLobby");
+        System.out.println("Lobby ID : " + gameLobbies.get(lobbyId).getId());
         return lobby;
     }
 

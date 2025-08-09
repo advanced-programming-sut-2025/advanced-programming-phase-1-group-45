@@ -1,5 +1,5 @@
 
-package com.proj.Map;
+package com.proj.map;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;

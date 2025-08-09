@@ -1,4 +1,4 @@
-package com.proj.Map;
+package com.proj.map;
 
 public enum farmName {
     STANDARD("Standard", "A simple plot of land, with a large amount of open space to design your farm."),

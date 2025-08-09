@@ -6,7 +6,6 @@ import com.proj.network.message.JsonBuilder;
 import com.proj.network.message.JsonParser;
 import com.proj.network.message.NetworkMessage;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -15,7 +14,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
-import com.proj.network.message.JsonBuilder;
 
 public class ClientHandler implements Runnable {
     private final Socket clientSocket;
@@ -42,7 +40,7 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-            if (!signUp()) {
+            if (!login()) {
                 return;
             }
 
@@ -69,7 +67,15 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private boolean signUp() throws IOException {
+
+    private boolean loggedIn = false;
+    public boolean getLoggedIn() {
+        return loggedIn;
+    }
+    public void setLoggedIn(boolean loggedIn) {
+        this.loggedIn = loggedIn;
+    }
+    private boolean login() throws IOException {
         // Send structured auth request
         JSONObject requestData = JsonBuilder.create()
             .put("message", "Please enter your credentials")
@@ -91,18 +97,13 @@ public class ClientHandler implements Runnable {
             JSONObject credentials = authMessage.getData();
             String username = JsonParser.getString(credentials, "username", "");
             String password = JsonParser.getString(credentials, "password", "");
-            String securityQuestion = JsonParser.getString(credentials, "securityQuestion", "");
 
             if (username.isEmpty() || password.isEmpty()) {
                 sendError("AUTH_FAILED", "Missing username or password");
                 return false;
             }
 
-           // boolean authenticated = server.getDatabaseHelper().addUser(username, password, securityQuestion);
-              boolean authenticated = server.getDatabaseHelper().verifyUser(username, password);
-
-
-            if (authenticated) {
+//            if (loggedIn) {
                 // Handle existing connections
                 if (server.getConnectedClients().containsKey(username)) {
                     ClientHandler existingClient = server.getConnectedClients().get(username);
@@ -120,10 +121,10 @@ public class ClientHandler implements Runnable {
                     .put("username", username)
                     .build());
                 return true;
-            } else {
-                sendError("AUTH_FAILED", "Registration failed");
-                return false;
-            }
+//            } else {
+//                sendError("AUTH_FAILED", "Registration failed");
+//                return false;
+//            }
         } catch (Exception e) {
             sendError("AUTH_FAILED", "Invalid authentication format");
             return false;
@@ -340,22 +341,24 @@ public class ClientHandler implements Runnable {
         sendMessage("ERROR", error);
     }
 
-    private void sendLobbiesList() {
+    public void sendLobbiesList() {
+        System.out.println("CLientHAndler Sending lobbies list");
         JSONArray lobbiesArray = new JSONArray();
 
         for (GameLobby lobby : server.getGameLobbies().values()) {
-            if (lobby.isVisible() || lobby.hasPlayer(username)) {
-                JSONObject lobbyInfo = lobby.getLobbyInfo();
+            System.out.println("sending  " + lobby.getName() + " lobby: " + lobby.getId());
+//            if (lobby.isVisible() || lobby.hasPlayer(username)) {
+            JSONObject lobbyInfo = lobby.getLobbyInfo();
 
-                if (lobby.hasPlayer(username)) {
-                    JSONObject players = new JSONObject();
-                    for (String playerName : lobby.getPlayers().keySet()) {
-                        players.put(playerName, true);
-                    }
-                    lobbyInfo.put("players", players);
+            if (lobby.hasPlayer(username)) {
+                JSONArray players = new JSONArray();
+                for (String playerName : lobby.getPlayers().keySet()) {
+                    players.put(playerName);
                 }
-                lobbiesArray.put(lobbyInfo);
+                lobbyInfo.put("players", players);
             }
+            lobbiesArray.put(lobbyInfo);
+//            }
         }
 
         JSONObject data = JsonBuilder.create()
@@ -386,5 +389,9 @@ public class ClientHandler implements Runnable {
 
     public String getUsername() {
         return username;
+    }
+
+    public boolean isRunning() {
+        return running.get() && !clientSocket.isClosed();
     }
 }

@@ -3,6 +3,7 @@ package com.proj.network;
 import com.proj.Database.DatabaseHelper;
 import com.proj.network.lobby.GameLobby;
 import com.proj.network.lobby.LobbyManager;
+import com.proj.network.message.JsonBuilder;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class GameServer {
 
     public void start() {
         if (running) {
-            System.err.println("GameServer " +  "server is already running");
+            System.out.println("GameServer " +  "server is already running");
             return;
         }
 
@@ -51,7 +52,7 @@ public class GameServer {
             serverSocket.bind(new InetSocketAddress(PORT));
 
             running = true;
-            System.err.println("GameServer " +  "Game server started on port " + PORT);
+            System.out.println("GameServer " +  "Game server started on port " + PORT);
 
             Thread gameUpdateThread = new Thread(new GameUpdateTask(this));
             gameUpdateThread.setDaemon(true);
@@ -61,7 +62,7 @@ public class GameServer {
             acceptConnections();
 
         } catch (IOException e) {
-            System.err.println("GameServer " +  "Error starting server" +  e);
+            System.out.println("GameServer " +  "Error starting server" +  e);
         } finally {
             shutdown();
         }
@@ -75,7 +76,7 @@ public class GameServer {
                 gameManager.checkInactiveGames();
                 logServerStats();
             } catch (Exception e) {
-                System.err.println("GameServer " +  "Error in maintenance tasks" +  e);
+                System.out.println("GameServer " +  "Error in maintenance tasks" +  e);
             }
         }, MAINTENANCE_INTERVAL_SECONDS, MAINTENANCE_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
@@ -84,10 +85,10 @@ public class GameServer {
         try {
             while (running && !serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept();
-                System.err.println("GameServer " +  "New connection from: " + clientSocket.getInetAddress());
+                System.out.println("GameServer " +  "New connection from: " + clientSocket.getInetAddress());
 
                 if (connectedClients.size() >= MAX_PLAYERS) {
-                    System.err.println("GameServer " +  "Server is full. New connection rejected.");
+                    System.out.println("GameServer " +  "Server is full. New connection rejected.");
                     sendServerFullMessage(clientSocket);
                     clientSocket.close();
                     continue;
@@ -98,7 +99,7 @@ public class GameServer {
             }
         } catch (IOException e) {
             if (running && !serverSocket.isClosed()) {
-                System.err.println("GameServer " +  "Error accepting connections" + e);
+                System.out.println("GameServer " +  "Error accepting connections" + e);
             }
         }
     }
@@ -116,21 +117,28 @@ public class GameServer {
             response.put("data", data);
             out.println(response.toString());
         } catch (IOException e) {
-            System.err.println("GameServer " +  "Error sending server full message" + e);
+            System.out.println("GameServer " +  "Error sending server full message" + e);
         }
     }
 
     public void registerClient(String username, ClientHandler handler) {
+        if (connectedClients.containsKey(username)) {
+            ClientHandler oldHandler = connectedClients.get(username);
+            oldHandler.sendMessage("DISCONNECT", JsonBuilder.create()
+                .put("message", "New login detected")
+                .build());
+            oldHandler.shutdown();
+        }
         connectedClients.put(username, handler);
         broadcastSystemMessage(username + " joined the game");
-        System.err.println("GameServer " +  "User registered: " + username);
+        System.out.println("GameServer " +  "User registered: " + username);
     }
 
     public void removeClient(String username) {
         connectedClients.remove(username);
         lobbyManager.removePlayer(username);
         broadcastSystemMessage(username + " left the game");
-        System.err.println("GameServer " +  "User removed: " + username);
+        System.out.println("GameServer " +  "User removed: " + username);
     }
 
     public void broadcastSystemMessage(String message) {
@@ -143,13 +151,16 @@ public class GameServer {
 
         String jsonMessage = messageObj.toString();
 
-        for (ClientHandler handler : connectedClients.values()) {
-            handler.sendRaw(jsonMessage);
+        for (Map.Entry<String, ClientHandler> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
+            ClientHandler handler = entry.getValue();
+            if (handler != null && handler.isRunning()) {
+                handler.sendRaw(jsonMessage);
+            }
         }
     }
 
     public void createLobby(String lobbyName, String owner, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
-        System.err.println("GameServer " +  "Creating a new lobby: " + lobbyName);
+        System.out.println("GameServer " +  "Creating a new lobby: " + lobbyName);
 
         GameLobby lobby = lobbyManager.createAndGetLobby(lobbyName, owner, password, maxPlayers, isPrivate, isVisible);
         ClientHandler ownerHandler = connectedClients.get(owner);
@@ -161,9 +172,16 @@ public class GameServer {
             response.put("data", lobby.getLobbyInfo());
 
             ownerHandler.sendRaw(response.toString());
+            broadcastLobbiesList();
+
         }
 
-        System.err.println("GameServer " +  "Lobby created: " + lobbyName + " with ID: " + lobby.getId());
+        System.out.println("GameServer " +  "Lobby created: " + lobbyName + " with ID: " + lobby.getId());
+    }
+    public void broadcastLobbiesList() {
+        for (ClientHandler handler : connectedClients.values()) {
+            handler.sendLobbiesList();
+        }
     }
 
     public void joinLobby(String lobbyId, String username, String password) {
@@ -171,7 +189,7 @@ public class GameServer {
         ClientHandler client = connectedClients.get(username);
 
         if (client == null) {
-            System.err.println("GameServer " +  "Username not found: " + username);
+            System.out.println("GameServer " +  "Username not found: " + username);
             return;
         }
 
@@ -239,7 +257,7 @@ public class GameServer {
         ClientHandler client = connectedClients.get(username);
 
         if (client == null) {
-            System.err.println("GameServer " +  "Username not found: " + username);
+            System.out.println("GameServer " +  "Username not found: " + username);
             return;
         }
 
@@ -337,7 +355,7 @@ public class GameServer {
         for (Map.Entry<String, ClientHandler> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
             ClientHandler handler = entry.getValue();
             if (handler.isTimedOut()) {
-                System.err.println("GameServer " +  "User removed due to inactivity: " + entry.getKey());
+                System.out.println("GameServer " +  "User removed due to inactivity: " + entry.getKey());
                 handler.shutdown();
                 removeClient(entry.getKey());
             }
@@ -351,13 +369,13 @@ public class GameServer {
             GameLobby lobby = entry.getValue();
             if (lobby.isEmpty() || (lobby.isInactive(inactivityTimeout) && !lobby.isGameActive())) {
                 lobbyManager.getGameLobbiesMap().remove(entry.getKey());
-                System.err.println("GameServer " +  "Inactive lobby removed: " + entry.getKey());
+                System.out.println("GameServer " +  "Inactive lobby removed: " + entry.getKey());
             }
         }
     }
 
     private void logServerStats() {
-        System.err.println("GameServer " +  String.format(
+        System.out.println("GameServer " +  String.format(
             "Server stats: %d online users, %d active lobbies, %d running games",
             connectedClients.size(),
             lobbyManager.getGameLobbiesMap().size(),
@@ -397,9 +415,9 @@ public class GameServer {
             maintenanceService.shutdownNow();
             dbHelper.disconnect();
 
-            System.err.println("GameServer" +  "Server closed successfully");
+            System.out.println("GameServer" +  "Server closed successfully");
         } catch (IOException e) {
-            System.err.println("GameServer" +  "Error closing server" + e);
+            System.out.println("GameServer" +  "Error closing server" + e);
         }
     }
 

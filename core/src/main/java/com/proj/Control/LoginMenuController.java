@@ -46,6 +46,14 @@ public class LoginMenuController {
                 User authenticatedUser = dbHelper.authenticateUser(identifier, password);
                 if (authenticatedUser != null) {
                     // Proceed to game screen with authenticated user
+                    try {
+                        Main.getMain().getGameClient().connect();
+                        Main.getMain().loginClient(authenticatedUser.getUsername(), authenticatedUser.getPassword());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.exit(0);
+                    }
+
                     Main.getMain().setScreen(new LobbyScreen(Main.getMain()));
                     //Main.getMain().setScreen(new MainMenuView(new MainMenuController(), skin));
                 } else {

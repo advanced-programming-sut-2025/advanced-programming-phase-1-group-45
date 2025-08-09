@@ -1,6 +1,5 @@
 package com.proj.Database;
 
-import com.badlogic.gdx.Gdx;
 import com.proj.Model.User;
 import java.sql.*;
 
@@ -14,12 +13,12 @@ public class DatabaseHelper {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(DB_URL);
-            Gdx.app.log("Database", "Connected to SQLite database at: " + System.getProperty("user.dir"));
+            System.out.println("Database "+ "Connected to SQLite database at: " + System.getProperty("user.dir"));
             createUserTable();
             createGameResultsTable();
             logAllUsers();
         } catch (Exception e) {
-            Gdx.app.error("Database", "Connection error: " + e.getMessage());
+            System.out.println("Database"+ "Connection error: " + e.getMessage());
         }
     }
 
@@ -27,10 +26,10 @@ public class DatabaseHelper {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
-                Gdx.app.log("Database", "Disconnected from database");
+                System.out.println("Database "+ "Disconnected from database");
             }
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Disconnection error: " + e.getMessage());
+            System.out.println("Database"+ "Disconnection error: " + e.getMessage());
         }
     }
 
@@ -42,7 +41,7 @@ public class DatabaseHelper {
             + "security_answer TEXT NOT NULL)";
 
         executeUpdate(createTableSQL);
-        Gdx.app.log("Database", "User table created/verified");
+        System.out.println("Database " + "User table created/verified");
 
         addColumnIfNotExists("users", "email", "TEXT");
         addColumnIfNotExists("users", "nickname", "TEXT");
@@ -56,11 +55,11 @@ public class DatabaseHelper {
                 if (!columns.next()) {
                     String sql = "ALTER TABLE " + table + " ADD COLUMN " + column + " " + type;
                     executeUpdate(sql);
-                    Gdx.app.log("Database", "Added column " + column + " to " + table);
+                    System.out.println("Database " + "Added column " + column + " to " + table);
                 }
             }
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Error checking/adding column " + column + ": " + e.getMessage());
+            System.out.println("Database"+ "Error checking/adding column " + column + ": " + e.getMessage());
         }
     }
 
@@ -68,7 +67,7 @@ public class DatabaseHelper {
         try (Statement stmt = connection.createStatement()) {
             stmt.executeUpdate(query);
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Update error: " + e.getMessage() + "\nQuery: " + query);
+            System.out.println("Database"+ "Update error: " + e.getMessage() + "\nQuery: " + query);
         }
     }
 
@@ -76,7 +75,7 @@ public class DatabaseHelper {
         try {
             return connection.createStatement().executeQuery(query);
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Query error: " + e.getMessage() + "\nQuery: " + query);
+            System.out.println("Database"+ "Query error: " + e.getMessage() + "\nQuery: " + query);
             return null;
         }
     }
@@ -87,6 +86,7 @@ public class DatabaseHelper {
 
     public boolean addUser(String username, String password, String securityAnswer,
                            String email, String nickname, String gender) {
+        System.out.println("name " + username +  " password " + password + " securityAnswer " + securityAnswer + " email " + email + " nickname " + nickname + " gender " + gender);
         String sql = "INSERT INTO users (username, password, security_answer, email, nickname, gender) "
             + "VALUES (?, ?, ?, ?, ?, ?)";
 
@@ -99,10 +99,10 @@ public class DatabaseHelper {
             pstmt.setString(6, gender);
             pstmt.executeUpdate();
 
-            Gdx.app.log("Database", "Added user: " + username);
+            System.out.println("Database "+ "Added user: " + username);
             return true;
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Error adding user: " + e.getMessage());
+            System.out.println("Database "+ "Error adding user: " + e.getMessage());
             return false;
         }
     }
@@ -115,7 +115,7 @@ public class DatabaseHelper {
             pstmt.setString(1, username);
             return pstmt.executeQuery();
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Error getting user: " + e.getMessage());
+            System.out.println("Database"+ "Error getting user: " + e.getMessage());
             return null;
         }
     }
@@ -134,7 +134,7 @@ public class DatabaseHelper {
                 return false;
             }
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Verification error: " + e.getMessage());
+            System.out.println("Database"+ "Verification error: " + e.getMessage());
             return false;
         }
     }
@@ -142,7 +142,7 @@ public class DatabaseHelper {
     public User authenticateUser(String identifier, String password) {
         String sql = "SELECT * FROM users WHERE (username = ? COLLATE NOCASE OR email = ? COLLATE NOCASE) AND password = ?";
 
-        Gdx.app.log("Database", "Attempting login with: " + identifier);
+        System.out.println("Database "+ "Attempting login with: " + identifier);
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, identifier);
@@ -161,15 +161,15 @@ public class DatabaseHelper {
                     user.setNickname(rs.getString("nickname"));
                     user.setGender(rs.getString("gender"));
 
-                    Gdx.app.log("Database", "Authenticated user: " + user.getUsername());
+                    System.out.println("Database "+ "Authenticated user: " + user.getUsername());
                     return user;
                 } else {
-                    Gdx.app.log("Database", "No user found for: " + identifier);
+                    System.out.println("Database "+ "No user found for: " + identifier);
                     return null;
                 }
             }
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Authentication error: " + e.getMessage());
+            System.out.println("Database"+ "Authentication error: " + e.getMessage());
             return null;
         }
     }
@@ -186,7 +186,7 @@ public class DatabaseHelper {
                 return null;
             }
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Security answer error: " + e.getMessage());
+            System.out.println("Database"+ "Security answer error: " + e.getMessage());
             return null;
         }
     }
@@ -199,9 +199,9 @@ public class DatabaseHelper {
             pstmt.setString(2, winner);
             pstmt.setLong(3, System.currentTimeMillis());
             pstmt.executeUpdate();
-            Gdx.app.log("Database", "Game result saved: " + gameId + ", winner: " + winner);
+            System.out.println("Database "+ "Game result saved: " + gameId + ", winner: " + winner);
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Error saving game result: " + e.getMessage());
+            System.out.println("Database"+ "Error saving game result: " + e.getMessage());
         }
     }
 
@@ -213,12 +213,12 @@ public class DatabaseHelper {
             + "timestamp BIGINT NOT NULL)";
 
         executeUpdate(createTableSQL);
-        Gdx.app.log("Database", "Game results table created");
+        System.out.println("Database "+ "Game results table created");
     }
 
     public void logAllUsers() {
         if (connection == null) {
-            Gdx.app.error("Database", "No connection to log users");
+            System.out.println("Database"+ "No connection to log users");
             return;
         }
 
@@ -235,29 +235,29 @@ public class DatabaseHelper {
             columns.close();
 
             if (columnList.length() == 0) {
-                Gdx.app.log("Database", "No columns found in users table");
+                System.out.println("Database "+ "No columns found in users table");
                 return;
             }
 
             String sql = "SELECT " + columnList.toString() + " FROM users";
-            Gdx.app.log("Database", "Dumping users with query: " + sql);
+            System.out.println("Database "+ "Dumping users with query: " + sql);
 
             try (Statement stmt = connection.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
 
-                Gdx.app.log("Database", "===== USER TABLE DUMP =====");
+                System.out.println("Database "+ "===== USER TABLE DUMP =====");
                 while (rs.next()) {
                     StringBuilder row = new StringBuilder();
                     for (String col : columnList.toString().split(", ")) {
                         if (row.length() > 0) row.append(" | ");
                         row.append(col).append(": ").append(rs.getString(col));
                     }
-                    Gdx.app.log("Database", row.toString());
+                    System.out.println("Database "+ row.toString());
                 }
-                Gdx.app.log("Database", "===== END DUMP =====");
+                System.out.println("Database "+ "===== END DUMP =====");
             }
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Error dumping users: " + e.getMessage());
+            System.out.println("Database"+ "Error dumping users: " + e.getMessage());
         }
     }
 
@@ -275,7 +275,7 @@ public class DatabaseHelper {
             int rows = pstmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Username update error: " + e.getMessage());
+            System.out.println("Database"+ "Username update error: " + e.getMessage());
             return false;
         }
     }
@@ -293,7 +293,7 @@ public class DatabaseHelper {
             int rows = pstmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Email update error: " + e.getMessage());
+            System.out.println("Database"+ "Email update error: " + e.getMessage());
             return false;
         }
     }
@@ -307,7 +307,7 @@ public class DatabaseHelper {
             int rows = pstmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Nickname update error: " + e.getMessage());
+            System.out.println("Database"+ "Nickname update error: " + e.getMessage());
             return false;
         }
     }
@@ -325,7 +325,7 @@ public class DatabaseHelper {
             int rows = pstmt.executeUpdate();
             return rows > 0;
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Password update error: " + e.getMessage());
+            System.out.println("Database"+ "Password update error: " + e.getMessage());
             return false;
         }
     }
@@ -358,7 +358,7 @@ public class DatabaseHelper {
             }
             return true;
         } catch (SQLException e) {
-            Gdx.app.error("Database", "Email uniqueness check error: " + e.getMessage());
+            System.out.println("Database"+ "Email uniqueness check error: " + e.getMessage());
             return false;
         }
     }

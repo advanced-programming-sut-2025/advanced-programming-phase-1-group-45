@@ -185,6 +185,7 @@ public class GameLobby {
             .put("playerCount", getPlayerCount())
             .put("maxPlayers", maxPlayers)
             .put("isPrivate", isPrivate)
+            .put("isVisible", isVisible)
             .put("isGameActive", isGameActive())
             .put("players", new JSONArray(players.keySet()))
             .build();

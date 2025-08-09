@@ -10,7 +10,7 @@ import com.proj.Model.TimeAndWeather.Weather;
 import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.Model.inventoryItems.ResourceItem;
 import com.proj.Model.inventoryItems.seeds.SeedRegistry;
-import com.proj.Map.FarmInOutPoint;
+import com.proj.map.FarmInOutPoint;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -52,12 +52,19 @@ public class GameAssetManager {
     private TextureRegion buffIconTexture;
     private TextureRegion eatingEffectTexture;
     private TextureRegion defaultIngredientTexture;
+    private Texture[] lobbyBackgroundTexture = new Texture[6];
 
 
     private GameAssetManager() {
         skin = new Skin(Gdx.files.internal("skin/pixthulhu-ui.json"));
         snowflake = new TextureRegion(new Texture("snowflake.png"));
         stardewSkin = new Skin(Gdx.files.internal("assets/LibGdx-Skin-main/NzSkin.json"));
+        lobbyBackgroundTexture[0] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-0.png"));
+        lobbyBackgroundTexture[1] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-1.png"));
+        lobbyBackgroundTexture[2] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-2.png"));
+        lobbyBackgroundTexture[3] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-3.png"));
+        lobbyBackgroundTexture[4] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-4.png"));
+        lobbyBackgroundTexture[5] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-5.png"));
 
         //clock
         clockTexture = new Texture("clock/clockmy.png");
@@ -100,6 +107,9 @@ public class GameAssetManager {
         SeedRegistry seedRegistry = SeedRegistry.getInstance();
         foragingLoader = new ForagingLoader();
         return skin;
+    }
+    public Texture getLobbyBackgroundTexture(int num) {
+        return lobbyBackgroundTexture[num];
     }
 
     public Skin getStardewSkin() {

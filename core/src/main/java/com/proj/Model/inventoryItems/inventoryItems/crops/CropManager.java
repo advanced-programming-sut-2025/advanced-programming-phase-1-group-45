@@ -8,8 +8,8 @@ import com.proj.Model.inventoryItems.crops.Crop;
 import com.proj.Model.inventoryItems.crops.CropData;
 import com.proj.Model.inventoryItems.crops.CropRegistry;
 import com.proj.Model.inventoryItems.crops.GiantCrop;
-import com.proj.Map.GameMap;
-import com.proj.Map.Season;
+import com.proj.map.GameMap;
+import com.proj.map.Season;
 
 import java.awt.*;
 

@@ -1,12 +1,11 @@
 package com.proj.network.event;
 
-import org.json.JSONObject;
-
 public class LobbyEvent {
     public enum Type {
         LOBBY_CREATED,
         JOIN_SUCCESS,
         LEFT,
+        LOBBY_ADDED,
         LOBBIES_LIST,
         GAME_STARTED,
         UPDATED,

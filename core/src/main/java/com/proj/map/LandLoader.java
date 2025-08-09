@@ -1,4 +1,4 @@
-package com.proj.Map;
+package com.proj.map;
 
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.*;

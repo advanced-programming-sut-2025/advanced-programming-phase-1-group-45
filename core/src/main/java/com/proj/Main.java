@@ -11,17 +11,18 @@ import com.proj.Model.Cooking.Refrigerator;
 import com.proj.Model.GameAssetManager;
 import com.proj.View.SignupMenuView;
 import com.proj.View.EntranceScreen;
-import com.proj.Map.farmName;
+import com.proj.map.farmName;
 import com.proj.network.event.NetworkEvent;
 import com.proj.network.client.GameClient;
 import com.proj.network.client.NetworkEventListener;
 import com.proj.Database.DatabaseHelper;
+import com.proj.network.lobby.LobbyScreen;
 
 
 /**
  * {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms.
  */
-public class Main extends Game {
+public class Main extends Game implements NetworkEventListener {
     private GameClient gameClient;
     private static Main main;
     private static SpriteBatch batch;
@@ -36,6 +37,7 @@ public class Main extends Game {
     private static final String SERVER_ADDRESS = "127.0.0.1";
     private static final int SERVER_PORT = 8080;
     private DatabaseHelper dbHelper;
+    private LobbyScreen lobbyScreen;
 
     /*@Override
     public void create() {
@@ -103,6 +105,14 @@ public class Main extends Game {
         backgroundMusic.setLooping(true);
         backgroundMusic.play();
     }
+    public LobbyScreen getLobbyScreen() {
+        lobbyScreen = new LobbyScreen(this);
+        return lobbyScreen;
+    }
+
+    public void goToLobbyScreen() {
+        setScreen(getLobbyScreen());
+    }
 
     /*@Override
     public void setScreen(Screen screen) {
@@ -146,33 +156,31 @@ public class Main extends Game {
     private void initializeNetworkClient() {
         gameClient = new GameClient(SERVER_ADDRESS, SERVER_PORT);
 //        gameClient.connect();
-        gameClient.addNetworkListener(new NetworkEventListener() {
-            @Override
-            public void handleNetworkEvent(NetworkEvent event) {
-                switch (event.getType()) {
-                    case CONNECTED:
-                        Gdx.app.log("NETWORK", "CONNECTED TO SERVER");
-                        break;
-                    case DISCONNECTED:
-                        Gdx.app.log("NETWORK", "DISCONNECTED FROM SERVER");
-                        break;
-                    case AUTH_SUCCESS:
-                        handleAuthSuccess();
-                        break;
-                    case AUTH_FAILED:
-                        Gdx.app.log("NETWORK", "AUTH FAILED: " + event.getMessage());
-                        break;
-                    case ERROR:
-                        Gdx.app.log("NETWORK", "ERROR: " + event.getMessage());
-                        break;
-
-                }
-            }
-        });
+        gameClient.addNetworkListener(this);
+    }
+    @Override
+    public void handleNetworkEvent (NetworkEvent event){
+        switch (event.getType()) {
+            case CONNECTED:
+                Gdx.app.log("NETWORK", "CONNECTED TO SERVER");
+                break;
+            case DISCONNECTED:
+                Gdx.app.log("NETWORK", "DISCONNECTED FROM SERVER");
+                break;
+            case AUTH_SUCCESS:
+                handleAuthSuccess();
+                break;
+            case AUTH_FAILED:
+                Gdx.app.log("NETWORK", "AUTH FAILED: " + event.getMessage());
+                break;
+            case ERROR:
+                Gdx.app.log("NETWORK", "ERROR: " + event.getMessage());
+                break;
+        }
     }
 
-    public void authenticate(String username, String password, String securityQuestion) {
-        gameClient.authenticate(username, password, securityQuestion);
+    public void loginClient(String username, String password) {
+        gameClient.login(username, password);
     }
 
     private void handleAuthSuccess() {

@@ -48,7 +48,6 @@ public class SignupMenuController {
 
                     // UPDATED METHOD CALL
                     if (signup(username, password, securityAnswer, email, nickname, gender)) {
-                        Main.getMain().getGameClient().connect();
                         Main.getMain().setScreen(new LoginMenuView(
                             new LoginMenuController(),
                             skin

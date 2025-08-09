@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
-import com.proj.Map.GameMap;
+import com.proj.map.GameMap;
 import com.proj.Model.Animal.Animal;
 
 import java.util.ArrayList;
