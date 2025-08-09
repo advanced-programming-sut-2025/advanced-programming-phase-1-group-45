@@ -98,4 +98,14 @@ public class SignupMenuController {
             });
         }
     }
+    public void handleLoginButton() {
+        if (view != null && view.getLoginButton() != null) {
+            view.getLoginButton().addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    Main.getMain().setScreen(new LoginMenuView(new LoginMenuController(), skin));
+                }
+            });
+        }
+    }
 }
