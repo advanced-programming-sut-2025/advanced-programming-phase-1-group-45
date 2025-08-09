@@ -543,12 +543,13 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         mainTable.add(titleLabel).padBottom(30).colspan(3).row();
 
         currentLobbyInfoLabel = new Label("Your Lobby:", skin);
-        mainTable.add(currentLobbyInfoLabel).pad(10).colspan(3).align(Align.left).row();
+        mainTable.add(currentLobbyInfoLabel).pad(10).colspan(3).align(Align.center).row();
 
         currentLobbyTable = new Table(skin);
         currentLobbyTable.setBackground("background");
         currentLobbyTable.setColor(1f, 1f, 1f, 0.8f);
-        mainTable.add(currentLobbyTable).colspan(3).fillX().padBottom(20).row();
+        mainTable.add(currentLobbyTable).colspan(3).
+            minWidth(400).minHeight(150).expandY().fillY().padBottom(10).row();
 
         startButton = new TextButton("Start Game", skin);
         leaveButton = new TextButton("Leave Lobby", skin);
