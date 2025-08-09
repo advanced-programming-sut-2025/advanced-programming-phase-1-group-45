@@ -241,15 +241,8 @@ public class GameServer {
         successResponse.put("data", lobby.getLobbyInfo());
         client.sendRaw(successResponse.toString());
 
-        // Broadcast to lobby
-        JSONObject broadcast = new JSONObject();
-        broadcast.put("type", "PLAYER_JOINED");
-
-        JSONObject broadcastData = new JSONObject();
-        broadcastData.put("username", username);
-        broadcast.put("data", broadcastData);
-
-        lobby.broadcastRaw(broadcast.toString());
+        System.out.println("new join broadcast");
+//        broadcastLobbiesList();
     }
 
     public void startGame(String lobbyId, String username) {

@@ -139,6 +139,11 @@ public class GameClient implements Disposable, Runnable {
                     handleLobbyCreated(data);
                     break;
 
+                case "LOBBY_UPDATE" :
+                    handleLobbyUpdate(data);
+                    break;
+
+
                 case "JOIN_SUCCESS":
                     handleJoinLobby(data);
                     break;
@@ -199,6 +204,14 @@ public class GameClient implements Disposable, Runnable {
         } catch (Exception e) {
             fireEvent(NetworkEvent.Type.ERROR, "Invalid auth success data: " + e.getMessage());
         }
+    }
+
+    private void handleLobbyUpdate(JSONObject data) {
+        fireLobbyEvent(LobbyEvent.Type.LOBBY_UPDATE, data);
+    }
+
+    private void handleNewJoinToLobby(JSONObject data) {
+        fireLobbyEvent(LobbyEvent.Type.LOBBY_UPDATE, data);
     }
 
     private void handleLobbyCreated(JSONObject data) {

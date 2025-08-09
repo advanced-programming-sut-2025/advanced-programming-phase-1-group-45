@@ -104,7 +104,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (currentLobbyId != null && isAdmin) {
-                    gameClient.startGame(currentLobbyId);
+                        gameClient.startGame(currentLobbyId);
                 }
             }
         });
@@ -223,7 +223,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         content.pad(15);
 
         content.add(new Label("Enter password for:", skin)).colspan(2).row();
-        content.add(new Label(lobby.getName(), skin, "bold")).colspan(2).padBottom(10).row();
+        content.add(new Label(lobby.getName(), skin )).colspan(2).padBottom(10).row();
 
         content.add(new Label("Password:", skin)).padRight(10);
         TextField passwordField = new TextField("", skin);
@@ -322,6 +322,11 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
                     game.switchToGameScreen();
                     break;
 
+                case LOBBY_UPDATE:
+                    System.out.println("lobby info updated");
+                    handleLobbyUpdate(event.getLobbyData());
+                break;
+
                 case ERROR:
                     showError(event.getLobbyData());
                     break;
@@ -336,6 +341,9 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         refreshLobbyList();
         updateCurrentLobbyInfo();
         refreshLobbyListUI();
+    }
+    private void handleLobbyUpdate(String data) {
+        refreshLobbyList();
     }
 
     @Override
@@ -357,6 +365,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
                 lobbiesMap.put(lobby.getId(), lobby);
             }
 
+            updateCurrentLobbyInfo();
             refreshLobbyListUI();
         } catch (JSONException e) {
             showError("Error loading lobbies: " + e.getMessage());
@@ -539,7 +548,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         mainTable.pad(20);
         stage.addActor(mainTable);
 
-        titleLabel = new Label("Multiplayer Lobby", skin, "default");
+        titleLabel = new Label("Multiplayer Lobby", skin);
         mainTable.add(titleLabel).padBottom(30).colspan(3).row();
 
         currentLobbyInfoLabel = new Label("Your Lobby:", skin);

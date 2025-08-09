@@ -156,6 +156,7 @@ public class ClientHandler implements Runnable {
                 processGameAction(data);
                 break;
 
+
             case "GET_LOBBIES":
                 sendLobbiesList();
                 break;
@@ -280,6 +281,7 @@ public class ClientHandler implements Runnable {
             if (lobby.isEmpty()) {
                 server.getGameLobbies().remove(lobby.getId());
                 server.broadcastSystemMessage("Lobby: " + lobby.getName() + " was removed");
+
             }
         } else {
             sendError("NOT_IN_LOBBY", "You are not in any lobby");

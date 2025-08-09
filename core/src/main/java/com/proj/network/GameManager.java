@@ -38,9 +38,9 @@ public class GameManager {
 
         JSONObject initialState = gameInstance.getGameState();
         lobby.broadcastMessage("GAME_STATE", initialState.toString());
-        lobby.broadcastMessage("GAME_STARTED", "بازی شروع شد");
+        lobby.broadcastMessage("GAME_STARTED", "game started");
 
-        logger.info("بازی جدید شروع شد: " + gameId);
+        logger.info("the new game started:  " + gameId);
         return true;
     }
 

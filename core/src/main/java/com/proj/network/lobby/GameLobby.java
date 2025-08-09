@@ -84,18 +84,19 @@ public class GameLobby {
         if (username.equals(owner) && !players.isEmpty()) {
             // انتخاب اولین بازیکن به عنوان صاحب جدید
             owner = players.keySet().iterator().next();
-            broadcastMessage("SYSTEM", owner + " صاحب جدید لابی شد");
+            broadcastMessage("SYSTEM", owner + " is the new lobby owner");
         }
 
         // اگر بازی در حال اجراست، بررسی کنیم آیا باید بازی را متوقف کنیم
         if (gameActive && gameInstance != null && players.size() < 2) {
-            endGame("تعداد بازیکنان کافی نیست");
+            endGame("players are not enough to continue game");
         }
 
-        // اطلاع‌رسانی به بازیکنان باقی‌مانده
         if (!players.isEmpty()) {
             broadcastMessage("LOBBY_UPDATE", getLobbyInfo().toString());
         }
+
+//        server.broadcastLobbiesList();
     }
 
     /**
@@ -103,7 +104,7 @@ public class GameLobby {
      */
     public void broadcastMessage(String type, String message) {
         for (ClientHandler handler : players.values()) {
-            handler.sendMessage(type, new JSONObject(message));
+            handler.sendMessage(type, JsonBuilder.create().put("data", message).build());
         }
     }
 

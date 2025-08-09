@@ -10,7 +10,6 @@ public class PlayerGameState {
     private Position position;
     private boolean isMoving = false;
     private PlayerDirection direction = PlayerDirection.DOWN;
-    private int health = 100;
     private int energy = 100;
     private int score = 0;
     private Map<String, Integer> inventory = new HashMap<>();
@@ -23,15 +22,14 @@ public class PlayerGameState {
 
     public void initialize() {
         position = new Position(0, 0);
-        health = 100;
         energy = 100;
         score = 0;
         direction = PlayerDirection.DOWN;
         isMoving = false;
 
         inventory.put("coin", 100);
-        inventory.put("health_potion", 2);
-        inventory.put("energy_potion", 2);
+//        inventory.put("health_potion", 2);
+//        inventory.put("energy_potion", 2);
 
         skills.put("farming", 1);
         skills.put("mining", 1);
@@ -46,7 +44,6 @@ public class PlayerGameState {
             .put("y", position.getY()));
         json.put("direction", direction.toString());
         json.put("isMoving", isMoving);
-        json.put("health", health);
         json.put("energy", energy);
         json.put("score", score);
 
@@ -94,9 +91,6 @@ public class PlayerGameState {
 
     public PlayerDirection getDirection() { return direction; }
     public void setDirection(PlayerDirection direction) { this.direction = direction; }
-
-    public int getHealth() { return health; }
-    public void setHealth(int health) { this.health = health; }
 
     public int getEnergy() { return energy; }
     public void setEnergy(int energy) { this.energy = energy; }
