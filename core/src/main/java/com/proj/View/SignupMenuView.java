@@ -18,6 +18,7 @@ public class SignupMenuView implements Screen {
     private final TextField securityQuestionField;
     private final TextButton signUpButton;
     private final TextButton guestButton;
+    private final TextButton LoginButton;
     public Table table;
     private final SignupMenuController controller;
     private Image backgroundImage;
@@ -59,6 +60,7 @@ public class SignupMenuView implements Screen {
         this.genderSelectBox = new SelectBox<>(skin);
         genderSelectBox.setItems("Male", "Female", "Non-binary", "Prefer not to say");
         genderSelectBox.setSelected("Prefer not to say");
+        this.LoginButton = new TextButton("Login", skin);
 
         controller.setView(this);
     }
@@ -95,6 +97,8 @@ public class SignupMenuView implements Screen {
         //table.add(new Label("Gender:", new Skin())).left(); // NEW
         table.row().pad(5, 0, 10, 0);
         table.add(genderSelectBox).width(400).left(); // NEW
+        table.row().pad(10, 0, 10, 0);
+        table.add(LoginButton).width(300);
 
         backgroundImage.setFillParent(true);
         stage.addActor(backgroundImage);
@@ -103,6 +107,7 @@ public class SignupMenuView implements Screen {
         controller.handleSignupMenuButton();
         controller.handleGuestButton();
         controller.handleGeneratePasswordButton();
+        controller.handleLoginButton();
     }
 
     @Override
@@ -146,4 +151,5 @@ public class SignupMenuView implements Screen {
     public SelectBox<String> getGenderSelectBox() {
         return genderSelectBox;
     }
+    public TextButton getLoginButton() { return LoginButton; }
 }
