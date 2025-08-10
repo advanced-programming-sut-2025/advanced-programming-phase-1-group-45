@@ -114,9 +114,9 @@ public class AvatarCreationView implements Screen {
         farmGrid.clear();
         for (farmName farm : farmName.values()) {
             try {
-                Texture texture = new Texture(Gdx.files.internal("FarmIcons/" + farm.name() + ".png"));
+                Texture texture = new Texture(Gdx.files.internal("FarmIcons/" + farm.getFarmName() + ".png"));
                 ImageButton btn = new ImageButton(new TextureRegionDrawable(new TextureRegion(texture)));
-                btn.setName(farm.name());
+                btn.setName(farm.getFarmName());
 
                 farmGrid.add(btn).size(60, 60).pad(5);
             } catch (Exception e) {
@@ -127,7 +127,7 @@ public class AvatarCreationView implements Screen {
 
     public void updateFarmSelection(farmName farm) {
         try {
-            Texture texture = new Texture(Gdx.files.internal("FarmIcons/" + farm.name() + ".png"));
+            Texture texture = new Texture(Gdx.files.internal("FarmIcons/" + farm.getFarmName() + ".png"));
             farmPreview.setDrawable(new TextureRegionDrawable(new TextureRegion(texture)));
 
             farmNameLabel.setText(farm.getFarmName());
