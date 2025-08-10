@@ -27,7 +27,7 @@ public class SignupMenuController {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     // Go directly to game screen for guests
-                    Main.getMain().setScreen(new MainMenuView(new MainMenuController(), GameAssetManager.getGameAssetManager().getSkin()));
+                    Main.getMain().setScreen(new GameScreen();
                 }
             });
         }
