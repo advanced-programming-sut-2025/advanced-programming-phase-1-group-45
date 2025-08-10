@@ -115,7 +115,7 @@ public class GameMap {
     }
 
     public boolean isPassable(float x, float y) {
-
+        System.out.println("tile darkhasti: x: " + (x/16) + " y: " + (y/16));
         return loader.isPassable(x, y);
     }
 
