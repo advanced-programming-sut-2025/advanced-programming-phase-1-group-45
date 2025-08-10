@@ -293,14 +293,11 @@ public class GameServer {
         boolean success = gameManager.startGame(lobby);
 
         if (success) {
-            JSONObject broadcast = new JSONObject();
-            broadcast.put("type", "GAME_STARTED");
 
-            JSONObject data = new JSONObject();
-            data.put("message", "Game started");
-            broadcast.put("data", data);
+            JSONObject broadCast = JsonBuilder.create().put("message", "Game Started").put("data", JsonBuilder.empty()).build();
+            broadCast.put("type", "GAME_STARTED");
 
-            lobby.broadcastRaw(broadcast.toString());
+            lobby.broadcastRaw(broadCast.toString());
         } else {
             errorData.put("code", "START_FAILED");
             errorData.put("message", "Error starting game");

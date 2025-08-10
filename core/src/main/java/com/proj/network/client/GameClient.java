@@ -159,7 +159,7 @@ public class GameClient implements Disposable, Runnable {
                     break;
 
                 case "GAME_STARTED":
-                    fireGameEvent(GameEvent.Type.STARTED, data);
+                    fireLobbyEvent(LobbyEvent.Type.GAME_STARTED, data);
                     break;
 
                 case "GAME_UPDATE":

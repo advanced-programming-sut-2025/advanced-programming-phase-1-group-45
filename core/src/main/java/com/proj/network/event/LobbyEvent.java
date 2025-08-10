@@ -8,8 +8,8 @@ public class LobbyEvent {
         LOBBY_ADDED,
         LOBBIES_LIST,
         GAME_STARTED,
-        UPDATED,
         LOBBY_UPDATE,
+        NEW_JOIN_TO_LOBBY,
         ERROR;
     }
 

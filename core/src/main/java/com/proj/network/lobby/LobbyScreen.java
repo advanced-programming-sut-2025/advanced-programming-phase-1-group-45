@@ -14,8 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.proj.Control.MainMenuController;
 import com.proj.Main;
 import com.proj.Model.GameAssetManager;
+import com.proj.View.MainMenuView;
+import com.proj.network.GameServer;
 import com.proj.network.client.GameClient;
 import com.proj.network.client.LobbyEventListener;
 import com.proj.network.client.LobbyListListener;
@@ -270,6 +273,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         }
 
         LobbyInfo lobby = lobbiesMap.get(currentLobbyId);
+        isAdmin = lobby.getOwner().equals(gameClient.getUsername());
         if (lobby == null) {
             currentLobbyTable.add("Lobby information not available").pad(20);
             return;
@@ -319,7 +323,8 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
                     break;
 
                 case GAME_STARTED:
-                    game.switchToGameScreen();
+                    handleStartGame();
+//                    game.switchToGameScreen();
                     break;
 
                 case LOBBY_UPDATE:
@@ -630,12 +635,16 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
     public void dispose() {
         gameClient.removeLobbyEventListener(this);
         gameClient.removeLobbyListListener(this);
-        stage.dispose();
     }
 
     @Override
     public void handleNetworkEvent(NetworkEvent event) {
         // Handle network events if needed
+    }
+
+    private void handleStartGame() {
+        Main.getMain().setScreen(new MainMenuView(new MainMenuController(),
+            GameAssetManager.getGameAssetManager().getSkin()));
     }
 
 
