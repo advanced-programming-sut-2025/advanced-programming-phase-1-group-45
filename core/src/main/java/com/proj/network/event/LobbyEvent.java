@@ -9,6 +9,7 @@ public class LobbyEvent {
         LOBBIES_LIST,
         GAME_STARTED,
         LOBBY_UPDATE,
+        ONLINE_PLAYERS_RECEIVED,
         NEW_JOIN_TO_LOBBY,
         ERROR;
     }

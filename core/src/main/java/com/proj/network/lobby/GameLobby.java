@@ -49,12 +49,13 @@ public class GameLobby {
      */
     public void addPlayer(String username, ClientHandler handler) {
         players.put(username, handler);
+        handler.setCurrentLobby(this);
         updateLastActivity();
 
         // اگر صاحب لابی خارج شده بود، اولین بازیکن جدید صاحب لابی می‌شود
         if (owner == null && !players.isEmpty()) {
             owner = username;
-            broadcastMessage("SYSTEM", username + " صاحب جدید لابی شد");
+            broadcastMessage("SYSTEM", username + " is the new lobby owner");
         }
 
         // ایجاد وضعیت بازی برای بازیکن جدید اگر بازی در حال اجراست
@@ -70,6 +71,7 @@ public class GameLobby {
 
         // اطلاع‌رسانی به همه بازیکنان
         broadcastMessage("LOBBY_UPDATE", getLobbyInfo().toString());
+        server.notifyPlayerStatusUpdate();
     }
 
     /**

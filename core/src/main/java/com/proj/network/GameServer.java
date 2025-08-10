@@ -4,6 +4,7 @@ import com.proj.Database.DatabaseHelper;
 import com.proj.network.lobby.GameLobby;
 import com.proj.network.lobby.LobbyManager;
 import com.proj.network.message.JsonBuilder;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -371,6 +372,37 @@ public class GameServer {
             lobbyManager.getGameLobbiesMap().size(),
             gameManager.getActiveGamesCount()
         ));
+    }
+
+    public JSONObject sendOnlinePlayersList() {
+        JSONArray playersArray = new JSONArray();
+
+        for (ClientHandler handler : connectedClients.values()) {
+            JSONObject playerInfo = new JSONObject();
+            playerInfo.put("username", handler.getUsername());
+            playerInfo.put("status", "Online");
+
+            if (findPlayerLobby(handler.getUsername()) != null) {
+                GameLobby lobby = findPlayerLobby(handler.getUsername());
+                playerInfo.put("lobbyId", lobby.getId());
+                playerInfo.put("lobbyName", lobby.getName());
+                playerInfo.put("inLobby", true);
+                playerInfo.put("isOwner", lobby.getOwner().equals(handler.getUsername()));
+            } else {
+                playerInfo.put("inLobby", false);
+            }
+
+            playersArray.put(playerInfo);
+        }
+
+        JSONObject result = JsonBuilder.create().put("onlinePlayers", playersArray).build();
+        return result;
+    }
+
+    public void notifyPlayerStatusUpdate() {
+        for (ClientHandler handler : connectedClients.values()) {
+            handler.sendPlayerList();
+        }
     }
 
     public void shutdown() {

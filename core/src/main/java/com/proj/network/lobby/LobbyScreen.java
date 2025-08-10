@@ -2,6 +2,7 @@ package com.proj.network.lobby;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -18,7 +19,6 @@ import com.proj.Control.MainMenuController;
 import com.proj.Main;
 import com.proj.Model.GameAssetManager;
 import com.proj.View.MainMenuView;
-import com.proj.network.GameServer;
 import com.proj.network.client.GameClient;
 import com.proj.network.client.LobbyEventListener;
 import com.proj.network.client.LobbyListListener;
@@ -60,6 +60,10 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
     private boolean isSearchByID = false;
     private String currentSearchId = "";
 
+    private Table onlinePlayersTable;
+    private ScrollPane onlinePlayersScrollPane;
+
+
     public LobbyScreen(Main game) {
         this.game = game;
         this.gameClient = game.getGameClient();
@@ -70,6 +74,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         gameClient.addLobbyListListener(this);
         System.err.println("request constructor");
         refreshLobbyList();
+        gameClient.requestOnlinePlayers();
     }
 
     private void setupEventListeners() {
@@ -107,7 +112,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (currentLobbyId != null && isAdmin) {
-                        gameClient.startGame(currentLobbyId);
+                    gameClient.startGame(currentLobbyId);
                 }
             }
         });
@@ -226,7 +231,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         content.pad(15);
 
         content.add(new Label("Enter password for:", skin)).colspan(2).row();
-        content.add(new Label(lobby.getName(), skin )).colspan(2).padBottom(10).row();
+        content.add(new Label(lobby.getName(), skin)).colspan(2).padBottom(10).row();
 
         content.add(new Label("Password:", skin)).padRight(10);
         TextField passwordField = new TextField("", skin);
@@ -322,6 +327,14 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
                     handleLeaveLobby();
                     break;
 
+                case ONLINE_PLAYERS_RECEIVED:
+                    try {
+                        Gdx.app.postRunnable(() -> updateOnlinePlayersList(new JSONObject(event.getLobbyData())));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
                 case GAME_STARTED:
                     handleStartGame();
 //                    game.switchToGameScreen();
@@ -330,7 +343,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
                 case LOBBY_UPDATE:
                     System.out.println("lobby info updated");
                     handleLobbyUpdate(event.getLobbyData());
-                break;
+                    break;
 
                 case ERROR:
                     showError(event.getLobbyData());
@@ -347,6 +360,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         updateCurrentLobbyInfo();
         refreshLobbyListUI();
     }
+
     private void handleLobbyUpdate(String data) {
         refreshLobbyList();
     }
@@ -374,6 +388,49 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
             refreshLobbyListUI();
         } catch (JSONException e) {
             showError("Error loading lobbies: " + e.getMessage());
+        }
+    }
+
+    private void updateOnlinePlayersList(JSONObject data) {
+        onlinePlayersTable.clear();
+
+        try {
+            JSONArray players = data.getJSONArray("onlinePlayers");
+
+            onlinePlayersTable.row();
+            onlinePlayersTable.add("Player").width(150).left();
+            onlinePlayersTable.add("Status").width(150).left();
+            onlinePlayersTable.add("Lobby").width(200).left();
+            onlinePlayersTable.row();
+
+            for (int i = 0; i < players.length(); i++) {
+                JSONObject player = players.getJSONObject(i);
+                String username = player.getString("username");
+                boolean inLobby = player.getBoolean("inLobby");
+
+                onlinePlayersTable.add(username).left();
+
+                if (inLobby) {
+                    String lobbyName = player.getString("lobbyName");
+                    boolean isOwner = player.getBoolean("isOwner");
+
+                    onlinePlayersTable.add("In Lobby").left();
+
+                    Label lobbyLabel = new Label(lobbyName, skin);
+                    if (isOwner) {
+                        lobbyLabel.setColor(Color.PINK);
+                        lobbyLabel.setText(lobbyName + " (Owner)");
+                    }
+                    onlinePlayersTable.add(lobbyLabel).left();
+                } else {
+                    onlinePlayersTable.add("Online").left();
+                    onlinePlayersTable.add("No Lobby").left();
+                }
+
+                onlinePlayersTable.row();
+            }
+        } catch (JSONException e) {
+            Gdx.app.error("LobbyScreen", "Error parsing online players", e);
         }
     }
 
@@ -461,7 +518,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
                 }
             });
 
-            if (lobby.getPlayerCount() >= lobby.getMaxPlayers() || lobby.isGameActive()) {
+            if (lobby.getPlayerCount() >= lobby.getMaxPlayers()) {
                 joinButton.setDisabled(true);
                 joinButton.setText("Full");
             }
@@ -563,7 +620,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         currentLobbyTable.setBackground("background");
         currentLobbyTable.setColor(1f, 1f, 1f, 0.8f);
         mainTable.add(currentLobbyTable).colspan(3).
-            minWidth(400).minHeight(150).expandY().fillY().padBottom(10).row();
+            maxWidth(400).minHeight(150).expandY().fillY().padBottom(10).row();
 
         startButton = new TextButton("Start Game", skin);
         leaveButton = new TextButton("Leave Lobby", skin);
@@ -574,6 +631,17 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         mainTable.add(buttonTable).colspan(3).padBottom(30).row();
 
         mainTable.add(new Label("Available Lobbies:", skin)).pad(10).colspan(3).align(Align.center).row();
+        onlinePlayersTable = new Table(skin);
+        onlinePlayersScrollPane = new ScrollPane(onlinePlayersTable, skin);
+        onlinePlayersScrollPane.setFadeScrollBars(true);
+
+        mainTable.add(onlinePlayersScrollPane)
+            .colspan(1).align(Align.top).align(Align.left)
+            .minHeight(250)
+            .minWidth(400)
+            .expandY()
+            .fillY();
+
         mainTable.add(new Label("Search by ID:", skin));
         Table searchTable = new Table();
         searchField = new TextField("", skin);
@@ -607,6 +675,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         Table bottomTable = new Table();
         bottomTable.add(createButton).center();
         mainTable.add(bottomTable).colspan(3).pad(20).row();
+
 
         setupEventListeners();
 

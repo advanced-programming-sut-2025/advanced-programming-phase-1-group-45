@@ -24,6 +24,7 @@ public class ClientHandler implements Runnable {
     private final AtomicBoolean running = new AtomicBoolean(true);
     private long lastActivityTime;
     private static final long TIMEOUT_MS = 60000; // 1 minute timeout
+    private GameLobby currentLobby;
 
     public ClientHandler(Socket socket, GameServer server) {
         this.clientSocket = socket;
@@ -156,6 +157,9 @@ public class ClientHandler implements Runnable {
                 processGameAction(data);
                 break;
 
+            case "GET_ONLINE_PLAYERS" :
+                sendPlayerList();
+                break;
 
             case "GET_LOBBIES":
                 sendLobbiesList();
@@ -288,6 +292,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
+
     private void startGame(JSONObject data) {
         String lobbyId = JsonParser.getString(data, "lobbyId", "");
         if (lobbyId.isEmpty()) {
@@ -369,6 +374,11 @@ public class ClientHandler implements Runnable {
         sendMessage("LOBBIES_LIST", data);
     }
 
+    public void sendPlayerList() {
+        JSONObject players = server.sendOnlinePlayersList();
+        sendMessage("PLAYERS_LIST", players);
+    }
+
     public synchronized void shutdown() {
         if (running.compareAndSet(true, false)) {
             try {
@@ -395,5 +405,12 @@ public class ClientHandler implements Runnable {
 
     public boolean isRunning() {
         return running.get() && !clientSocket.isClosed();
+    }
+
+    public GameLobby getLobby() {
+        return currentLobby;
+    }
+    public void setCurrentLobby(GameLobby lobby) {
+        this.currentLobby = lobby;
     }
 }

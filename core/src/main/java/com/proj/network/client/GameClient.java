@@ -158,6 +158,11 @@ public class GameClient implements Disposable, Runnable {
                     fireLobbyListEvent(data);
                     break;
 
+                    case "PLAYERS_LIST":
+                        handleOnlinePlayersResponse(data);
+                        break;
+
+
                 case "GAME_STARTED":
                     fireLobbyEvent(LobbyEvent.Type.GAME_STARTED, data);
                     break;
@@ -220,6 +225,20 @@ public class GameClient implements Disposable, Runnable {
             fireLobbyEvent(LobbyEvent.Type.LOBBY_CREATED, data);
         } catch (Exception e) {
             fireEvent(NetworkEvent.Type.ERROR, "Error processing lobby creation: " + e.getMessage());
+        }
+    }
+
+
+    public void requestOnlinePlayers() {
+        sendMessage("GET_ONLINE_PLAYERS", new JSONObject());
+    }
+
+    public void handleOnlinePlayersResponse(JSONObject data) {
+        for (LobbyEventListener listener : lobbyListeners) {
+            listener.handleLobbyEvent(
+                new LobbyEvent(LobbyEvent.Type.ONLINE_PLAYERS_RECEIVED,
+                    data.toString())
+            );
         }
     }
 
