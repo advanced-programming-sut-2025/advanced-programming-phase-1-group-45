@@ -19,7 +19,7 @@ public class ForagingItem extends InventoryItem implements LandObject {
     private Point position; // موقعیت در نقشه (به صورت tile coordinates)
 
     public ForagingItem(String name, Season[] seasons, int baseSellPrice, int energy, TextureRegion texture) {
-        super("foragingCrop", name, texture, true, 5);
+        super(name, name, texture, true, 5);
         this.name = name;
         this.season = new HashSet<>(Arrays.asList(seasons));
         this.baseSellPrice = baseSellPrice;

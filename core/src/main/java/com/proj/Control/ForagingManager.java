@@ -14,11 +14,13 @@ import com.proj.map.TileType;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class ForagingManager {
     private Array<ForagingItem> foragingCrops = new Array<>();
     private GameMap gameMap;
     private final Random random = new Random();
+    private Array<Tile> emptyTiles = new Array<>();
 
     public ForagingManager() {
         foragingCrops = GameAssetManager.getGameAssetManager().getForagingCrops();
@@ -26,8 +28,20 @@ public class ForagingManager {
 
     public void setGameMap(GameMap map) {
         this.gameMap = map;
+        findEmptyTiles();
     }
 
+    public void findEmptyTiles() {
+        emptyTiles.clear();
+        for (Tile[] tile : gameMap.getLandLoader().getTiles()) {
+            for (Tile tile1 : tile) {
+                if (tile1.isPassable()) {
+                    System.err.println("ine khalie " + tile1.getLocation());
+                    emptyTiles.add(tile1);
+                }
+            }
+        }
+    }
 
     public void spawnDailyItems(Season currentSeason) {
         gameMap.removeForaging();
@@ -41,7 +55,10 @@ public class ForagingManager {
         int totalTiles = gameMap.getMapWidth() * gameMap.getMapHeight();
         int itemsToSpawn = Math.max(1, (int) (totalTiles * 0.005));
         for (int i = 0; i < itemsToSpawn; i++) {
-            Point position = findValidSpawnPosition();
+            Tile tile = emptyTiles.random();
+            emptyTiles.removeValue(tile, true);
+            Point position = tile.getLocation();
+            //findValidSpawnPosition();
             ForagingItem template = seasonalItems.random();
 
             ForagingItem newItem = new ForagingItem(
@@ -106,10 +123,10 @@ public class ForagingManager {
     private Point findValidSpawnPosition() {
         int attempts = 0;
         while (attempts < 100) {
-            int x = random.nextInt(gameMap.getMapWidth());
-            int y = random.nextInt(gameMap.getMapHeight());
-            if (gameMap.canPlantInTile(x, y)) {
-                return new Point(x, y);
+            int x = random.nextInt(emptyTiles.toArray().length);
+            if (gameMap.isPassable(emptyTiles.get(x).getLocation().x,
+                emptyTiles.get(x).getLocation().y)) {
+                return emptyTiles.get(x).getLocation();
             }
             attempts++;
         }
@@ -119,6 +136,5 @@ public class ForagingManager {
     public ForagingItem tryCollectItem(Point playerTilePosition, String toolName) {
         return gameMap.harvestForagingItem(playerTilePosition, toolName);
     }
-
 
 }

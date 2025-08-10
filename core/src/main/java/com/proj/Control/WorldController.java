@@ -33,9 +33,11 @@ import java.util.List;
 
 public class WorldController {
     private static WorldController instance;
+
     public static WorldController getInstance() {
         return instance;
     }
+
     private GameMap gameMap;
     //private String farmName;
     private String currentFarmName;
@@ -253,7 +255,9 @@ public class WorldController {
         weatherController.update(gameTime.getWeather(), delta);
         if (gameTime.isNewDay()) {
             for (Integer mapId : gameMaps.keySet()) {
-                if (mapId == 2 || mapId == 3) continue;
+                if (mapId == 2 || mapId == 3) {
+                    continue;
+                }
                 foragingManager.setGameMap(gameMaps.get(mapId));
                 foragingManager.spawnDailyItems(gameTime.getSeason());
                 gameMaps.get(mapId).updateDaily(gameTime.getSeason());
@@ -288,7 +292,7 @@ public class WorldController {
         showSeedsButton.toFront();
         positionUiElement(width, height);
         showSeedsButton.setPosition(
-            showSeedsButton.getWidth() - 14 ,
+            showSeedsButton.getWidth() - 14,
             showSeedsButton.getHeight() + 20
         );
         seedWindow.centerWindow();
@@ -296,7 +300,7 @@ public class WorldController {
         showForagingButton.toFront();
         positionUiElement(width, height);
         showForagingButton.setPosition(
-            showForagingButton.getWidth() - 14  ,
+            showForagingButton.getWidth() - 14,
             showForagingButton.getHeight() + 120
         );
         foragingInventoryWindow.centerWindow();
@@ -304,7 +308,7 @@ public class WorldController {
         showCropButton.toFront();
         positionUiElement(width, height);
         showCropButton.setPosition(
-            showCropButton.getWidth() - 14 ,
+            showCropButton.getWidth() - 14,
             showCropButton.getHeight() + 220
         );
         cropInventoryWindow.centerWindow();
@@ -313,7 +317,7 @@ public class WorldController {
         showCropInfoButton.toFront();
         positionUiElement(width, height);
         showCropInfoButton.setPosition(
-            showCropInfoButton.getWidth() - 14 ,
+            showCropInfoButton.getWidth() - 14,
             showCropInfoButton.getHeight() + 320
         );
         cropInfoWindow.centerWindow();
@@ -439,6 +443,7 @@ public class WorldController {
     public ForagingManager getForagingManager() {
         return foragingManager;
     }
+
     public void renderMap(OrthographicCamera camera) {
         if (gameMap != null) {
             gameMap.render(camera);
@@ -454,6 +459,7 @@ public class WorldController {
         }
         ((Game) Gdx.app.getApplicationListener()).setScreen(newScreen);
     }
+
     private farmName getFarmNameFromString(String name) {
         for (farmName farm : farmName.values()) {
             if (farm.getFarmName().equalsIgnoreCase(name)) {

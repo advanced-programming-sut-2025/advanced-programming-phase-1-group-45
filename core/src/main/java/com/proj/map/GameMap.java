@@ -115,7 +115,6 @@ public class GameMap {
     }
 
     public boolean isPassable(float x, float y) {
-        System.out.println("tile darkhasti: x: " + (x/16) + " y: " + (y/16));
         return loader.isPassable(x, y);
     }
 
@@ -144,7 +143,7 @@ public class GameMap {
         Tile tile = loader.getTiles()[x][y];
         tile.setObject(foragingObject);
         tile.setPassable(false);
-        tile.setType(TileType.FORAGING);
+        tile.setType(TileType.FORAGING_CROP);
         foragingCropTiles.add(tile);
     }
 
@@ -162,7 +161,7 @@ public class GameMap {
         Object item = tile.getLandObject();
         if (item instanceof ForagingItem) {
             ForagingItem itemForagingItem = (ForagingItem) item;
-            if (((ForagingItem) item).getId().equals("foragingCrop") && toolName.equals("Scythe")) {
+            if (toolName.equals("Scythe")) {
                 tile.removeObject();
                 tile.setPassable(true);
                 tile.setType(null);
