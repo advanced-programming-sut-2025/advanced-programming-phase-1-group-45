@@ -133,6 +133,7 @@ public class GameServer {
         connectedClients.put(username, handler);
         broadcastSystemMessage(username + " joined the game");
         System.out.println("GameServer " +  "User registered: " + username);
+        notifyPlayerStatusUpdate();
     }
 
     public void removeClient(String username) {
@@ -140,6 +141,7 @@ public class GameServer {
         lobbyManager.removePlayer(username);
         broadcastSystemMessage(username + " left the game");
         System.out.println("GameServer " +  "User removed: " + username);
+        notifyPlayerStatusUpdate();
     }
 
     public void broadcastSystemMessage(String message) {

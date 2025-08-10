@@ -98,6 +98,7 @@ public class GameLobby {
             broadcastMessage("LOBBY_UPDATE", getLobbyInfo().toString());
         }
 
+        server.notifyPlayerStatusUpdate();
 //        server.broadcastLobbiesList();
     }
 

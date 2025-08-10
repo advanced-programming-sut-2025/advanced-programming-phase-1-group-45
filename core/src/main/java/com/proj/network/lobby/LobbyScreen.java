@@ -397,41 +397,55 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         try {
             JSONArray players = data.getJSONArray("onlinePlayers");
 
-            onlinePlayersTable.row();
-            onlinePlayersTable.add("Player").width(150).left();
-            onlinePlayersTable.add("Status").width(150).left();
-            onlinePlayersTable.add("Lobby").width(200).left();
-            onlinePlayersTable.row();
+            // ایجاد ردیف هدر
+            Table headerRow = new Table();
+            headerRow.setBackground(skin.getDrawable("background"));
+
+            // افزایش فاصله بین ستون‌ها با pad بیشتر
+            headerRow.add(new Label("Player", skin)).width(120).pad(5, 20, 5, 5); // چپ:20, راست:10
+            headerRow.add(new Label("Status", skin)).width(100).pad(5, 15, 5, 35); // چپ:15, راست:15
+            headerRow.add(new Label("Lobby", skin)).width(150).left(); // چپ:10, راست:20
+            onlinePlayersTable.add(headerRow).fillX().row();
+
+            onlinePlayersTable.add(createSeparator()).colspan(3).growX().height(1).padBottom(5).row();
 
             for (int i = 0; i < players.length(); i++) {
                 JSONObject player = players.getJSONObject(i);
                 String username = player.getString("username");
                 boolean inLobby = player.getBoolean("inLobby");
 
-                onlinePlayersTable.add(username).left();
+                Table playerRow = new Table();
+
+                playerRow.add(new Label(username, skin)).width(120).pad(3, 20, 3, 10);
 
                 if (inLobby) {
+                    playerRow.add(new Label("In Lobby", skin)).width(100).pad(3, 15, 3, 35);
+
                     String lobbyName = player.getString("lobbyName");
                     boolean isOwner = player.getBoolean("isOwner");
-
-                    onlinePlayersTable.add("In Lobby").left();
 
                     Label lobbyLabel = new Label(lobbyName, skin);
                     if (isOwner) {
                         lobbyLabel.setColor(Color.PINK);
-                        lobbyLabel.setText(lobbyName + " (Owner)");
                     }
-                    onlinePlayersTable.add(lobbyLabel).left();
+                    playerRow.add(lobbyLabel).width(200).pad(3, 15, 3, 45);
                 } else {
-                    onlinePlayersTable.add("Online").left();
-                    onlinePlayersTable.add("No Lobby").left();
+                    playerRow.add(new Label("Online", skin)).width(100).pad(3, 15, 3, 35);
+                    playerRow.add(new Label("-", skin)).width(150).pad(3, 10, 3, 20);
                 }
 
-                onlinePlayersTable.row();
+                onlinePlayersTable.add(playerRow).fillX().row();
+
+                onlinePlayersTable.add(createSeparator()).colspan(3).growX().height(1).padBottom(3).row();
             }
         } catch (JSONException e) {
             Gdx.app.error("LobbyScreen", "Error parsing online players", e);
         }
+    }
+    private Label createSeparator() {
+        Label separator = new Label("", skin);
+        separator.setColor(Color.DARK_GRAY);
+        return separator;
     }
 
     private LobbyInfo parseLobbyInfo(JSONObject json) throws JSONException {
@@ -610,80 +624,88 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         mainTable.pad(20);
         stage.addActor(mainTable);
 
+        // عنوان اصلی
         titleLabel = new Label("Multiplayer Lobby", skin);
-        mainTable.add(titleLabel).padBottom(30).colspan(3).row();
+        mainTable.add(titleLabel).colspan(2).padBottom(30).row(); // تغییر به colspan=2
+
+        // بخش لابی جاری (عرض کمتر)
+        Table currentLobbySection = new Table();
+        currentLobbySection.setBackground(skin.getDrawable("background"));
+        currentLobbySection.pad(15);
 
         currentLobbyInfoLabel = new Label("Your Lobby:", skin);
-        mainTable.add(currentLobbyInfoLabel).pad(10).colspan(3).align(Align.center).row();
+        currentLobbySection.add(currentLobbyInfoLabel).colspan(2).padBottom(10).row();
 
         currentLobbyTable = new Table(skin);
-        currentLobbyTable.setBackground("background");
-        currentLobbyTable.setColor(1f, 1f, 1f, 0.8f);
-        mainTable.add(currentLobbyTable).colspan(3).
-            maxWidth(400).minHeight(150).expandY().fillY().padBottom(10).row();
+        currentLobbySection.add(currentLobbyTable).colspan(2).row();
 
+        Table lobbyButtons = new Table();
         startButton = new TextButton("Start Game", skin);
         leaveButton = new TextButton("Leave Lobby", skin);
+        lobbyButtons.add(startButton).padRight(15);
+        lobbyButtons.add(leaveButton);
+        currentLobbySection.add(lobbyButtons).colspan(2).padTop(15).row();
 
-        Table buttonTable = new Table();
-        buttonTable.add(startButton).padRight(10);
-        buttonTable.add(leaveButton);
-        mainTable.add(buttonTable).colspan(3).padBottom(30).row();
+        mainTable.add(currentLobbySection).colspan(2).minWidth(400).padBottom(20).row(); // تغییر به colspan=2
 
-        mainTable.add(new Label("Available Lobbies:", skin)).pad(10).colspan(3).align(Align.center).row();
+        // بخش اصلی با دو ستون
+        Table contentTable = new Table();
+        contentTable.defaults().grow().space(20);
+
+        // ستون سمت چپ: بازیکنان آنلاین (عرض کمتر)
+        Table playersColumn = new Table();
+        playersColumn.setBackground(skin.getDrawable("background"));
+        playersColumn.pad(15);
+
+        Label onlinePlayersTitle = new Label("Online Players", skin);
+        playersColumn.add(onlinePlayersTitle).padBottom(10).row();
+
         onlinePlayersTable = new Table(skin);
         onlinePlayersScrollPane = new ScrollPane(onlinePlayersTable, skin);
-        onlinePlayersScrollPane.setFadeScrollBars(true);
+        onlinePlayersScrollPane.setFadeScrollBars(false);
+        onlinePlayersScrollPane.setScrollbarsVisible(true);
+        playersColumn.add(onlinePlayersScrollPane).minHeight(300).minWidth(400).grow().row(); // عرض کمتر
 
-        mainTable.add(onlinePlayersScrollPane)
-            .colspan(1).align(Align.top).align(Align.left)
-            .minHeight(250)
-            .minWidth(400)
-            .expandY()
-            .fillY();
+        contentTable.add(playersColumn).minWidth(350); // عرض کمتر
 
-        mainTable.add(new Label("Search by ID:", skin));
-        Table searchTable = new Table();
+        // ستون سمت راست: لابی‌های موجود
+        Table lobbiesColumn = new Table();
+        lobbiesColumn.setBackground(skin.getDrawable("background"));
+        lobbiesColumn.pad(15);
+
+        Label availableLobbiesTitle = new Label("Available Lobbies", skin);
+        lobbiesColumn.add(availableLobbiesTitle).padBottom(10).row();
+
+        // بخش جستجو
+        Table searchSection = new Table();
+        searchSection.defaults().space(5);
+
         searchField = new TextField("", skin);
-        searchField.setMessageText("Enter Lobby ID");
-        searchTable.add(searchField).width(400).padRight(5);
+        searchField.setMessageText("Enter ID");
+        searchSection.add(searchField).width(250).padRight(5);
 
         searchButton = new TextButton("Search", skin);
-        searchTable.add(searchButton).padRight(5);
+        searchSection.add(searchButton).padRight(5);
 
         clearSearchButton = new TextButton("Clear", skin);
-        searchTable.add(clearSearchButton);
+        searchSection.add(clearSearchButton);
 
-        mainTable.add(searchTable).colspan(2).align(Align.left).row();
+        lobbiesColumn.add(searchSection).padBottom(10).row();
 
         lobbyListTable = new Table(skin);
-        lobbyListTable.setBackground("background");
-        ScrollPane scrollPane = new ScrollPane(lobbyListTable, skin);
-        scrollPane.setFadeScrollBars(true);
-        lobbyListTable.setColor(1f, 1f, 1f, 0.8f);
-        mainTable.add(scrollPane)
-            .colspan(3)
-            .minHeight(250)
-            .maxWidth(800)
-            .expandY()
-            .fillY()
-            .pad(10)
-            .row();
+        ScrollPane lobbiesScrollPane = new ScrollPane(lobbyListTable, skin);
+        lobbiesScrollPane.setFadeScrollBars(false);
+        lobbiesScrollPane.setScrollbarsVisible(true);
+        lobbiesColumn.add(lobbiesScrollPane).minHeight(250).grow().row();
 
-        createButton = new TextButton("Create Lobby", skin);
+        createButton = new TextButton("Create New Lobby", skin);
+        lobbiesColumn.add(createButton).padTop(10);
 
-        Table bottomTable = new Table();
-        bottomTable.add(createButton).center();
-        mainTable.add(bottomTable).colspan(3).pad(20).row();
-
+        contentTable.add(lobbiesColumn).minWidth(500);
+        mainTable.add(contentTable).colspan(2).row(); // تغییر به colspan=2
 
         setupEventListeners();
-
-//        if (!hasShownOnce) {
-//            System.err.println("show request");
         updateCurrentLobbyInfo();
-//            hasShownOnce = true;
-//        }
     }
 
     @Override

@@ -278,6 +278,7 @@ public class ClientHandler implements Runnable {
         GameLobby lobby = server.findPlayerLobby(username);
         if (lobby != null) {
             lobby.removePlayer(username);
+            setCurrentLobby(null);
             sendMessage("LEAVE_SUCCESS", JsonBuilder.create()
                 .put("message", "You left the lobby")
                 .build());
@@ -285,7 +286,6 @@ public class ClientHandler implements Runnable {
             if (lobby.isEmpty()) {
                 server.getGameLobbies().remove(lobby.getId());
                 server.broadcastSystemMessage("Lobby: " + lobby.getName() + " was removed");
-
             }
         } else {
             sendError("NOT_IN_LOBBY", "You are not in any lobby");
