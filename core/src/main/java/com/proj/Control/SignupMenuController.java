@@ -29,7 +29,7 @@ public class SignupMenuController {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     // Go directly to game screen for guests
-                    Main.getMain().setScreen(new GameScreen(farmName.STANDARD));
+                    Main.getMain().setScreen(new GameScreen(farmName.RIVERLAND));
                 }
             });
         }

@@ -21,6 +21,7 @@ public class ForagingManager {
     private GameMap gameMap;
     private final Random random = new Random();
     private Array<Tile> emptyTiles = new Array<>();
+    private int emptyTilesCount = 0;
 
     public ForagingManager() {
         foragingCrops = GameAssetManager.getGameAssetManager().getForagingCrops();
@@ -38,6 +39,7 @@ public class ForagingManager {
                 if (tile1.isPassable()) {
                     System.err.println("ine khalie " + tile1.getLocation());
                     emptyTiles.add(tile1);
+                    emptyTilesCount++;
                 }
             }
         }
@@ -53,7 +55,7 @@ public class ForagingManager {
         }
         if (seasonalItems.size == 0) return;
         int totalTiles = gameMap.getMapWidth() * gameMap.getMapHeight();
-        int itemsToSpawn = Math.max(1, (int) (totalTiles * 0.005));
+        int itemsToSpawn = Math.max(1, (int) (emptyTilesCount * 0.02));
         for (int i = 0; i < itemsToSpawn; i++) {
             Tile tile = emptyTiles.random();
             emptyTiles.removeValue(tile, true);
