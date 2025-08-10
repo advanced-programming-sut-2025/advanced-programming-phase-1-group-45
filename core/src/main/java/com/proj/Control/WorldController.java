@@ -272,8 +272,12 @@ public class WorldController {
                     continue;
                 }
                 foragingManager.setGameMap(gameMaps.get(mapId));
-                foragingManager.spawnDailyItems(gameTime.getSeason());
+                foragingManager.spawnDailyRandomItems(gameTime.getSeason());
                 gameMaps.get(mapId).updateDaily(gameTime.getSeason());
+            }
+            if(cavePoint != null) {
+                foragingManager.setGameMap(caveMap);
+                foragingManager.spawnDailyRandomItems(gameTime.getSeason());
             }
             foragingManager.setGameMap(gameMap);
         }

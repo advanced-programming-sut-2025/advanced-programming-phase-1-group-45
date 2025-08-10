@@ -32,6 +32,7 @@ public class GameMap {
     private Point playerSpawnPoint;
     private LanternLightSystem lanternLightSystem;
     private List<Tile> foragingCropTiles;
+    private List<Tile> foragingMineralTiles;
     private FarmingController farmingController;
     private Season currentSeason;
     private TiledMapTile tilledDirt;
@@ -46,6 +47,7 @@ public class GameMap {
         mapRenderer = new OrthogonalTiledMapRenderer(loader.getMap());
         initializeLanternSystem();
         foragingCropTiles = new ArrayList<>();
+        foragingMineralTiles = new ArrayList<>();
         this.farmingController = farmingController;
         if (farmingController != null) {
             farmingController.setMap(this);
@@ -105,6 +107,13 @@ public class GameMap {
                 pos.x * loader.getTileWidth(),
                 pos.y * loader.getTileHeight());
         }
+        if(mapName.equalsIgnoreCase("cave")) {
+        for (Tile tile : foragingMineralTiles) {
+            ForagingItem item = (ForagingItem) tile.getLandObject();
+            Point pos = item.getPosition();
+            batch.draw(item.getTexture(), pos.x*loader.getTileWidth(), pos.y*loader.getTileHeight(),
+                (float) item.getTexture().getRegionWidth()/6f , (float) item.getTexture().getRegionHeight()/6f);
+        }}
         if (farmingController != null) {
             farmingController.renderAll(batch, currentSeason);
         }
@@ -147,12 +156,27 @@ public class GameMap {
         foragingCropTiles.add(tile);
     }
 
+    public void putForagingMineralInTile(int x, int y, LandObject foragingObject) {
+        Tile tile = loader.getTiles()[x][y];
+        tile.setObject(foragingObject);
+        tile.setPassable(false);
+        tile.setType(TileType.FORAGING_MINERAL);
+        foragingCropTiles.add(tile);
+    }
+
     public void removeForaging() {
         for (Tile tile : foragingCropTiles) {
             tile.setPassable(true);
             tile.removeObject();
         }
+        if (mapName.equalsIgnoreCase("cave")) {
+            for (Tile tile : foragingMineralTiles) {
+                tile.setPassable(false);
+                tile.removeObject();
+            }
+        }
         foragingCropTiles.clear();
+        foragingMineralTiles.clear();
     }
 
     public ForagingItem harvestForagingItem(Point playerPoint, String toolName) {
@@ -166,6 +190,22 @@ public class GameMap {
                 tile.setPassable(true);
                 tile.setType(null);
                 foragingCropTiles.remove(tile);
+                return itemForagingItem;
+            }
+        }
+        return null;
+    }
+    public ForagingItem pickMineral(Point playerPoint, String toolName) {
+        Tile tile = loader.getTiles()[playerPoint.x][playerPoint.y];
+        if (tile == null) return null;
+        Object item = tile.getLandObject();
+        if (item instanceof ForagingItem) {
+            ForagingItem itemForagingItem = (ForagingItem) item;
+            if (toolName.equals("Pickaxe")) {
+                tile.removeObject();
+                tile.setPassable(true);
+                tile.setType(null);
+                foragingMineralTiles.remove(tile);
                 return itemForagingItem;
             }
         }

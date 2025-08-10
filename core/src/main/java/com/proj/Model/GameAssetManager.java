@@ -96,16 +96,21 @@ public class GameAssetManager {
 
     private void loadCavePoint() {
         cavePoints = new HashMap<>();
-        cavePoints.put(farmName.STANDARD, new Point(34,59));
-        cavePoints.put(farmName.RIVERLAND, new Point(34,59));
-        cavePoints.put(farmName.WILDERNESS, new Point(34,59));
-        cavePoints.put(farmName.HILL_TOP, new Point(34,59));
-        cavePoints.put(farmName.FOUR_CORNERS, new Point(30,45));
-        cavePoints.put(farmName.MEADOWLANDS, new Point(88,21));
-        cavePoints.put(farmName.FOREST, new Point(34,59));
+        cavePoints.put(farmName.STANDARD, new Point(34, 59));
+        cavePoints.put(farmName.RIVERLAND, new Point(34, 59));
+        cavePoints.put(farmName.WILDERNESS, new Point(34, 59));
+        cavePoints.put(farmName.HILL_TOP, new Point(34, 59));
+        cavePoints.put(farmName.FOUR_CORNERS, new Point(30, 45));
+        cavePoints.put(farmName.MEADOWLANDS, new Point(88, 21));
+        cavePoints.put(farmName.FOREST, new Point(34, 59));
     }
+
     public Point getCavePoint(farmName farmName) {
         return cavePoints.get(farmName);
+    }
+
+    public Array<ForagingItem> getForagingMinerals() {
+        return foragingLoader.getForagingMinerals();
     }
 
     public Texture getSpaceImageTexture() {
@@ -123,6 +128,7 @@ public class GameAssetManager {
         foragingLoader = new ForagingLoader();
         return skin;
     }
+
     public Texture getLobbyBackgroundTexture(int num) {
         return lobbyBackgroundTexture[num];
     }
@@ -437,6 +443,10 @@ public class GameAssetManager {
         foragingItem.put("winterroot", new Texture("assets/foraging/Winter_Root.png"));
     }
 
+    private Texture getMineralTexture(String path) {
+        return new Texture(path);
+    }
+
     private void loadResources() {
         TextureRegion fiber = new TextureRegion(new Texture("assets/resource/Fiber.png"));
         TextureRegion stone = new TextureRegion(new Texture("assets/resource/Stone.png"));
@@ -532,7 +542,6 @@ public class GameAssetManager {
             }
         }
     }
-
 
 
     private void loadEffectTextures() {

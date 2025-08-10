@@ -22,9 +22,11 @@ public class ForagingManager {
     private final Random random = new Random();
     private Array<Tile> emptyTiles = new Array<>();
     private int emptyTilesCount = 0;
+    private Array<ForagingItem> foragingMinerals = new Array<>();
 
     public ForagingManager() {
         foragingCrops = GameAssetManager.getGameAssetManager().getForagingCrops();
+        foragingMinerals = GameAssetManager.getGameAssetManager().getForagingMinerals();
     }
 
     public void setGameMap(GameMap map) {
@@ -42,6 +44,14 @@ public class ForagingManager {
                     emptyTilesCount++;
                 }
             }
+        }
+    }
+
+    public void spawnDailyRandomItems(Season currentSeason) {
+        if (gameMap.getMapName().equalsIgnoreCase("cave")) {
+            spawnForagingMineral();
+        } else {
+            spawnDailyItems(currentSeason);
         }
     }
 
@@ -119,6 +129,29 @@ public class ForagingManager {
                     tiles[x][y].setPassable(false);
                 }
             }
+        }
+    }
+
+    private void spawnForagingMineral() {
+        gameMap.removeForaging();
+        Array<ForagingItem> foragingItems = foragingMinerals;
+        int itemsToSpawn = Math.max(1, (int) (emptyTilesCount * 0.005));
+        for (int i = 0; i < itemsToSpawn; i++) {
+            Tile tile = emptyTiles.random();
+            emptyTiles.removeValue(tile, true);
+            Point position = tile.getLocation();
+            ForagingItem template = foragingItems.random();
+
+            ForagingItem newItem = new ForagingItem(
+                template.getName(),
+                template.getSeason().toArray(new Season[0]),
+                template.getBaseSellPrice(),
+                template.getEnergy(),
+                template.getTexture()
+            );
+
+            newItem.setPosition(position);
+            gameMap.putForagingMineralInTile(position.x, position.y, newItem);
         }
     }
 
