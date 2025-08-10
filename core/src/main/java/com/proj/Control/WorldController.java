@@ -76,6 +76,9 @@ public class WorldController {
     private GameMap currentMap;
     private String currentMapName;
 
+    private Point cavePoint;
+    private GameMap caveMap;
+
 
     public WorldController(String landName, Time gameTime, Stage uisatge) {
         this.gameTime = gameTime;
@@ -91,7 +94,6 @@ public class WorldController {
         this.uistage = uisatge;
         this.weatherController = new WeatherController();
         this.npcManager = new NPCManager();  // Initialize NPC manager
-//        loadMaps();
         if (maps.containsKey(landName)) {
             currentMap = gameMaps.get(maps.get(landName));
         } else {
@@ -229,6 +231,17 @@ public class WorldController {
             }
             gameMaps.put(maps.get(string), new GameMap(string, currentSeason, farmingController));
         }
+
+        if (!currentMapName.equalsIgnoreCase("Island")) {
+            caveMap = new GameMap("cave", currentSeason, null);
+            for (farmName fa : farmName.values()) {
+                if (fa.getFarmName().equals(currentMapName)) {
+                    cavePoint = GameAssetManager.getGameAssetManager().getCavePoint(fa);
+                    break;
+                }
+            }
+        }
+
     }
 
     private FarmInOutPoint findExitEnterPointsById(int mapId) {
@@ -392,8 +405,29 @@ public class WorldController {
         if (isExitPoint(point)) {
             triggerToOtherMap(point);
             return false;
+        } else if (gameMap.getMapName().equalsIgnoreCase("cave")) {
+            if ((tileX == 16 && tileY == 1)|| (tileX == 15 && tileY == 1) ) {
+                backToFarm();
+            }
+        } else if (cavePoint.x == point.x && cavePoint.y == point.y) {
+            triggerToCave();
+            return false;
         }
         return gameMap.isPassable(x, y);
+    }
+
+    public void triggerToCave() {
+        gameMap = caveMap;
+        foragingManager.setGameMap(caveMap);
+        player.setPosition(16 * 16, 2 * 16);
+        player.setTargetPosition(16 * 16, 2 * 16);
+    }
+
+    public void backToFarm() {
+        gameMap = gameMaps.get(1);
+        foragingManager.setGameMap(gameMap);
+        player.setPosition(cavePoint.x * gameMap.getTileWidth(), (cavePoint.y - 1) * gameMap.getTileHeight());
+        player.setTargetPosition(cavePoint.x * gameMap.getTileWidth(), (cavePoint.y - 1) * gameMap.getTileHeight());
     }
 
     private void triggerToOtherMap(Point point) {

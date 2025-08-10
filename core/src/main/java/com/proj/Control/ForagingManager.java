@@ -55,7 +55,7 @@ public class ForagingManager {
         }
         if (seasonalItems.size == 0) return;
         int totalTiles = gameMap.getMapWidth() * gameMap.getMapHeight();
-        int itemsToSpawn = Math.max(1, (int) (emptyTilesCount * 0.02));
+        int itemsToSpawn = Math.max(1, (int) (emptyTilesCount * 0.005));
         for (int i = 0; i < itemsToSpawn; i++) {
             Tile tile = emptyTiles.random();
             emptyTiles.removeValue(tile, true);

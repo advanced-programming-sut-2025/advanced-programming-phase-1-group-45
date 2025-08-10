@@ -11,6 +11,7 @@ import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.Model.inventoryItems.ResourceItem;
 import com.proj.Model.inventoryItems.seeds.SeedRegistry;
 import com.proj.map.FarmInOutPoint;
+import com.proj.map.farmName;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class GameAssetManager {
     private Texture lanternLight;
     private Skin stardewSkin;
     private Texture spaceImageTexture;
+    private HashMap<farmName, Point> cavePoints;
 
 
     private List<FarmInOutPoint> exitPointList = new ArrayList<>();
@@ -88,10 +90,23 @@ public class GameAssetManager {
         loadFoodTextures();
         loadObjectTextures();
         loadEffectTextures();
-
+        loadCavePoint();
         defaultIngredientTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/foraging/Leek.png")));
     }
 
+    private void loadCavePoint() {
+        cavePoints = new HashMap<>();
+        cavePoints.put(farmName.STANDARD, new Point(34,59));
+        cavePoints.put(farmName.RIVERLAND, new Point(34,59));
+        cavePoints.put(farmName.WILDERNESS, new Point(34,59));
+        cavePoints.put(farmName.HILL_TOP, new Point(34,59));
+        cavePoints.put(farmName.FOUR_CORNERS, new Point(30,45));
+        cavePoints.put(farmName.MEADOWLANDS, new Point(88,21));
+        cavePoints.put(farmName.FOREST, new Point(34,59));
+    }
+    public Point getCavePoint(farmName farmName) {
+        return cavePoints.get(farmName);
+    }
 
     public Texture getSpaceImageTexture() {
         return spaceImageTexture;
