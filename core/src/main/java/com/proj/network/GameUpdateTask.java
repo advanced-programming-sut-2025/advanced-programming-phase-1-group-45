@@ -80,9 +80,9 @@ public class GameUpdateTask implements Runnable {
      * به‌روزرسانی وضعیت بازیکنان
      */
     private void updatePlayers(float deltaTime) {
-        for (Map.Entry<String, ClientHandler> entry : server.getConnectedClients().entrySet()) {
+        for (Map.Entry<String, ClientController> entry : server.getConnectedClients().entrySet()) {
             String username = entry.getKey();
-            ClientHandler client = entry.getValue();
+            ClientController client = entry.getValue();
 
             // بازیابی انرژی بازیکنان در حالت استراحت
             GameLobby lobby = findPlayerLobby(username);

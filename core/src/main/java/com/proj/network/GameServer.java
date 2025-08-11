@@ -22,7 +22,7 @@ public class GameServer {
     private static final int THREAD_POOL_SIZE = 10;
     private static final int MAINTENANCE_INTERVAL_SECONDS = 60;
 
-    private final Map<String, ClientHandler> connectedClients = new ConcurrentHashMap<>();
+    private final Map<String, ClientController> connectedClients = new ConcurrentHashMap<>();
     private final LobbyManager lobbyManager;
     private final ExecutorService threadPool;
     private final ScheduledExecutorService maintenanceService;
@@ -95,8 +95,8 @@ public class GameServer {
                     continue;
                 }
 
-                ClientHandler clientHandler = new ClientHandler(clientSocket, this);
-                threadPool.execute(clientHandler);
+                ClientController clientController = new ClientController(clientSocket, this);
+                threadPool.execute(clientController);
             }
         } catch (IOException e) {
             if (running && !serverSocket.isClosed()) {
@@ -122,9 +122,9 @@ public class GameServer {
         }
     }
 
-    public void registerClient(String username, ClientHandler handler) {
+    public void registerClient(String username, ClientController handler) {
         if (connectedClients.containsKey(username)) {
-            ClientHandler oldHandler = connectedClients.get(username);
+            ClientController oldHandler = connectedClients.get(username);
             oldHandler.sendMessage("DISCONNECT", JsonBuilder.create()
                 .put("message", "New login detected")
                 .build());
@@ -154,8 +154,8 @@ public class GameServer {
 
         String jsonMessage = messageObj.toString();
 
-        for (Map.Entry<String, ClientHandler> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
-            ClientHandler handler = entry.getValue();
+        for (Map.Entry<String, ClientController> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
+            ClientController handler = entry.getValue();
             if (handler != null && handler.isRunning()) {
                 handler.sendRaw(jsonMessage);
             }
@@ -166,7 +166,7 @@ public class GameServer {
         System.out.println("GameServer " +  "Creating a new lobby: " + lobbyName);
 
         GameLobby lobby = lobbyManager.createAndGetLobby(lobbyName, owner, password, maxPlayers, isPrivate, isVisible);
-        ClientHandler ownerHandler = connectedClients.get(owner);
+        ClientController ownerHandler = connectedClients.get(owner);
         if (ownerHandler != null) {
             lobby.addPlayer(owner, ownerHandler);
 
@@ -182,14 +182,14 @@ public class GameServer {
         System.out.println("GameServer " +  "Lobby created: " + lobbyName + " with ID: " + lobby.getId());
     }
     public void broadcastLobbiesList() {
-        for (ClientHandler handler : connectedClients.values()) {
+        for (ClientController handler : connectedClients.values()) {
             handler.sendLobbiesList();
         }
     }
 
     public void joinLobby(String lobbyId, String username, String password) {
         GameLobby lobby = lobbyManager.getGameLobby(lobbyId);
-        ClientHandler client = connectedClients.get(username);
+        ClientController client = connectedClients.get(username);
 
         if (client == null) {
             System.out.println("GameServer " +  "Username not found: " + username);
@@ -250,7 +250,7 @@ public class GameServer {
 
     public void startGame(String lobbyId, String username) {
         GameLobby lobby = lobbyManager.getGameLobby(lobbyId);
-        ClientHandler client = connectedClients.get(username);
+        ClientController client = connectedClients.get(username);
 
         if (client == null) {
             System.out.println("GameServer " +  "Username not found: " + username);
@@ -313,7 +313,7 @@ public class GameServer {
         GameLobby playerLobby = findPlayerLobby(username);
 
         if (playerLobby == null || !playerLobby.isGameActive()) {
-            ClientHandler client = connectedClients.get(username);
+            ClientController client = connectedClients.get(username);
             if (client != null) {
                 JSONObject error = new JSONObject();
                 error.put("type", "ERROR");
@@ -345,8 +345,8 @@ public class GameServer {
     }
 
     private void checkDisconnectedClients() {
-        for (Map.Entry<String, ClientHandler> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
-            ClientHandler handler = entry.getValue();
+        for (Map.Entry<String, ClientController> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
+            ClientController handler = entry.getValue();
             if (handler.isTimedOut()) {
                 System.out.println("GameServer " +  "User removed due to inactivity: " + entry.getKey());
                 handler.shutdown();
@@ -379,7 +379,7 @@ public class GameServer {
     public JSONObject sendOnlinePlayersList() {
         JSONArray playersArray = new JSONArray();
 
-        for (ClientHandler handler : connectedClients.values()) {
+        for (ClientController handler : connectedClients.values()) {
             JSONObject playerInfo = new JSONObject();
             playerInfo.put("username", handler.getUsername());
             playerInfo.put("status", "Online");
@@ -402,7 +402,7 @@ public class GameServer {
     }
 
     public void notifyPlayerStatusUpdate() {
-        for (ClientHandler handler : connectedClients.values()) {
+        for (ClientController handler : connectedClients.values()) {
             handler.sendPlayerList();
         }
     }
@@ -417,7 +417,7 @@ public class GameServer {
         try {
             broadcastSystemMessage("Server is shutting down");
 
-            for (ClientHandler handler : connectedClients.values()) {
+            for (ClientController handler : connectedClients.values()) {
                 handler.shutdown();
             }
             connectedClients.clear();
@@ -449,7 +449,7 @@ public class GameServer {
         return dbHelper;
     }
 
-    public Map<String, ClientHandler> getConnectedClients() {
+    public Map<String, ClientController> getConnectedClients() {
         return connectedClients;
     }
 

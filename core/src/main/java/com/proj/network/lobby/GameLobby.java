@@ -1,6 +1,6 @@
 package com.proj.network.lobby;
 
-import com.proj.network.ClientHandler;
+import com.proj.network.ClientController;
 import com.proj.network.GameInstance;
 import com.proj.network.GameServer;
 import com.proj.network.PlayerGameState;
@@ -23,7 +23,7 @@ public class GameLobby {
     private long creationTime;
     private long lastActivityTime;
 
-    private final Map<String, ClientHandler> players = new ConcurrentHashMap<>();
+    private final Map<String, ClientController> players = new ConcurrentHashMap<>();
     private final Map<String, PlayerGameState> playerStates = new ConcurrentHashMap<>();
 
     private GameInstance gameInstance;
@@ -47,7 +47,7 @@ public class GameLobby {
     /**
      * افزودن بازیکن به لابی
      */
-    public void addPlayer(String username, ClientHandler handler) {
+    public void addPlayer(String username, ClientController handler) {
         players.put(username, handler);
         handler.setCurrentLobby(this);
         updateLastActivity();
@@ -106,13 +106,13 @@ public class GameLobby {
      * ارسال پیام به تمام بازیکنان لابی
      */
     public void broadcastMessage(String type, String message) {
-        for (ClientHandler handler : players.values()) {
+        for (ClientController handler : players.values()) {
             handler.sendMessage(type, JsonBuilder.create().put("data", message).build());
         }
     }
 
     public void broadcastRaw(String message) {
-        for (ClientHandler handler : players.values()) {
+        for (ClientController handler : players.values()) {
             if (!handler.isTimedOut()) {
                 handler.sendRaw(message);
             }
@@ -256,7 +256,7 @@ public class GameLobby {
         return players.size();
     }
 
-    public Map<String, ClientHandler> getPlayers() {
+    public Map<String, ClientController> getPlayers() {
         return players;
     }
 

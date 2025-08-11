@@ -15,7 +15,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ClientHandler implements Runnable {
+public class ClientController implements Runnable {
     private final Socket clientSocket;
     private final GameServer server;
     private PrintWriter out;
@@ -26,7 +26,7 @@ public class ClientHandler implements Runnable {
     private static final long TIMEOUT_MS = 60000; // 1 minute timeout
     private GameLobby currentLobby;
 
-    public ClientHandler(Socket socket, GameServer server) {
+    public ClientController(Socket socket, GameServer server) {
         this.clientSocket = socket;
         this.server = server;
         this.lastActivityTime = System.currentTimeMillis();
@@ -107,7 +107,7 @@ public class ClientHandler implements Runnable {
 //            if (loggedIn) {
                 // Handle existing connections
                 if (server.getConnectedClients().containsKey(username)) {
-                    ClientHandler existingClient = server.getConnectedClients().get(username);
+                    ClientController existingClient = server.getConnectedClients().get(username);
                     existingClient.sendMessage("DISCONNECT", JsonBuilder.create()
                         .put("message", "You've been disconnected because you logged in from another device")
                         .build());
@@ -192,7 +192,7 @@ public class ClientHandler implements Runnable {
 
         String recipient = JsonParser.getString(data, "recipient", null);
         if (recipient != null) {
-            ClientHandler recipientHandler = server.getConnectedClients().get(recipient);
+            ClientController recipientHandler = server.getConnectedClients().get(recipient);
             if (recipientHandler != null) {
                 JSONObject privateMsg = JsonBuilder.create()
                     .put("sender", username)
@@ -212,7 +212,7 @@ public class ClientHandler implements Runnable {
                 .put("isPrivate", false)
                 .build();
 
-            for (ClientHandler client : server.getConnectedClients().values()) {
+            for (ClientController client : server.getConnectedClients().values()) {
                 client.sendMessage("CHAT", publicMsg);
             }
         }
