@@ -33,7 +33,7 @@ public class Scythe extends Tool {
                 return true;
             }
         }
-        if (tile.getType() == TileType.FORAGING) {
+        if (tile.getType() == TileType.FORAGING_CROP) {
             ForagingItem collectedItem = WorldController
                 .getInstance()
                 .getForagingManager()

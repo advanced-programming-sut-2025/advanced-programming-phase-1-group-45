@@ -23,7 +23,7 @@ public class ForagingInventoryWindow extends Window {
 
 
     public ForagingInventoryWindow(Skin skin, SeedSelectionListener selectionListener) {
-        super("ForagingCrop Inventory", skin);
+        super("Foraging Items Inventory", skin);
         getTitleLabel().setAlignment(Align.center);
         this.skin = skin;
         this.selectionListener = selectionListener;
@@ -69,7 +69,7 @@ public class ForagingInventoryWindow extends Window {
 
         Array<ForagingItem> seeds = getPlayerSeeds();
         if (seeds.size == 0) {
-            contentTable.add(new Label("No Foraging Crop available", skin)).row();
+            contentTable.add(new Label("No Foraging Item available", skin)).row();
             return;
         }
 

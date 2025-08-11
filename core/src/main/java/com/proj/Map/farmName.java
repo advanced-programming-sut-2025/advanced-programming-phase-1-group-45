@@ -10,11 +10,11 @@ public enum farmName {
             "However, a mineral deposit provides mining opportunities."),
     WILDERNESS("Wilderness", "There's plenty of good land here, but beware... at night the monsters come out."),
     FOUR_CORNERS("FourCorners", "The land is divide into four parcels, each with its own perk." +
-           "Perfect for a group!"); //,
-//    MEADOWLANDS("Meadowlands", "It's not the best for growing crops, but there's a chewy blue grass" +
-//        "that animals love. You start with two chickens."),
-//    BEACH("Island", "Good foraging and fishing, and tons of open space. Sometimes, supply" +
-//        "crates wash up on share. However, sprinklers don't work in the sandy soil.");
+           "Perfect for a group!"),
+    MEADOWLANDS("Meadowlands", "It's not the best for growing crops, but there's a chewy blue grass" +
+        "that animals love. You start with two chickens."),
+    BEACH("Island", "Good foraging and fishing, and tons of open space. Sometimes, supply" +
+        "crates wash up on share. However, sprinklers don't work in the sandy soil.");
 
     private String farmName;
     private String description;

@@ -17,6 +17,7 @@ import com.proj.network.client.GameClient;
 import com.proj.network.client.NetworkEventListener;
 import com.proj.Database.DatabaseHelper;
 import com.proj.network.lobby.LobbyScreen;
+import com.badlogic.gdx.graphics.GL20;
 
 
 /**
@@ -53,6 +54,9 @@ public class Main extends Game implements NetworkEventListener {
     }*/
     @Override
     public void create() {
+        Gdx.app.log("OpenGL", "Version: " + Gdx.gl.glGetString(GL20.GL_VERSION));
+        Gdx.app.log("OpenGL", "Renderer: " + Gdx.gl.glGetString(GL20.GL_RENDERER));
+        Gdx.app.log("OpenGL", "Vendor: " + Gdx.gl.glGetString(GL20.GL_VENDOR));
         main = this;
         batch = new SpriteBatch();
         menuBackground = new Texture(Gdx.files.internal("menu_bg.png"));
@@ -67,13 +71,13 @@ public class Main extends Game implements NetworkEventListener {
 
         loadMusic();
     }
-
-    public void startNewGame() {// in jadide
+//ino comment kardam chon nemidoonestam parametr avali ro chi bedam*******************
+    /*public void startNewGame() {// in jadide
         if (getScreen() != null) {
             getScreen().dispose();
         }
         setScreen(new GameScreen(farmName.STANDARD));
-    }
+    }*/
 
     public void showAuthScreen() {
         setScreen(new SignupMenuView(
@@ -85,7 +89,7 @@ public class Main extends Game implements NetworkEventListener {
     public void switchToGameScreen() {
         Gdx.app.postRunnable(() -> {
             Screen current = getScreen();
-            setScreen(new GameScreen(farmName.STANDARD));
+            setScreen(new GameScreen(this, farmName.STANDARD));
             if (current != null) {
                 current.dispose();
             }

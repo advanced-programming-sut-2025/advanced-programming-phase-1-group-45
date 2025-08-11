@@ -14,20 +14,45 @@ import com.proj.map.TileType;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class ForagingManager {
     private Array<ForagingItem> foragingCrops = new Array<>();
     private GameMap gameMap;
     private final Random random = new Random();
+    private Array<Tile> emptyTiles = new Array<>();
+    private int emptyTilesCount = 0;
+    private Array<ForagingItem> foragingMinerals = new Array<>();
 
     public ForagingManager() {
         foragingCrops = GameAssetManager.getGameAssetManager().getForagingCrops();
+        foragingMinerals = GameAssetManager.getGameAssetManager().getForagingMinerals();
     }
 
     public void setGameMap(GameMap map) {
         this.gameMap = map;
+        findEmptyTiles();
     }
 
+    public void findEmptyTiles() {
+        emptyTiles.clear();
+        for (Tile[] tile : gameMap.getLandLoader().getTiles()) {
+            for (Tile tile1 : tile) {
+                if (tile1.isPassable()) {
+                    emptyTiles.add(tile1);
+                    emptyTilesCount++;
+                }
+            }
+        }
+    }
+
+    public void spawnDailyRandomItems(Season currentSeason) {
+        if (gameMap.getMapName().equalsIgnoreCase("cave")) {
+            spawnForagingMineral();
+        } else {
+            spawnDailyItems(currentSeason);
+        }
+    }
 
     public void spawnDailyItems(Season currentSeason) {
         gameMap.removeForaging();
@@ -39,9 +64,12 @@ public class ForagingManager {
         }
         if (seasonalItems.size == 0) return;
         int totalTiles = gameMap.getMapWidth() * gameMap.getMapHeight();
-        int itemsToSpawn = Math.max(1, (int) (totalTiles * 0.005));
+        int itemsToSpawn = Math.max(1, (int) (emptyTilesCount * 0.005));
         for (int i = 0; i < itemsToSpawn; i++) {
-            Point position = findValidSpawnPosition();
+            Tile tile = emptyTiles.random();
+            emptyTiles.removeValue(tile, true);
+            Point position = tile.getLocation();
+            //findValidSpawnPosition();
             ForagingItem template = seasonalItems.random();
 
             ForagingItem newItem = new ForagingItem(
@@ -103,13 +131,39 @@ public class ForagingManager {
         }
     }
 
+    private void spawnForagingMineral() {
+        gameMap.removeForaging();
+        Array<ForagingItem> foragingItems = foragingMinerals;
+        int itemsToSpawn = Math.max(1, (int) (emptyTilesCount * 0.0007));
+        for (int i = 0; i < itemsToSpawn; i++) {
+            Tile tile = emptyTiles.random();
+            if (tile.getLocation().x == 16 && tile.getLocation().y == 2) {
+                tile = emptyTiles.get(2);
+            }
+            emptyTiles.removeValue(tile, true);
+            Point position = tile.getLocation();
+            ForagingItem template = foragingItems.random();
+
+            ForagingItem newItem = new ForagingItem(
+                template.getName(),
+                template.getSeason().toArray(new Season[0]),
+                template.getBaseSellPrice(),
+                template.getEnergy(),
+                template.getTexture()
+            );
+
+            newItem.setPosition(position);
+            gameMap.putForagingMineralInTile(position.x, position.y, newItem);
+        }
+    }
+
     private Point findValidSpawnPosition() {
         int attempts = 0;
         while (attempts < 100) {
-            int x = random.nextInt(gameMap.getMapWidth());
-            int y = random.nextInt(gameMap.getMapHeight());
-            if (gameMap.canPlantInTile(x, y)) {
-                return new Point(x, y);
+            int x = random.nextInt(emptyTiles.toArray().length);
+            if (gameMap.isPassable(emptyTiles.get(x).getLocation().x,
+                emptyTiles.get(x).getLocation().y)) {
+                return emptyTiles.get(x).getLocation();
             }
             attempts++;
         }
@@ -119,6 +173,5 @@ public class ForagingManager {
     public ForagingItem tryCollectItem(Point playerTilePosition, String toolName) {
         return gameMap.harvestForagingItem(playerTilePosition, toolName);
     }
-
 
 }

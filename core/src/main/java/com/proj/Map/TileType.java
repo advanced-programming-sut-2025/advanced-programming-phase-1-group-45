@@ -10,7 +10,8 @@ public enum TileType {
     QUARRY("Quarry"),
     WATER("Water"),
     SHOP("Shop"),
-    FORAGING("Foraging");
+    FORAGING_CROP("Foraging"),
+    FORAGING_MINERAL("Foraging_Mineral");
     private final String type;
     TileType(String type) {
         this.type = type;

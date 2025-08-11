@@ -13,10 +13,27 @@ public class Inventory {
     private int selectedSlot = 0;
     private boolean isVisible = false;
     private boolean noToolSelected = true; // برای شروع بدون ابزار
+    private int money = 1000;
 
     public Inventory() {
         this.capacity = DEFAULT_CAPACITY;
         this.items = new HashMap<>();
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public void addMoney(int amount) {
+        money += amount;
+    }
+
+    public boolean removeMoney(int amount) {
+        if (money >= amount) {
+            money -= amount;
+            return true;
+        }
+        return false;
     }
 
     public Inventory(int capacity) {

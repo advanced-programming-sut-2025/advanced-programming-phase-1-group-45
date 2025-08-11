@@ -5,6 +5,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.proj.Player;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import java.util.List;
+import java.util.ArrayList;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -196,6 +200,70 @@ public class InventoryManager {
         }
     }
 
+    public boolean hasItem(String itemId, int quantity) {
+        int count = 0;
+        for (InventoryItem item : playerInventory.getItems().values()) { // Iterate through values
+            if (item.getId().equals(itemId)) {
+                count += item.getQuantity();
+            }
+        }
+        return count >= quantity;
+    }
+
+    public boolean removeItem(String itemId, int amount) {
+        int remaining = amount;
+        List<Map.Entry<Integer, InventoryItem>> entries =
+            new ArrayList<>(playerInventory.getItems().entrySet());
+
+        for (Map.Entry<Integer, InventoryItem> entry : entries) {
+            InventoryItem item = entry.getValue();
+            if (item.getId().equals(itemId)) {
+                int removeAmount = Math.min(remaining, item.getQuantity());
+                item.setQuantity(item.getQuantity() - removeAmount);
+                remaining -= removeAmount;
+
+                if (item.getQuantity() == 0) {
+                    playerInventory.getItems().remove(entry.getKey());
+                }
+                if (remaining <= 0) break;
+            }
+        }
+        return false;
+    }
+
+    public InventoryItem findItemById(String itemId) {
+        for (InventoryItem item : playerInventory.getItems().values()) { // Iterate through values
+            if (item.getId().equals(itemId)) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public void addItem(String itemId, int quantity) {
+        InventoryItem existingItem = findItemById(itemId);
+
+        if (existingItem != null) {
+            existingItem.setQuantity(existingItem.getQuantity() + quantity);
+        } else {
+            TextureRegion texture = itemTextures.get(itemId);
+            
+            if (texture == null) {
+                Gdx.app.log("InventoryManager", "Creating placeholder for: " + itemId);
+                texture = createPlaceholderTexture();
+                itemTextures.put(itemId, texture);
+            }
+        }
+    }
+
+    private TextureRegion createPlaceholderTexture() {
+        Pixmap pixmap = new Pixmap(32, 32, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.MAGENTA);
+        pixmap.fill();
+        Texture texture = new Texture(pixmap);
+        pixmap.dispose();
+        return new TextureRegion(texture);
+    }
 
 }
 

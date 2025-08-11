@@ -11,6 +11,7 @@ import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.Model.inventoryItems.ResourceItem;
 import com.proj.Model.inventoryItems.seeds.SeedRegistry;
 import com.proj.map.FarmInOutPoint;
+import com.proj.map.farmName;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class GameAssetManager {
     private Texture lanternLight;
     private Skin stardewSkin;
     private Texture spaceImageTexture;
+    private HashMap<farmName, Point> cavePoints;
 
 
     private List<FarmInOutPoint> exitPointList = new ArrayList<>();
@@ -88,10 +90,28 @@ public class GameAssetManager {
         loadFoodTextures();
         loadObjectTextures();
         loadEffectTextures();
-
+        loadCavePoint();
         defaultIngredientTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/foraging/Leek.png")));
     }
 
+    private void loadCavePoint() {
+        cavePoints = new HashMap<>();
+        cavePoints.put(farmName.STANDARD, new Point(34, 59));
+        cavePoints.put(farmName.RIVERLAND, new Point(34, 59));
+        cavePoints.put(farmName.WILDERNESS, new Point(34, 59));
+        cavePoints.put(farmName.HILL_TOP, new Point(34, 59));
+        cavePoints.put(farmName.FOUR_CORNERS, new Point(30, 45));
+        cavePoints.put(farmName.MEADOWLANDS, new Point(88, 21));
+        cavePoints.put(farmName.FOREST, new Point(34, 59));
+    }
+
+    public Point getCavePoint(farmName farmName) {
+        return cavePoints.get(farmName);
+    }
+
+    public Array<ForagingItem> getForagingMinerals() {
+        return foragingLoader.getForagingMinerals();
+    }
 
     public Texture getSpaceImageTexture() {
         return spaceImageTexture;
@@ -108,6 +128,7 @@ public class GameAssetManager {
         foragingLoader = new ForagingLoader();
         return skin;
     }
+
     public Texture getLobbyBackgroundTexture(int num) {
         return lobbyBackgroundTexture[num];
     }
@@ -177,23 +198,141 @@ public class GameAssetManager {
         return foragingLoader.getForagingCrops();
     }
 
-    private void loadFarmExitPoints() {
+    private List<FarmInOutPoint> mainFarmsPoints = new ArrayList<>();
+
+    private void loadMainFarmPoints() {
         FarmInOutPoint standard = new FarmInOutPoint("Standard", 1);
         standard.addFarmExitPoint(new Point(40, 65), 5);
         standard.addFarmExitPoint(new Point(41, 65), 5);
 
-        standard.addFarmEnterPoint(new Point(40, 64), 5);
+        standard.addFarmEnterPoint(new Point(40, 63), 5);
 
         standard.addFarmExitPoint(new Point(41, 3), 6);
-        standard.addFarmExitPoint(new Point(41, 3), 6);
+        standard.addFarmExitPoint(new Point(40, 3), 6);
         standard.addFarmEnterPoint(new Point(41, 4), 6);
 
 
         standard.addFarmExitPoint(new Point(80, 48), 2);
         standard.addFarmEnterPoint(new Point(79, 48), 2);
 
-        exitPointList.add(standard);
+        FarmInOutPoint forestLand = new FarmInOutPoint("ForestLand", 1);
+        forestLand.addFarmExitPoint(new Point(40, 63), 5);
+        forestLand.addFarmExitPoint(new Point(41, 63), 5);
 
+        forestLand.addFarmEnterPoint(new Point(40, 62), 5);
+
+        forestLand.addFarmExitPoint(new Point(41, 3), 6);
+        forestLand.addFarmExitPoint(new Point(41, 3), 6);
+        forestLand.addFarmExitPoint(new Point(40, 3), 6);
+        forestLand.addFarmEnterPoint(new Point(41, 4), 6);
+
+
+        forestLand.addFarmExitPoint(new Point(80, 48), 2);
+        forestLand.addFarmEnterPoint(new Point(79, 48), 2);
+        mainFarmsPoints.add(forestLand);
+
+
+        FarmInOutPoint medowlands = new FarmInOutPoint("Medowlands", 1);
+        medowlands.addFarmExitPoint(new Point(63, 75), 5);
+        medowlands.addFarmExitPoint(new Point(64, 75), 5);
+
+        forestLand.addFarmEnterPoint(new Point(63, 73), 5);
+
+        medowlands.addFarmExitPoint(new Point(52, 1), 6);
+        medowlands.addFarmExitPoint(new Point(53, 1), 6);
+        medowlands.addFarmEnterPoint(new Point(53, 2), 6);
+
+        medowlands.addFarmExitPoint(new Point(100, 53), 2);
+        medowlands.addFarmExitPoint(new Point(100, 52), 2);
+        medowlands.addFarmEnterPoint(new Point(99, 53), 2);
+        mainFarmsPoints.add(medowlands);
+
+
+        FarmInOutPoint riverland = new FarmInOutPoint("Riverland", 1);
+        riverland.addFarmExitPoint(new Point(40, 65), 5);
+        riverland.addFarmExitPoint(new Point(41, 65), 5);
+
+        riverland.addFarmEnterPoint(new Point(40, 64), 5);
+
+        riverland.addFarmExitPoint(new Point(41, 4), 6);
+        riverland.addFarmExitPoint(new Point(41, 4), 6);
+        riverland.addFarmExitPoint(new Point(40, 4), 6);
+        riverland.addFarmEnterPoint(new Point(41, 4), 6);
+
+
+        riverland.addFarmExitPoint(new Point(80, 48), 2);
+        riverland.addFarmEnterPoint(new Point(79, 48), 2);
+        mainFarmsPoints.add(riverland);
+
+
+        FarmInOutPoint hillTop = new FarmInOutPoint("Hill_top", 1);
+        hillTop.addFarmExitPoint(new Point(40, 65), 5);
+        hillTop.addFarmExitPoint(new Point(41, 65), 5);
+
+        hillTop.addFarmEnterPoint(new Point(40, 64), 5);
+
+        hillTop.addFarmExitPoint(new Point(41, 2), 6);
+        hillTop.addFarmExitPoint(new Point(40, 2), 6);
+        hillTop.addFarmEnterPoint(new Point(41, 4), 6);
+
+
+        hillTop.addFarmExitPoint(new Point(80, 48), 2);
+        hillTop.addFarmEnterPoint(new Point(79, 48), 2);
+        mainFarmsPoints.add(hillTop);
+
+        FarmInOutPoint wilderness = new FarmInOutPoint("Wilderness", 1);
+        wilderness.addFarmExitPoint(new Point(40, 65), 5);
+        wilderness.addFarmExitPoint(new Point(41, 65), 5);
+
+        wilderness.addFarmEnterPoint(new Point(40, 64), 5);
+
+        wilderness.addFarmExitPoint(new Point(41, 2), 6);
+        wilderness.addFarmExitPoint(new Point(40, 2), 6);
+        wilderness.addFarmEnterPoint(new Point(41, 4), 6);
+
+
+        wilderness.addFarmExitPoint(new Point(80, 48), 2);
+        wilderness.addFarmEnterPoint(new Point(79, 48), 2);
+        mainFarmsPoints.add(wilderness);
+
+        FarmInOutPoint fourCorner = new FarmInOutPoint("Four_Corners", 1);
+        fourCorner.addFarmExitPoint(new Point(40, 79), 5);
+        fourCorner.addFarmExitPoint(new Point(41, 79), 5);
+
+        fourCorner.addFarmEnterPoint(new Point(40, 78), 5);
+
+        fourCorner.addFarmExitPoint(new Point(41, 18), 6);
+        fourCorner.addFarmExitPoint(new Point(40, 18), 6);
+        fourCorner.addFarmEnterPoint(new Point(41, 20), 6);
+
+
+        fourCorner.addFarmExitPoint(new Point(80, 63), 2);
+        fourCorner.addFarmEnterPoint(new Point(79, 63), 2);
+        mainFarmsPoints.add(fourCorner);
+
+        FarmInOutPoint island = new FarmInOutPoint("Island", 1);
+        island.addFarmExitPoint(new Point(40, 110), 5);
+        island.addFarmExitPoint(new Point(41, 110), 5);
+
+        island.addFarmEnterPoint(new Point(40, 108), 5);
+
+        island.addFarmExitPoint(new Point(82, 6), 6);
+        island.addFarmExitPoint(new Point(82, 7), 6);
+        island.addFarmEnterPoint(new Point(82, 8), 6);
+
+
+        island.addFarmExitPoint(new Point(79, 93), 2);
+        island.addFarmExitPoint(new Point(79, 92), 2);
+
+        island.addFarmEnterPoint(new Point(78, 93), 2);
+        mainFarmsPoints.add(island);
+
+
+        mainFarmsPoints.add(standard);
+    }
+
+    private void loadFarmExitPoints() {
+        loadMainFarmPoints();
         FarmInOutPoint backWoods = new FarmInOutPoint("BackWoods", 5);
         backWoods.addFarmExitPoint(new Point(14, 0), 1);
         backWoods.addFarmExitPoint(new Point(13, 0), 1);
@@ -304,6 +443,10 @@ public class GameAssetManager {
         foragingItem.put("winterroot", new Texture("assets/foraging/Winter_Root.png"));
     }
 
+    private Texture getMineralTexture(String path) {
+        return new Texture(path);
+    }
+
     private void loadResources() {
         TextureRegion fiber = new TextureRegion(new Texture("assets/resource/Fiber.png"));
         TextureRegion stone = new TextureRegion(new Texture("assets/resource/Stone.png"));
@@ -350,8 +493,16 @@ public class GameAssetManager {
 
     }
 
-    public List<FarmInOutPoint> getExitPointList() {
-        return exitPointList;
+    public List<FarmInOutPoint> getExitPointList(String farmName) {
+        List<FarmInOutPoint> custom = new ArrayList<>();
+        for (FarmInOutPoint points : mainFarmsPoints) {
+            if (points.getFarmName().equals(farmName)) {
+                custom.add(points);
+                break;
+            }
+        }
+        custom.addAll(exitPointList);
+        return custom;
     }
 
     public Texture getForagingTexture(String forageName) {
@@ -391,7 +542,6 @@ public class GameAssetManager {
             }
         }
     }
-
 
 
     private void loadEffectTextures() {

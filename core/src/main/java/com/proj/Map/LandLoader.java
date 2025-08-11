@@ -32,7 +32,11 @@ public class LandLoader {
 
     private void loadMap() {
         String seasonName = landSeason.toString().toLowerCase();
-        this.landPath = "assets/map/land/" + seasonName + "/" + landName + "_" + seasonName + ".tmx";
+        if (!landName.equalsIgnoreCase("cave")) {
+        this.landPath = "assets/map/land/" + seasonName + "/" + landName + "_" + seasonName + ".tmx";}
+        else {
+            this.landPath = "assets/map/land/cave.tmx";
+        }
         map = new TmxMapLoader().load(landPath);
 
         mapWidth = map.getProperties().get("width", Integer.class);
@@ -82,12 +86,14 @@ public class LandLoader {
                 for (LayerInfo layer : collisionLayers) {
                     TiledMapTileLayer.Cell cell = layer.tileLayer.getCell(x, y);
                     if (cell == null || cell.getTile() == null) continue;
-                    TileType tileType = findType(cell);
-                    if (tileType != null) {
-                        tiles[x][y].setType(tileType);
-                        if (tileType == TileType.FIBER || tileType == TileType.STONE || tileType == TileType.WOOD) {
-                            tiles[x][y].setObject(GameAssetManager.getGameAssetManager().
-                                getNaturalResourceList().get(tileType.toString().toLowerCase()));
+                    if (!landName.equalsIgnoreCase("cave")) {
+                        TileType tileType = findType(cell);
+                        if (tileType != null) {
+                            tiles[x][y].setType(tileType);
+                            if (tileType == TileType.FIBER || tileType == TileType.STONE || tileType == TileType.WOOD) {
+                                tiles[x][y].setObject(GameAssetManager.getGameAssetManager().
+                                    getNaturalResourceList().get(tileType.toString().toLowerCase()));
+                            }
                         }
                     }
                     Boolean walkable = getWalkableProperty(cell);
