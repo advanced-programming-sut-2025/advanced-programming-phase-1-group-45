@@ -141,7 +141,12 @@ public class SeedInventoryWindow extends Window {
 
         if (selectionListener != null) {
             boolean success = selectionListener.onSeedSelected(seed);
+            if (success) {
+                seed.setQuantity(-1);
+                InventoryManager.getInstance().getPlayerInventory().addItem(seed);
+            }
             selectedSeed = null;
+            updateDisplay();
         }
     }
 

@@ -15,6 +15,7 @@ public class Crop {
     private boolean hasProduct = false;
     private boolean isWatered;
     private boolean isFertilized;
+    private String fertilizedName = null;
     private int daysWithoutWater = 0;
     private int daysUntilNextHarvest = 0;
     private boolean isFullyGrown = false;
@@ -34,7 +35,13 @@ public class Crop {
 
     public void grow() {
         if (!isFullyGrown) {
-            daysInCurrentStage++;
+            if (fertilizedName == null) {
+                daysInCurrentStage++;
+            } else if (fertilizedName.equalsIgnoreCase("Basic Fertilize")) {
+                daysInCurrentStage+=2;
+            } else if (fertilizedName.equalsIgnoreCase("Deluxe Fertilize")) {
+                daysInCurrentStage+=3;
+            }
             if (daysInCurrentStage >= data.getGrowthStages()[currentStage]) {
                 currentStage++;
                 daysInCurrentStage = 0;
@@ -59,16 +66,19 @@ public class Crop {
         isWatered = true;
         daysWithoutWater = 0;
         showWaterEffect = true;
-        waterEffectTimer = 1.0f; // نمایش افکت به مدت 1 ثانیه
+        waterEffectTimer = 1.0f;
     }
 
 
-    public void fertilize() {
+    public void fertilize(String fertilizerName) {
+        System.err.println("fertilize");
         isFertilized = true;
+        this.fertilizedName = fertilizerName;
+        showFertilizeEffect = true;
+        fertilizeEffectTimer = 1.0f;
     }
 
     public void updateEffects(float delta) {
-        // به‌روزرسانی تایمرهای افکت
         if (waterEffectTimer > 0) {
             waterEffectTimer -= delta;
             if (waterEffectTimer <= 0) {

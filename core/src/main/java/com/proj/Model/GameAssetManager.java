@@ -55,6 +55,7 @@ public class GameAssetManager {
     private TextureRegion eatingEffectTexture;
     private TextureRegion defaultIngredientTexture;
     private Texture[] lobbyBackgroundTexture = new Texture[6];
+    private Texture backpackTexture;
 
 
     private GameAssetManager() {
@@ -67,7 +68,7 @@ public class GameAssetManager {
         lobbyBackgroundTexture[3] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-3.png"));
         lobbyBackgroundTexture[4] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-4.png"));
         lobbyBackgroundTexture[5] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-5.png"));
-
+        backpackTexture = new Texture(Gdx.files.internal("assets/backpack.png"));
         //clock
         clockTexture = new Texture("clock/clockmy.png");
         clockHand = new Texture("clock/clock_hand.png");
@@ -103,6 +104,10 @@ public class GameAssetManager {
         cavePoints.put(farmName.FOUR_CORNERS, new Point(30, 45));
         cavePoints.put(farmName.MEADOWLANDS, new Point(88, 21));
         cavePoints.put(farmName.FOREST, new Point(34, 59));
+    }
+
+    public Texture getBackpackTexture() {
+        return backpackTexture;
     }
 
     public Point getCavePoint(farmName farmName) {

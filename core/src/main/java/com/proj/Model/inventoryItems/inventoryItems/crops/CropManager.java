@@ -144,7 +144,7 @@ public class CropManager {
             giantCrop.water();
         }
         if (giantFertilized) {
-            giantCrop.fertilize();
+            giantCrop.fertilize("Basic_Fertilize");
         }
         giantCrops.add(giantCrop);
 
