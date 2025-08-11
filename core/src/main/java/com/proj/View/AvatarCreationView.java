@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.proj.Control.AvatarCreationController;
+import com.proj.Main;
 import com.proj.Model.Character;
 import com.proj.map.farmName;
 
@@ -33,6 +34,7 @@ public class AvatarCreationView implements Screen {
     private Label farmDescription;
     private ImageButton[] farmButtons;
     private ImageButton lastSelectedFarmButton;
+    private TextButton saveButton;
 
     public AvatarCreationView(AvatarCreationController controller, Character character, Skin skin) {
         this.character = character;
@@ -89,8 +91,15 @@ public class AvatarCreationView implements Screen {
 
         mainTable.add(new Label("Farm Name:", skin)).right().padRight(10);
         mainTable.add(farmField).left().width(200).padBottom(20).row();
+        saveButton = new TextButton("Save", skin);
+        mainTable.add(saveButton).colspan(2).padTop(20).width(200).height(100);
 
-        mainTable.add(new TextButton("Save", skin)).colspan(2).padTop(20).width(200).height(100);
+        saveButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Main.getMain().switchToGameScreen();
+            }
+        });
 
         farmGrid = new Table();
         farmPreview = new Image();
@@ -99,7 +108,14 @@ public class AvatarCreationView implements Screen {
         farmDescription.setWrap(true);
 
         createFarmGrid(skin);
-        updateFarmSelection(character.getFarmType());
+
+        if (character.getFarmType() != null) {
+            updateFarmSelection(character.getFarmType());
+        } else {
+            Gdx.app.log("DEBUG", "Farm type is null, setting default.");
+            character.setFarmType(farmName.values()[0]); //default farm
+            updateFarmSelection(character.getFarmType());
+        }
 
         mainTable.add(new Label("Choose Farm:", skin)).colspan(2).padBottom(10).row();
         mainTable.add(farmGrid).colspan(2).padBottom(10).row();
@@ -112,15 +128,31 @@ public class AvatarCreationView implements Screen {
 
     private void createFarmGrid(Skin skin) {
         farmGrid.clear();
-        for (farmName farm : farmName.values()) {
+        farmButtons = new ImageButton[farmName.values().length];
+        int index = 0;
+        for (farmName farm1 : farmName.values()) {
             try {
-                Texture texture = new Texture(Gdx.files.internal("FarmIcons/" + farm.getFarmName() + ".png"));
+                Texture texture = new Texture(Gdx.files.internal("FarmIcons/" + farm1.getFarmName() + ".png"));
                 ImageButton btn = new ImageButton(new TextureRegionDrawable(new TextureRegion(texture)));
-                btn.setName(farm.getFarmName());
+                btn.setName(farm1.getFarmName());
 
+                final int finalIndex = index;
+                btn.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        character.setFarmType(farm1);
+                        updateFarmSelection(farm1);
+                        resetFarmButtonColors();
+                        btn.setColor(Color.GOLD);
+                        lastSelectedFarmButton = btn;
+                        Gdx.app.log("FARM", "Selected farm: " + farm1.name());
+                    }
+                });
+
+                farmButtons[index++] = btn;
                 farmGrid.add(btn).size(60, 60).pad(5);
             } catch (Exception e) {
-                Gdx.app.error("FARM_GRID", "Failed to load icon for: " + farm.name(), e);
+                Gdx.app.error("FARM_GRID", "Failed to load icon for: " + farm1.name(), e);
             }
         }
     }
@@ -231,7 +263,6 @@ public class AvatarCreationView implements Screen {
     public void dispose() {
         if (bgTexture != null) bgTexture.dispose();
         if (overlayTexture != null) overlayTexture.dispose();
-        stage.dispose();
     }
 
     private void buildFarmSection(Table table, Skin skin) {
