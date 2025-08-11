@@ -30,7 +30,6 @@ public class GameInstance {
             state.initialize();
             playerStates.put(username, state);
         }
-
         gameActive = true;
     }
 
@@ -86,6 +85,15 @@ public class GameInstance {
 
     public PlayerGameState getPlayerState(String username) {
         return playerStates.get(username);
+    }
+
+    public boolean allAreReadyToPlay() {
+        for (PlayerGameState playerState : playerStates.values()) {
+            if (!playerState.isReadyToPlay()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void updateLastActivityTime() {

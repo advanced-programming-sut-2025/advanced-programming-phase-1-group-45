@@ -2,6 +2,7 @@ package com.proj.network.client;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Disposable;
+import com.proj.map.farmName;
 import com.proj.network.event.GameEvent;
 import com.proj.network.event.LobbyEvent;
 import com.proj.network.event.NetworkEvent;
@@ -33,6 +34,7 @@ public class GameClient implements Disposable, Runnable {
     private final List<NetworkEventListener> listeners = new ArrayList<>();
     List<LobbyEventListener> lobbyListeners = new ArrayList<>();
     List<LobbyListListener> lobbyListListeners = new ArrayList<>();
+    List<GameEventListener> gameListeners = new ArrayList<>();
 
     private String username;
     private String currentLobbyId;
@@ -78,6 +80,11 @@ public class GameClient implements Disposable, Runnable {
             lobbyListListeners.add(listener);
         }
     }
+    public void addGameListener(GameEventListener listener) {
+        if (!gameListeners.contains(listener)) {
+            gameListeners.add(listener);
+        }
+    }
 
     public void removeLobbyEventListener(LobbyEventListener listener) {
         lobbyListeners.remove(listener);
@@ -90,6 +97,10 @@ public class GameClient implements Disposable, Runnable {
     public void removeNetworkEventListener(NetworkEventListener listener) {
         listeners.remove(listener);
     }
+    public void removeGameListener(GameEventListener listener) {
+        gameListeners.remove(listener);
+    }
+
 
     @Override
     public void run() {
@@ -145,7 +156,6 @@ public class GameClient implements Disposable, Runnable {
                     handleLobbyUpdate(data);
                     break;
 
-
                 case "JOIN_SUCCESS":
                     handleJoinLobby(data);
                     break;
@@ -164,7 +174,6 @@ public class GameClient implements Disposable, Runnable {
                         handleOnlinePlayersResponse(data);
                         break;
 
-
                 case "GAME_STARTED":
                     fireLobbyEvent(LobbyEvent.Type.GAME_STARTED, data);
                     break;
@@ -182,6 +191,9 @@ public class GameClient implements Disposable, Runnable {
                         JsonParser.getString(data, "message", "System message"));
                     break;
 
+                case "START_PLAYING":
+                    fireGameEvent(GameEvent.Type.START, JsonBuilder.empty());
+                    break;
                 case "PONG":
                     // Ping response - no action needed
                     break;
@@ -210,6 +222,7 @@ public class GameClient implements Disposable, Runnable {
             fireEvent(NetworkEvent.Type.ERROR, "Error handling message: " + e.getMessage());
         }
     }
+
 
     private void handleAuthSuccess(JSONObject data) {
         try {
@@ -308,6 +321,17 @@ public class GameClient implements Disposable, Runnable {
             .put("lobbyId", lobbyId)
             .build();
         sendMessage("START_GAME", data);
+    }
+
+    public void sendStateToStartGame(farmName farm) {
+        JSONObject data = JsonBuilder.create().
+            put("farmName", farm.getFarmName()).build();
+        sendMessage("STATE_TO_START_GAME", data);
+    }
+
+    public void readyToPlay() {
+        JSONObject data = JsonBuilder.create().put("ready", true).build();
+        sendMessage("READY_TO_PLAY", data);
     }
 
     public void createLobby(String name, String password, int maxPlayers,
@@ -435,10 +459,8 @@ public class GameClient implements Disposable, Runnable {
 
     private void fireGameEvent(GameEvent.Type type, JSONObject data) {
         GameEvent event = new GameEvent(type, data.toString());
-        for (NetworkEventListener listener : listeners) {
-            if (listener instanceof GameEventListener) {
-                ((GameEventListener) listener).handleGameEvent(event);
-            }
+        for (GameEventListener listener : gameListeners) {
+                (listener).handleGameEvent(event);
         }
     }
 

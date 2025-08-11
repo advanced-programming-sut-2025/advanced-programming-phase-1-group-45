@@ -16,9 +16,11 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.proj.Control.MainMenuController;
+import com.proj.Control.MultiPlayerMainMenuController;
 import com.proj.Main;
 import com.proj.Model.GameAssetManager;
 import com.proj.View.MainMenuView;
+import com.proj.View.MultiPlayerMainMenu;
 import com.proj.network.client.GameClient;
 import com.proj.network.client.LobbyEventListener;
 import com.proj.network.client.LobbyListListener;
@@ -734,7 +736,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
     }
 
     private void handleStartGame() {
-        Main.getMain().setScreen(new MainMenuView(new MainMenuController(),
+        Main.getMain().setScreen(new MultiPlayerMainMenu(new MultiPlayerMainMenuController(),
             GameAssetManager.getGameAssetManager().getSkin()));
     }
 

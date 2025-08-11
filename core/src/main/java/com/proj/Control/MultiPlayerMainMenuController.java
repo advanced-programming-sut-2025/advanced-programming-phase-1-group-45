@@ -6,12 +6,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.proj.Main;
 import com.proj.Model.GameAssetManager;
-import com.proj.View.AvatarCreationView;
-import com.proj.View.ChangeInfoMenuView;
-import com.proj.View.MainMenuView;
-import com.proj.View.MultiPlayerMainMenu;
+import com.proj.View.*;
+import com.proj.network.client.NetworkEventListener;
+import com.proj.network.event.NetworkEvent;
 
-public class MultiPlayerMainMenuController {
+public class MultiPlayerMainMenuController implements NetworkEventListener {
     private MultiPlayerMainMenu view;
     private Skin skin;
 
@@ -25,9 +24,9 @@ public class MultiPlayerMainMenuController {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 com.proj.Model.Character newCharacter = new com.proj.Model.Character();
-                AvatarCreationController controller = new AvatarCreationController(newCharacter);
+                MultiPlayerAvatarController controller = new MultiPlayerAvatarController(newCharacter);
 
-                Main.getMain().setScreen(new AvatarCreationView(controller, newCharacter, skin));
+                Main.getMain().setScreen(new MultiplayerAvatarMenu(controller, newCharacter, skin));
                 System.out.println("Profile button clicked");
             }
         });
@@ -61,5 +60,10 @@ public class MultiPlayerMainMenuController {
                 Gdx.app.exit();
             }
         });
+    }
+
+    @Override
+    public void handleNetworkEvent(NetworkEvent event) {
+
     }
 }

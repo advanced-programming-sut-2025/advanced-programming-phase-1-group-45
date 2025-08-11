@@ -106,8 +106,8 @@ public class GameLobby {
      * ارسال پیام به تمام بازیکنان لابی
      */
     public void broadcastMessage(String type, String message) {
-        for (ClientConnectionController handler : players.values()) {
-            handler.sendMessage(type, JsonBuilder.create().put("data", message).build());
+        for (ClientConnectionController client : players.values()) {
+            client.sendMessage(type, JsonBuilder.create().put("data", message).build());
         }
     }
 

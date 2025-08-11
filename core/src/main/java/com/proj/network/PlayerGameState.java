@@ -8,7 +8,8 @@ import com.proj.map.*;
 
 public class PlayerGameState {
     private String username;
-    private com.proj.map.farmName fa
+    private farmName farm;
+    private boolean readyToPlay;
     private Position position;
     private boolean isMoving = false;
     private PlayerDirection direction = PlayerDirection.DOWN;
@@ -99,5 +100,16 @@ public class PlayerGameState {
 
     public int getScore() { return score; }
     public void setScore(int score) { this.score = score; }
+
+
+    public void setFarmName(farmName farmName) {
+        this.farm = farmName;
+    }
+    public farmName getFarm() {
+        return farm;
+    }
+
+    public void setReadyToPlay(boolean readyToPlay) { this.readyToPlay = readyToPlay; }
+    public boolean isReadyToPlay() { return readyToPlay; }
 }
 

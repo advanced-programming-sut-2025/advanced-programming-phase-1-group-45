@@ -12,11 +12,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.proj.Control.AvatarCreationController;
+import com.proj.Control.MultiPlayerAvatarController;
 import com.proj.Main;
 import com.proj.Model.Character;
 import com.proj.map.farmName;
+import com.proj.network.client.GameEventListener;
+import com.proj.network.client.NetworkEventListener;
+import com.proj.network.event.GameEvent;
+import com.proj.network.event.NetworkEvent;
 
-public class AvatarCreationView implements Screen {
+public class MultiplayerAvatarMenu implements Screen, GameEventListener {
     private Stage stage;
     private Character character;
     private Image characterPreview;
@@ -36,9 +41,9 @@ public class AvatarCreationView implements Screen {
     private ImageButton lastSelectedFarmButton;
     private TextButton saveButton;
 
-    public AvatarCreationView(AvatarCreationController controller, Character character, Skin skin) {
+    public MultiplayerAvatarMenu(MultiPlayerAvatarController controller, Character character, Skin skin) {
         this.character = character;
-
+        Main.getMain().getGameClient().addGameListener(this);
         debugCheckAssets();
 
         stage = new Stage(new ScreenViewport());
@@ -98,6 +103,7 @@ public class AvatarCreationView implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Main.getMain().getGameClient().sendStateToStartGame(character.getFarmType());
+                Main.getMain().getGameClient().readyToPlay();
 //                Main.getMain().switchToGameScreen(character.getFarmType());
             }
         });
@@ -358,5 +364,17 @@ public class AvatarCreationView implements Screen {
         } catch (Exception e) {
             Gdx.app.error("FARM_PREVIEW", "Failed to load preview for: " + farm.name(), e);
         }
+    }
+
+    @Override
+    public void handleGameEvent(GameEvent event) {
+        if (event.getType() == GameEvent.Type.START){
+            Main.getMain().switchToGameScreen(character.getFarmType());
+        }
+    }
+
+    @Override
+    public void handleNetworkEvent(NetworkEvent event) {
+
     }
 }

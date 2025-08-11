@@ -1,6 +1,7 @@
 package com.proj.network;
 
 import com.badlogic.gdx.Gdx;
+import com.proj.map.farmName;
 import com.proj.network.lobby.GameLobby;
 import com.proj.network.message.JsonBuilder;
 import com.proj.network.message.JsonParser;
@@ -70,12 +71,15 @@ public class ClientConnectionController implements Runnable {
 
 
     private boolean loggedIn = false;
+
     public boolean getLoggedIn() {
         return loggedIn;
     }
+
     public void setLoggedIn(boolean loggedIn) {
         this.loggedIn = loggedIn;
     }
+
     private boolean login() throws IOException {
         // Send structured auth request
         JSONObject requestData = JsonBuilder.create()
@@ -105,23 +109,23 @@ public class ClientConnectionController implements Runnable {
             }
 
 //            if (loggedIn) {
-                // Handle existing connections
-                if (server.getConnectedClients().containsKey(username)) {
-                    ClientConnectionController existingClient = server.getConnectedClients().get(username);
-                    existingClient.sendMessage("DISCONNECT", JsonBuilder.create()
-                        .put("message", "You've been disconnected because you logged in from another device")
-                        .build());
-                    existingClient.shutdown();
-                }
-                this.username = username;
-                server.registerClient(username, this);
-
-                // Send structured auth success
-                sendMessage("AUTH_SUCCESS", JsonBuilder.create()
-                    .put("message", "Welcome " + username)
-                    .put("username", username)
+            // Handle existing connections
+            if (server.getConnectedClients().containsKey(username)) {
+                ClientConnectionController existingClient = server.getConnectedClients().get(username);
+                existingClient.sendMessage("DISCONNECT", JsonBuilder.create()
+                    .put("message", "You've been disconnected because you logged in from another device")
                     .build());
-                return true;
+                existingClient.shutdown();
+            }
+            this.username = username;
+            server.registerClient(username, this);
+
+            // Send structured auth success
+            sendMessage("AUTH_SUCCESS", JsonBuilder.create()
+                .put("message", "Welcome " + username)
+                .put("username", username)
+                .build());
+            return true;
 //            } else {
 //                sendError("AUTH_FAILED", "Registration failed");
 //                return false;
@@ -149,15 +153,27 @@ public class ClientConnectionController implements Runnable {
                 joinLobby(data);
                 break;
 
+            case "START":
+                playing(data);
+                break;
+
             case "START_GAME":
                 startGame(data);
+                break;
+
+            case "STATE_TO_START_GAME":
+                receiveStateToStart(data);
+                break;
+
+            case "READY_TO_PLAY":
+                readyToStart(data);
                 break;
 
             case "GAME_ACTION":
                 processGameAction(data);
                 break;
 
-            case "GET_ONLINE_PLAYERS" :
+            case "GET_ONLINE_PLAYERS":
                 sendPlayerList();
                 break;
 
@@ -274,6 +290,35 @@ public class ClientConnectionController implements Runnable {
         }
     }
 
+    private void receiveStateToStart(JSONObject data) {
+        String farm = JsonParser.getString(data, "farmName", "Standard");
+        GameInstance game = server.getGameManager().getGameInstance(currentLobby.getId());
+        if (game == null) {
+            sendError("GAME_NOT_FOUND", "Game not found for your lobby");
+            return;
+        }
+        farmName selected = farmName.STANDARD;
+        for (farmName fa : farmName.values()) {
+            if (fa.getFarmName().equalsIgnoreCase(farm)) {
+                selected = fa;
+                break;
+            }
+        }
+        game.getPlayerState(username).setFarmName(selected);
+    }
+
+    private void readyToStart(JSONObject data) {
+        GameInstance game = server.getGameManager().getGameInstance(currentLobby.getId());
+        if (game == null) {
+            sendError("GAME_NOT_FOUND", "Game not found for your lobby");
+            return;
+        }
+        game.getPlayerState(username).setReadyToPlay(true);
+        if (game.allAreReadyToPlay()) {
+            currentLobby.broadcastMessage("START", "all are ready to play");
+        }
+    }
+
     private void leaveLobby(JSONObject data) {
         GameLobby lobby = server.findPlayerLobby(username);
         if (lobby != null) {
@@ -305,6 +350,10 @@ public class ClientConnectionController implements Runnable {
         } catch (Exception e) {
             sendError("GAME_START_FAILED", "Error starting game: " + e.getMessage());
         }
+    }
+
+    private void playing(JSONObject data) {
+        sendMessage("START_PLAYING", data);
     }
 
     private void processGameAction(JSONObject data) {
@@ -410,6 +459,7 @@ public class ClientConnectionController implements Runnable {
     public GameLobby getLobby() {
         return currentLobby;
     }
+
     public void setCurrentLobby(GameLobby lobby) {
         this.currentLobby = lobby;
     }

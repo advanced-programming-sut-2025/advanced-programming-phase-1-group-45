@@ -2,7 +2,7 @@ package com.proj.network.event;
 
 public class GameEvent {
     public enum Type {
-        STARTED,
+        START,
         UPDATE,
         ENDED,
         ACTION,
