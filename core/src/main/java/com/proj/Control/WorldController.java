@@ -488,7 +488,7 @@ public class WorldController {
         }
     }
 
-    public void triggerToNewScreen(String newMapName, Point spawnPoint) {
+    /*public void triggerToNewScreen(String newMapName, Point spawnPoint) {
         GameScreen newScreen = new GameScreen(getFarmNameFromString(newMapName));
         newScreen.setPlayerSpawnPoint(spawnPoint);
         newScreen.setNPCManager(this.npcManager);
@@ -496,7 +496,7 @@ public class WorldController {
             newScreen.setPlayer(this.player);
         }
         ((Game) Gdx.app.getApplicationListener()).setScreen(newScreen);
-    }
+    }*/
 
     private farmName getFarmNameFromString(String name) {
         for (farmName farm : farmName.values()) {
