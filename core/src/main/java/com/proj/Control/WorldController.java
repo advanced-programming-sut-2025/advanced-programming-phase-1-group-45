@@ -3,12 +3,17 @@ package com.proj.Control;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.proj.Model.CropInfoWindow;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.Inventory.InventoryManager;
@@ -79,6 +84,10 @@ public class WorldController {
     private Point cavePoint;
     private GameMap caveMap;
 
+    private ImageButton inventoryButton;
+    private Table inventoryMenu; // جدول برای منوی اینونتوری
+    private boolean menuVisible = false;
+
 
     public WorldController(String landName, Time gameTime, Stage uisatge) {
         this.gameTime = gameTime;
@@ -110,7 +119,89 @@ public class WorldController {
         InventoryManager.getInstance().getPlayerInventory().addItem(ItemRegistry.getInstance().get("tulip_bulb"));
         InventoryManager.getInstance().getPlayerInventory().addItem(ItemRegistry.getInstance().get("acorn"));
 
+//        Skin stardewSkin = GameAssetManager.getGameAssetManager().getStardewSkin();
+//        seedWindow = new SeedInventoryWindow(stardewSkin, gameMaps.get(1).getFarmingController());
+//        seedWindow.setVisible(false);
+//
+//        foragingInventoryWindow = new ForagingInventoryWindow(stardewSkin, gameMaps.get(1).getFarmingController());
+//        foragingInventoryWindow.setVisible(false);
+//
+//        cropInventoryWindow = new CropInventoryWindow(stardewSkin);
+//        cropInventoryWindow.setVisible(false);
+//
+//        cropInfoWindow = new CropInfoWindow(stardewSkin);
+//        cropInfoWindow.setVisible(false);
+//
+//        uistage.addActor(seedWindow);
+//        uistage.addActor(foragingInventoryWindow);
+//        uistage.addActor(cropInventoryWindow);
+//        uistage.addActor(cropInfoWindow);
+//
+//        showSeedsButton = new TextButton("Seed", stardewSkin);
+//        showSeedsButton.setSize(157, 80);
+//        showSeedsButton.setPosition(
+//            Gdx.graphics.getWidth() - showSeedsButton.getWidth() - 1,
+//            Gdx.graphics.getHeight() - showSeedsButton.getHeight() - 20
+//        );
+//        showSeedsButton.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                seedWindow.setVisible(!seedWindow.isVisible());
+//            }
+//        });
+//        showSeedsButton.toFront();
+//        uistage.addActor(showSeedsButton);
+//
+//        showForagingButton = new TextButton("Foraging", stardewSkin);
+//        showForagingButton.setSize(157, 80);
+//        showForagingButton.setPosition(
+//            Gdx.graphics.getWidth() - showForagingButton.getWidth() - 1,
+//            Gdx.graphics.getHeight() - showSeedsButton.getHeight() - 180
+//        );
+//        showForagingButton.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                foragingInventoryWindow.setVisible(!foragingInventoryWindow.isVisible());
+//            }
+//        });
+//        showForagingButton.toFront();
+//        uistage.addActor(showForagingButton);
+//
+//        showCropButton = new TextButton("Crop", stardewSkin);
+//        showCropButton.setSize(157, 80);
+//        showCropButton.setPosition(
+//            Gdx.graphics.getWidth() - showCropButton.getWidth() - 1,
+//            Gdx.graphics.getHeight() - showCropButton.getHeight() - 300
+//        );
+//        showCropButton.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                cropInventoryWindow.setVisible(!cropInventoryWindow.isVisible());
+//            }
+//        });
+//        showCropButton.toFront();
+//        uistage.addActor(showCropButton);
+//
+//
+//        showCropInfoButton = new TextButton("Crop_info", stardewSkin);
+//        showCropInfoButton.setSize(157, 80);
+//        showCropInfoButton.setPosition(
+//            Gdx.graphics.getWidth() - showCropInfoButton.getWidth() - 1,
+//            Gdx.graphics.getHeight() - showCropInfoButton.getHeight() - 400
+//        );
+//        showCropInfoButton.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                cropInfoWindow.setVisible(!cropInfoWindow.isVisible());
+//            }
+//        });
+//        showCropInfoButton.toFront();
+//        uistage.addActor(showCropInfoButton);
+
+
         Skin stardewSkin = GameAssetManager.getGameAssetManager().getStardewSkin();
+
+        // ایجاد پنجره‌ها (همانند قبل)
         seedWindow = new SeedInventoryWindow(stardewSkin, gameMaps.get(1).getFarmingController());
         seedWindow.setVisible(false);
 
@@ -128,72 +219,107 @@ public class WorldController {
         uistage.addActor(cropInventoryWindow);
         uistage.addActor(cropInfoWindow);
 
-        showSeedsButton = new TextButton("Seed", stardewSkin);
-        showSeedsButton.setSize(157, 80);
-        showSeedsButton.setPosition(
-            Gdx.graphics.getWidth() - showSeedsButton.getWidth() - 1,
-            Gdx.graphics.getHeight() - showSeedsButton.getHeight() - 20
-        );
-        showSeedsButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                seedWindow.setVisible(!seedWindow.isVisible());
-            }
-        });
-        showSeedsButton.toFront();
-        uistage.addActor(showSeedsButton);
-
-        showForagingButton = new TextButton("Foraging", stardewSkin);
-        showForagingButton.setSize(157, 80);
-        showForagingButton.setPosition(
-            Gdx.graphics.getWidth() - showForagingButton.getWidth() - 1,
-            Gdx.graphics.getHeight() - showSeedsButton.getHeight() - 180
-        );
-        showForagingButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                foragingInventoryWindow.setVisible(!foragingInventoryWindow.isVisible());
-            }
-        });
-        showForagingButton.toFront();
-        uistage.addActor(showForagingButton);
-
-        showCropButton = new TextButton("Crop", stardewSkin);
-        showCropButton.setSize(157, 80);
-        showCropButton.setPosition(
-            Gdx.graphics.getWidth() - showCropButton.getWidth() - 1,
-            Gdx.graphics.getHeight() - showCropButton.getHeight() - 300
-        );
-        showCropButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                cropInventoryWindow.setVisible(!cropInventoryWindow.isVisible());
-            }
-        });
-        showCropButton.toFront();
-        uistage.addActor(showCropButton);
-
-
-        showCropInfoButton = new TextButton("Crop_info", stardewSkin);
-        showCropInfoButton.setSize(157, 80);
-        showCropInfoButton.setPosition(
-            Gdx.graphics.getWidth() - showCropInfoButton.getWidth() - 1,
-            Gdx.graphics.getHeight() - showCropInfoButton.getHeight() - 400
-        );
-        showCropInfoButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                cropInfoWindow.setVisible(!cropInfoWindow.isVisible());
-            }
-        });
-        showCropInfoButton.toFront();
-        uistage.addActor(showCropInfoButton);
+        createInventoryButton();
+        createInventoryMenu();
 
 
         positionUiElement(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         farmInOutPoints = GameAssetManager.getGameAssetManager().getExitPointList(gameMap.getMapName());
         currentFarmInOutPoint = findExitEnterPointsById(maps.get(landName));
         foragingManager = new ForagingManager();
+    }
+
+
+    private void createInventoryButton() {
+        Texture inventoryTexture = new Texture(Gdx.files.internal("assets/backpack.png"));
+        TextureRegion inventoryRegion = new TextureRegion(inventoryTexture);
+
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.imageUp = new TextureRegionDrawable(inventoryRegion);
+
+        inventoryButton = new ImageButton(style);
+        inventoryButton.setSize(106, 128);
+
+        // موقعیت در پایین-راست
+        inventoryButton.setPosition(
+            Gdx.graphics.getWidth() - inventoryButton.getWidth() - 20,
+            20 // فاصله از پایین
+        );
+
+        inventoryButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                toggleInventoryMenu();
+            }
+        });
+
+        uistage.addActor(inventoryButton);
+    }
+
+    private void createInventoryMenu() {
+        Skin stardewSkin = GameAssetManager.getGameAssetManager().getStardewSkin();
+        inventoryMenu = new Table();
+        inventoryMenu.setVisible(false);
+        inventoryMenu.setBackground(stardewSkin.getDrawable("background"));
+
+        TextButton cropInfoMenuButton = createMenuButton("Crop Info", () -> {
+            cropInfoWindow.setVisible(true);
+            cropInfoWindow.centerWindow();
+            inventoryMenu.setVisible(false);
+            menuVisible = false;
+        }, stardewSkin);
+
+        TextButton cropsMenuButton = createMenuButton("Crops", () -> {
+            cropInventoryWindow.setVisible(true);
+            cropInventoryWindow.centerWindow();
+            inventoryMenu.setVisible(false);
+            menuVisible = false;
+        }, stardewSkin);
+
+        TextButton foragingMenuButton = createMenuButton("Foraging", () -> {
+            foragingInventoryWindow.setVisible(true);
+            foragingInventoryWindow.centerWindow();
+            inventoryMenu.setVisible(false);
+            menuVisible = false;
+        }, stardewSkin);
+
+        TextButton seedsMenuButton = createMenuButton("Seeds", () -> {
+            seedWindow.setVisible(true);
+            seedWindow.centerWindow();
+            inventoryMenu.setVisible(false);
+            menuVisible = false;
+        }, stardewSkin);
+
+        inventoryMenu.add(cropInfoMenuButton).pad(5).row();
+        inventoryMenu.add(cropsMenuButton).pad(5).row();
+        inventoryMenu.add(foragingMenuButton).pad(5).row();
+        inventoryMenu.add(seedsMenuButton).pad(5).row();
+
+        inventoryMenu.pack();
+        uistage.addActor(inventoryMenu);
+    }
+
+    private TextButton createMenuButton(String text, Runnable action, Skin skin) {
+        TextButton button = new TextButton(text, skin);
+        button.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                action.run();
+            }
+        });
+        return button;
+    }
+
+
+    private void toggleInventoryMenu() {
+        menuVisible = !menuVisible;
+        inventoryMenu.setVisible(menuVisible);
+
+        if (menuVisible) {
+            float x = inventoryButton.getX() + inventoryButton.getWidth() - inventoryMenu.getWidth();
+            float y = inventoryButton.getY() + inventoryButton.getHeight();
+            inventoryMenu.setPosition(x, y);
+        }
     }
 
     private void initUI() {
@@ -307,38 +433,50 @@ public class WorldController {
         uistage.getViewport().update(width, height, true);
         positionUiElement(width, height);
 
-        showSeedsButton.toFront();
-        positionUiElement(width, height);
-        showSeedsButton.setPosition(
-            showSeedsButton.getWidth() - 14,
-            showSeedsButton.getHeight() + 20
+        inventoryButton.setPosition(
+            width - inventoryButton.getWidth() - 20,
+            20 // فاصله از پایین
         );
-        seedWindow.centerWindow();
 
-        showForagingButton.toFront();
-        positionUiElement(width, height);
-        showForagingButton.setPosition(
-            showForagingButton.getWidth() - 14,
-            showForagingButton.getHeight() + 120
-        );
-        foragingInventoryWindow.centerWindow();
+        // اگر منو باز است، موقعیت آن را به‌روزرسانی کن
+        if (menuVisible) {
+            float x = inventoryButton.getX() + inventoryButton.getWidth() - inventoryMenu.getWidth();
+            float y = inventoryButton.getY() + inventoryButton.getHeight();
+            inventoryMenu.setPosition(x, y);
+        }
 
-        showCropButton.toFront();
-        positionUiElement(width, height);
-        showCropButton.setPosition(
-            showCropButton.getWidth() - 14,
-            showCropButton.getHeight() + 220
-        );
-        cropInventoryWindow.centerWindow();
-
-
-        showCropInfoButton.toFront();
-        positionUiElement(width, height);
-        showCropInfoButton.setPosition(
-            showCropInfoButton.getWidth() - 14,
-            showCropInfoButton.getHeight() + 320
-        );
-        cropInfoWindow.centerWindow();
+//        showSeedsButton.toFront();
+//        positionUiElement(width, height);
+//        showSeedsButton.setPosition(
+//            showSeedsButton.getWidth() - 14,
+//            showSeedsButton.getHeight() + 20
+//        );
+//        seedWindow.centerWindow();
+//
+//        showForagingButton.toFront();
+//        positionUiElement(width, height);
+//        showForagingButton.setPosition(
+//            showForagingButton.getWidth() - 14,
+//            showForagingButton.getHeight() + 120
+//        );
+//        foragingInventoryWindow.centerWindow();
+//
+//        showCropButton.toFront();
+//        positionUiElement(width, height);
+//        showCropButton.setPosition(
+//            showCropButton.getWidth() - 14,
+//            showCropButton.getHeight() + 220
+//        );
+//        cropInventoryWindow.centerWindow();
+//
+//
+//        showCropInfoButton.toFront();
+//        positionUiElement(width, height);
+//        showCropInfoButton.setPosition(
+//            showCropInfoButton.getWidth() - 14,
+//            showCropInfoButton.getHeight() + 320
+//        );
+//        cropInfoWindow.centerWindow();
 
 
         if (seedWindow != null) {
