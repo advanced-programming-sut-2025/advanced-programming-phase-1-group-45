@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
-import com.proj.map.GameMap;
+import com.proj.Map.GameMap;
 import com.proj.Model.Animal.Animal;
 
 import java.util.ArrayList;
@@ -258,44 +258,52 @@ public class AnimalBuildingController {
             Texture spriteSheet = animalTextures.get(animalType);
 
             if (spriteSheet != null) {
-                int rows = 4;
-                int cols = 4;
+                int cols = 4; // تعداد ستون‌ها همیشه 4 است
+                int rows;
 
-                // Adjust rows based on animal type as in your friend's code
+                // تنظیم تعداد ردیف‌ها براساس نوع حیوان
                 if (animalType.equals("rabbit") || animalType.equals("chicken") || animalType.equals("dinosaur")) {
                     rows = 7;
                 } else if (animalType.equals("duck")) {
                     rows = 14;
+                } else {
+                    rows = 4; // برای گاو، گوسفند، بز و خوک
                 }
 
                 int frameWidth = spriteSheet.getWidth() / cols;
                 int frameHeight = spriteSheet.getHeight() / rows;
 
+                // تقسیم اسپرایت‌شیت به فریم‌ها
                 TextureRegion[][] tmp = TextureRegion.split(spriteSheet, frameWidth, frameHeight);
 
-                // Store idle frame
+                // ذخیره فریم ایستا
                 idleFrames.put(animalType, tmp[0][0]);
 
-                // Create animations based on animal type
+                // ساخت انیمیشن‌ها براساس نوع حیوان
                 switch (animalType) {
                     case "cow":
                     case "goat":
                     case "sheep":
                     case "pig":
+                        // ردیف اول: حرکت به پایین
+                        walkDownAnimations.put(animalType, createAnimation(tmp[0], 0, 4));
+                        // ردیف دوم: حرکت به چپ/راست
+                        walkLeftAnimations.put(animalType, createFlippedAnimation(tmp[1], 0, 4));
+                        walkRightAnimations.put(animalType, createAnimation(tmp[1], 0, 4));
+                        // ردیف سوم: حرکت به بالا
+                        walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
+                        // ردیف چهارم: ناز کردن
+                        petAnimations.put(animalType, createAnimation(tmp[3], 0, 4));
+                        break;
+
                     case "rabbit":
                     case "dinosaur":
                         walkDownAnimations.put(animalType, createAnimation(tmp[0], 0, 4));
                         walkLeftAnimations.put(animalType, createFlippedAnimation(tmp[1], 0, 4));
                         walkRightAnimations.put(animalType, createAnimation(tmp[1], 0, 4));
                         walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
-
-                        if (animalType.equals("rabbit") || animalType.equals("dinosaur")) {
-                            petAnimations.put(animalType, createAnimation(tmp[4], 0, 4));
-                            feedAnimations.put(animalType, createAnimation(tmp[6], 0, 4));
-                        } else {
-                            petAnimations.put(animalType, createAnimation(tmp[3], 0, 4));
-                            feedAnimations.put(animalType, createAnimation(tmp[4], 0, 4));
-                        }
+                        // ردیف پنجم: ناز کردن
+                        petAnimations.put(animalType, createAnimation(tmp[4], 0, 4));
                         break;
 
                     case "chicken":
@@ -303,17 +311,17 @@ public class AnimalBuildingController {
                         walkRightAnimations.put(animalType, createAnimation(tmp[1], 0, 4));
                         walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
                         walkDownAnimations.put(animalType, createAnimation(tmp[3], 0, 4));
+                        // ردیف پنجم: ناز کردن
                         petAnimations.put(animalType, createAnimation(tmp[4], 0, 4));
-                        feedAnimations.put(animalType, createAnimation(tmp[6], 0, 4));
                         break;
 
                     case "duck":
                         walkLeftAnimations.put(animalType, createAnimation(tmp[0], 0, 4));
                         walkRightAnimations.put(animalType, createFlippedAnimation(tmp[0], 0, 4));
                         walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
-                        walkDownAnimations.put(animalType, createFlippedAnimation(tmp[2], 0, 4));
+                        walkDownAnimations.put(animalType, createAnimation(tmp[3], 0, 4));
+                        // ردیف دوازدهم: ناز کردن
                         petAnimations.put(animalType, createAnimation(tmp[12], 0, 4));
-                        feedAnimations.put(animalType, createAnimation(tmp[13], 0, 4));
                         break;
                 }
             }
@@ -323,7 +331,7 @@ public class AnimalBuildingController {
     private Animation<TextureRegion> createAnimation(TextureRegion[] frames, int startIndex, int frameCount) {
         Array<TextureRegion> animationFrames = new Array<>(TextureRegion.class);
         for (int i = startIndex; i < startIndex + frameCount && i < frames.length; i++) {
-            animationFrames.add(new TextureRegion(frames[i]));
+            animationFrames.add(frames[i]);
         }
         return new Animation<>(FRAME_DURATION, animationFrames, Animation.PlayMode.LOOP);
     }
@@ -332,11 +340,12 @@ public class AnimalBuildingController {
         Array<TextureRegion> animationFrames = new Array<>(TextureRegion.class);
         for (int i = startIndex; i < startIndex + frameCount && i < frames.length; i++) {
             TextureRegion region = new TextureRegion(frames[i]);
-            region.flip(true, false);
+            region.flip(true, false); // برعکس کردن افقی
             animationFrames.add(region);
         }
         return new Animation<>(FRAME_DURATION, animationFrames, Animation.PlayMode.LOOP);
     }
+
 
 
 
@@ -495,12 +504,12 @@ public class AnimalBuildingController {
         selectedAnimal = null;
     }
 
-    public void showInteriorView(boolean isBarn, int buildingIndex) {
-        showingInterior = true;
-        showingBarnInterior = isBarn;
-        showingCoopInterior = !isBarn;
-        selectedBuildingIndex = buildingIndex;
-    }
+//    public void showInteriorView(boolean isBarn, int buildingIndex) {
+//        showingInterior = true;
+//        showingBarnInterior = isBarn;
+//        showingCoopInterior = !isBarn;
+//        selectedBuildingIndex = buildingIndex;
+//    }
 
 
 
@@ -593,119 +602,7 @@ public class AnimalBuildingController {
             renderAnimalList(batch);
         }
     }
-
-    private void renderInterior(SpriteBatch batch) {
-        Texture interiorTexture = showingBarnInterior ? barnInteriorTexture : coopInteriorTexture;
-
-        // ذخیره ماتریس پروجکشن فعلی
-        Matrix4 originalMatrix = batch.getProjectionMatrix();
-
-        // تنظیم ماتریس پروجکشن جدید برای نمایش کامل عکس
-        Matrix4 screenMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.setProjectionMatrix(screenMatrix);
-
-        // محاسبه ابعاد متناسب با حفظ نسبت تصویر
-        float imageWidth = interiorTexture.getWidth();
-        float imageHeight = interiorTexture.getHeight();
-        float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();
-
-        float scale = Math.min(screenWidth / imageWidth, screenHeight / imageHeight);
-        float scaledWidth = imageWidth * scale;
-        float scaledHeight = imageHeight * scale;
-
-        // محاسبه موقعیت برای نمایش در مرکز صفحه
-        float x = (screenWidth - scaledWidth) / 2;
-        float y = (screenHeight - scaledHeight) / 2;
-
-        // نمایش تصویر با ابعاد محاسبه شده
-        batch.draw(interiorTexture, x, y, scaledWidth, scaledHeight);
-
-        // بازگرداندن ماتریس پروجکشن اصلی
-        batch.setProjectionMatrix(originalMatrix);
-
-        // بقیه کدهای رندر حیوانات و المان‌های دیگر...
-        List<Animal> animals = showingBarnInterior ?
-            animalsInBarns[selectedBuildingIndex] :
-            animalsInCoops[selectedBuildingIndex];
-
-        for (Animal animal : animals) {
-            renderAnimal(batch, animal);
-        }
-
-        if (feedingAnimal != null) {
-            renderFeedingAnimation(batch);
-        }
-
-        if (pettingAnimal != null) {
-            renderPettingAnimation(batch);
-        }
-
-        if (showingAnimalMenu && selectedAnimal != null) {
-            renderAnimalMenu(batch);
-        }
-    }
-
-    private void renderAnimal(SpriteBatch batch, Animal animal) {
-        String animalType = animal.getType().toLowerCase();
-        TextureRegion currentFrame;
-
-        // انتخاب فریم انیمیشن مناسب بر اساس وضعیت حیوان
-        if (animal == pettingAnimal) {
-            Animation<TextureRegion> petAnimation = petAnimations.get(animalType);
-            currentFrame = petAnimation != null ?
-                petAnimation.getKeyFrame(pettingTime, false) :
-                idleFrames.get(animalType);
-        } else if (animal == feedingAnimal) {
-            Animation<TextureRegion> feedAnimation = feedAnimations.get(animalType);
-            currentFrame = feedAnimation != null ?
-                feedAnimation.getKeyFrame(feedingTime, false) :
-                idleFrames.get(animalType);
-        } else if (animal.isMoving()) {
-            Animation<TextureRegion> walkAnimation = null;
-            switch (animal.getDirection()) {
-                case UP: walkAnimation = walkUpAnimations.get(animalType); break;
-                case DOWN: walkAnimation = walkDownAnimations.get(animalType); break;
-                case LEFT: walkAnimation = walkLeftAnimations.get(animalType); break;
-                case RIGHT: walkAnimation = walkRightAnimations.get(animalType); break;
-            }
-            currentFrame = walkAnimation != null ?
-                walkAnimation.getKeyFrame(animal.getStateTime(), true) :
-                idleFrames.get(animalType);
-        } else {
-            currentFrame = idleFrames.get(animalType);
-        }
-
-        // ترسیم حیوان
-        if (currentFrame != null) {
-            if (animal == pettingAnimal) {
-                batch.setColor(1, 1, 1, 0.8f + 0.2f * (float)Math.sin(pettingTime * 10));
-            }
-            batch.draw(currentFrame, animal.getX(), animal.getY());
-            batch.setColor(1, 1, 1, 1);
-
-            // نمایش نام حیوان
-            if (font != null) {
-                font.setColor(1, 1, 1, 1);
-                layout.setText(font, animal.getName());
-                font.draw(batch, animal.getName(),
-                    animal.getX() + (currentFrame.getRegionWidth()/2) - layout.width/2,
-                    animal.getY() - 5);
-            }
-
-            // نمایش محصول اگر حیوان محصولی داشته باشد
-            if (animal.hasProduct()) {
-                Texture productTexture = productTextures.get(animal.getProduct());
-                if (productTexture != null) {
-                    batch.draw(productTexture,
-                        animal.getX() + (currentFrame.getRegionWidth()/2) - productTexture.getWidth()/2,
-                        animal.getY() + currentFrame.getRegionHeight() + 5);
-                }
-            }
-        }
-    }
-
-
+    
     private void renderFeedingAnimation(SpriteBatch batch) {
         if (feedingAnimal != null) {
             String animalType = feedingAnimal.getType().toLowerCase();
@@ -1144,34 +1041,123 @@ public class AnimalBuildingController {
     }
 
 
+    private void renderInterior(SpriteBatch batch) {
+        // استفاده از کد اصلی شما برای رندر داخل ساختمان
+        Texture interiorTexture = showingBarnInterior ? barnInteriorTexture : coopInteriorTexture;
+
+        // ذخیره ماتریس پروجکشن فعلی
+        Matrix4 originalMatrix = batch.getProjectionMatrix();
+
+        // تنظیم ماتریس پروجکشن جدید برای نمایش کامل عکس
+        Matrix4 screenMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.setProjectionMatrix(screenMatrix);
+
+        // محاسبه ابعاد متناسب با حفظ نسبت تصویر
+        float imageWidth = interiorTexture.getWidth();
+        float imageHeight = interiorTexture.getHeight();
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+
+        float scale = Math.min(screenWidth / imageWidth, screenHeight / imageHeight);
+        float scaledWidth = imageWidth * scale;
+        float scaledHeight = imageHeight * scale;
+
+        // محاسبه موقعیت برای نمایش در مرکز صفحه
+        float x = (screenWidth - scaledWidth) / 2;
+        float y = (screenHeight - scaledHeight) / 2;
+
+        // نمایش تصویر با ابعاد محاسبه شده
+        batch.draw(interiorTexture, x, y, scaledWidth, scaledHeight);
+
+        // بازگرداندن ماتریس پروجکشن اصلی
+        batch.setProjectionMatrix(originalMatrix);
+
+        // رندر حیوانات داخل ساختمان
+        List<Animal> animals = showingBarnInterior ?
+            animalsInBarns[selectedBuildingIndex] :
+            animalsInCoops[selectedBuildingIndex];
+
+        for (Animal animal : animals) {
+            renderAnimal(batch, animal);
+        }
+    }
+
     public void transferAnimalToBuilding(String animalType, boolean isBarn, int buildingIndex) {
-        // Create a new animal of the selected type
+        // ایجاد یک حیوان جدید با نوع انتخاب شده
         String animalName = animalType + "_" + (int)(Math.random() * 1000);
         Animal newAnimal = new Animal(animalName, animalType);
 
-        // Set random position inside the building
+        // تنظیم موقعیت تصادفی برای حیوان در ساختمان
         float x = 100 + (float)(Math.random() * 200);
         float y = 100 + (float)(Math.random() * 200);
         newAnimal.setPosition(x, y);
 
-        // Add to the appropriate building
+        // مقداردهی جهت اولیه و وضعیت حیوان
+        newAnimal.setDirection(Animal.Direction.DOWN);
+        newAnimal.setMoving(false);
+        newAnimal.setFree(false);
+
+        // اضافه کردن حیوان به ساختمان مناسب
         if (isBarn) {
-            if (buildingIndex >= 0 && buildingIndex < barnCount) {
+            if (buildingIndex < barnCount) {
                 animalsInBarns[buildingIndex].add(newAnimal);
                 System.out.println(animalType + " با نام " + animalName + " به طویله اضافه شد.");
             }
         } else {
-            if (buildingIndex >= 0 && buildingIndex < coopCount) {
+            if (buildingIndex < coopCount) {
                 animalsInCoops[buildingIndex].add(newAnimal);
                 System.out.println(animalType + " با نام " + animalName + " به قفس اضافه شد.");
             }
         }
 
-        // Show the interior of the building where the animal was placed
+        // نمایش داخل ساختمان بعد از قرار دادن حیوان
         showingInterior = true;
         showingBarnInterior = isBarn;
         showingCoopInterior = !isBarn;
         selectedBuildingIndex = buildingIndex;
+
+        // پاک کردن حالت انتخاب
+        selectedAnimalType = null;
+        selectingBuildingForAnimal = false;
+    }
+
+    private void renderAnimal(SpriteBatch batch, Animal animal) {
+        String animalType = animal.getType().toLowerCase();
+
+        // از تصاویر تکی TAKI استفاده می‌کنیم
+        Texture animalTexture = animalListTextures.get(animalType);
+
+        if (animalTexture != null) {
+            // مقیاس بزرگتر برای نمایش حیوان
+            float scale = 2.0f;  // این مقدار را می‌توانید تنظیم کنید
+
+            // محاسبه ابعاد جدید
+            float width = animalTexture.getWidth() * scale;
+            float height = animalTexture.getHeight() * scale;
+
+            // رسم حیوان با سایز بزرگتر
+            batch.draw(animalTexture, animal.getX(), animal.getY(), width, height);
+
+            // رسم نام حیوان بالای آن
+            if (font != null) {
+                font.setColor(1, 1, 1, 1);
+                layout.setText(font, animal.getName());
+                font.draw(batch, animal.getName(),
+                    animal.getX() + (width/2) - layout.width/2,
+                    animal.getY() - 5);
+            }
+
+            // رسم محصول اگر حیوان محصولی داشته باشد
+            if (animal.hasProduct()) {
+                Texture productTexture = productTextures.get(animal.getProduct());
+                if (productTexture != null) {
+                    batch.draw(productTexture,
+                        animal.getX() + (width/2) - productTexture.getWidth()/2,
+                        animal.getY() + height + 5);
+                }
+            }
+        }
     }
 
 }
+
