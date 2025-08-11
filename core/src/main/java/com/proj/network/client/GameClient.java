@@ -38,6 +38,8 @@ public class GameClient implements Disposable, Runnable {
     private String currentLobbyId;
     private boolean authenticated = false;
 
+    private final List<ChatListener> chatListeners = new ArrayList<>();
+
     public GameClient(String serverAddress, int serverPort) {
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
@@ -186,6 +188,18 @@ public class GameClient implements Disposable, Runnable {
 
                 case "ERROR":
                     handleError(data);
+                    break;
+                case "CHAT":
+                    String sender = JsonParser.getString(data, "sender", "Unknown");
+                    String chatMessage = JsonParser.getString(data, "message", "");
+                    boolean isPrivate = JsonParser.getBoolean(data, "isPrivate", false);
+
+                    // Send to any chat listeners
+                    for (NetworkEventListener listener : listeners) {
+                        if (listener instanceof ChatListener) {
+                            ((ChatListener) listener).onChatMessage(sender, chatMessage, isPrivate);
+                        }
+                    }
                     break;
 
                 default:
@@ -448,5 +462,15 @@ public class GameClient implements Disposable, Runnable {
 
     public String getCurrentLobbyId() {
         return currentLobbyId;
+    }
+
+    public void addChatListener(ChatListener listener) {
+        if (!chatListeners.contains(listener)) {
+            chatListeners.add(listener);
+        }
+    }
+
+    public void removeChatListener(ChatListener listener) {
+        chatListeners.remove(listener);
     }
 }

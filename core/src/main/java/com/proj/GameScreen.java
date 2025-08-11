@@ -38,13 +38,16 @@ import com.proj.Enums.Shop;
 import com.proj.View.ShopScreen;
 import com.proj.managers.ShopManager;
 import com.badlogic.gdx.graphics.Color;
+import com.proj.network.chat.ChatSystem;
+import com.proj.network.client.ChatListener;
+import com.proj.network.event.NetworkEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import java.awt.*;
 
-public class GameScreen implements Screen {
+public class GameScreen implements Screen, ChatListener {
     private Player player;
     private EnergyBar energyBar;
     private OrthographicCamera hudCamera;
@@ -104,7 +107,7 @@ public class GameScreen implements Screen {
     private int selectedRefrigeratorSlot = -1;
     private String transferMessage = "";
     private float messageTimer = 0;
-
+    private ChatSystem chatSystem;
 
 
     public GameScreen(Main main, farmName farm) {
@@ -202,7 +205,8 @@ public class GameScreen implements Screen {
                 Gdx.input.setInputProcessor(new InputMultiplexer(uistage));
                 mapPixelWidth = worldController.getMapWidth() * worldController.getTileWidth();
                 mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
-
+                chatSystem = new ChatSystem(main, uistage);
+                main.getGameClient().addChatListener(this);
                 float startX = 20 * 16 + 8;
                 float startY = 28 * 16 + 8;
 
@@ -486,6 +490,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
+        main.getGameClient().removeChatListener(this);
     }
 
     @Override
@@ -570,6 +575,14 @@ public class GameScreen implements Screen {
 
             float moveDistance = 16;
             boolean moved = false;
+            if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
+                chatSystem.toggle();
+            }
+
+            if (chatSystem.isVisible()) {
+                return;
+            }
+
 
             if (Gdx.input.isKeyPressed(Input.Keys.W)) {
                 player.setDirection(PlayerDirection.UP);
@@ -1065,6 +1078,18 @@ public class GameScreen implements Screen {
 
 
 
+    public void onChatMessage(String sender, String message, boolean isPrivate) {
+        if (chatSystem != null) {
+            chatSystem.receiveMessage(sender, message, isPrivate);
+        }
+    }
+    public ChatSystem getChatSystem() {
+        return chatSystem;
+    }
 
 
+    @Override
+    public void handleNetworkEvent(NetworkEvent event) {
+
+    }
 }
