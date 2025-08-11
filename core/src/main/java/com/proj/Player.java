@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.proj.Control.WorldController;
+import com.proj.Model.Inventory.Inventory;
+import com.proj.Model.Inventory.InventoryItem;
 
 public class Player {
     private Vector2 position;
@@ -35,6 +37,10 @@ public class Player {
     private static final float FAINT_DURATION = 2.0f;
     private static final float ENERGY_COST_PER_TILE = 5f;
 
+    private int money;
+    private final Inventory inventory;
+    private Main game;
+
     private TextureRegion faintFrame;
     private TextureRegion faintFinalFrame;
 
@@ -53,6 +59,8 @@ public class Player {
         this.worldController = worldController;
         this.position = new Vector2(startX, startY);
         this.targetPosition = new Vector2(startX, startY);
+        this.money = 1000; // Starting money
+        this.inventory = new Inventory(24);
         this.boundingBox = new Rectangle(position.x - WIDTH/4, position.y - HEIGHT/4, WIDTH/2, HEIGHT/2);
         loadAnimations();
     }
@@ -337,6 +345,36 @@ public class Player {
 
     public boolean isEating() {
         return isEating;
+    }
+
+      public int getMoney() {
+        return money;
+    }
+
+    public void addMoney(int amount) {
+        money += amount;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    /*public int getInventoryCount(String itemId) {
+        int count = 0;
+        for (InventoryItem item : inventory.getItems()) {
+            if (item.getId().equals(itemId)) {
+                count += item.getQuantity();
+            }
+        }
+        return count;
+    }*/
+
+    public void addItem(String itemId, int quantity) {
+        
+    }
+
+    public Main getGame() {
+        return game;
     }
 
 }
