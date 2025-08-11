@@ -23,7 +23,7 @@ public class ClientController implements Runnable {
     private String username = null;
     private final AtomicBoolean running = new AtomicBoolean(true);
     private long lastActivityTime;
-    private static final long TIMEOUT_MS = 60000; // 1 minute timeout
+    private static final long TIMEOUT_MS = 60000; // 1 minute
     private GameLobby currentLobby;
 
     public ClientController(Socket socket, GameServer server) {

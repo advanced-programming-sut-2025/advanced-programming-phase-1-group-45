@@ -123,7 +123,7 @@ public class GameManager {
             GameInstance game = entry.getValue();
 
             if (currentTime - game.getLastActivityTime() > inactivityTimeout) {
-                logger.info("پایان بازی به دلیل عدم فعالیت: " + game.getGameId());
+                logger.info("inactive game ended: " + game.getGameId());
                 endGame(game.getGameId(), null);
             }
         }
