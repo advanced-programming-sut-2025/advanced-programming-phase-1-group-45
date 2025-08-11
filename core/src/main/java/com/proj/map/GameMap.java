@@ -111,17 +111,12 @@ public class GameMap {
         for (Tile tile : foragingMineralTiles) {
             ForagingItem item = (ForagingItem) tile.getLandObject();
             Point pos = item.getPosition();
-            float texW = item.getTexture().getRegionWidth() / 100f;
-            float texH = item.getTexture().getRegionHeight() / 100f;
-            System.out.println("texW: " + texW + " texH: " + texH);
-            float drawX = pos.x * loader.getTileWidth() + (loader.getTileWidth() - texW) / 2f;
+            float drawX = pos.x * loader.getTileWidth() + (loader.getTileWidth() - item.getTexture().getRegionWidth()) / 2f;
             float drawY = pos.y * loader.getTileWidth();
             batch.draw(
                 item.getTexture(),
-                drawX, drawY,
-                texW, texH
+                drawX, drawY
             );
-
 //            batch.draw(item.getTexture(), pos.x*loader.getTileWidth(), pos.y*loader.getTileHeight(),
 //                loader.getTileWidth() , loader.getTileHeight());
         }}
@@ -172,7 +167,7 @@ public class GameMap {
         tile.setObject(foragingObject);
         tile.setPassable(false);
         tile.setType(TileType.FORAGING_MINERAL);
-        foragingCropTiles.add(tile);
+        foragingMineralTiles.add(tile);
     }
 
     public void removeForaging() {

@@ -108,6 +108,7 @@ public class WorldController {
         uistage.addActor(dateDisplayActor);
 
         InventoryManager.getInstance().getPlayerInventory().addItem(ItemRegistry.getInstance().get("tulip_bulb"));
+        InventoryManager.getInstance().getPlayerInventory().addItem(ItemRegistry.getInstance().get("acorn"));
 
         Skin stardewSkin = GameAssetManager.getGameAssetManager().getStardewSkin();
         seedWindow = new SeedInventoryWindow(stardewSkin, gameMaps.get(1).getFarmingController());

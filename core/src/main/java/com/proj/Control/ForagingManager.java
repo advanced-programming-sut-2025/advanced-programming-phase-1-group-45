@@ -134,7 +134,7 @@ public class ForagingManager {
     private void spawnForagingMineral() {
         gameMap.removeForaging();
         Array<ForagingItem> foragingItems = foragingMinerals;
-        int itemsToSpawn = Math.max(1, (int) (emptyTilesCount * 0.005));
+        int itemsToSpawn = Math.max(1, (int) (emptyTilesCount * 0.0007));
         for (int i = 0; i < itemsToSpawn; i++) {
             Tile tile = emptyTiles.random();
             if (tile.getLocation().x == 16 && tile.getLocation().y == 2) {

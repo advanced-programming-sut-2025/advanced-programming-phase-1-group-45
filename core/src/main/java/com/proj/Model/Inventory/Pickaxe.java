@@ -2,6 +2,7 @@ package com.proj.Model.Inventory;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.proj.Control.WorldController;
+import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.Model.inventoryItems.ResourceItem;
 import com.proj.Model.inventoryItems.crops.Crop;
 import com.proj.map.GameMap;
@@ -28,6 +29,13 @@ public class Pickaxe extends Tool {
             ResourceItem nr = WorldController.getInstance().getGameMap().pickNaturalResource(new Point(tileX, tileY));
             if (nr != null) {
                 InventoryManager.getInstance().getPlayerInventory().addItem(nr);
+                return true;
+            }
+        }
+        else if (tile.getType() == TileType.FORAGING_MINERAL) {
+            ForagingItem item = WorldController.getInstance().getGameMap().pickMineral(new Point(tileX, tileY), "Pickaxe");
+            if (item != null) {
+                InventoryManager.getInstance().getPlayerInventory().addItem(item);
                 return true;
             }
         }
