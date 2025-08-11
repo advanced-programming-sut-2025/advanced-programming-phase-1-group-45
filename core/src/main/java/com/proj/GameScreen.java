@@ -240,6 +240,7 @@ public class GameScreen implements Screen {
                 font.getData().setScale(1.5f);
 
                 worldController.setPlayer(player);
+                shopManager = new ShopManager(player, inventoryManager);
                 placeNPCs();
                 camera.position.set(player.getPosition().x, player.getPosition().y, 0);
                 camera.update();
