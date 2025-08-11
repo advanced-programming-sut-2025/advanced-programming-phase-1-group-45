@@ -310,15 +310,14 @@ public class CropManager {
                 float duration = 0.5f; // Animation duration in seconds
                 float progress = Math.min(1.0f, timer / duration);
 
-                // Calculate vertical position (starts above plant, ends at tile level)
                 float startY = drawY + texH + 5; // Start above the plant
                 float targetY = drawY; // End at tile level
                 float currentY = startY - (startY - targetY) * progress;
 
                 batch.draw(waterEffectTexture,
-                    drawX + texW / 2 - 8,
+                    drawX + texW / 2 - 4,
                     currentY,
-                    16, 16);
+                    8, 8);
             }
 
             if (crop.isShowingFertilizeEffect()) {
