@@ -23,6 +23,9 @@ import com.proj.Model.TimeAndWeather.WeatherController;
 import com.proj.Model.inventoryItems.ForagingInventoryWindow;
 import com.proj.Model.inventoryItems.SeedInventoryWindow;
 import com.proj.Model.inventoryItems.crops.CropInventoryWindow;
+import com.proj.Model.inventoryItems.fertilizer.BasicFertilizer;
+import com.proj.Model.inventoryItems.fertilizer.DeluxeFertilizer;
+import com.proj.Model.inventoryItems.fertilizer.FertilizeWindow;
 import com.proj.Model.inventoryItems.seeds.ItemRegistry;
 import com.proj.Player;
 import com.proj.map.FarmInOutPoint;
@@ -60,6 +63,9 @@ public class WorldController {
     private TextButton showCropButton;
     private CropInfoWindow cropInfoWindow;
     private TextButton showCropInfoButton;
+
+    private FertilizeWindow fertilizerWindow;
+    private TextButton showFertilizerButton;
 
     private ClockWidget clockWidget;
     private TimeDisplayActor timeDisplayActor;
@@ -119,92 +125,11 @@ public class WorldController {
         InventoryManager.getInstance().getPlayerInventory().addItem(ItemRegistry.getInstance().get("tulip_bulb"));
         InventoryManager.getInstance().getPlayerInventory().addItem(ItemRegistry.getInstance().get("acorn"));
 
-//        Skin stardewSkin = GameAssetManager.getGameAssetManager().getStardewSkin();
-//        seedWindow = new SeedInventoryWindow(stardewSkin, gameMaps.get(1).getFarmingController());
-//        seedWindow.setVisible(false);
-//
-//        foragingInventoryWindow = new ForagingInventoryWindow(stardewSkin, gameMaps.get(1).getFarmingController());
-//        foragingInventoryWindow.setVisible(false);
-//
-//        cropInventoryWindow = new CropInventoryWindow(stardewSkin);
-//        cropInventoryWindow.setVisible(false);
-//
-//        cropInfoWindow = new CropInfoWindow(stardewSkin);
-//        cropInfoWindow.setVisible(false);
-//
-//        uistage.addActor(seedWindow);
-//        uistage.addActor(foragingInventoryWindow);
-//        uistage.addActor(cropInventoryWindow);
-//        uistage.addActor(cropInfoWindow);
-//
-//        showSeedsButton = new TextButton("Seed", stardewSkin);
-//        showSeedsButton.setSize(157, 80);
-//        showSeedsButton.setPosition(
-//            Gdx.graphics.getWidth() - showSeedsButton.getWidth() - 1,
-//            Gdx.graphics.getHeight() - showSeedsButton.getHeight() - 20
-//        );
-//        showSeedsButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                seedWindow.setVisible(!seedWindow.isVisible());
-//            }
-//        });
-//        showSeedsButton.toFront();
-//        uistage.addActor(showSeedsButton);
-//
-//        showForagingButton = new TextButton("Foraging", stardewSkin);
-//        showForagingButton.setSize(157, 80);
-//        showForagingButton.setPosition(
-//            Gdx.graphics.getWidth() - showForagingButton.getWidth() - 1,
-//            Gdx.graphics.getHeight() - showSeedsButton.getHeight() - 180
-//        );
-//        showForagingButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                foragingInventoryWindow.setVisible(!foragingInventoryWindow.isVisible());
-//            }
-//        });
-//        showForagingButton.toFront();
-//        uistage.addActor(showForagingButton);
-//
-//        showCropButton = new TextButton("Crop", stardewSkin);
-//        showCropButton.setSize(157, 80);
-//        showCropButton.setPosition(
-//            Gdx.graphics.getWidth() - showCropButton.getWidth() - 1,
-//            Gdx.graphics.getHeight() - showCropButton.getHeight() - 300
-//        );
-//        showCropButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                cropInventoryWindow.setVisible(!cropInventoryWindow.isVisible());
-//            }
-//        });
-//        showCropButton.toFront();
-//        uistage.addActor(showCropButton);
-//
-//
-//        showCropInfoButton = new TextButton("Crop_info", stardewSkin);
-//        showCropInfoButton.setSize(157, 80);
-//        showCropInfoButton.setPosition(
-//            Gdx.graphics.getWidth() - showCropInfoButton.getWidth() - 1,
-//            Gdx.graphics.getHeight() - showCropInfoButton.getHeight() - 400
-//        );
-//        showCropInfoButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                cropInfoWindow.setVisible(!cropInfoWindow.isVisible());
-//            }
-//        });
-//        showCropInfoButton.toFront();
-//        uistage.addActor(showCropInfoButton);
-
-
         Skin stardewSkin = GameAssetManager.getGameAssetManager().getStardewSkin();
-
-        // ایجاد پنجره‌ها (همانند قبل)
         seedWindow = new SeedInventoryWindow(stardewSkin, gameMaps.get(1).getFarmingController());
         seedWindow.setVisible(false);
-
+        fertilizerWindow = new FertilizeWindow(stardewSkin, gameMaps.get(1).getFarmingController());
+        fertilizerWindow.setVisible(false);
         foragingInventoryWindow = new ForagingInventoryWindow(stardewSkin, gameMaps.get(1).getFarmingController());
         foragingInventoryWindow.setVisible(false);
 
@@ -218,6 +143,7 @@ public class WorldController {
         uistage.addActor(foragingInventoryWindow);
         uistage.addActor(cropInventoryWindow);
         uistage.addActor(cropInfoWindow);
+        uistage.addActor(fertilizerWindow);
 
         createInventoryButton();
         createInventoryMenu();
@@ -231,7 +157,7 @@ public class WorldController {
 
 
     private void createInventoryButton() {
-        Texture inventoryTexture = new Texture(Gdx.files.internal("assets/backpack.png"));
+        Texture inventoryTexture = GameAssetManager.getGameAssetManager().getBackpackTexture();
         TextureRegion inventoryRegion = new TextureRegion(inventoryTexture);
 
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
@@ -240,10 +166,9 @@ public class WorldController {
         inventoryButton = new ImageButton(style);
         inventoryButton.setSize(106, 128);
 
-        // موقعیت در پایین-راست
         inventoryButton.setPosition(
             Gdx.graphics.getWidth() - inventoryButton.getWidth() - 20,
-            20 // فاصله از پایین
+            20
         );
 
         inventoryButton.addListener(new ClickListener() {
@@ -290,10 +215,18 @@ public class WorldController {
             menuVisible = false;
         }, stardewSkin);
 
+        TextButton fertilizeMenuButton = createMenuButton("Fertilizer", () -> {
+            fertilizerWindow.setVisible(true);
+            fertilizerWindow.centerWindow();
+            inventoryMenu.setVisible(false);
+            menuVisible = false;
+        }, stardewSkin);
+
         inventoryMenu.add(cropInfoMenuButton).pad(5).row();
         inventoryMenu.add(cropsMenuButton).pad(5).row();
         inventoryMenu.add(foragingMenuButton).pad(5).row();
         inventoryMenu.add(seedsMenuButton).pad(5).row();
+        inventoryMenu.add(fertilizeMenuButton).pad(5).row();
 
         inventoryMenu.pack();
         uistage.addActor(inventoryMenu);
@@ -402,7 +335,7 @@ public class WorldController {
                 foragingManager.spawnDailyRandomItems(gameTime.getSeason());
                 gameMaps.get(mapId).updateDaily(gameTime.getSeason());
             }
-            if(cavePoint != null) {
+            if (cavePoint != null) {
                 foragingManager.setGameMap(caveMap);
                 foragingManager.spawnDailyRandomItems(gameTime.getSeason());
             }
@@ -435,55 +368,24 @@ public class WorldController {
 
         inventoryButton.setPosition(
             width - inventoryButton.getWidth() - 20,
-            20 // فاصله از پایین
+            20
         );
 
-        // اگر منو باز است، موقعیت آن را به‌روزرسانی کن
         if (menuVisible) {
             float x = inventoryButton.getX() + inventoryButton.getWidth() - inventoryMenu.getWidth();
             float y = inventoryButton.getY() + inventoryButton.getHeight();
             inventoryMenu.setPosition(x, y);
         }
 
-//        showSeedsButton.toFront();
-//        positionUiElement(width, height);
-//        showSeedsButton.setPosition(
-//            showSeedsButton.getWidth() - 14,
-//            showSeedsButton.getHeight() + 20
-//        );
-//        seedWindow.centerWindow();
-//
-//        showForagingButton.toFront();
-//        positionUiElement(width, height);
-//        showForagingButton.setPosition(
-//            showForagingButton.getWidth() - 14,
-//            showForagingButton.getHeight() + 120
-//        );
-//        foragingInventoryWindow.centerWindow();
-//
-//        showCropButton.toFront();
-//        positionUiElement(width, height);
-//        showCropButton.setPosition(
-//            showCropButton.getWidth() - 14,
-//            showCropButton.getHeight() + 220
-//        );
-//        cropInventoryWindow.centerWindow();
-//
-//
-//        showCropInfoButton.toFront();
-//        positionUiElement(width, height);
-//        showCropInfoButton.setPosition(
-//            showCropInfoButton.getWidth() - 14,
-//            showCropInfoButton.getHeight() + 320
-//        );
-//        cropInfoWindow.centerWindow();
-
-
         if (seedWindow != null) {
             seedWindow.setPosition(
                 (width - seedWindow.getWidth()) / 2,
                 (height - seedWindow.getHeight()) / 2
             );
+        }
+
+        if (fertilizerWindow.isVisible()) {
+            fertilizerWindow.centerWindow();
         }
 
         weatherController.resize((int) width, (int) height);
@@ -549,7 +451,7 @@ public class WorldController {
             triggerToOtherMap(point);
             return false;
         } else if (gameMap.getMapName().equalsIgnoreCase("cave")) {
-            if ((tileX == 16 && tileY == 1)|| (tileX == 15 && tileY == 1) ) {
+            if ((tileX == 16 && tileY == 1) || (tileX == 15 && tileY == 1)) {
                 backToFarm();
             }
         } else if (cavePoint.x == point.x && cavePoint.y == point.y) {

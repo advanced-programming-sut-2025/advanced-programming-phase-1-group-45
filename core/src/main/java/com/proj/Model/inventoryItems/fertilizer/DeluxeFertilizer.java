@@ -5,13 +5,16 @@ import com.proj.Model.Inventory.InventoryItem;
 
 public class DeluxeFertilizer extends InventoryItem {
     public DeluxeFertilizer() {
-        super("Deluxe Fertilizer", "fertilizer_deluxe",
-            GameAssetManager.getGameAssetManager().getTexture("assets/deluxe_fertilizer.png"),
+        super("Deluxe_Fertilizer", "Deluxe Fertilizer",
+            GameAssetManager.getGameAssetManager().getTexture("assets/fertilize2.png"),
             false,1);
     }
 
     @Override
     public void use() {
+
+    }
+    public void useOnTile(float x, float y) {
 
     }
 }

@@ -6,13 +6,17 @@ import com.proj.Model.InventoryItemFactory;
 
 public class BasicFertilizer extends InventoryItem {
     public BasicFertilizer() {
-        super("Basic Fertilizer", "fertilizer_basic",
-            GameAssetManager.getGameAssetManager().getTexture("assets/basic_fertilizer.png"),
+        super("Basic_Fertilizer", "Basic Fertilizer",
+            GameAssetManager.getGameAssetManager().getTexture("assets/fertilize1.png"),
             false,1);
     }
 
     @Override
     public void use() {
+
+    }
+
+    public void useOnTile(int x, int y) {
 
     }
 }

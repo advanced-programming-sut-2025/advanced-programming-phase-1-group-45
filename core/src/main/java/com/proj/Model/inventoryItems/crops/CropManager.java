@@ -1,7 +1,9 @@
 package com.proj.Model.inventoryItems.crops;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
@@ -10,6 +12,10 @@ import com.proj.map.Season;
 import com.proj.Model.Inventory.InventoryItem;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.badlogic.gdx.math.MathUtils.random;
 
 public class CropManager {
     private final Array<Crop> crops = new Array<>();
@@ -18,11 +24,31 @@ public class CropManager {
     private TextureRegion waterEffectTexture;
     private TextureRegion fertilizeEffectTexture;
 
+    private final Map<Crop, Float> waterEffectTimers = new HashMap<>();
+    private final Map<GiantCrop, Float> giantCropWaterEffectTimers = new HashMap<>();
+    private final Map<Crop, Float> fertilizeEffectTimers = new HashMap<>();
+    private final Map<Crop, Particle[]> fertilizeParticles = new HashMap<>();
+    private final Map<GiantCrop, Float> giantCropFertilizeEffectTimers = new HashMap<>();
+    private final Map<GiantCrop, ParticleEmitter.Particle[]> giantCropFertilizeParticles = new HashMap<>();
+    private Texture blackParticleTexture;
+
+    private static class Particle {
+        float startX;
+        float startY;
+        float targetY;
+        float currentY;
+        float speed;
+        boolean active;
+    }
+
     public void setMap(GameMap map) {
         this.map = map;
         waterEffectTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/drop_water.png")));
-//        fertilizeEffectTexture = new TextureRegion(new Texture(Gdx.files.internal("effects/fertilizer_bag.png")));
-    }
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(0, 0, 0, 1); // سیاه
+        pixmap.fill();
+        blackParticleTexture = new Texture(pixmap);
+        pixmap.dispose();    }
 
     public boolean plantFromSeed(String cropId, int tileX, int tileY) {
         CropData data = CropRegistry.getInstance().get(cropId);
@@ -133,7 +159,7 @@ public class CropManager {
             giantCrop.water();
         }
         if (giantFertilized) {
-            giantCrop.fertilize();
+            giantCrop.fertilize("Basic_Fertilize");
         }
         giantCrops.add(giantCrop);
 
@@ -146,8 +172,11 @@ public class CropManager {
     private void removeCropAt(int x, int y) {
         Crop crop = getCropAt(x, y);
         if (crop instanceof GiantCrop) {
-            giantCrops.removeValue((GiantCrop) crop, true);
+            GiantCrop giantCrop = (GiantCrop) crop;
+            giantCropWaterEffectTimers.remove(giantCrop);
+            giantCrops.removeValue(giantCrop, true);
         } else if (crop != null) {
+            waterEffectTimers.remove(crop);
             crops.removeValue(crop, true);
         }
     }
@@ -277,22 +306,60 @@ public class CropManager {
                 texW, texH
             );
             if (crop.isShowingWaterEffect()) {
+                float timer = waterEffectTimers.getOrDefault(crop, 0f);
+                float duration = 0.5f; // Animation duration in seconds
+                float progress = Math.min(1.0f, timer / duration);
+
+                // Calculate vertical position (starts above plant, ends at tile level)
+                float startY = drawY + texH + 5; // Start above the plant
+                float targetY = drawY; // End at tile level
+                float currentY = startY - (startY - targetY) * progress;
+
                 batch.draw(waterEffectTexture,
                     drawX + texW / 2 - 8,
-                    drawY + texH + 5,
+                    currentY,
                     16, 16);
             }
 
             if (crop.isShowingFertilizeEffect()) {
-                batch.draw(fertilizeEffectTexture,
-                    drawX + texW / 2 - 8,
-                    drawY + texH + 25,
-                    16, 16);
+                Particle[] particles = fertilizeParticles.get(crop);
+                if (particles != null) {
+                    for (Particle particle : particles) {
+                        if (particle.active) {
+                            float screenX = particle.startX * tileW;
+                            float screenY = particle.currentY * tileH;
+                            batch.draw(blackParticleTexture,
+                                screenX - 2,
+                                screenY - 2,
+                                4, 4);
+                        }
+                    }
+                }
             }
         }
 
         for (GiantCrop giantCrop : giantCrops) {
             renderGiantCrop(batch, giantCrop, tileW, tileH);
+            if (giantCrop.isShowingWaterEffect()) {
+                float timer = giantCropWaterEffectTimers.getOrDefault(giantCrop, 0f);
+                float duration = 0.5f;
+                float progress = Math.min(1.0f, timer / duration);
+
+                float drawX = giantCrop.getX() * tileW;
+                float drawY = giantCrop.getY() * tileH;
+                float width = 2 * tileW;
+                float height = 2 * tileH;
+
+                float startY = drawY + height + 25;
+                float targetY = drawY;
+                float currentY = startY - (startY - targetY) * progress;
+
+                // Center effect on giant crop
+                batch.draw(waterEffectTexture,
+                    drawX + width/2 - 8,
+                    currentY,
+                    16, 16);
+            }
         }
 
     }
@@ -300,10 +367,76 @@ public class CropManager {
     public void update(float delta) {
         for (Crop crop : crops) {
             crop.updateEffects(delta);
+            // Update water effect timer
+            if (crop.isShowingWaterEffect()) {
+                float currentTime = waterEffectTimers.getOrDefault(crop, 0f);
+                waterEffectTimers.put(crop, currentTime + delta);
+            } else {
+                waterEffectTimers.remove(crop);
+            }
+
+            if (crop.isShowingFertilizeEffect()) {
+                float currentTime = fertilizeEffectTimers.getOrDefault(crop, 0f);
+                fertilizeEffectTimers.put(crop, currentTime + delta);
+
+                if (!fertilizeParticles.containsKey(crop)) {
+                    Particle[] particles = new Particle[4]; // 4 ذره
+                    for (int i = 0; i < particles.length; i++) {
+                        particles[i] = new Particle();
+                        particles[i].active = false;
+                    }
+                    fertilizeParticles.put(crop, particles);
+                }
+
+                updateParticles(crop, delta);
+            } else {
+                fertilizeEffectTimers.remove(crop);
+                fertilizeParticles.remove(crop);
+            }
         }
         for (GiantCrop giantCrop : giantCrops) {
             giantCrop.updateEffects(delta);
+            // Update water effect timer for giant crops
+            if (giantCrop.isShowingWaterEffect()) {
+                float currentTime = giantCropWaterEffectTimers.getOrDefault(giantCrop, 0f);
+                giantCropWaterEffectTimers.put(giantCrop, currentTime + delta);
+            } else {
+                giantCropWaterEffectTimers.remove(giantCrop);
+            }
         }
+
+    }
+
+    private void updateParticles(Crop crop, float delta) {
+        Particle[] particles = fertilizeParticles.get(crop);
+        float timer = fertilizeEffectTimers.getOrDefault(crop, 0f);
+
+        for (Particle particle : particles) {
+            if (!particle.active) {
+                // فعال کردن تصادفی ذرات
+                if (random.nextFloat() > 0.7f) {
+                    initParticle(particle, crop);
+                }
+            } else {
+                // به‌روزرسانی موقعیت ذره
+                particle.currentY -= particle.speed * delta;
+
+                // بررسی پایان حرکت ذره
+                if (particle.currentY <= particle.targetY) {
+                    particle.active = false;
+                }
+            }
+        }
+    }
+
+
+    private void initParticle(Particle particle, Crop crop) {
+        particle.startX = crop.getX() + 0.2f + random.nextFloat() * 0.6f;
+        particle.startY = crop.getY() + 1.0f + random.nextFloat() * 0.5f;
+        particle.targetY = crop.getY();
+        particle.currentY = particle.startY;
+        particle.speed = 0.5f + random.nextFloat() * 1.5f;
+        particle.active = true;
     }
 
     public Crop getCropAt(int x, int y) {

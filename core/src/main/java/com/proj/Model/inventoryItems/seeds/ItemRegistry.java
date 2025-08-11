@@ -8,6 +8,8 @@ import com.proj.Model.inventoryItems.FruitItem;
 import com.proj.Model.inventoryItems.SeedItem;
 import com.proj.Model.inventoryItems.crops.CropData;
 import com.proj.Model.inventoryItems.crops.CropRegistry;
+import com.proj.Model.inventoryItems.fertilizer.BasicFertilizer;
+import com.proj.Model.inventoryItems.fertilizer.DeluxeFertilizer;
 import com.proj.Model.inventoryItems.trees.TreeData;
 import com.proj.Model.inventoryItems.trees.TreeRegistry;
 
@@ -49,6 +51,11 @@ public class ItemRegistry {
         }catch (Exception e) {
             e.printStackTrace();
         }
+
+        BasicFertilizer b = new BasicFertilizer();
+        DeluxeFertilizer d = new DeluxeFertilizer();
+        items.put(b.getId(), b);
+        items.put(d.getId(), d);
     }
 
     public static synchronized ItemRegistry getInstance() {
