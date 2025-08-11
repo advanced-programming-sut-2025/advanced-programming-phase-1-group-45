@@ -39,7 +39,6 @@ public class ForagingManager {
         for (Tile[] tile : gameMap.getLandLoader().getTiles()) {
             for (Tile tile1 : tile) {
                 if (tile1.isPassable()) {
-                    System.err.println("ine khalie " + tile1.getLocation());
                     emptyTiles.add(tile1);
                     emptyTilesCount++;
                 }
@@ -138,6 +137,9 @@ public class ForagingManager {
         int itemsToSpawn = Math.max(1, (int) (emptyTilesCount * 0.005));
         for (int i = 0; i < itemsToSpawn; i++) {
             Tile tile = emptyTiles.random();
+            if (tile.getLocation().x == 16 && tile.getLocation().y == 2) {
+                tile = emptyTiles.get(2);
+            }
             emptyTiles.removeValue(tile, true);
             Point position = tile.getLocation();
             ForagingItem template = foragingItems.random();

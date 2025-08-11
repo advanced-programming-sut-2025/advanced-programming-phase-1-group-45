@@ -111,8 +111,19 @@ public class GameMap {
         for (Tile tile : foragingMineralTiles) {
             ForagingItem item = (ForagingItem) tile.getLandObject();
             Point pos = item.getPosition();
-            batch.draw(item.getTexture(), pos.x*loader.getTileWidth(), pos.y*loader.getTileHeight(),
-                (float) item.getTexture().getRegionWidth()/6f , (float) item.getTexture().getRegionHeight()/6f);
+            float texW = item.getTexture().getRegionWidth() / 100f;
+            float texH = item.getTexture().getRegionHeight() / 100f;
+            System.out.println("texW: " + texW + " texH: " + texH);
+            float drawX = pos.x * loader.getTileWidth() + (loader.getTileWidth() - texW) / 2f;
+            float drawY = pos.y * loader.getTileWidth();
+            batch.draw(
+                item.getTexture(),
+                drawX, drawY,
+                texW, texH
+            );
+
+//            batch.draw(item.getTexture(), pos.x*loader.getTileWidth(), pos.y*loader.getTileHeight(),
+//                loader.getTileWidth() , loader.getTileHeight());
         }}
         if (farmingController != null) {
             farmingController.renderAll(batch, currentSeason);

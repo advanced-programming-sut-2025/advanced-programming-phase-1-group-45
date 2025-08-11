@@ -647,7 +647,7 @@ public class GameScreen implements Screen {
             }
 
             if (moved) {
-                Gdx.app.log("GameScreen", "Player started moving");
+//                Gdx.app.log("GameScreen", "Player started moving");
             }
 
             // کدهای مربوط به حیوانات
