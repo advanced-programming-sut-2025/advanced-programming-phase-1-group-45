@@ -22,7 +22,7 @@ public class GameServer {
     private static final int THREAD_POOL_SIZE = 10;
     private static final int MAINTENANCE_INTERVAL_SECONDS = 60;
 
-    private final Map<String, ClientController> connectedClients = new ConcurrentHashMap<>();
+    private final Map<String, ClientConnectionController> connectedClients = new ConcurrentHashMap<>();
     private final LobbyManager lobbyManager;
     private final ExecutorService threadPool;
     private final ScheduledExecutorService maintenanceService;
@@ -95,8 +95,8 @@ public class GameServer {
                     continue;
                 }
 
-                ClientController clientController = new ClientController(clientSocket, this);
-                threadPool.execute(clientController);
+                ClientConnectionController clientConnectionController = new ClientConnectionController(clientSocket, this);
+                threadPool.execute(clientConnectionController);
             }
         } catch (IOException e) {
             if (running && !serverSocket.isClosed()) {
@@ -122,15 +122,15 @@ public class GameServer {
         }
     }
 
-    public void registerClient(String username, ClientController handler) {
+    public void registerClient(String username, ClientConnectionController clientController) {
         if (connectedClients.containsKey(username)) {
-            ClientController oldHandler = connectedClients.get(username);
+            ClientConnectionController oldHandler = connectedClients.get(username);
             oldHandler.sendMessage("DISCONNECT", JsonBuilder.create()
                 .put("message", "New login detected")
                 .build());
             oldHandler.shutdown();
         }
-        connectedClients.put(username, handler);
+        connectedClients.put(username, clientController);
         broadcastSystemMessage(username + " joined the game");
         System.out.println("GameServer " +  "User registered: " + username);
         notifyPlayerStatusUpdate();
@@ -154,27 +154,27 @@ public class GameServer {
 
         String jsonMessage = messageObj.toString();
 
-        for (Map.Entry<String, ClientController> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
-            ClientController handler = entry.getValue();
-            if (handler != null && handler.isRunning()) {
-                handler.sendRaw(jsonMessage);
+        for (Map.Entry<String, ClientConnectionController> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
+            ClientConnectionController clientController = entry.getValue();
+            if (clientController != null && clientController.isRunning()) {
+                clientController.sendRaw(jsonMessage);
             }
         }
     }
 
-    public void createLobby(String lobbyName, String owner, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
+    public void createLobby(String lobbyName, String admin, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
         System.out.println("GameServer " +  "Creating a new lobby: " + lobbyName);
 
-        GameLobby lobby = lobbyManager.createAndGetLobby(lobbyName, owner, password, maxPlayers, isPrivate, isVisible);
-        ClientController ownerHandler = connectedClients.get(owner);
-        if (ownerHandler != null) {
-            lobby.addPlayer(owner, ownerHandler);
+        GameLobby lobby = lobbyManager.createAndGetLobby(lobbyName, admin, password, maxPlayers, isPrivate, isVisible);
+        ClientConnectionController adminHandler = connectedClients.get(admin);
+        if (adminHandler != null) {
+            lobby.addPlayer(admin, adminHandler);
 
             JSONObject response = new JSONObject();
             response.put("type", "LOBBY_CREATED");
             response.put("data", lobby.getLobbyInfo());
 
-            ownerHandler.sendRaw(response.toString());
+            adminHandler.sendRaw(response.toString());
             broadcastLobbiesList();
 
         }
@@ -182,14 +182,14 @@ public class GameServer {
         System.out.println("GameServer " +  "Lobby created: " + lobbyName + " with ID: " + lobby.getId());
     }
     public void broadcastLobbiesList() {
-        for (ClientController handler : connectedClients.values()) {
-            handler.sendLobbiesList();
+        for (ClientConnectionController clientController : connectedClients.values()) {
+            clientController.sendLobbiesList();
         }
     }
 
     public void joinLobby(String lobbyId, String username, String password) {
         GameLobby lobby = lobbyManager.getGameLobby(lobbyId);
-        ClientController client = connectedClients.get(username);
+        ClientConnectionController client = connectedClients.get(username);
 
         if (client == null) {
             System.out.println("GameServer " +  "Username not found: " + username);
@@ -250,7 +250,7 @@ public class GameServer {
 
     public void startGame(String lobbyId, String username) {
         GameLobby lobby = lobbyManager.getGameLobby(lobbyId);
-        ClientController client = connectedClients.get(username);
+        ClientConnectionController client = connectedClients.get(username);
 
         if (client == null) {
             System.out.println("GameServer " +  "Username not found: " + username);
@@ -269,9 +269,9 @@ public class GameServer {
             return;
         }
 
-        if (!lobby.getOwner().equals(username)) {
-            errorData.put("code", "NOT_OWNER");
-            errorData.put("message", "Only lobby owner can start the game");
+        if (!lobby.getAdmin().equals(username)) {
+            errorData.put("code", "NOT_ADMIN");
+            errorData.put("message", "Only lobby admin can start the game");
             errorResponse.put("data", errorData);
             client.sendRaw(errorResponse.toString());
             return;
@@ -313,7 +313,7 @@ public class GameServer {
         GameLobby playerLobby = findPlayerLobby(username);
 
         if (playerLobby == null || !playerLobby.isGameActive()) {
-            ClientController client = connectedClients.get(username);
+            ClientConnectionController client = connectedClients.get(username);
             if (client != null) {
                 JSONObject error = new JSONObject();
                 error.put("type", "ERROR");
@@ -345,11 +345,11 @@ public class GameServer {
     }
 
     private void checkDisconnectedClients() {
-        for (Map.Entry<String, ClientController> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
-            ClientController handler = entry.getValue();
-            if (handler.isTimedOut()) {
+        for (Map.Entry<String, ClientConnectionController> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
+            ClientConnectionController clientController = entry.getValue();
+            if (clientController.isTimedOut()) {
                 System.out.println("GameServer " +  "User removed due to inactivity: " + entry.getKey());
-                handler.shutdown();
+                clientController.shutdown();
                 removeClient(entry.getKey());
             }
         }
@@ -379,17 +379,17 @@ public class GameServer {
     public JSONObject sendOnlinePlayersList() {
         JSONArray playersArray = new JSONArray();
 
-        for (ClientController handler : connectedClients.values()) {
+        for (ClientConnectionController clientController : connectedClients.values()) {
             JSONObject playerInfo = new JSONObject();
-            playerInfo.put("username", handler.getUsername());
+            playerInfo.put("username", clientController.getUsername());
             playerInfo.put("status", "Online");
 
-            if (findPlayerLobby(handler.getUsername()) != null) {
-                GameLobby lobby = findPlayerLobby(handler.getUsername());
+            if (findPlayerLobby(clientController.getUsername()) != null) {
+                GameLobby lobby = findPlayerLobby(clientController.getUsername());
                 playerInfo.put("lobbyId", lobby.getId());
                 playerInfo.put("lobbyName", lobby.getName());
                 playerInfo.put("inLobby", true);
-                playerInfo.put("isOwner", lobby.getOwner().equals(handler.getUsername()));
+                playerInfo.put("isAdmin", lobby.getAdmin().equals(clientController.getUsername()));
             } else {
                 playerInfo.put("inLobby", false);
             }
@@ -402,8 +402,8 @@ public class GameServer {
     }
 
     public void notifyPlayerStatusUpdate() {
-        for (ClientController handler : connectedClients.values()) {
-            handler.sendPlayerList();
+        for (ClientConnectionController clientController : connectedClients.values()) {
+            clientController.sendPlayerList();
         }
     }
 
@@ -417,8 +417,8 @@ public class GameServer {
         try {
             broadcastSystemMessage("Server is shutting down");
 
-            for (ClientController handler : connectedClients.values()) {
-                handler.shutdown();
+            for (ClientConnectionController clientController : connectedClients.values()) {
+                clientController.shutdown();
             }
             connectedClients.clear();
 
@@ -449,7 +449,7 @@ public class GameServer {
         return dbHelper;
     }
 
-    public Map<String, ClientController> getConnectedClients() {
+    public Map<String, ClientConnectionController> getConnectedClients() {
         return connectedClients;
     }
 

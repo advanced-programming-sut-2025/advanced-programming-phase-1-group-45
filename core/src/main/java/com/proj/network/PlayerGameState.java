@@ -4,9 +4,11 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.proj.map.*;
 
 public class PlayerGameState {
     private String username;
+    private com.proj.map.farmName fa
     private Position position;
     private boolean isMoving = false;
     private PlayerDirection direction = PlayerDirection.DOWN;

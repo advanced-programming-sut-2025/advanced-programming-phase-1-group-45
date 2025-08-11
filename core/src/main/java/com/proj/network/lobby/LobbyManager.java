@@ -15,9 +15,9 @@ public class LobbyManager {
         this.server = server;
     }
 
-    public synchronized GameLobby createAndGetLobby(String lobbyName, String owner, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
+    public synchronized GameLobby createAndGetLobby(String lobbyName, String admin, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
         String lobbyId = generateLobbyId();
-        GameLobby lobby = new GameLobby(lobbyId, lobbyName, owner, maxPlayers, isPrivate, isVisible, server);
+        GameLobby lobby = new GameLobby(lobbyId, lobbyName, admin, maxPlayers, isPrivate, isVisible, server);
 
         if (isPrivate) {
             lobby.setPassword(password);

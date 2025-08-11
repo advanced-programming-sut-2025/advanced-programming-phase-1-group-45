@@ -48,7 +48,7 @@ public class GameManager {
         GameInstance game = activeGames.get(gameId);
 
         if (game == null) {
-            logger.warning("بازی یافت نشد: " + gameId);
+            logger.warning("Game ended: " + gameId);
             return false;
         }
 
@@ -100,13 +100,13 @@ public class GameManager {
         try {
             server.getDatabaseHelper().saveGameResult(gameId, winner);
         } catch (Exception e) {
-            logger.warning("خطا در ذخیره نتیجه بازی: " + e.getMessage());
+            logger.warning("error in receiving game result:  " + e.getMessage());
         }
 
         activeGames.remove(gameId);
         lastUpdateTimes.remove(gameId);
 
-        logger.info("بازی پایان یافت: " + gameId + "، برنده: " + winner);
+        logger.info("Game ended: " + gameId + "، winner: " + winner);
     }
 
 

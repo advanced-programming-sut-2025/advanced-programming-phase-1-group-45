@@ -1,6 +1,6 @@
 package com.proj.network.lobby;
 
-import com.proj.network.ClientController;
+import com.proj.network.ClientConnectionController;
 import com.proj.network.GameInstance;
 import com.proj.network.GameServer;
 import com.proj.network.PlayerGameState;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameLobby {
     private String id;
     private String name;
-    private String owner;
+    private String admin;
     private int maxPlayers;
     private boolean isPrivate;
     private boolean isVisible;
@@ -23,7 +23,7 @@ public class GameLobby {
     private long creationTime;
     private long lastActivityTime;
 
-    private final Map<String, ClientController> players = new ConcurrentHashMap<>();
+    private final Map<String, ClientConnectionController> players = new ConcurrentHashMap<>();
     private final Map<String, PlayerGameState> playerStates = new ConcurrentHashMap<>();
 
     private GameInstance gameInstance;
@@ -32,10 +32,10 @@ public class GameLobby {
     public GameLobby() {
     }
 
-    public GameLobby(String id, String name, String owner, int maxPlayers, boolean isPrivate, boolean isVisible, GameServer server) {
+    public GameLobby(String id, String name, String admin, int maxPlayers, boolean isPrivate, boolean isVisible, GameServer server) {
         this.id = id;
         this.name = name;
-        this.owner = owner;
+        this.admin = admin;
         this.maxPlayers = maxPlayers;
         this.isPrivate = isPrivate;
         this.isVisible = isVisible;
@@ -47,15 +47,15 @@ public class GameLobby {
     /**
      * افزودن بازیکن به لابی
      */
-    public void addPlayer(String username, ClientController handler) {
+    public void addPlayer(String username, ClientConnectionController handler) {
         players.put(username, handler);
         handler.setCurrentLobby(this);
         updateLastActivity();
 
         // اگر صاحب لابی خارج شده بود، اولین بازیکن جدید صاحب لابی می‌شود
-        if (owner == null && !players.isEmpty()) {
-            owner = username;
-            broadcastMessage("SYSTEM", username + " is the new lobby owner");
+        if (admin == null && !players.isEmpty()) {
+            admin = username;
+            broadcastMessage("SYSTEM", username + " is the new lobby admin");
         }
 
         // ایجاد وضعیت بازی برای بازیکن جدید اگر بازی در حال اجراست
@@ -83,10 +83,10 @@ public class GameLobby {
         updateLastActivity();
 
         // اگر صاحب لابی خارج شد و بازیکن دیگری هست
-        if (username.equals(owner) && !players.isEmpty()) {
+        if (username.equals(admin) && !players.isEmpty()) {
             // انتخاب اولین بازیکن به عنوان صاحب جدید
-            owner = players.keySet().iterator().next();
-            broadcastMessage("SYSTEM", owner + " is the new lobby owner");
+            admin = players.keySet().iterator().next();
+            broadcastMessage("SYSTEM", admin + " is the new lobby admin");
         }
 
         // اگر بازی در حال اجراست، بررسی کنیم آیا باید بازی را متوقف کنیم
@@ -106,13 +106,13 @@ public class GameLobby {
      * ارسال پیام به تمام بازیکنان لابی
      */
     public void broadcastMessage(String type, String message) {
-        for (ClientController handler : players.values()) {
+        for (ClientConnectionController handler : players.values()) {
             handler.sendMessage(type, JsonBuilder.create().put("data", message).build());
         }
     }
 
     public void broadcastRaw(String message) {
-        for (ClientController handler : players.values()) {
+        for (ClientConnectionController handler : players.values()) {
             if (!handler.isTimedOut()) {
                 handler.sendRaw(message);
             }
@@ -145,7 +145,7 @@ public class GameLobby {
 
         // ارسال وضعیت بازی به همه بازیکنان
         broadcastMessage("GAME_STATE", gameInstance.getGameState().toString());
-        broadcastMessage("GAME_STARTED", "بازی شروع شد");
+        broadcastMessage("GAME_STARTED", "game starded.. please choose your map and start gaming");
 
         return true;
     }
@@ -185,7 +185,7 @@ public class GameLobby {
         return new JsonBuilder()
             .put("id", id)
             .put("name", name)
-            .put("owner", owner)
+            .put("admin", admin)
             .put("playerCount", getPlayerCount())
             .put("maxPlayers", maxPlayers)
             .put("isPrivate", isPrivate)
@@ -228,8 +228,8 @@ public class GameLobby {
         return name;
     }
 
-    public String getOwner() {
-        return owner;
+    public String getAdmin() {
+        return admin;
     }
 
     public int getMaxPlayers() {
@@ -256,7 +256,7 @@ public class GameLobby {
         return players.size();
     }
 
-    public Map<String, ClientController> getPlayers() {
+    public Map<String, ClientConnectionController> getPlayers() {
         return players;
     }
 
@@ -293,11 +293,11 @@ public class GameLobby {
     }
 
     public String getAdminId() {
-        return owner;
+        return admin;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setAdmin(String admin) {
+        this.admin = admin;
     }
 
     public void setGameInstance(GameInstance gameInstance) {

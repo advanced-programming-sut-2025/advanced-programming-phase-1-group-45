@@ -278,7 +278,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         }
 
         LobbyInfo lobby = lobbiesMap.get(currentLobbyId);
-        isAdmin = lobby.getOwner().equals(gameClient.getUsername());
+        isAdmin = lobby.getAdmin().equals(gameClient.getUsername());
         if (lobby == null) {
             currentLobbyTable.add("Lobby information not available").pad(20);
             return;
@@ -295,7 +295,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
 
         for (String player : lobby.getPlayers()) {
             Label playerLabel = new Label(player, skin);
-            if (player.equals(lobby.getOwner())) {
+            if (player.equals(lobby.getAdmin())) {
                 playerLabel.setText(player + " (Admin)");
                 playerLabel.setColor(1, 0, 1, 1);
             }
@@ -422,10 +422,10 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
                     playerRow.add(new Label("In Lobby", skin)).width(100).pad(3, 15, 3, 35);
 
                     String lobbyName = player.getString("lobbyName");
-                    boolean isOwner = player.getBoolean("isOwner");
+                    boolean isAdmin = player.getBoolean("isAdmin");
 
                     Label lobbyLabel = new Label(lobbyName, skin);
-                    if (isOwner) {
+                    if (isAdmin) {
                         lobbyLabel.setColor(Color.PINK);
                     }
                     playerRow.add(lobbyLabel).width(200).pad(3, 15, 3, 45);
@@ -452,7 +452,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         LobbyInfo lobby = new LobbyInfo();
         lobby.setId(json.getString("id"));
         lobby.setName(json.getString("name"));
-        lobby.setOwner(json.getString("owner"));
+        lobby.setAdmin(json.getString("admin"));
         lobby.setPlayerCount(json.getInt("playerCount"));
         lobby.setMaxPlayers(json.getInt("maxPlayers"));
         lobby.setPrivate(json.getBoolean("isPrivate"));
@@ -563,7 +563,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
             lobbiesMap.put(lobby.getId(), lobby);
 
             currentLobbyId = lobby.getId();
-            isAdmin = lobby.getOwner().equals(gameClient.getUsername());
+            isAdmin = lobby.getAdmin().equals(gameClient.getUsername());
             updateCurrentLobbyInfo();
             refreshLobbyListUI();
         } catch (JSONException e) {
@@ -742,7 +742,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
     public class LobbyInfo {
         private String id;
         private String name;
-        private String owner;
+        private String admin;
         private int playerCount;
         private int maxPlayers;
         private boolean isPrivate;
@@ -750,7 +750,6 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         private boolean isVisible;
         private List<String> players = new ArrayList<>();
 
-        // Getters and Setters
         public String getId() {
             return id;
         }
@@ -775,12 +774,12 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
             this.name = name;
         }
 
-        public String getOwner() {
-            return owner;
+        public String getAdmin() {
+            return admin;
         }
 
-        public void setOwner(String owner) {
-            this.owner = owner;
+        public void setAdmin(String admin) {
+            this.admin = admin;
         }
 
         public int getPlayerCount() {
