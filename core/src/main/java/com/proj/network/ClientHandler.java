@@ -186,14 +186,12 @@ public class ClientHandler implements Runnable {
             return;
         }
 
-        // Truncate long messages
         if (messageText.length() > 200) {
             messageText = messageText.substring(0, 200) + "...";
         }
 
         String recipient = JsonParser.getString(data, "recipient", null);
         if (recipient != null) {
-            // Private message
             ClientHandler recipientHandler = server.getConnectedClients().get(recipient);
             if (recipientHandler != null) {
                 JSONObject privateMsg = JsonBuilder.create()
@@ -203,21 +201,23 @@ public class ClientHandler implements Runnable {
                     .build();
 
                 recipientHandler.sendMessage("PRIVATE_CHAT", privateMsg);
-                // Also send a copy to the sender
                 sendMessage("PRIVATE_CHAT", privateMsg);
             } else {
                 sendError("USER_OFFLINE", "User " + recipient + " is not online");
             }
         } else {
-            // Broadcast public message
             JSONObject publicMsg = JsonBuilder.create()
                 .put("sender", username)
                 .put("message", messageText)
                 .put("isPrivate", false)
                 .build();
-            server.broadcastSystemMessage("CHAT" + messageText);
+
+            for (ClientHandler client : server.getConnectedClients().values()) {
+                client.sendMessage("CHAT", publicMsg);
+            }
         }
     }
+
 
     public void sendRaw(String message) {
         if (!running.get() || out == null) return;

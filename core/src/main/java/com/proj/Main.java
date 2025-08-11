@@ -180,6 +180,23 @@ public class Main extends Game implements NetworkEventListener {
             case ERROR:
                 Gdx.app.log("NETWORK", "ERROR: " + event.getMessage());
                 break;
+
+            case PRIVATE_MESSAGE:
+                if (getScreen() instanceof GameScreen) {
+                    String[] parts = event.getMessage().split(":", 2);
+                    if (parts.length == 2) {
+                        String sender = parts[0].trim();
+                        String message = parts[1].trim();
+                        ((GameScreen) getScreen()).getChatSystem().receiveMessage(sender, message, true);
+                    }
+                }
+                break;
+
+            case SYSTEM_MESSAGE:
+                if (getScreen() instanceof GameScreen) {
+                    ((GameScreen) getScreen()).getChatSystem().addSystemMessage(event.getMessage());
+                }
+                break;
         }
     }
 
