@@ -97,7 +97,7 @@ public class AvatarCreationView implements Screen {
         saveButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Main.getMain().switchToGameScreen();
+                Main.getMain().switchToGameScreen(character.getFarmType());
             }
         });
 
@@ -130,42 +130,50 @@ public class AvatarCreationView implements Screen {
         farmGrid.clear();
         farmButtons = new ImageButton[farmName.values().length];
         int index = 0;
-        for (farmName farm1 : farmName.values()) {
+        for (final farmName farmType : farmName.values()) {
             try {
-                Texture texture = new Texture(Gdx.files.internal("FarmIcons/" + farm1.getFarmName() + ".png"));
+                String fileName = farmType.getFarmName(); // Use getFarmName() consistently
+                Texture texture = new Texture(Gdx.files.internal("FarmIcons/" + fileName + ".png"));
                 ImageButton btn = new ImageButton(new TextureRegionDrawable(new TextureRegion(texture)));
-                btn.setName(farm1.getFarmName());
+                btn.setName(fileName);
 
-                final int finalIndex = index;
                 btn.addListener(new ClickListener() {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
-                        character.setFarmType(farm1);
-                        updateFarmSelection(farm1);
+                        character.setFarmType(farmType);
+                        updateFarmSelection(farmType);
                         resetFarmButtonColors();
                         btn.setColor(Color.GOLD);
                         lastSelectedFarmButton = btn;
-                        Gdx.app.log("FARM", "Selected farm: " + farm1.name());
                     }
                 });
 
-                farmButtons[index++] = btn;
+                farmButtons[index] = btn;
                 farmGrid.add(btn).size(60, 60).pad(5);
+
+                // Set initial selection state
+                if (character.getFarmType() == farmType) {
+                    btn.setColor(Color.GOLD);
+                    lastSelectedFarmButton = btn;
+                }
+
+                index++;
             } catch (Exception e) {
-                Gdx.app.error("FARM_GRID", "Failed to load icon for: " + farm1.name(), e);
+                Gdx.app.error("FARM_GRID", "Error loading: " + farmType.getFarmName(), e);
             }
         }
     }
 
+
     public void updateFarmSelection(farmName farm) {
         try {
-            Texture texture = new Texture(Gdx.files.internal("FarmIcons/" + farm.getFarmName() + ".png"));
+            String fileName = farm.getFarmName();
+            Texture texture = new Texture(Gdx.files.internal("FarmIcons/" + fileName + ".png"));
             farmPreview.setDrawable(new TextureRegionDrawable(new TextureRegion(texture)));
-
             farmNameLabel.setText(farm.getFarmName());
             farmDescription.setText(farm.getDescription());
         } catch (Exception e) {
-            Gdx.app.error("FARM_PREVIEW", "Failed to load farm preview", e);
+            Gdx.app.error("FARM_PREVIEW", "Error loading preview for: " + farm.getFarmName(), e);
         }
     }
 

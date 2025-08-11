@@ -86,10 +86,10 @@ public class Main extends Game implements NetworkEventListener {
         ));
     }
 
-    public void switchToGameScreen() {
+    public void switchToGameScreen(farmName farm) {
         Gdx.app.postRunnable(() -> {
             Screen current = getScreen();
-            setScreen(new GameScreen(this, farmName.STANDARD));
+            setScreen(new GameScreen(this, farm));
             if (current != null) {
                 current.dispose();
             }
