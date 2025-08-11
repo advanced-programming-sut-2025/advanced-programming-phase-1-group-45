@@ -31,6 +31,13 @@ import com.proj.map.farmName;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.proj.Model.EnergyBar;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.proj.Enums.Shop;
+import com.proj.View.ShopScreen;
+import com.proj.managers.ShopManager;
+import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,9 +90,11 @@ public class GameScreen implements Screen {
     private boolean showGImage = false;
     //private StoreManager storeManager;
     //private Store currentStore = null;
+    private final Main main;
     private boolean inStoreInterface = false;
     private BitmapFont font;
     private GlyphLayout glyphLayout = new GlyphLayout();
+    private ShopManager shopManager;
 
     public Refrigerator refrigerator;
     public CookingManager cookingManager;
@@ -98,10 +107,11 @@ public class GameScreen implements Screen {
 
 
 
-    public GameScreen(farmName farm) {
+    public GameScreen(Main main, farmName farm) {
         mapName = farm.getFarmName();
         this.farm = farm;
         this.mapName = farm.getFarmName();
+        this.main = main;
     }
 
     public void setPlayer(Player player) {
@@ -245,6 +255,16 @@ public class GameScreen implements Screen {
                 e.printStackTrace();
             }
         }
+    }
+
+    private Shop getCurrentShop() {
+        if (player.getPosition().x > 100 && player.getPosition().x < 200) {
+            return Shop.BLACKSMITH;
+        } else if (player.getPosition().y > 300 && player.getPosition().y < 400) {
+            return Shop.CARPENTER;
+        }
+        // Default to general store
+        return Shop.GENERAL_STORE;
     }
 
     @Override
@@ -655,6 +675,19 @@ public class GameScreen implements Screen {
                 if (animalManager != null) {
                     animalManager.printAnimalsStatus();
                 }
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+                Gdx.app.postRunnable(() -> {
+                    try {
+                        ShopScreen shopScreen = new ShopScreen(
+                            main, player, inventoryManager,
+                            shopManager, Shop.GENERAL_STORE, this
+                        );
+                        main.setScreen(shopScreen);
+                    } catch (Exception e) {
+                        Gdx.app.error("GameScreen", "Error creating shop screen", e);
+                    }
+                });
             }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.N)) {
