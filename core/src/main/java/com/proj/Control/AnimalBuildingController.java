@@ -58,10 +58,7 @@ public class AnimalBuildingController {
     private boolean showingCoopInterior = false;
     private int selectedBuildingIndex = -1;
     private String selectedAnimalType = null;
-    // Animal interaction
-    private Animal draggingAnimal = null;
-    private float dragOffsetX = 0;
-    private float dragOffsetY = 0;
+
     private Animal selectedAnimal = null;
     private boolean showingAnimalMenu = false;
 
@@ -412,8 +409,6 @@ public class AnimalBuildingController {
                     selectedAnimalType = data.name.toLowerCase();
                     selectingBuildingForAnimal = true;
 
-                    System.out.println("حیوان " + selectedAnimalType + " انتخاب شد.");
-                    System.out.println("برای قرار دادن در طویله کلید Z و برای قفس کلید X را فشار دهید.");
                     break;
                 }
             }
@@ -499,17 +494,9 @@ public class AnimalBuildingController {
         showingBarnInterior = false;
         showingCoopInterior = false;
         selectedBuildingIndex = -1;
-        draggingAnimal = null;
         showingAnimalMenu = false;
         selectedAnimal = null;
     }
-
-//    public void showInteriorView(boolean isBarn, int buildingIndex) {
-//        showingInterior = true;
-//        showingBarnInterior = isBarn;
-//        showingCoopInterior = !isBarn;
-//        selectedBuildingIndex = buildingIndex;
-//    }
 
 
 
@@ -642,7 +629,6 @@ public class AnimalBuildingController {
 
 
     private void renderAnimalList(SpriteBatch batch) {
-        // ترسیم پس‌زمینه لیست با مقیاس
         batch.draw(listBackgroundTexture, listX, listY, listWidth, listHeight);
 
         float slotWidth = listWidth / SLOTS_PER_ROW;
