@@ -10,7 +10,11 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -67,6 +71,8 @@ public class GameScreen implements Screen, ChatListener {
     private PlayerBag playerBag;
     private AnimalBuildingController animalBuildingController;
     private AnimalManager animalManager;
+
+    private ImageButton chatButton;
 
     private NPCManager npcManager;
     private Texture npcTexture;
@@ -205,8 +211,12 @@ public class GameScreen implements Screen, ChatListener {
                 Gdx.input.setInputProcessor(new InputMultiplexer(uistage));
                 mapPixelWidth = worldController.getMapWidth() * worldController.getTileWidth();
                 mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
+
                 chatSystem = new ChatSystem(main, uistage);
+                createChatButton();
+
                 main.getGameClient().addChatListener(this);
+
                 float startX = 20 * 16 + 8;
                 float startY = 28 * 16 + 8;
 
@@ -575,9 +585,6 @@ public class GameScreen implements Screen, ChatListener {
 
             float moveDistance = 16;
             boolean moved = false;
-            if (Gdx.input.isKeyJustPressed(Input.Keys.TAB)) {
-                chatSystem.toggle();
-            }
 
             if (chatSystem.isVisible()) {
                 return;
@@ -1091,5 +1098,30 @@ public class GameScreen implements Screen, ChatListener {
     @Override
     public void handleNetworkEvent(NetworkEvent event) {
 
+    }
+
+    private void createChatButton() {
+        Texture chatIcon = GameAssetManager.getGameAssetManager().getChatIcon();
+        TextureRegion chatR = new TextureRegion(chatIcon);
+
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.imageUp = new TextureRegionDrawable(chatR);
+
+        chatButton = new ImageButton(style);
+        chatButton.setSize(128, 128);
+
+        chatButton.setPosition(
+            20,
+            Gdx.graphics.getHeight() - chatButton.getWidth() - 20
+            );
+
+        chatButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                chatSystem.toggle();
+            }
+        });
+
+        uistage.addActor(chatButton);
     }
 }

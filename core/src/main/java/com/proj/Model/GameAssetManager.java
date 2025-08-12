@@ -34,6 +34,7 @@ public class GameAssetManager {
     private Texture springClock;
     private Texture summerClock;
     private Texture winterClock;
+    private Texture chatIcon;
 
     private HashMap<String, TextureRegion> weatherClocks;
 
@@ -69,6 +70,7 @@ public class GameAssetManager {
         lobbyBackgroundTexture[4] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-4.png"));
         lobbyBackgroundTexture[5] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-5.png"));
         backpackTexture = new Texture(Gdx.files.internal("assets/backpack.png"));
+        chatIcon = new Texture(Gdx.files.internal("assets/chat_icon.jpg"));
         //clock
         clockTexture = new Texture("clock/clockmy.png");
         clockHand = new Texture("clock/clock_hand.png");
@@ -142,6 +144,9 @@ public class GameAssetManager {
         return stardewSkin;
     }
 
+    public Texture getChatIcon() {
+        return chatIcon;
+    }
     public TextureRegion getTexture(String path) {
         return new TextureRegion(new Texture(Gdx.files.internal(path)));
     }

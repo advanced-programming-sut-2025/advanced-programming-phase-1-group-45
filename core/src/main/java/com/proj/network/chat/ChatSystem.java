@@ -32,7 +32,7 @@ public class ChatSystem {
     public ChatSystem(Main main, Stage stage) {
         this.main = main;
         this.stage = stage;
-        this.skin = GameAssetManager.getGameAssetManager().getSkin();
+        this.skin = GameAssetManager.getGameAssetManager().getStardewSkin();
 
         createUI();
         setupListeners();
@@ -100,6 +100,7 @@ public class ChatSystem {
     public void toggle() {
         isVisible = !isVisible;
         chatWindow.setVisible(isVisible);
+        chatWindow.center();
         if (isVisible) {
             stage.setKeyboardFocus(messageField);
         }
@@ -140,6 +141,7 @@ public class ChatSystem {
             if (isPrivate) {
                 addMessage("You to " + recipient + " (private): " + message);
             } else {
+
                 // The server will broadcast this back to all clients including us
             }
 

@@ -97,8 +97,8 @@ public class AvatarCreationView implements Screen {
         saveButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Main.getMain().getGameClient().sendStateToStartGame(character.getFarmType());
-//                Main.getMain().switchToGameScreen(character.getFarmType());
+//                Main.getMain().getGameClient().sendStateToStartGame(character.getFarmType());
+                Main.getMain().switchToGameScreen(character.getFarmType());
             }
         });
 
