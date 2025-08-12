@@ -83,7 +83,7 @@ public class CompositeMapSystem {
         background = new Texture(Gdx.files.internal("assets/background.png"));
 
         // ایجاد دایره سفید برای نشانگرها
-        whiteCircle = createCircleTexture(12, Color.WHITE);
+        whiteCircle = createCircleTexture(60, Color.WHITE);
 
         // ایجاد پنجره نقشه
         createMapWindow();
@@ -189,7 +189,6 @@ public class CompositeMapSystem {
         @Override
         public void act(float delta) {
             super.act(delta);
-            // به روزرسانی اندازه Actor متناسب با محتوای نقشه
             float width = 0, height = 0;
             for (MapConfig config : mapConfigs.values()) {
                 width = Math.max(width, config.position.x + config.position.width);
