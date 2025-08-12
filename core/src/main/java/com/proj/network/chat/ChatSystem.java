@@ -1,6 +1,7 @@
 package com.proj.network.chat;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -10,7 +11,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.proj.Main;
 import com.proj.Model.GameAssetManager;
+import com.proj.network.client.ChatListener;
+import com.proj.network.event.NetworkEvent;
 import com.proj.network.message.JsonBuilder;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -36,7 +40,7 @@ public class ChatSystem {
         this.main = main;
         this.stage = stage;
         this.skin = GameAssetManager.getGameAssetManager().getStardewSkin();
-
+//        main.getGameClient().addChatListener(this);
         createUI();
         setupListeners();
     }
@@ -199,6 +203,7 @@ public class ChatSystem {
         onlinePlayers.clear();
         onlinePlayers.add("Everyone");
         onlinePlayers.addAll(players);
+        System.err.println(players.size() + " players online");
 
         String currentSelection = recipientSelect.getSelected();
         recipientSelect.setItems(onlinePlayers.toArray(new String[0]));
