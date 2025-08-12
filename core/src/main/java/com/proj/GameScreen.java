@@ -46,6 +46,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.proj.network.chat.ChatSystem;
 import com.proj.network.client.ChatListener;
 import com.proj.network.event.NetworkEvent;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -1076,7 +1078,6 @@ public class GameScreen implements Screen, ChatListener {
         font.draw(worldController.getSpriteBatch(), "Press T to transfer from player to refrigerator", 20, 40);
         font.draw(worldController.getSpriteBatch(), "Press F to transfer from refrigerator to player", 20, 20);
 
-        // رسم پیام انتقال
         if (messageTimer > 0) {
             font.draw(worldController.getSpriteBatch(), transferMessage, Gdx.graphics.getWidth() / 2 - 100, 80);
         }
@@ -1089,9 +1090,13 @@ public class GameScreen implements Screen, ChatListener {
     public void onChatMessage(String sender, String message, boolean isPrivate) {
         if (chatSystem != null) {
             chatSystem.receiveMessage(sender, message, isPrivate);
-            showAlertIcon();
+            if (!chatSystem.isVisible()) {
+            showAlertIcon();}
+            Main.getMain().getGameClient().requestOnlinePlayers();
         }
     }
+
+
     public ChatSystem getChatSystem() {
         return chatSystem;
     }
@@ -1121,6 +1126,7 @@ public class GameScreen implements Screen, ChatListener {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 hideAlertIcon();
+                main.getGameClient().requestOnlinePlayers();
                 chatSystem.toggle();
             }
         });
@@ -1134,9 +1140,9 @@ public class GameScreen implements Screen, ChatListener {
         Texture exclamationTexture = GameAssetManager.getGameAssetManager().getExclamationIcon();
         alertIcon = new Image(new TextureRegionDrawable(new TextureRegion(exclamationTexture)));
 
-        alertIcon.setSize(50, 50);
+        alertIcon.setSize(30, 30);
         alertIcon.setPosition(
-            chatButton.getX() + chatButton.getWidth() - 25,
+            chatButton.getX() - 25,
             chatButton.getY() + chatButton.getHeight() + 10
         );
 
@@ -1149,4 +1155,23 @@ public class GameScreen implements Screen, ChatListener {
             alertIcon = null;
         }
     }
+
+    @Override
+    public void onReceivedPlayerList(String players) {
+        System.err.println("update List" + players);
+        List<String> onlinePlayers = new ArrayList<>();
+
+        JSONObject data = new JSONObject(players);
+        JSONArray playerList = data.getJSONArray("onlinePlayers");
+        for (int i = 0; i < playerList.length(); i++) {
+            JSONObject player = playerList.getJSONObject(i);
+            String username = player.getString("username");
+            if (username.equalsIgnoreCase(main.getGameClient().getUsername())) {
+                continue;
+            }
+            onlinePlayers.add(username);
+        }
+        chatSystem.updateOnlinePlayers(onlinePlayers);
+    }
+
 }

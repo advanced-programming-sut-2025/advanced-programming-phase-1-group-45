@@ -221,6 +221,7 @@ public class GameClient implements Disposable, Runnable {
             }
         } catch (Exception e) {
             fireEvent(NetworkEvent.Type.ERROR, "Error handling message: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -265,8 +266,11 @@ public class GameClient implements Disposable, Runnable {
         for (LobbyEventListener listener : lobbyListeners) {
             listener.handleLobbyEvent(
                 new LobbyEvent(LobbyEvent.Type.ONLINE_PLAYERS_RECEIVED,
-                    data.toString())
-            );
+                    data.toString()));
+        }
+        for (ChatListener listener1 : chatListeners) {
+            listener1.onReceivedPlayerList(data.toString());
+            System.out.println("send for: " + listener1.toString());
         }
     }
 
@@ -296,11 +300,15 @@ public class GameClient implements Disposable, Runnable {
         try {
             String sender = JsonParser.getString(data, "sender", "Unknown");
             String message = JsonParser.getString(data, "message", "");
-            fireEvent(NetworkEvent.Type.PRIVATE_MESSAGE, sender + ": " + message);
+            for (ChatListener listener : chatListeners) {
+                listener.onChatMessage(sender, message, true);
+            }
+//            fireChatEvent(NetworkEvent.Type.PRIVATE_MESSAGE, sender + ": " + message);
         } catch (Exception e) {
             fireEvent(NetworkEvent.Type.ERROR, "Error processing private chat: " + e.getMessage());
         }
     }
+
 
     private void handleError(JSONObject data) {
         try {
