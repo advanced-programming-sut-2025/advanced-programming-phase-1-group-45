@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.proj.Model.GameAssetManager;
 
 public class CompositeMapSystem {
     private Stage stage;
@@ -75,8 +76,8 @@ public class CompositeMapSystem {
         }
     }
 
-    public CompositeMapSystem() {
-        stage = new Stage(new ScreenViewport());
+    public CompositeMapSystem(Stage stage) {
+        this.stage = stage;
 
         // ایجاد بکگراند برای نقشه ترکیبی
         background = new Texture(Gdx.files.internal("assets/background.png"));
@@ -89,7 +90,7 @@ public class CompositeMapSystem {
 
         // تنظیم نقشه‌ها
         addMapConfig("Farm", new Texture("map_pic/farm.jpg"), 0, 0, 80 * 16, 65 * 16);
-        addMapConfig("Town", new Texture("map_pic/town.jpg"),  0, 0, 130 * 16, 110 * 16);
+        addMapConfig("Town", new Texture("map_pic/town.jpg"), 0, 0, 130 * 16, 110 * 16);
         addMapConfig("Mountain", new Texture("map_pic/mountain.jpg"), 0, 0, 1500 * 16, 2000 * 16);
         addMapConfig("Beach", new Texture("map_pic/beach.jpg"), 0, 0, 135 * 16, 41 * 16);
         addMapConfig("BusStop", new Texture("map_pic/busstop.jpg"), 0, 0, 65 * 16, 30 * 16);
@@ -102,7 +103,7 @@ public class CompositeMapSystem {
     }
 
     private void createMapWindow() {
-        Skin skin = new Skin(Gdx.files.internal("uiskin.json")); // نیاز به فایل پوست دارید
+        Skin skin = GameAssetManager.getGameAssetManager().getStardewSkin(); // نیاز به فایل پوست دارید
 
         mapWindow = new Window("Map Overview", skin);
         mapWindow.setKeepWithinStage(true);
@@ -264,7 +265,7 @@ public class CompositeMapSystem {
 
     public void closeMapWindow() {
         mapWindow.setVisible(false);
-        isWindowOpen = true;
+        isWindowOpen = false;
     }
 
     public void toggleMapWindow() {

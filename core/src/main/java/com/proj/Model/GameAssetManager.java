@@ -58,6 +58,7 @@ public class GameAssetManager {
     private Texture[] lobbyBackgroundTexture = new Texture[6];
     private Texture backpackTexture;
     private Texture exclamationIcon;
+    private Texture mapIcon;
 
 
     private GameAssetManager() {
@@ -73,6 +74,7 @@ public class GameAssetManager {
         backpackTexture = new Texture(Gdx.files.internal("assets/backpack.png"));
         chatIcon = new Texture(Gdx.files.internal("assets/chat_icon.jpg"));
         exclamationIcon = new Texture("assets/exclamation_icon.png");
+        mapIcon = new Texture("assets/");
         //clock
         clockTexture = new Texture("clock/clockmy.png");
         clockHand = new Texture("clock/clock_hand.png");

@@ -76,10 +76,9 @@ public class GameLobby {
 
     public void sendPlayerPositions() {
         JSONArray players = new JSONArray();
-        GameInstance gameInstance = getGameInstance();
+        GameInstance gameInstance = server.getGameManager().getGameInstance(id);
         if (gameInstance != null) {
-
-            for (PlayerGameState playerGameState : playerStates.values()) {
+            for (PlayerGameState playerGameState : gameInstance.getAllPlayers()) {
                 JSONObject position = new JSONObject();
                 position.put("username", playerGameState.getUsername()).put("x", playerGameState.getPosition().getX()).put("y",
                     playerGameState.getPosition().getY()).put("mapName",
@@ -90,6 +89,9 @@ public class GameLobby {
             JSONObject allPlayers = new JSONObject();
             allPlayers.put("players", players);
             broadcastMessage("PLAYER_POSITIONS", allPlayers.toString());
+            System.out.println("GAmeLobby  sending position ");
+        } else {
+            System.out.println("GAmeLobby  sending position error");
         }
     }
 

@@ -391,6 +391,7 @@ public class ClientConnectionController implements Runnable {
 
     private void sendPlayerPositions(JSONObject data) {
         sendMessage("PLAYER_POSITIONS", data);
+        System.out.println("ClientController  sending position ");
     }
 
     private void handlePlayerMovement(JSONObject data) {
@@ -409,6 +410,7 @@ public class ClientConnectionController implements Runnable {
         String mapName = data.getString("mapName");
         player.setPosition(new Position(x, y), mapName);
         currentLobby.sendPlayerPositions();
+        System.out.println("ClientController  sending position " + x + " " + y);
     }
 
     public synchronized void sendMessage(String type, JSONObject data) {

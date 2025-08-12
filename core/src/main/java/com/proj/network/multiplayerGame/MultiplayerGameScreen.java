@@ -51,6 +51,7 @@ import com.proj.network.client.ChatListener;
 import com.proj.network.client.GameEventListener;
 import com.proj.network.event.GameEvent;
 import com.proj.network.event.NetworkEvent;
+import com.proj.network.message.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -133,7 +134,6 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
         this.mapName = farm.getFarmName();
         this.main = main;
         main.getGameClient().addGameListener(this);
-        compositeMapSystem = new CompositeMapSystem();
     }
 
     public void addRemotePlayer(String player) {
@@ -226,6 +226,8 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
                 uistageViewport.apply();
                 camera.update();
                 Gdx.input.setInputProcessor(new InputMultiplexer(uistage));
+                compositeMapSystem = new CompositeMapSystem(uistage);
+
                 mapPixelWidth = worldController.getMapWidth() * worldController.getTileWidth();
                 mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
 
@@ -331,7 +333,6 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             worldController.getSpriteBatch().setProjectionMatrix(camera.combined);
 
             worldController.renderMap(camera);
-            compositeMapSystem.render();
             if (npcManager != null) {
 
                 for (NPCObject npc : npcManager.getNPCs()) {
@@ -1231,8 +1232,9 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
     }
 
     private void updatePlayersPosition(String players) {
-
-        JSONArray data = new JSONArray(players);
+        System.out.println("updatePlayersPosition " + players);
+        JSONObject pl = new JSONObject(players);
+        JSONArray data = JsonParser.getArray(pl, "players");
         for (int i = 0; i < data.length(); i++) {
             JSONObject player = data.getJSONObject(i);
             String name = player.getString("username");

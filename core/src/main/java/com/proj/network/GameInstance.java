@@ -92,7 +92,9 @@ public class GameInstance {
     public PlayerGameState getPlayerState(String username) {
         return playerStates.get(username);
     }
-
+    public List<PlayerGameState> getAllPlayers() {
+        return new ArrayList<>(playerStates.values());
+    }
     public boolean allAreReadyToPlay() {
         for (PlayerGameState playerState : playerStates.values()) {
             if (!playerState.isReadyToPlay()) {

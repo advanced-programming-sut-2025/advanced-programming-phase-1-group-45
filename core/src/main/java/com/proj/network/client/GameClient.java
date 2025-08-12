@@ -196,7 +196,7 @@ public class GameClient implements Disposable, Runnable {
                     break;
 
                     case "PLAYER_POSITIONS":
-                        fireGameEvent(GameEvent.Type.UPDATE_POSITIONS, JsonBuilder.empty() );
+                        fireGameEvent(GameEvent.Type.UPDATE_POSITIONS, data );
                         break;
 
                 case "PONG":
@@ -392,6 +392,7 @@ public class GameClient implements Disposable, Runnable {
         }
         JSONObject data = JsonBuilder.create().put("x", x).put("y", y).put("mapName", map).build();
         sendMessage("MOVE", data);
+        System.out.println("GameClient  sending position " + x + " " + y);
     }
 
     public void requestLobbiesList() {
@@ -484,6 +485,7 @@ public class GameClient implements Disposable, Runnable {
 
     private void fireGameEvent(GameEvent.Type type, JSONObject data) {
         GameEvent event = new GameEvent(type, data.toString());
+        System.out.println("sending game postion");
         for (GameEventListener listener : gameListeners) {
                 (listener).handleGameEvent(event);
         }
