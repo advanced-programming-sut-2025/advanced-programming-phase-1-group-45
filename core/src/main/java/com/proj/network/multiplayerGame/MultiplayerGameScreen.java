@@ -1136,7 +1136,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
 
         chatButton.setPosition(
             20,
-            Gdx.graphics.getHeight() - chatButton.getWidth() - 40
+            mapButton.getHeight() + 20
         );
 
         chatButton.addListener(new ClickListener() {
@@ -1153,7 +1153,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
     private ImageButton mapButton;
 
     private void createMapButton() {
-        Texture chatIcon = GameAssetManager.getGameAssetManager().getChatIcon();
+        Texture chatIcon = new Texture("assets/map_icon.jpg");
         TextureRegion chatR = new TextureRegion(chatIcon);
 
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
@@ -1232,15 +1232,25 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
     }
 
     private void updatePlayersPosition(String players) {
-        System.out.println("updatePlayersPosition " + players);
-        JSONObject pl = new JSONObject(players);
+
+        JSONObject outer = new JSONObject(players);
+
+        // 1. استخراج رشته JSON از کلید "data"
+        String dataString = outer.getString("data");
+        System.out.println("Data string: " + dataString);
+
+        // 2. تجزیه رشته به عنوان یک شیء JSON جدید
+        JSONObject pl = new JSONObject(dataString);
+
         JSONArray data = JsonParser.getArray(pl, "players");
+        System.out.println("data suze: "  +data.length());
         for (int i = 0; i < data.length(); i++) {
             JSONObject player = data.getJSONObject(i);
             String name = player.getString("username");
-            float x = player.getFloat("x");
-            float y = player.getFloat("y");
+            float x = (float) player.getDouble("x");
+            float y = (float) player.getDouble("y");
             String mapName = player.getString("mapName");
+            System.out.println(name + " " + x + " " + y);
             compositeMapSystem.updatePlayerPosition(name, mapName, x,y);
         }
     }

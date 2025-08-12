@@ -19,22 +19,22 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.proj.Model.GameAssetManager;
 
 public class CompositeMapSystem {
-    private Stage stage;
-    private Window mapWindow;
+    private final Stage stage;
+    private  Window mapWindow;
     private boolean isWindowOpen = false;
 
-    private ObjectMap<String, MapConfig> mapConfigs = new ObjectMap<>();
-    private Array<PlayerMarker> playerMarkers = new Array<>();
-    private Texture background;
-    private Texture whiteCircle;
-    private CompositeMapActor mapActor;
+    private final ObjectMap<String, MapConfig> mapConfigs = new ObjectMap<>();
+    private final Array<PlayerMarker> playerMarkers = new Array<>();
+    private final Texture background;
+    private final Texture markerTexture;
+    private  CompositeMapActor mapActor;
 
     // ساختار تنظیمات هر نقشه
     private static class MapConfig {
-        Texture mapTexture;
-        Rectangle position; // موقعیت و ابعاد در نقشه ترکیبی
-        float gameMinX, gameMinY; // حداقل مختصات در بازی
-        float gameMaxX, gameMaxY; // حداکثر مختصات در بازی
+        final Texture mapTexture;
+        final Rectangle position = new Rectangle(); // موقعیت و ابعاد در نقشه ترکیبی
+        final float gameMinX, gameMinY; // حداقل مختصات در بازی
+        final float gameMaxX, gameMaxY; // حداکثر مختصات در بازی
         float scaleX, scaleY; // فاکتورهای تبدیل مختصات
 
         public MapConfig(Texture texture,
@@ -44,10 +44,13 @@ public class CompositeMapSystem {
             this.gameMinY = minY;
             this.gameMaxX = maxX;
             this.gameMaxY = maxY;
-            this.position = new Rectangle();
+        }
 
-            this.scaleX = position.width / (gameMaxX - gameMinX);
-            this.scaleY = position.height / (gameMaxY - gameMinY);
+        public void updateScales() {
+            if (position.width > 0 && position.height > 0) {
+                this.scaleX = position.width / (gameMaxX - gameMinX);
+                this.scaleY = position.height / (gameMaxY - gameMinY);
+            }
         }
 
         public Vector2 convertToMapPosition(float gameX, float gameY) {
@@ -63,10 +66,10 @@ public class CompositeMapSystem {
 
     // ساختار نشانگر بازیکنان
     private static class PlayerMarker {
-        String playerId;
+        final String playerId;
         String mapName;
-        Vector2 position;
-        Color color;
+        final Vector2 position;
+        final Color color;
 
         public PlayerMarker(String id, String map, float x, float y, Color color) {
             this.playerId = id;
@@ -78,39 +81,39 @@ public class CompositeMapSystem {
 
     public CompositeMapSystem(Stage stage) {
         this.stage = stage;
-
-        // ایجاد بکگراند برای نقشه ترکیبی
-        background = new Texture(Gdx.files.internal("assets/background.png"));
-
-        // ایجاد دایره سفید برای نشانگرها
-        whiteCircle = createCircleTexture(60, Color.WHITE);
-
-        // ایجاد پنجره نقشه
+        background = new Texture(Gdx.files.internal("menu_bg.png")); // حذف assets/ از مسیر
+        markerTexture = createCircleTexture(12, Color.WHITE);
         createMapWindow();
+        GameAssetManager assetManager = GameAssetManager.getGameAssetManager();
 
-        // تنظیم نقشه‌ها
-        addMapConfig("Farm", new Texture("map_pic/farm.jpg"), 0, 0, 80 * 16, 65 * 16);
-        addMapConfig("Town", new Texture("map_pic/town.jpg"), 0, 0, 130 * 16, 110 * 16);
-        addMapConfig("Mountain", new Texture("map_pic/mountain.jpg"), 0, 0, 1500 * 16, 2000 * 16);
-        addMapConfig("Beach", new Texture("map_pic/beach.jpg"), 0, 0, 135 * 16, 41 * 16);
-        addMapConfig("BusStop", new Texture("map_pic/busstop.jpg"), 0, 0, 65 * 16, 30 * 16);
-        addMapConfig("Forest", new Texture("map_pic/forest.jpg"), 0, 0, 120 * 16, 120 * 16);
-        addMapConfig("Backwoods", new Texture("map_pic/backwoods.jpg"), 0, 0, 120 * 16, 120 * 16);
-
+        try {
+            addMapConfig("Farm", new Texture("map_pic/farm.jpg"), 0, 0, 80 * 16, 65 * 16);
+            addMapConfig("Town", new Texture("map_pic/town.jpg"), 0, 0, 130 * 16, 110 * 16);
+            addMapConfig("Mountain", new Texture("map_pic/mountain.jpg"), 0, 0, 135 * 16, 41 * 16);
+            addMapConfig("Beach", new Texture("map_pic/beach.jpg"), 0, 0, 104 * 16, 50 * 16);
+            addMapConfig("BusStop", new Texture("map_pic/busstop.jpg"), 0, 0, 65 * 16, 30 * 16);
+            addMapConfig("Forest", new Texture("map_pic/forest.jpg"), 0, 0, 120 * 16, 120 * 16);
+            addMapConfig("BackWoods", new Texture("map_pic/backwoods.jpg"), 0, 0, 50 * 16, 40 * 16);
+        } catch (Exception e) {
+            Gdx.app.error("CompositeMapSystem", "Error loading map textures", e);
+        }
 
         // محاسبه چیدمان نقشه‌ها
         arrangeMaps();
     }
 
     private void createMapWindow() {
-        Skin skin = GameAssetManager.getGameAssetManager().getStardewSkin(); // نیاز به فایل پوست دارید
+        Skin skin = GameAssetManager.getGameAssetManager().getStardewSkin();
 
         mapWindow = new Window("Map Overview", skin);
         mapWindow.setKeepWithinStage(true);
         mapWindow.setResizable(true);
         mapWindow.setMovable(true);
-        mapWindow.setSize(800, 600);
-        mapWindow.setPosition(100, 100);
+        mapWindow.setSize(1500, 600);
+        mapWindow.setPosition(
+            (Gdx.graphics.getWidth() - mapWindow.getWidth()) / 2,
+            (Gdx.graphics.getHeight() - mapWindow.getHeight()) / 2
+        );
         mapWindow.setVisible(false);
 
         // دکمه بستن
@@ -121,7 +124,7 @@ public class CompositeMapSystem {
                 closeMapWindow();
             }
         });
-        mapWindow.getTitleTable().add(closeButton).size(30, 30);
+        mapWindow.getTitleTable().add(closeButton).size(30, 30).padRight(5);
 
         // Actor برای نمایش نقشه
         mapActor = new CompositeMapActor();
@@ -134,18 +137,17 @@ public class CompositeMapSystem {
 
         // کشیدن پنجره با نگه داشتن هر جای آن
         mapWindow.addListener(new InputListener() {
-            private float startX, startY;
+            private Vector2 dragOffset = new Vector2();
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                startX = x;
-                startY = y;
+                dragOffset.set(x, y);
                 return true;
             }
 
             @Override
             public void touchDragged(InputEvent event, float x, float y, int pointer) {
-                mapWindow.moveBy(x - startX, y - startY);
+                mapWindow.moveBy(x - dragOffset.x, y - dragOffset.y);
             }
         });
     }
@@ -174,11 +176,12 @@ public class CompositeMapSystem {
                     // تنظیم رنگ بازیکن
                     batch.setColor(marker.color);
 
-                    // رسم نشانگر
-                    batch.draw(whiteCircle,
+                    // رسم نشانگر (اندازه ثابت)
+                    batch.draw(markerTexture,
                         getX() + mapPos.x - 6,
                         getY() + mapPos.y - 6,
                         12, 12);
+                    System.out.println("keshidam");
 
                     // بازگردانی رنگ پیش‌فرض
                     batch.setColor(Color.WHITE);
@@ -199,7 +202,7 @@ public class CompositeMapSystem {
     }
 
     private void arrangeMaps() {
-        float padding = 30; // فاصله بین نقشه‌ها
+        float padding = 30;
         float currentX = 20;
         float currentY = 20;
         float rowHeight = 0;
@@ -220,6 +223,9 @@ public class CompositeMapSystem {
                 config.mapTexture.getHeight()
             );
 
+            // 4. محاسبه مقیاس‌ها بعد از تنظیم موقعیت
+            config.updateScales();
+
             // به‌روزرسانی موقعیت برای نقشه بعدی
             currentX += config.mapTexture.getWidth() + padding;
             rowHeight = Math.max(rowHeight, config.mapTexture.getHeight());
@@ -228,24 +234,28 @@ public class CompositeMapSystem {
 
     public void addMapConfig(String mapName, Texture texture,
                              float minX, float minY, float maxX, float maxY) {
-        mapConfigs.put(mapName, new MapConfig(texture, minX, minY, maxX, maxY));
+        if (texture != null) {
+            mapConfigs.put(mapName, new MapConfig(texture, minX, minY, maxX, maxY));
+        }
     }
 
     public void updatePlayerPosition(String playerId, String mapName, float x, float y) {
         PlayerMarker marker = findPlayerMarker(playerId);
         if (marker == null) {
-            Color color = new Color(
-                (float) Math.random() * 0.5f + 0.5f,
-                (float) Math.random() * 0.5f + 0.5f,
-                (float) Math.random() * 0.5f + 0.5f,
-                1
-            );
+            Color color = generateDistinctColor(playerId.hashCode());
             marker = new PlayerMarker(playerId, mapName, x, y, color);
             playerMarkers.add(marker);
         } else {
             marker.mapName = mapName;
             marker.position.set(x, y);
         }
+    }
+
+    // 5. تولید رنگ‌های متمایز بر اساس ID بازیکن
+    private Color generateDistinctColor(int seed) {
+        float hue = (seed & 0xFFFFFF) / 16777215.0f; // محدوده 0-1
+//        return Color.rgb888(1f, new float[]{hue * 360, 0.8f, 0.9f});
+        return Color.WHITE;
     }
 
     private PlayerMarker findPlayerMarker(String playerId) {
@@ -260,6 +270,7 @@ public class CompositeMapSystem {
     public void openMapWindow() {
         mapWindow.setVisible(true);
         isWindowOpen = true;
+        mapWindow.toFront(); // پنجره را به جلو بیاور
     }
 
     public void closeMapWindow() {
@@ -284,21 +295,27 @@ public class CompositeMapSystem {
 
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);
+        // بازنشانی موقعیت پنجره هنگام تغییر سایز
+        mapWindow.setPosition(
+            (width - mapWindow.getWidth()) / 2,
+            (height - mapWindow.getHeight()) / 2
+        );
     }
 
     public void dispose() {
-        stage.dispose();
         background.dispose();
-        whiteCircle.dispose();
+        markerTexture.dispose();
         for (MapConfig config : mapConfigs.values()) {
             config.mapTexture.dispose();
         }
+        // نکته: stage توسط سازنده خارجی مدیریت می‌شود
     }
 
-    private Texture createCircleTexture(int size, Color color) {
+    private Texture createCircleTexture(int radius, Color color) {
+        int size = radius * 2;
         Pixmap pixmap = new Pixmap(size, size, Pixmap.Format.RGBA8888);
         pixmap.setColor(color);
-        pixmap.fillCircle(size / 2, size / 2, size / 2);
+        pixmap.fillCircle(radius, radius, radius);
         Texture texture = new Texture(pixmap);
         pixmap.dispose();
         return texture;
