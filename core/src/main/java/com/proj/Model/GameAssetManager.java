@@ -57,6 +57,7 @@ public class GameAssetManager {
     private TextureRegion defaultIngredientTexture;
     private Texture[] lobbyBackgroundTexture = new Texture[6];
     private Texture backpackTexture;
+    private Texture exclamationIcon;
 
 
     private GameAssetManager() {
@@ -71,6 +72,7 @@ public class GameAssetManager {
         lobbyBackgroundTexture[5] = new Texture(Gdx.files.internal("lobbyScreenBackground/8wrj34bkyx6e1-5.png"));
         backpackTexture = new Texture(Gdx.files.internal("assets/backpack.png"));
         chatIcon = new Texture(Gdx.files.internal("assets/chat_icon.jpg"));
+        exclamationIcon = new Texture("assets/exclamation_icon.png");
         //clock
         clockTexture = new Texture("clock/clockmy.png");
         clockHand = new Texture("clock/clock_hand.png");
@@ -154,7 +156,9 @@ public class GameAssetManager {
     public TextureRegion getSnowflake() {
         return snowflake;
     }
-
+    public Texture getExclamationIcon() {
+        return exclamationIcon;
+    }
     public BitmapFont getTinyFont() {
         return tinyFont;
     }

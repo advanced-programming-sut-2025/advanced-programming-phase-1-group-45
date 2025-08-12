@@ -1,10 +1,13 @@
 package com.proj.network.chat;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.proj.Main;
 import com.proj.Model.GameAssetManager;
 import com.proj.network.message.JsonBuilder;
@@ -21,7 +24,7 @@ public class ChatSystem {
     private Window chatWindow;
     private TextArea chatHistory;
     private TextField messageField;
-    private TextButton sendButton;
+    private ImageButton sendButton;
     private SelectBox<String> recipientSelect;
     private CheckBox privateCheckbox;
 
@@ -40,8 +43,8 @@ public class ChatSystem {
 
     private void createUI() {
         chatWindow = new Window("Chat", skin);
-        chatWindow.setSize(400, 300);
-        chatWindow.setPosition(20, 20);
+        chatWindow.setSize(600, 400);
+        chatWindow.setPosition(20,20);
         chatWindow.setMovable(true);
         chatWindow.setResizable(true);
 
@@ -50,7 +53,14 @@ public class ChatSystem {
 
         messageField = new TextField("", skin);
 
-        sendButton = new TextButton("Send", skin);
+        Texture sendIcon = new Texture("assets/send_icon.png");
+        TextureRegion chatR = new TextureRegion(sendIcon);
+
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.imageUp = new TextureRegionDrawable(chatR);
+
+        sendButton = new ImageButton(style);
+        sendButton.setSize(64, 64);
 
         recipientSelect = new SelectBox<>(skin);
         recipientSelect.setItems("Everyone");
@@ -61,8 +71,8 @@ public class ChatSystem {
         contentTable.add(chatHistory).colspan(3).expand().fill().pad(5).row();
 
         Table inputTable = new Table();
-        inputTable.add(privateCheckbox).left().padRight(5);
-        inputTable.add(recipientSelect).width(120).padRight(5);
+        inputTable.add(privateCheckbox).left().padRight(45);
+        inputTable.add(recipientSelect).width(300).padRight(5);
         contentTable.add(inputTable).colspan(3).left().padBottom(5).row();
 
         contentTable.add(messageField).expandX().fillX().pad(5);

@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -1088,6 +1089,7 @@ public class GameScreen implements Screen, ChatListener {
     public void onChatMessage(String sender, String message, boolean isPrivate) {
         if (chatSystem != null) {
             chatSystem.receiveMessage(sender, message, isPrivate);
+            showAlertIcon();
         }
     }
     public ChatSystem getChatSystem() {
@@ -1112,16 +1114,39 @@ public class GameScreen implements Screen, ChatListener {
 
         chatButton.setPosition(
             20,
-            Gdx.graphics.getHeight() - chatButton.getWidth() - 20
+            Gdx.graphics.getHeight() - chatButton.getWidth() - 40
             );
 
         chatButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                hideAlertIcon();
                 chatSystem.toggle();
             }
         });
 
         uistage.addActor(chatButton);
+    }
+
+    private com.badlogic.gdx.scenes.scene2d.ui.Image alertIcon;
+
+    private void showAlertIcon() {
+        Texture exclamationTexture = GameAssetManager.getGameAssetManager().getExclamationIcon();
+        alertIcon = new Image(new TextureRegionDrawable(new TextureRegion(exclamationTexture)));
+
+        alertIcon.setSize(50, 50);
+        alertIcon.setPosition(
+            chatButton.getX() + chatButton.getWidth() - 25,
+            chatButton.getY() + chatButton.getHeight() + 10
+        );
+
+        uistage.addActor(alertIcon);
+    }
+
+    private void hideAlertIcon() {
+        if (alertIcon != null) {
+            alertIcon.remove();
+            alertIcon = null;
+        }
     }
 }
