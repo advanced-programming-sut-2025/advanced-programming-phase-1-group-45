@@ -40,6 +40,7 @@ public class Main extends Game implements NetworkEventListener {
     private static final int SERVER_PORT = 8080;
     private DatabaseHelper dbHelper;
     private LobbyScreen lobbyScreen;
+    private Music currentMusic;
 
     /*@Override
     public void create() {
@@ -71,6 +72,22 @@ public class Main extends Game implements NetworkEventListener {
         setScreen(new EntranceScreen(this));
 
         loadMusic();
+    }
+
+    public void playMusic(Music music) {
+        if (currentMusic != null) {
+            currentMusic.stop();
+        }
+        currentMusic = music;
+        currentMusic.setLooping(true);
+        currentMusic.play();
+    }
+
+    public void stopMusic() {
+        if (currentMusic != null) {
+            currentMusic.stop();
+            currentMusic = null;
+        }
     }
 //ino comment kardam chon nemidoonestam parametr avali ro chi bedam*******************
     /*public void startNewGame() {// in jadide
