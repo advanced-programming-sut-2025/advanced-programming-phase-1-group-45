@@ -331,6 +331,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             worldController.getSpriteBatch().setProjectionMatrix(camera.combined);
 
             worldController.renderMap(camera);
+            compositeMapSystem.render();
             if (npcManager != null) {
 
                 for (NPCObject npc : npcManager.getNPCs()) {
@@ -1168,8 +1169,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
         mapButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                compositeMapSystem.render(worldController.getSpriteBatch(),
-                    0,0,Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                compositeMapSystem.toggleMapWindow();
             }
         });
 
