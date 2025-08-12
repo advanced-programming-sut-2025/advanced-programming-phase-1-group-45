@@ -286,6 +286,26 @@ public class GameScreen implements Screen, ChatListener {
         return Shop.GENERAL_STORE;
     }
 
+    private void handleAnimalBuildingClick() {
+        if (animalBuildingController == null || !animalBuildingController.isShowingInterior()) {
+            return;
+        }
+
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            float mouseX = Gdx.input.getX();
+            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // تبدیل به مختصات Y بالا
+
+            // چاپ مختصات کلیک برای دیباگ
+            System.out.println("کلیک در مختصات: X=" + mouseX + ", Y=" + mouseY);
+
+            // بررسی کلیک روی حیوان
+            if (animalBuildingController.handleClick(mouseX, mouseY)) {
+                System.out.println("کلیک روی حیوان تشخیص داده شد!");
+            }
+        }
+    }
+
+
     @Override
     public void render(float delta) {
         try {
@@ -343,6 +363,9 @@ public class GameScreen implements Screen, ChatListener {
             if (animalBuildingController != null) {
                 animalBuildingController.render(worldController.getSpriteBatch());
             }
+
+            handleAnimalBuildingClick();
+
 
             if (playerBag != null) {
                 playerBag.render(worldController.getSpriteBatch(), camera);
@@ -578,9 +601,47 @@ public class GameScreen implements Screen, ChatListener {
                 (animalBuildingController.isPlacingBarn() ||
                     animalBuildingController.isPlacingCoop() ||
                     animalBuildingController.isShowingInterior() ||
-                    animalBuildingController.isShowingAnimalList())) {  // اضافه کردن این شرط
-                System.out.println("Skipping player movement - special state active");
+                    animalBuildingController.isShowingAnimalList())) {
+                // کنترل‌های مخصوص حالت‌های خاص حیوانات
+                if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+                    if (animalBuildingController.isShowingInterior()) {
+                        animalBuildingController.closeInteriorView();
+                    } else if (animalBuildingController.isShowingAnimalList()) {
+                        animalBuildingController.setShowingAnimalList(false);
+                    } else if (animalBuildingController.isPlacingBarn() || animalBuildingController.isPlacingCoop()) {
+                        animalBuildingController.cancelPlacement();
+                    }
+                }
                 return;
+            }
+
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.SLASH)) {
+                if (animalBuildingController != null) {
+                    // بررسی وجود طویله‌ها
+                    if (animalBuildingController.hasBarn()) {
+                        // نمایش اولین طویله (یا طویله نزدیک به بازیکن)
+                        animalBuildingController.showNearestBarn(player.getPosition().x, player.getPosition().y);
+                    } else {
+                        // نمایش پیام خطا
+                        System.out.println("هیچ طویله‌ای در نقشه وجود ندارد!");
+                        // می‌توانید اینجا یک پیام گرافیکی به کاربر نمایش دهید
+                    }
+                }
+            }
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.BACKSLASH)) {
+                if (animalBuildingController != null) {
+                    // بررسی وجود قفس‌ها
+                    if (animalBuildingController.hasCoop()) {
+                        // نمایش اولین قفس (یا قفس نزدیک به بازیکن)
+                        animalBuildingController.showNearestCoop(player.getPosition().x, player.getPosition().y);
+                    } else {
+                        // نمایش پیام خطا
+                        System.out.println("هیچ قفسی در نقشه وجود ندارد!");
+                        // می‌توانید اینجا یک پیام گرافیکی به کاربر نمایش دهید
+                    }
+                }
             }
 
             if (player.isMoving() || player.isFainted() || player.isFainting()) {
@@ -695,7 +756,6 @@ public class GameScreen implements Screen, ChatListener {
 //                Gdx.app.log("GameScreen", "Player started moving");
             }
 
-            // کدهای مربوط به حیوانات
             if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
                 if (animalManager != null) {
                     animalManager.printAnimalsStatus();
@@ -1022,15 +1082,12 @@ public class GameScreen implements Screen, ChatListener {
         for (int i = 0; i < inventoryManager.getPlayerInventory().getCapacity(); i++) {
             InventoryItem item = inventoryManager.getPlayerInventory().getItem(i);
             if (item != null) {
-                // رسم آیتم
                 if (item.getTexture() != null) {
                     worldController.getSpriteBatch().draw(item.getTexture(), x, y, 32, 32);
                 }
 
-                // رسم نام و تعداد
                 font.draw(worldController.getSpriteBatch(), item.getName() + " x" + item.getQuantity(), x + 40, y + 16);
 
-                // رسم کادر انتخاب
                 if (i == selectedPlayerSlot) {
                     worldController.getSpriteBatch().setColor(1, 1, 0, 0.5f);
                     worldController.getSpriteBatch().draw(whitePixel, x - 2, y - 2, 36, 36);
@@ -1047,7 +1104,6 @@ public class GameScreen implements Screen, ChatListener {
             }
         }
 
-        // رسم موجودی یخچال
         font.draw(worldController.getSpriteBatch(), "Refrigerator Contents:", 20, Gdx.graphics.getHeight() / 2);
         x = 20;
         y = Gdx.graphics.getHeight() / 2 - 40;
@@ -1056,15 +1112,12 @@ public class GameScreen implements Screen, ChatListener {
         for (int i = 0; i < refrigerator.getInventory().getCapacity(); i++) {
             InventoryItem item = refrigerator.getInventory().getItem(i);
             if (item != null) {
-                // رسم آیتم
                 if (item.getTexture() != null) {
                     worldController.getSpriteBatch().draw(item.getTexture(), x, y, 32, 32);
                 }
 
-                // رسم نام و تعداد
                 font.draw(worldController.getSpriteBatch(), item.getName() + " x" + item.getQuantity(), x + 40, y + 16);
 
-                // رسم کادر انتخاب
                 if (i == selectedRefrigeratorSlot) {
                     worldController.getSpriteBatch().setColor(1, 1, 0, 0.5f);
                     worldController.getSpriteBatch().draw(whitePixel, x - 2, y - 2, 36, 36);
@@ -1081,7 +1134,6 @@ public class GameScreen implements Screen, ChatListener {
             }
         }
 
-        // رسم راهنما
         font.draw(worldController.getSpriteBatch(), "Click on items to select them", 20, 60);
         font.draw(worldController.getSpriteBatch(), "Press T to transfer from player to refrigerator", 20, 40);
         font.draw(worldController.getSpriteBatch(), "Press F to transfer from refrigerator to player", 20, 20);
@@ -1099,7 +1151,7 @@ public class GameScreen implements Screen, ChatListener {
         if (chatSystem != null) {
             chatSystem.receiveMessage(sender, message, isPrivate);
             if (!chatSystem.isVisible()) {
-            showAlertIcon();}
+                showAlertIcon();}
             Main.getMain().getGameClient().requestOnlinePlayers();
         }
     }
@@ -1128,7 +1180,7 @@ public class GameScreen implements Screen, ChatListener {
         chatButton.setPosition(
             20,
             Gdx.graphics.getHeight() - chatButton.getWidth() - 40
-            );
+        );
 
         chatButton.addListener(new ClickListener() {
             @Override
@@ -1183,3 +1235,4 @@ public class GameScreen implements Screen, ChatListener {
     }
 
 }
+
