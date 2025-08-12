@@ -48,6 +48,7 @@ import com.proj.network.client.ChatListener;
 import com.proj.network.event.NetworkEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import com.proj.Radio.RadioMenuScreen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -843,10 +844,17 @@ public class GameScreen implements Screen, ChatListener {
                 // جلوگیری از پردازش سایر ورودی‌ها وقتی رابط کاربری یخچال باز است
                 return;
             }
-
-
-
-
+            if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+                Gdx.app.postRunnable(() -> {
+                    try {
+                        RadioMenuScreen radioScreen = new RadioMenuScreen(main, this);
+                        main.setScreen(radioScreen);
+                        Gdx.app.log("GameScreen", "Opened radio menu");
+                    } catch (Exception e) {
+                        Gdx.app.error("GameScreen", "Error opening radio menu", e);
+                    }
+                });
+            }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
                 InventoryItem selectedItem = inventoryManager.getPlayerInventory().getSelectedItem();
