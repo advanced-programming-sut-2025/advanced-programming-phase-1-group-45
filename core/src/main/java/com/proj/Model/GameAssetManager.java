@@ -74,7 +74,11 @@ public class GameAssetManager {
         backpackTexture = new Texture(Gdx.files.internal("assets/backpack.png"));
         chatIcon = new Texture(Gdx.files.internal("assets/chat_icon.jpg"));
         exclamationIcon = new Texture("assets/exclamation_icon.png");
+<<<<<<< HEAD
 //        mapIcon = new Texture("assets/");
+=======
+    
+>>>>>>> fd2d8fd7190b074621a9abf44300455f26675ab0
         //clock
         clockTexture = new Texture("clock/clockmy.png");
         clockHand = new Texture("clock/clock_hand.png");

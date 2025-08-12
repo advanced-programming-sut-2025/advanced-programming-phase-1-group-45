@@ -5,14 +5,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.utils.Array;
 import com.proj.map.GameMap;
 import com.proj.Model.Animal.Animal;
 
@@ -22,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 public class AnimalBuildingController {
-    // Building textures
     private Texture barnTexture;
     private Texture coopTexture;
     private Texture barnInteriorTexture;
@@ -47,8 +42,6 @@ public class AnimalBuildingController {
     private int coopCount = 0;
     private int selectedListIndex = -1; // شاخص حیوان انتخاب شده در لیست
     private boolean highlightSelection = false; // برای نمایش انتخاب فعلی
-    private boolean waitingForBuildingSelection = false;
-    // Animals in buildings
     private List<Animal>[] animalsInBarns = new List[100];
     private List<Animal>[] animalsInCoops = new List[100];
 
@@ -59,31 +52,9 @@ public class AnimalBuildingController {
     private int selectedBuildingIndex = -1;
     private String selectedAnimalType = null;
 
-    private Animal selectedAnimal = null;
-    private boolean showingAnimalMenu = false;
-
-    // Free animals
     private List<Animal> freeAnimals = new ArrayList<>();
-    private static final float DIRECTION_CHANGE_INTERVAL = 2.0f;
-    private static final float MAX_DISTANCE = 5 * 16; // Assuming tileSize is 16
 
-    // Animal animations
-    private Map<String, Animation<TextureRegion>> walkUpAnimations = new HashMap<>();
-    private Map<String, Animation<TextureRegion>> walkDownAnimations = new HashMap<>();
-    private Map<String, Animation<TextureRegion>> walkLeftAnimations = new HashMap<>();
-    private Map<String, Animation<TextureRegion>> walkRightAnimations = new HashMap<>();
-    private Map<String, Animation<TextureRegion>> petAnimations = new HashMap<>();
-    private Map<String, Animation<TextureRegion>> feedAnimations = new HashMap<>();
-    private Map<String, TextureRegion> idleFrames = new HashMap<>();
-    private static final float FRAME_DURATION = 0.15f;
 
-    // Rendering
-    private ShapeRenderer shapeRenderer;
-    private float interiorX;
-    private float interiorY;
-    private float interiorScale = 0f;
-
-    // UI components
     private BitmapFont font;
     private BitmapFont animalNameFont;
     private GlyphLayout layout;
@@ -103,19 +74,10 @@ public class AnimalBuildingController {
     private float cameraX = 0;
     private float cameraY = 0;
     public boolean selectingBuildingForAnimal = false;
-    // Textures
     private Map<String, Texture> animalTextures = new HashMap<>();
     private Map<String, Texture> productTextures = new HashMap<>();
     private Texture hayHopperTexture;
     private Texture hayHopperFullTexture;
-
-    // Animation state
-    private Animal feedingAnimal = null;
-    private float feedingTime = 0;
-    private static final float FEEDING_DURATION = 2.0f;
-    private Animal pettingAnimal = null;
-    private float pettingTime = 0;
-    private static final float PETTING_DURATION = 2.0f;
 
     public static class AnimalDisplayData {
         public String name;
@@ -152,8 +114,6 @@ public class AnimalBuildingController {
                 animalsInCoops[i] = new ArrayList<>();
             }
 
-            // Initialize rendering tools
-            shapeRenderer = new ShapeRenderer();
             font = new BitmapFont();
             animalNameFont = new BitmapFont();
             animalNameFont.setColor(Color.BLACK);
@@ -164,10 +124,8 @@ public class AnimalBuildingController {
             updateListPosition();
             loadAnimalsToDisplay();
 
-            // Load animal textures and animations
             loadAnimalTextures();
             loadAnimalListTextures();
-            loadAnimalAnimations();
 
         } catch (Exception e) {
             Gdx.app.error("AnimalBuildingController", "Error loading textures", e);
@@ -190,13 +148,10 @@ public class AnimalBuildingController {
     }
 
     private void updateListPosition() {
-        // Scale the list to make it smaller
         listWidth = listBackgroundTexture.getWidth() * listScale;
         listHeight = listBackgroundTexture.getHeight() * listScale;
 
-        // Position the list relative to camera position
-        float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();
+
 
         // نمایش لیست در گوشه بالا سمت راست دوربین
         listX = cameraX-100 ; // تنظیم فاصله از مرکز دوربین
@@ -248,106 +203,9 @@ public class AnimalBuildingController {
         productTextures.put("Dinosaur_Egg", new Texture(Gdx.files.internal("assets/Animals/AnimalProducts/Dinosaur_Egg.png")));
     }
 
-    private void loadAnimalAnimations() {
-        String[] animalTypes = {"cow", "chicken", "sheep", "goat", "pig", "duck", "rabbit", "dinosaur"};
-
-        for (String animalType : animalTypes) {
-            Texture spriteSheet = animalTextures.get(animalType);
-
-            if (spriteSheet != null) {
-                int cols = 4; // تعداد ستون‌ها همیشه 4 است
-                int rows;
-
-                // تنظیم تعداد ردیف‌ها براساس نوع حیوان
-                if (animalType.equals("rabbit") || animalType.equals("chicken") || animalType.equals("dinosaur")) {
-                    rows = 7;
-                } else if (animalType.equals("duck")) {
-                    rows = 14;
-                } else {
-                    rows = 4; // برای گاو، گوسفند، بز و خوک
-                }
-
-                int frameWidth = spriteSheet.getWidth() / cols;
-                int frameHeight = spriteSheet.getHeight() / rows;
-
-                // تقسیم اسپرایت‌شیت به فریم‌ها
-                TextureRegion[][] tmp = TextureRegion.split(spriteSheet, frameWidth, frameHeight);
-
-                // ذخیره فریم ایستا
-                idleFrames.put(animalType, tmp[0][0]);
-
-                // ساخت انیمیشن‌ها براساس نوع حیوان
-                switch (animalType) {
-                    case "cow":
-                    case "goat":
-                    case "sheep":
-                    case "pig":
-                        // ردیف اول: حرکت به پایین
-                        walkDownAnimations.put(animalType, createAnimation(tmp[0], 0, 4));
-                        // ردیف دوم: حرکت به چپ/راست
-                        walkLeftAnimations.put(animalType, createFlippedAnimation(tmp[1], 0, 4));
-                        walkRightAnimations.put(animalType, createAnimation(tmp[1], 0, 4));
-                        // ردیف سوم: حرکت به بالا
-                        walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
-                        // ردیف چهارم: ناز کردن
-                        petAnimations.put(animalType, createAnimation(tmp[3], 0, 4));
-                        break;
-
-                    case "rabbit":
-                    case "dinosaur":
-                        walkDownAnimations.put(animalType, createAnimation(tmp[0], 0, 4));
-                        walkLeftAnimations.put(animalType, createFlippedAnimation(tmp[1], 0, 4));
-                        walkRightAnimations.put(animalType, createAnimation(tmp[1], 0, 4));
-                        walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
-                        // ردیف پنجم: ناز کردن
-                        petAnimations.put(animalType, createAnimation(tmp[4], 0, 4));
-                        break;
-
-                    case "chicken":
-                        walkLeftAnimations.put(animalType, createAnimation(tmp[0], 0, 4));
-                        walkRightAnimations.put(animalType, createAnimation(tmp[1], 0, 4));
-                        walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
-                        walkDownAnimations.put(animalType, createAnimation(tmp[3], 0, 4));
-                        // ردیف پنجم: ناز کردن
-                        petAnimations.put(animalType, createAnimation(tmp[4], 0, 4));
-                        break;
-
-                    case "duck":
-                        walkLeftAnimations.put(animalType, createAnimation(tmp[0], 0, 4));
-                        walkRightAnimations.put(animalType, createFlippedAnimation(tmp[0], 0, 4));
-                        walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
-                        walkDownAnimations.put(animalType, createAnimation(tmp[3], 0, 4));
-                        // ردیف دوازدهم: ناز کردن
-                        petAnimations.put(animalType, createAnimation(tmp[12], 0, 4));
-                        break;
-                }
-            }
-        }
-    }
-
-    private Animation<TextureRegion> createAnimation(TextureRegion[] frames, int startIndex, int frameCount) {
-        Array<TextureRegion> animationFrames = new Array<>(TextureRegion.class);
-        for (int i = startIndex; i < startIndex + frameCount && i < frames.length; i++) {
-            animationFrames.add(frames[i]);
-        }
-        return new Animation<>(FRAME_DURATION, animationFrames, Animation.PlayMode.LOOP);
-    }
-
-    private Animation<TextureRegion> createFlippedAnimation(TextureRegion[] frames, int startIndex, int frameCount) {
-        Array<TextureRegion> animationFrames = new Array<>(TextureRegion.class);
-        for (int i = startIndex; i < startIndex + frameCount && i < frames.length; i++) {
-            TextureRegion region = new TextureRegion(frames[i]);
-            region.flip(true, false); // برعکس کردن افقی
-            animationFrames.add(region);
-        }
-        return new Animation<>(FRAME_DURATION, animationFrames, Animation.PlayMode.LOOP);
-    }
-
-
 
 
     public void update(float delta) {
-        // کنترل‌های جابجایی ساختمان‌ها
         if (isPlacingBarn) {
             if (Gdx.input.isKeyPressed(Input.Keys.W)) {
                 barnY += MOVEMENT_SPEED;
@@ -415,71 +273,38 @@ public class AnimalBuildingController {
         }
 
         if (selectedAnimalType != null && selectingBuildingForAnimal) {
-            // انتخاب طویله با کلید Z
             if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
                 if (barnCount > 0) {
                     transferAnimalToBuilding(selectedAnimalType, true, 0);
                     selectingBuildingForAnimal = false;
                     selectedAnimalType = null;
-                } else {
-                    System.out.println("هیچ طویله‌ای وجود ندارد!");
                 }
                 return;
             }
 
-            // انتخاب قفس با کلید X
             if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
                 if (coopCount > 0) {
                     transferAnimalToBuilding(selectedAnimalType, false, 0);
                     selectingBuildingForAnimal = false;
                     selectedAnimalType = null;
-                } else {
-                    System.out.println("هیچ قفسی وجود ندارد!");
                 }
                 return;
             }
 
-            // لغو انتخاب با ESCAPE
             if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
                 selectedAnimalType = null;
                 selectingBuildingForAnimal = false;
-                System.out.println("انتخاب حیوان لغو شد.");
             }
         }
 
 
         // کنترل‌های داخل ساختمان
         if (showingInterior) {
-            // کلیدهای تعامل با حیوان انتخاب شده
-            if (selectedAnimal != null) {
-                if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-                    startPetting(selectedAnimal);
-                }
-                if (Gdx.input.isKeyJustPressed(Input.Keys.F)) {
-                    startFeeding(selectedAnimal);
-                }
-                if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-                    selectedAnimal.setOutside(!selectedAnimal.isOutside());
-                }
-                if (Gdx.input.isKeyJustPressed(Input.Keys.C)) {
-                    if (selectedAnimal.hasProduct()) {
-                        selectedAnimal.collectProduct();
-                    }
-                }
-                if (Gdx.input.isKeyJustPressed(Input.Keys.S)) {
-                    sellAnimal(selectedAnimal);
-                    selectedAnimal = null;
-                    showingAnimalMenu = false;
-                }
-            }
-
-            // خروج از نمای داخلی با ESCAPE
             if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
                 closeInteriorView();
             }
         }
 
-        // نمایش/مخفی کردن لیست حیوانات با کلید L
         if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
             showingAnimalList = !showingAnimalList;
             if (showingAnimalList) {
@@ -494,64 +319,8 @@ public class AnimalBuildingController {
         showingBarnInterior = false;
         showingCoopInterior = false;
         selectedBuildingIndex = -1;
-        showingAnimalMenu = false;
-        selectedAnimal = null;
     }
 
-
-
-
-
-    private void chooseRandomDirection(Animal animal) {
-        int direction = (int)(Math.random() * 5);
-        Animal.Direction newDirection;
-
-        switch (direction) {
-            case 0: newDirection = Animal.Direction.UP; break;
-            case 1: newDirection = Animal.Direction.DOWN; break;
-            case 2: newDirection = Animal.Direction.LEFT; break;
-            case 3: newDirection = Animal.Direction.RIGHT; break;
-            default:
-                animal.setMoving(false);
-                return;
-        }
-
-        animal.setDirection(newDirection);
-        animal.setMoving(true);
-    }
-
-    private void updateAnimalPosition(Animal animal, float delta) {
-        float currentX = animal.getX();
-        float currentY = animal.getY();
-        float nextX = currentX;
-        float nextY = currentY;
-        float moveAmount = 80f * delta;
-
-        switch (animal.getDirection()) {
-            case UP: nextY += moveAmount; break;
-            case DOWN: nextY -= moveAmount; break;
-            case LEFT: nextX -= moveAmount; break;
-            case RIGHT: nextX += moveAmount; break;
-        }
-
-        float homeX = currentX;
-        float homeY = currentY;
-        float distanceFromHome = (float) Math.sqrt(Math.pow(nextX - homeX, 2) + Math.pow(nextY - homeY, 2));
-
-        if (distanceFromHome <= MAX_DISTANCE && canMoveTo(nextX, nextY)) {
-            animal.setX(nextX);
-            animal.setY(nextY);
-        } else {
-            animal.setMoving(false);
-            chooseRandomDirection(animal);
-        }
-    }
-
-    private boolean canMoveTo(float x, float y) {
-        float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();
-        return x >= 0 && y >= 0 && x + 64 <= screenWidth && y + 64 <= screenHeight;
-    }
 
     public void render(SpriteBatch batch) {
         if (showingInterior) {
@@ -590,42 +359,6 @@ public class AnimalBuildingController {
         }
     }
 
-    private void renderFeedingAnimation(SpriteBatch batch) {
-        if (feedingAnimal != null) {
-            String animalType = feedingAnimal.getType().toLowerCase();
-            Texture animalTexture = animalTextures.get(animalType);
-
-            if (animalTexture != null) {
-                Animation<TextureRegion> feedAnimation = feedAnimations.get(animalType);
-                TextureRegion currentFrame = feedAnimation != null ?
-                    feedAnimation.getKeyFrame(feedingTime, false) :
-                    idleFrames.get(animalType);
-
-                batch.draw(currentFrame, feedingAnimal.getX(), feedingAnimal.getY());
-
-                float hopperX = feedingAnimal.getX() + currentFrame.getRegionWidth()/2 - hayHopperTexture.getWidth()/2;
-                float hopperY = feedingAnimal.getY() - hayHopperTexture.getHeight();
-
-                Texture hopperTexture = feedingTime < FEEDING_DURATION/2 ?
-                    hayHopperFullTexture : hayHopperTexture;
-                batch.draw(hopperTexture, hopperX, hopperY);
-            }
-        }
-    }
-
-    private void renderPettingAnimation(SpriteBatch batch) {
-        if (pettingAnimal != null) {
-            String animalType = pettingAnimal.getType().toLowerCase();
-            Animation<TextureRegion> petAnimation = petAnimations.get(animalType);
-
-            if (petAnimation != null) {
-                TextureRegion currentFrame = petAnimation.getKeyFrame(pettingTime, false);
-                batch.setColor(1, 1, 1, 0.8f + 0.2f * (float)Math.sin(pettingTime * 10));
-                batch.draw(currentFrame, pettingAnimal.getX(), pettingAnimal.getY());
-                batch.setColor(1, 1, 1, 1);
-            }
-        }
-    }
 
 
     private void renderAnimalList(SpriteBatch batch) {
@@ -683,110 +416,7 @@ public class AnimalBuildingController {
 
 
 
-    public void selectAnimalFromList(String animalType) {
-        this.selectedAnimalType = animalType;
-        showingAnimalList = false;
-        highlightSelection = false;
-        selectedListIndex = -1;
-        selectingBuildingForAnimal = true; // فعال کردن حالت انتخاب ساختمان
-        waitingForBuildingSelection = true;
-        System.out.println("حیوان " + animalType + " انتخاب شد. برای قرار دادن در طویله کلید B و برای قفس کلید K را فشار دهید.");
-    }
 
-
-    private void placeSelectedAnimalInBuilding(boolean isBarn, int buildingIndex) {
-        if (selectedAnimalType == null) return;
-
-        // ایجاد حیوان جدید با نوع انتخاب شده
-        String animalName = selectedAnimalType + "_" + (int)(Math.random() * 1000);
-        Animal newAnimal = new Animal(animalName, selectedAnimalType);
-
-        // تعیین موقعیت تصادفی برای حیوان در ساختمان
-        float x = 100 + (float)(Math.random() * 300);
-        float y = 100 + (float)(Math.random() * 300);
-        newAnimal.setPosition(x, y);
-
-        // قرار دادن حیوان در ساختمان
-        if (isBarn) {
-            if (buildingIndex < barnCount) {
-                animalsInBarns[buildingIndex].add(newAnimal);
-                System.out.println(selectedAnimalType + " با نام " + animalName + " در طویله قرار گرفت.");
-            }
-        } else {
-            if (buildingIndex < coopCount) {
-                animalsInCoops[buildingIndex].add(newAnimal);
-                System.out.println(selectedAnimalType + " با نام " + animalName + " در قفس قرار گرفت.");
-            }
-        }
-    }
-
-
-
-    // متد برای چک کردن وضعیت انتظار برای انتخاب ساختمان
-    public boolean isWaitingForBuildingSelection() {
-        return waitingForBuildingSelection && selectedAnimalType != null;
-    }
-
-    private void renderAnimalMenu(SpriteBatch batch) {
-        float menuWidth = 200;
-        float menuHeight = 150;
-        float menuX = selectedAnimal.getX() + 50;
-        float menuY = selectedAnimal.getY() + 50;
-
-        // اطمینان از نمایش منو در محدوده صفحه
-        if (menuX + menuWidth > Gdx.graphics.getWidth()) {
-            menuX = Gdx.graphics.getWidth() - menuWidth - 10;
-        }
-        if (menuY + menuHeight > Gdx.graphics.getHeight()) {
-            menuY = Gdx.graphics.getHeight() - menuHeight - 10;
-        }
-
-        // ترسیم پس‌زمینه منو
-        batch.setColor(0.2f, 0.2f, 0.2f, 0.8f);
-        batch.draw(whitePixelTexture, menuX, menuY, menuWidth, menuHeight);
-        batch.setColor(1, 1, 1, 1);
-
-        // ترسیم محتوای منو
-        if (font != null) {
-            font.setColor(1, 1, 1, 1);
-
-            layout.setText(font, selectedAnimal.getName() + " (" + selectedAnimal.getType() + ")");
-            font.draw(batch, selectedAnimal.getName() + " (" + selectedAnimal.getType() + ")",
-                menuX + 10, menuY + menuHeight - 10);
-
-            layout.setText(font, "Friendship: " + selectedAnimal.getFriendship());
-            font.draw(batch, "Friendship: " + selectedAnimal.getFriendship(),
-                menuX + 10, menuY + menuHeight - 30);
-
-            layout.setText(font, "Fed today: " + (selectedAnimal.isFedToday() ? "Yes" : "No"));
-            font.draw(batch, "Fed today: " + (selectedAnimal.isFedToday() ? "Yes" : "No"),
-                menuX + 10, menuY + menuHeight - 50);
-
-            layout.setText(font, "Petted today: " + (selectedAnimal.isPetToday() ? "Yes" : "No"));
-            font.draw(batch, "Petted today: " + (selectedAnimal.isPetToday() ? "Yes" : "No"),
-                menuX + 10, menuY + menuHeight - 70);
-
-            layout.setText(font, "Outside: " + (selectedAnimal.isOutside() ? "Yes" : "No"));
-            font.draw(batch, "Outside: " + (selectedAnimal.isOutside() ? "Yes" : "No"),
-                menuX + 10, menuY + menuHeight - 90);
-
-            layout.setText(font, "Has product: " + (selectedAnimal.hasProduct() ? "Yes" : "No"));
-            font.draw(batch, "Has product: " + (selectedAnimal.hasProduct() ? "Yes" : "No"),
-                menuX + 10, menuY + menuHeight - 110);
-
-            // ترسیم دکمه‌ها با راهنمای کلید
-            renderButton(batch, "Pet (P)", menuX + 10, menuY + 10, 80, 20);
-            renderButton(batch, "Feed (F)", menuX + 110, menuY + 10, 80, 20);
-            renderButton(batch, selectedAnimal.isOutside() ? "Bring Inside (O)" : "Take Outside (O)",
-                menuX + 10, menuY + 35, 180, 20);
-
-            if (selectedAnimal.hasProduct()) {
-                renderButton(batch, "Collect (C)", menuX + 10, menuY + 60, 80, 20);
-            }
-
-            renderButton(batch, "Sell (S)", menuX + 110, menuY + 60, 80, 20);
-        }
-    }
 
 
     private void renderButton(SpriteBatch batch, String text, float x, float y, float width, float height) {
@@ -808,72 +438,6 @@ public class AnimalBuildingController {
         }
 
         batch.setColor(1, 1, 1, 1);
-    }
-
-    private void handleAnimalMenuClick(float mouseX, float mouseY) {
-        float menuWidth = 200;
-        float menuHeight = 150;
-        float menuX = selectedAnimal.getX() + 50;
-        float menuY = selectedAnimal.getY() + 50;
-
-        // Adjust menu position if it would go off screen
-        if (menuX + menuWidth > Gdx.graphics.getWidth()) {
-            menuX = Gdx.graphics.getWidth() - menuWidth - 10;
-        }
-        if (menuY + menuHeight > Gdx.graphics.getHeight()) {
-            menuY = Gdx.graphics.getHeight() - menuHeight - 10;
-        }
-
-        // Check if buttons are clicked
-        if (isClickOnButton(mouseX, mouseY, menuX + 10, menuY + 10, 80, 20)) {
-            startPetting(selectedAnimal);
-        } else if (isClickOnButton(mouseX, mouseY, menuX + 110, menuY + 10, 80, 20)) {
-            startFeeding(selectedAnimal);
-        } else if (isClickOnButton(mouseX, mouseY, menuX + 10, menuY + 35, 180, 20)) {
-            selectedAnimal.setOutside(!selectedAnimal.isOutside());
-        } else if (selectedAnimal.hasProduct() && isClickOnButton(mouseX, mouseY, menuX + 10, menuY + 60, 80, 20)) {
-            selectedAnimal.collectProduct();
-        } else if (isClickOnButton(mouseX, mouseY, menuX + 110, menuY + 60, 80, 20)) {
-            sellAnimal(selectedAnimal);
-            selectedAnimal = null;
-            showingAnimalMenu = false;
-        }
-    }
-
-    private boolean isClickOnButton(float mouseX, float mouseY, float buttonX, float buttonY, float buttonWidth, float buttonHeight) {
-        return mouseX >= buttonX && mouseX <= buttonX + buttonWidth &&
-            mouseY >= buttonY && mouseY <= buttonY + buttonHeight;
-    }
-
-    private boolean isClickOnBuilding(float buildingX, float buildingY, float width, float height, float mouseX, float mouseY) {
-        return mouseX >= buildingX && mouseX <= buildingX + width &&
-            mouseY >= buildingY && mouseY <= buildingY + height;
-    }
-
-    private boolean isClickOnAnimal(Animal animal, float mouseX, float mouseY) {
-        Texture texture = animalTextures.get(animal.getType().toLowerCase());
-        if (texture == null) return false;
-
-        float width = texture.getWidth();
-        float height = texture.getHeight();
-
-        return mouseX >= animal.getX() && mouseX <= animal.getX() + width &&
-            mouseY >= animal.getY() && mouseY <= animal.getY() + height;
-    }
-
-    private boolean isInInteriorBounds(float x, float y) {
-        float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();
-
-        Texture interiorTexture = showingBarnInterior ? barnInteriorTexture : coopInteriorTexture;
-        float scale = Math.min(screenWidth / interiorTexture.getWidth(), screenHeight / interiorTexture.getHeight()) * interiorScale;
-        float scaledWidth = interiorTexture.getWidth() * scale;
-        float scaledHeight = interiorTexture.getHeight() * scale;
-        float interiorX = (screenWidth - scaledWidth) / 2;
-        float interiorY = (screenHeight - scaledHeight) / 2;
-
-        return x >= interiorX && x <= interiorX + scaledWidth &&
-            y >= interiorY && y <= interiorY + scaledHeight;
     }
 
     public void startPlacingBarn(float x, float y) {
@@ -922,58 +486,6 @@ public class AnimalBuildingController {
         }
     }
 
-    private void removeAnimalFromBuilding(Animal animal) {
-        if (showingBarnInterior && selectedBuildingIndex >= 0) {
-            animalsInBarns[selectedBuildingIndex].remove(animal);
-        } else if (showingCoopInterior && selectedBuildingIndex >= 0) {
-            animalsInCoops[selectedBuildingIndex].remove(animal);
-        }
-        animal.setFree(true);
-        freeAnimals.add(animal);
-    }
-
-    public void startPetting(Animal animal) {
-        pettingAnimal = animal;
-        pettingTime = 0;
-    }
-
-    public void startFeeding(Animal animal) {
-        feedingAnimal = animal;
-        feedingTime = 0;
-    }
-
-    public void sellAnimal(Animal animal) {
-        // Implement selling logic here
-        if (showingBarnInterior && selectedBuildingIndex >= 0) {
-            animalsInBarns[selectedBuildingIndex].remove(animal);
-        } else if (showingCoopInterior && selectedBuildingIndex >= 0) {
-            animalsInCoops[selectedBuildingIndex].remove(animal);
-        }
-        freeAnimals.remove(animal);
-    }
-
-    public AnimalDisplayData getAnimalAt(float screenX, float screenY) {
-        if (!showingAnimalList) return null;
-
-        float slotWidth = listWidth / SLOTS_PER_ROW;
-        float slotHeight = listHeight / 2;
-
-        float touchX = screenX;
-        float touchY = Gdx.graphics.getHeight() - screenY;
-
-        if (touchX >= listX && touchX <= listX + listWidth &&
-            touchY >= listY && touchY <= listY + listHeight) {
-
-            int col = (int)((touchX - listX) / slotWidth);
-            int row = 1 - (int)((touchY - listY) / slotHeight);
-            int index = row * SLOTS_PER_ROW + col;
-
-            if (index >= 0 && index < animalsToDisplay.size()) {
-                return animalsToDisplay.get(index);
-            }
-        }
-        return null;
-    }
 
 
     public boolean isPlacingBarn() {
@@ -988,13 +500,6 @@ public class AnimalBuildingController {
         return showingInterior;
     }
 
-    public boolean isShowingBarnInterior() {
-        return showingBarnInterior;
-    }
-
-    public boolean isShowingCoopInterior() {
-        return showingCoopInterior;
-    }
 
     public void dispose() {
         if (barnTexture != null) barnTexture.dispose();
@@ -1003,7 +508,6 @@ public class AnimalBuildingController {
         if (coopInteriorTexture != null) coopInteriorTexture.dispose();
         if (hayHopperTexture != null) hayHopperTexture.dispose();
         if (hayHopperFullTexture != null) hayHopperFullTexture.dispose();
-        if (shapeRenderer != null) shapeRenderer.dispose();
         if (font != null) font.dispose();
         if (animalNameFont != null) animalNameFont.dispose();
         if (whitePixelTexture != null) whitePixelTexture.dispose();
@@ -1110,14 +614,11 @@ public class AnimalBuildingController {
     private void renderAnimal(SpriteBatch batch, Animal animal) {
         String animalType = animal.getType().toLowerCase();
 
-        // از تصاویر تکی TAKI استفاده می‌کنیم
         Texture animalTexture = animalListTextures.get(animalType);
 
         if (animalTexture != null) {
-            // مقیاس بزرگتر برای نمایش حیوان
             float scale = 2.0f;  // این مقدار را می‌توانید تنظیم کنید
 
-            // محاسبه ابعاد جدید
             float width = animalTexture.getWidth() * scale;
             float height = animalTexture.getHeight() * scale;
 
