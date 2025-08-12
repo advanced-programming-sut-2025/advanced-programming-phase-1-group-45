@@ -191,9 +191,10 @@ public class GameClient implements Disposable, Runnable {
                         JsonParser.getString(data, "message", "System message"));
                     break;
 
-                case "START_PLAYING":
+                case "START":
                     fireGameEvent(GameEvent.Type.START, JsonBuilder.empty());
                     break;
+
                 case "PONG":
                     // Ping response - no action needed
                     break;
