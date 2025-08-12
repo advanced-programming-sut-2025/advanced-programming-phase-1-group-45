@@ -6,6 +6,7 @@ public class GameEvent {
         UPDATE,
         ENDED,
         ACTION,
+        UPDATE_POSITIONS,
         PLAYER_MOVED,
     }
 

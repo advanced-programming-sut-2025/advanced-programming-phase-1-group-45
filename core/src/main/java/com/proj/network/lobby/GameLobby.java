@@ -74,6 +74,25 @@ public class GameLobby {
         server.notifyPlayerStatusUpdate();
     }
 
+    public void sendPlayerPositions() {
+        JSONArray players = new JSONArray();
+        GameInstance gameInstance = getGameInstance();
+        if (gameInstance != null) {
+
+            for (PlayerGameState playerGameState : playerStates.values()) {
+                JSONObject position = new JSONObject();
+                position.put("username", playerGameState.getUsername()).put("x", playerGameState.getPosition().getX()).put("y",
+                    playerGameState.getPosition().getY()).put("mapName",
+                    playerGameState.getCurrentMapName());
+                players.put(position);
+            }
+
+            JSONObject allPlayers = new JSONObject();
+            allPlayers.put("players", players);
+            broadcastMessage("PLAYER_POSITIONS", allPlayers.toString());
+        }
+    }
+
     /**
      * حذف بازیکن از لابی
      */

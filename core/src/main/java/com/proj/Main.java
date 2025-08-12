@@ -18,6 +18,7 @@ import com.proj.network.client.NetworkEventListener;
 import com.proj.Database.DatabaseHelper;
 import com.proj.network.lobby.LobbyScreen;
 import com.badlogic.gdx.graphics.GL20;
+import com.proj.network.multiplayerGame.MultiplayerGameScreen;
 
 
 /**
@@ -90,6 +91,17 @@ public class Main extends Game implements NetworkEventListener {
         Gdx.app.postRunnable(() -> {
             Screen current = getScreen();
             setScreen(new GameScreen(this, farm));
+            if (current != null) {
+                current.dispose();
+            }
+            changeBackgroundMusic("music/theme2.mp3");
+        });
+    }
+
+    public void switchToMultiplayerGameScreen(farmName farm) {
+        Gdx.app.postRunnable(() -> {
+            Screen current = getScreen();
+            setScreen(new MultiplayerGameScreen(this, farm));
             if (current != null) {
                 current.dispose();
             }

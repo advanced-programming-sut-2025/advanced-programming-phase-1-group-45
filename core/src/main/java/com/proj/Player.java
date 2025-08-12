@@ -10,8 +10,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.proj.Control.WorldController;
 import com.proj.Model.Inventory.Inventory;
 import com.proj.Model.Inventory.InventoryItem;
+import com.proj.network.client.GameEventListener;
+import com.proj.network.event.GameEvent;
+import com.proj.network.event.NetworkEvent;
 
-public class Player {
+public class Player implements GameEventListener {
     private Vector2 position;
     private Vector2 targetPosition;
     private float speed = 100f;
@@ -221,6 +224,7 @@ public class Player {
             isMoving = true;
             frameIndex = 1;
             frameTime = 0;
+            Main.getMain().getGameClient().sendPlayerNewPosition(worldX, worldY, WorldController.getInstance().getGameMap().getMapName());
         } else if (currentEnergy < ENERGY_COST_PER_TILE) {
             startFainting();
         }
@@ -370,11 +374,20 @@ public class Player {
     }*/
 
     public void addItem(String itemId, int quantity) {
-        
+
     }
 
     public Main getGame() {
         return game;
     }
 
+    @Override
+    public void handleGameEvent(GameEvent event) {
+
+    }
+
+    @Override
+    public void handleNetworkEvent(NetworkEvent event) {
+
+    }
 }

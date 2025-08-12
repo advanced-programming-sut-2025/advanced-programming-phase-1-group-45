@@ -195,6 +195,10 @@ public class GameClient implements Disposable, Runnable {
                     fireGameEvent(GameEvent.Type.START, JsonBuilder.empty());
                     break;
 
+                    case "PLAYER_POSITIONS":
+                        fireGameEvent(GameEvent.Type.UPDATE_POSITIONS, JsonBuilder.empty() );
+                        break;
+
                 case "PONG":
                     // Ping response - no action needed
                     break;
@@ -379,6 +383,17 @@ public class GameClient implements Disposable, Runnable {
         sendMessage("CHAT", data);
     }
 
+    public void sendPlayerNewPosition(float x, float y, String mapName) {
+        String map = mapName ;
+        for (farmName f : farmName.values()) {
+            if (mapName.equalsIgnoreCase(f.getFarmName())) {
+                map = "Farm";
+            }
+        }
+        JSONObject data = JsonBuilder.create().put("x", x).put("y", y).put("mapName", map).build();
+        sendMessage("MOVE", data);
+    }
+
     public void requestLobbiesList() {
         sendMessage("GET_LOBBIES", JsonBuilder.empty());
     }
@@ -416,6 +431,7 @@ public class GameClient implements Disposable, Runnable {
             }
         }, "Ping-Thread").start();
     }
+
 
     public void disconnect() {
         if (running.compareAndSet(true, false)) {

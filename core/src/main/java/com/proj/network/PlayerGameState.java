@@ -4,12 +4,15 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import com.proj.map.*;
 
 public class PlayerGameState {
     private String username;
     private farmName farm;
     private boolean readyToPlay;
+
+    private String currentMapName;
     private Position position;
     private boolean isMoving = false;
     private PlayerDirection direction = PlayerDirection.DOWN;
@@ -79,37 +82,78 @@ public class PlayerGameState {
     }
 
     public void restoreEnergy(float amount) {
-        energy = Math.min(100, energy + (int)amount);
+        energy = Math.min(100, energy + (int) amount);
     }
 
     // Getters and setters
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getUsername() {
+        return username;
+    }
 
-    public Position getPosition() { return position; }
-    public void setPosition(Position position) { this.position = position; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    public boolean isMoving() { return isMoving; }
-    public void setMoving(boolean moving) { isMoving = moving; }
+    public Position getPosition() {
+        return position;
+    }
 
-    public PlayerDirection getDirection() { return direction; }
-    public void setDirection(PlayerDirection direction) { this.direction = direction; }
+    public String getCurrentMapName() {
+        return currentMapName;
+    }
 
-    public int getEnergy() { return energy; }
-    public void setEnergy(int energy) { this.energy = energy; }
+    public void setPosition(Position position, String mapName) {
+        this.position = position;
+        this.currentMapName = mapName;
+    }
 
-    public int getScore() { return score; }
-    public void setScore(int score) { this.score = score; }
+    public boolean isMoving() {
+        return isMoving;
+    }
+
+    public void setMoving(boolean moving) {
+        isMoving = moving;
+    }
+
+    public PlayerDirection getDirection() {
+        return direction;
+    }
+
+    public void setDirection(PlayerDirection direction) {
+        this.direction = direction;
+    }
+
+    public int getEnergy() {
+        return energy;
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
 
 
     public void setFarmName(farmName farmName) {
         this.farm = farmName;
     }
+
     public farmName getFarm() {
         return farm;
     }
 
-    public void setReadyToPlay(boolean readyToPlay) { this.readyToPlay = readyToPlay; }
-    public boolean isReadyToPlay() { return readyToPlay; }
+    public void setReadyToPlay(boolean readyToPlay) {
+        this.readyToPlay = readyToPlay;
+    }
+
+    public boolean isReadyToPlay() {
+        return readyToPlay;
+    }
 }
 

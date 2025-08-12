@@ -178,6 +178,14 @@ public class ClientConnectionController implements Runnable {
                 sendPlayerList();
                 break;
 
+            case "PLAYER_POSITIONS":
+                sendPlayerPositions(data);
+                break;
+
+                case "MOVE":
+                handlePlayerMovement(data);
+                break;
+
             case "GET_LOBBIES":
                 sendLobbiesList();
                 break;
@@ -369,6 +377,38 @@ public class ClientConnectionController implements Runnable {
         } catch (Exception e) {
             sendError("GAME_ACTION_FAILED", "Error processing game action: " + e.getMessage());
         }
+    }
+//
+//    private void sendPlayersInGame() {
+//        GameInstance game = server.getGameManager().getGameInstance(currentLobby.getId());
+//        if (game == null) {
+//            sendError("GAME_NOT_FOUND", "Game not found for your lobby");
+//            return;
+//        }
+//        JSONArray p = new JSONArray();
+//        for (PlayerGameState pla : game.ge)
+//    }
+
+    private void sendPlayerPositions(JSONObject data) {
+        sendMessage("PLAYER_POSITIONS", data);
+    }
+
+    private void handlePlayerMovement(JSONObject data) {
+        GameInstance game = server.getGameManager().getGameInstance(currentLobby.getId());
+        if (game == null) {
+            sendError("GAME_NOT_FOUND", "Game not found for your lobby");
+            return;
+        }
+        PlayerGameState player = game.getPlayerState(username);
+        if (player == null) {
+            sendError("PLAYER_NOT_FOUND", "Player not found for your lobby");
+            return;
+        }
+        float x = data.getFloat("x");
+        float y = data.getFloat("y");
+        String mapName = data.getString("mapName");
+        player.setPosition(new Position(x, y), mapName);
+        currentLobby.sendPlayerPositions();
     }
 
     public synchronized void sendMessage(String type, JSONObject data) {

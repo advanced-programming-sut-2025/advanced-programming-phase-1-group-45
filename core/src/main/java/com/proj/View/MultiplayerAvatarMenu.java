@@ -369,7 +369,7 @@ public class MultiplayerAvatarMenu implements Screen, GameEventListener {
     @Override
     public void handleGameEvent(GameEvent event) {
         if (event.getType() == GameEvent.Type.START){
-            Main.getMain().switchToGameScreen(character.getFarmType());
+            Main.getMain().switchToMultiplayerGameScreen(character.getFarmType());
         }
     }
 

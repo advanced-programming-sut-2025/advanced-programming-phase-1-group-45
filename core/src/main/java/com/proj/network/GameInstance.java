@@ -3,7 +3,9 @@ package com.proj.network;
 import com.proj.network.lobby.GameLobby;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GameInstance {
@@ -20,6 +22,10 @@ public class GameInstance {
         this.lobby = lobby;
         this.lastActivityTime = System.currentTimeMillis();
         this.lastUpdateTime = System.currentTimeMillis();
+    }
+
+    public List<String> getPlayers() {
+        return new ArrayList<>(playerStates.keySet());
     }
 
     public void initialize() {
