@@ -1,4 +1,3 @@
-// CookingScreen.java
 package com.proj.Model.Cooking;
 
 import com.badlogic.gdx.Gdx;
@@ -6,24 +5,22 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import java.util.List;
-
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.Timer;
 import com.proj.Main;
-import com.proj.Model.Cooking.CookingManager;
-import com.proj.Model.Inventory.InventoryManager;
-import com.proj.Model.Cooking.CookingRecipe;
-import com.proj.Model.GameAssetManager;
+import com.proj.Model.Inventory.Inventory;
 import com.proj.Model.Inventory.InventoryItem;
+import com.proj.Model.Inventory.InventoryManager;
 import com.proj.Player;
 
+import java.util.List;
 import java.util.Map;
 
 public class CookingScreen implements Screen {
@@ -33,200 +30,251 @@ public class CookingScreen implements Screen {
     private CookingManager cookingManager;
     private InventoryManager inventoryManager;
     private Player player;
-    private Table mainTable;
+    private Table root;
     private Label statusLabel;
 
     public CookingScreen(Main game, Skin skin, InventoryManager inventoryManager, CookingManager cookingManager, Player player) {
         this.game = game;
-        this.skin = skin;
+        this.skin = skin != null ? skin : new Skin(Gdx.files.internal("uiskin.json"));
         this.inventoryManager = inventoryManager;
         this.cookingManager = cookingManager;
         this.player = player;
-
         stage = new Stage(new ScreenViewport());
-
         createUI();
     }
 
     private void createUI() {
-        mainTable = new Table(skin);
-        mainTable.setFillParent(true);
-        mainTable.pad(10);
+        stage.clear();
+        root = new Table(skin);
+        root.setFillParent(true);
+        root.pad(12);
+        stage.addActor(root);
 
-        Label titleLabel = new Label("Cooking Recipes", skin, "title");
-        mainTable.add(titleLabel).padBottom(20).colspan(2).row();
-
-        Table recipesTable = new Table(skin);
-        recipesTable.top().left().pad(10);
-        recipesTable.defaults().pad(5);
-
-        ScrollPane scrollPane = new ScrollPane(recipesTable, skin);
-        scrollPane.setFadeScrollBars(false);
-        scrollPane.setScrollingDisabled(true, false);
-
-        mainTable.add(scrollPane).expand().fill().colspan(2).row();
+        Label title = new Label("Cooking", skin);
+        title.setFontScale(1.2f);
+        title.setColor(Color.WHITE);
+        root.add(title).colspan(3).left().row();
 
         statusLabel = new Label("", skin);
-        statusLabel.setAlignment(Align.center);
-        mainTable.add(statusLabel).padTop(10).colspan(2).row();
+        statusLabel.setColor(Color.WHITE);
+        root.add(statusLabel).colspan(3).left().padTop(6).row();
 
-        TextButton closeButton = new TextButton("Close", skin);
-        closeButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(game.getGameScreen());
-                dispose();
-            }
-        });
-        mainTable.add(closeButton).expandX().right().padTop(20).colspan(2);
+        Table listTable = new Table(skin);
+        ScrollPane scroll = new ScrollPane(listTable, skin);
+        scroll.setFadeScrollBars(false);
+        root.add(scroll).colspan(3).expand().fill().height(360).row();
 
-        stage.addActor(mainTable);
-        updateRecipeDisplay(recipesTable);
-    }
+        // recipes
+        List<CookingRecipe> recipes = cookingManager != null ? cookingManager.getAvailableRecipes() : null;
+        if (recipes == null || recipes.isEmpty()) {
+            listTable.add(new Label("No recipes available.", skin)).row();
+        } else {
+            for (CookingRecipe recipe : recipes) {
+                Table entry = new Table(skin);
+                entry.setBackground(skin.newDrawable("white", new Color(0,0,0,0.15f)));
+                entry.left().pad(8).padBottom(10);
 
-    private void updateRecipeDisplay(Table recipesTable) {
-        recipesTable.clear();
+                // result icon (bigger)
+                TextureRegion resTex = null;
+                try { resTex = recipe.getResultItem() != null ? recipe.getResultItem().getTexture() : null; } catch (Throwable ignored){}
+                Image resImg = resTex != null ? new Image(resTex) : new Image();
+                resImg.setSize(48,48);
+                entry.add(resImg).size(48,48).left().padRight(8);
 
-        List<CookingRecipe> recipesList = cookingManager.getAvailableRecipes();
+                // name + ingredients list
+                Table mid = new Table(skin);
+                Label name = new Label(recipe.getRecipeName(), skin);
+                name.setColor(recipe.isLearned() ? Color.WHITE : Color.LIGHT_GRAY);
+                mid.add(name).left().row();
 
-        if (recipesList.isEmpty()) {
-            recipesTable.add(new Label("No recipes available.", skin)).row();
-            return;
-        }
+                Table ingrRow = new Table(skin);
+                for (Map.Entry<String,Integer> ing : recipe.getIngredients().entrySet()) {
+                    String id = ing.getKey();
+                    int qty = ing.getValue();
 
-        float iconSize = 64;
+                    TextureRegion ingTex = null;
+                    try { ingTex = com.proj.Model.GameAssetManager.getGameAssetManager().getIngredientTexture(id); } catch (Throwable ignored){}
+                    Image ingImg = ingTex != null ? new Image(ingTex) : new Image();
+                    ingImg.setSize(20,20);
 
-        for (CookingRecipe recipe : recipesList) {
-            Table recipeEntry = new Table(skin);
-            // حذف تنظیم پس‌زمینه
-            recipeEntry.pad(10);
+                    // quantity and available count
+                    int available = countAvailable(id);
+                    Label q = new Label(available + "/" + qty, skin);
+                    q.setColor(available >= qty ? Color.GREEN : Color.RED);
 
-            // استفاده از سازنده ساده‌تر Label
-            Label recipeNameLabel = new Label(recipe.getRecipeName(), skin);
-            if (!recipe.isLearned()) {
-                recipeNameLabel.setColor(Color.GRAY);
-                recipeNameLabel.setText(recipe.getRecipeName() + " (Locked)");
-            }
-            recipeEntry.add(recipeNameLabel).left().row();
-
-            Table ingredientsTable = new Table(skin);
-            ingredientsTable.defaults().pad(2);
-            for (Map.Entry<String, Integer> entry : recipe.getIngredients().entrySet()) {
-                String ingredientId = entry.getKey();
-                int requiredQuantity = entry.getValue();
-
-                Table ingredientCell = new Table();
-                Image ingredientIcon = new Image(GameAssetManager.getGameAssetManager().getIngredientTexture(ingredientId));
-                Label ingredientLabel = new Label(requiredQuantity + "x " + ingredientId, skin);
-
-                ingredientCell.add(ingredientIcon).size(iconSize / 2).padRight(5);
-                ingredientCell.add(ingredientLabel).left();
-
-                ingredientsTable.add(ingredientCell).left();
-
-                int currentQuantity = 0;
-                for (InventoryItem item : inventoryManager.getPlayerInventory().getItems().values()) {
-                    if (item != null && item.getId().equals(ingredientId)) {
-                        currentQuantity += item.getQuantity();
-                    }
+                    Table single = new Table(skin);
+                    single.add(ingImg).size(20,20).padRight(4);
+                    single.add(new Label(id, skin)).padRight(6);
+                    single.add(q);
+                    ingrRow.add(single).padRight(8);
                 }
-                for (InventoryItem item : game.getRefrigerator().getInventory().getItems().values()) {
-                    if (item != null && item.getId().equals(ingredientId)) {
-                        currentQuantity += item.getQuantity();
-                    }
+                mid.add(ingrRow).left().row();
+
+                entry.add(mid).expandX().fillX().left().padRight(8);
+
+                // action column: Cook / Learn / Locked
+                Table actions = new Table(skin);
+                final TextButton actionBtn = new TextButton(recipe.isLearned() ? "Cook" : "Learn", skin);
+                actions.add(actionBtn).row();
+
+                // progress bar (hidden initially)
+                final ProgressBar progress = new ProgressBar(0f, 1f, 0.01f, false, skin);
+                progress.setValue(0f);
+                progress.setVisible(false);
+                actions.add(progress).width(120).padTop(6).row();
+
+                // locked overlay if not learned
+                if (!recipe.isLearned()) {
+                    Label lock = new Label("Locked", skin);
+                    lock.setColor(Color.GRAY);
+                    actions.add(lock).row();
                 }
 
-                Label quantityLabel = new Label("(" + currentQuantity + "/" + requiredQuantity + ")", skin);
-                if (currentQuantity < requiredQuantity) {
-                    quantityLabel.setColor(Color.RED);
-                } else {
-                    quantityLabel.setColor(Color.GREEN);
-                }
-                ingredientsTable.add(quantityLabel).left();
-            }
-            recipeEntry.add(ingredientsTable).left().padLeft(10).row();
-
-            Table resultTable = new Table(skin);
-            resultTable.defaults().pad(2);
-            Image resultIcon = new Image(recipe.getResultItem().getTexture());
-            Label resultLabel = new Label("Result: " + recipe.getResultItem().getName(), skin);
-            resultTable.add(resultIcon).size(iconSize).padRight(10);
-            resultTable.add(resultLabel).left();
-            recipeEntry.add(resultTable).left().padTop(10).row();
-
-            TextButton actionButton;
-            if (recipe.isLearned()) {
-                actionButton = new TextButton("Cook", skin);
-                actionButton.addListener(new ClickListener() {
+                // listener
+                actionBtn.addListener(new ClickListener(){
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
-                        if (cookingManager.cook(recipe.getRecipeName(), player)) {
-                            statusLabel.setText(recipe.getRecipeName() + " cooked!");
-                            statusLabel.setColor(Color.GREEN);
+                        if (!recipe.isLearned()) {
+                            doLearn(recipe);
                         } else {
-                            statusLabel.setText("Failed to cook " + recipe.getRecipeName() + ".");
-                            statusLabel.setColor(Color.RED);
+                            doCookWithAnimation(recipe, actionBtn, progress);
                         }
-                        updateRecipeDisplay(recipesTable);
                     }
                 });
-                boolean canCook = cookingManager.isRecipeLearned(recipe.getRecipeName()) && cookingManager.canCook(recipe);
-                actionButton.setDisabled(!canCook || player.getCurrentEnergy() < CookingManager.ENERGY_COST_PER_COOK);
-                if (actionButton.isDisabled()) actionButton.setColor(Color.GRAY); else actionButton.setColor(Color.WHITE);
 
-            } else {
-                actionButton = new TextButton("Learn", skin);
-                actionButton.addListener(new ClickListener() {
-                    @Override
-                    public void clicked(InputEvent event, float x, float y) {
-                        cookingManager.learnRecipe(recipe.getRecipeName());
-                        statusLabel.setText(recipe.getRecipeName() + " learned!");
-                        statusLabel.setColor(Color.BLUE);
-                        updateRecipeDisplay(recipesTable);
-                    }
-                });
+                entry.add(actions).right();
+                listTable.add(entry).expandX().fillX().padBottom(8).row();
             }
-            recipeEntry.add(actionButton).expandX().right().padTop(10).row();
+        }
 
-            recipesTable.add(recipeEntry).expandX().fillX().padBottom(15).row();
+        // bottom: hints
+        Table hints = new Table(skin);
+        hints.add(new Label("Tips: Press Esc to close. Cook uses " + CookingManager.ENERGY_COST_PER_COOK + " energy.", skin)).left();
+        root.add(hints).colspan(3).left().padTop(8).row();
+    }
+
+    private int countAvailable(String ingredientId) {
+        int total = 0;
+        try {
+            if (inventoryManager != null && inventoryManager.getPlayerInventory() != null) {
+                for (InventoryItem it : inventoryManager.getPlayerInventory().getItems().values()) {
+                    if (it != null && it.getId().equals(ingredientId)) total += it.getQuantity();
+                }
+            }
+            if (cookingManager != null && cookingManager.getRefrigeratorInventory() != null) {
+                for (InventoryItem it : cookingManager.getRefrigeratorInventory().getItems().values()) {
+                    if (it != null && it.getId().equals(ingredientId)) total += it.getQuantity();
+                }
+            }
+        } catch (Throwable t) {
+            Gdx.app.error("CookingScreen", "countAvailable", t);
+        }
+        return total;
+    }
+
+    private void doLearn(CookingRecipe recipe) {
+        try {
+            if (cookingManager == null) { setStatus("Cannot learn: no manager", Color.RED); return; }
+            cookingManager.learnRecipe(recipe.getRecipeName());
+            setStatus(recipe.getRecipeName() + " learned!", Color.CYAN);
+            // refresh UI
+            createUI();
+        } catch (Throwable t) {
+            Gdx.app.error("CookingScreen", "doLearn", t);
+            setStatus("Error learning recipe", Color.RED);
         }
     }
 
+    private void doCookWithAnimation(CookingRecipe recipe, TextButton btn, ProgressBar progress) {
+        try {
+            if (cookingManager == null || player == null) { setStatus("Cannot cook: missing data", Color.RED); return; }
+            // quick pre-check
+            if (!cookingManager.canCook(recipe)) { setStatus("Not enough ingredients", Color.RED); return; }
+            if (player.getCurrentEnergy() < CookingManager.ENERGY_COST_PER_COOK) { setStatus("Not enough energy", Color.RED); return; }
+
+            // disable button, show progress
+            btn.setDisabled(true);
+            progress.setVisible(true);
+            progress.setValue(0f);
+            setStatus("Cooking " + recipe.getRecipeName() + "...", Color.ORANGE);
+
+            final float totalTime = 1.5f;
+            final float[] elapsed = {0f};
+            Timer.schedule(new Timer.Task(){
+                @Override
+                public void run() {
+                    elapsed[0] += 0.05f;
+                    float v = Math.min(1f, elapsed[0] / totalTime);
+                    progress.setValue(v);
+                    if (v >= 1f) {
+                        this.cancel();
+                        // actually cook (consumes ingredients, adds result, uses energy)
+                        boolean ok = cookingManager.cook(recipe.getRecipeName(), player);
+                        if (ok) {
+                            setStatus(recipe.getRecipeName() + " cooked!", Color.GREEN);
+                            // if the result is a FoodItem, make player start eating animation showing its texture
+                            com.proj.Model.Cooking.FoodItem res = recipe.getResultItem();
+                            if (res != null) {
+                                // get texture if available
+                                TextureRegion t = res.getTexture();
+                                // give player the eaten item (we'll simulate immediate eat: show graphic and restore energy)
+                                // Option A: add to inventory (default)
+                                if (inventoryManager != null && inventoryManager.getPlayerInventory() != null) {
+                                    inventoryManager.getPlayerInventory().addItem(res);
+                                }
+                                // Optionally auto-eat: if you want auto-eat uncomment below:
+                                player.startEatingAnimation(t);
+                                player.restoreEnergy(res.getEnergyRestored());
+                            }
+                        } else {
+                            setStatus("Failed to cook " + recipe.getRecipeName(), Color.RED);
+                        }
+                        // restore button & hide progress after short delay
+                        Timer.schedule(new Timer.Task(){
+                            @Override public void run() {
+                                btn.setDisabled(false);
+                                progress.setVisible(false);
+                                progress.setValue(0f);
+                                // refresh UI for counts and button states
+                                createUI();
+                            }
+                        }, 0.5f);
+                    }
+                }
+            }, 0f, 0.05f);
+        } catch (Throwable t) {
+            Gdx.app.error("CookingScreen", "doCookWithAnimation", t);
+            setStatus("Error cooking", Color.RED);
+            btn.setDisabled(false);
+            progress.setVisible(false);
+        }
+    }
+
+    private void setStatus(String txt, Color color) {
+        statusLabel.setText(txt);
+        statusLabel.setColor(color);
+    }
 
     @Override
-    public void show() {
-        Gdx.input.setInputProcessor(stage);
-        updateRecipeDisplay((Table) ((ScrollPane) mainTable.getChildren().get(1)).getActor());
-    }
+    public void show() { Gdx.input.setInputProcessor(stage); }
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(0.06f, 0.06f, 0.07f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        stage.act(Math.min(delta, 1/30f));
         stage.draw();
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            game.setScreen(game.getGameScreen());
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) || Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            if (game != null) game.setScreen(game.getGameScreen());
             dispose();
         }
     }
 
-    @Override
-    public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
-    }
-
-    @Override
-    public void pause() {}
-
-    @Override
-    public void resume() {}
-
-    @Override
-    public void hide() {}
-
-    @Override
-    public void dispose() {
-        stage.dispose();
-    }
+    @Override public void resize(int width, int height) { stage.getViewport().update(width, height, true); }
+    @Override public void pause() {}
+    @Override public void resume() {}
+    @Override public void hide() {}
+    @Override public void dispose() { if (stage != null) stage.dispose(); }
 }
+
