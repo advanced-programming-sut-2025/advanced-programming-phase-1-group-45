@@ -155,8 +155,8 @@ public class CompositeMapSystem {
     private class CompositeMapActor extends Actor {
         @Override
         public void draw(Batch batch, float parentAlpha) {
-            batch.end();
-            batch.begin();
+//            batch.end();
+//            batch.begin();
             batch.draw(background, getX(), getY(), getWidth(), getHeight());
 
             // رسم نقشه‌های فردی

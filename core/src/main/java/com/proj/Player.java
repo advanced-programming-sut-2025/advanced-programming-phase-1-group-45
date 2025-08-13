@@ -58,6 +58,11 @@ public class Player implements GameEventListener {
     private com.proj.Model.Cooking.Buff activeBuff;
     private float buffRemainingTime;
 
+
+    private TextureRegion eatingTexture; // current food texture to show
+    private float eatingDisplayTimer = 0f;
+    private static final float EATING_DISPLAY_DURATION = 3.0f;
+
     public Player(WorldController worldController, float startX, float startY) {
         this.worldController = worldController;
         this.position = new Vector2(startX, startY);
@@ -159,7 +164,14 @@ public class Player implements GameEventListener {
                 isEating = false;
                 eatingAnimationTimer = 0;
             }
+            if (eatingDisplayTimer > 0f) {
+                eatingDisplayTimer -= delta;
+                if (eatingDisplayTimer <= 0f) {
+                    eatingTexture = null;
+                }
+            }
         }
+
 
         if (activeBuff != null) {
             buffRemainingTime -= delta;
@@ -181,6 +193,11 @@ public class Player implements GameEventListener {
         }
         TextureRegion currentTexture = getCurrentFrame();
         batch.draw(currentTexture, position.x - WIDTH/2, position.y - HEIGHT/2, WIDTH, HEIGHT);
+        if (eatingTexture != null) {
+            float sx = position.x - WIDTH/2;
+            float sy = position.y + HEIGHT/2; // in front of player (adjust as needed)
+            batch.draw(eatingTexture, sx, sy, 24, 24);
+        }
     }
 
     private TextureRegion getCurrentFrame() {
@@ -390,4 +407,13 @@ public class Player implements GameEventListener {
     public void handleNetworkEvent(NetworkEvent event) {
 
     }
+
+
+    public void startEatingAnimation(TextureRegion foodTexture) {
+        this.isEating = true;
+        this.eatingAnimationTimer = 0f;
+        this.eatingDisplayTimer = EATING_DISPLAY_DURATION;
+        this.eatingTexture = foodTexture;
+    }
+
 }
