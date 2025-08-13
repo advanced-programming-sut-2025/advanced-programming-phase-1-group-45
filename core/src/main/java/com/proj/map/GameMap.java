@@ -91,6 +91,7 @@ public class GameMap {
     public void updateDaily(Season season) {
         this.currentSeason = season;
         if (farmingController == null) return;
+        System.out.println("farming contr update");
         farmingController.updateDaily(currentSeason);
     }
 

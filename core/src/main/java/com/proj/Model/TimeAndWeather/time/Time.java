@@ -234,8 +234,12 @@ public class Time implements GameEventListener {
                     break;
             }
             boolean isNewDay = JsonParser.getBoolean(data, "isNewDay", false);
-            System.out.println(isNewDay + " is new day");
-            this.isNewDay = isNewDay;
+            if (isNewDay) {
+                System.out.println("day changed");
+            }
+            if (!this.isNewDay) {
+                this.isNewDay = isNewDay;
+            }
             this.hour = hour;
             this.minute = minute;
             this.day = day;

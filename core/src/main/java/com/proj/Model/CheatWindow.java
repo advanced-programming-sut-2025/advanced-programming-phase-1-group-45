@@ -151,6 +151,7 @@ public class CheatWindow {
                     TextField timeField = (TextField) getContentTable().findActor("dayInput");
                     String day = timeField.getText();
                     if (day.matches("^\\d+$")) {
+
                         Main.getMain().getGameClient().changeDay(Integer.parseInt(day));
                     } else {
                         new Dialog("Error", skin).text("Invalid day format! Use numbers").button("OK").show(stage);

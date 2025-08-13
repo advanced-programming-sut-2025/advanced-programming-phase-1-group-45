@@ -326,12 +326,13 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             updateCamera();
             Main.getMain().getGameClient().updateTimeInGame(delta);
 //            gameTime.update(delta, timeIsPaused);
-            worldController.update(delta);
+//            worldController.update(delta);
             inventoryManager.update(delta, player);
             animalManager.update(delta);
             worldController.getSpriteBatch().begin();
             worldController.getSpriteBatch().setProjectionMatrix(camera.combined);
 
+            worldController.update(delta);
             worldController.render(camera);
             if (npcManager != null) {
 
@@ -402,17 +403,12 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             worldController.getSpriteBatch().end();
 
             uistageViewport.apply();
-            // رندر کردن رابط کاربری یخچال
             if (showRefrigeratorUI) {
                 renderRefrigeratorUI();
             }
-
-// کاهش تایمر پیام
             if (messageTimer > 0) {
                 messageTimer -= delta;
             }
-
-
             if (animalBuildingController == null ||
                 (!animalBuildingController.isPlacingBarn() &&
                     !animalBuildingController.isPlacingCoop())) {
