@@ -387,12 +387,10 @@ public class GameScreen implements Screen, ChatListener {
 
             uistageViewport.apply();
             uistage.act(delta);
-            // رندر کردن رابط کاربری یخچال
             if (showRefrigeratorUI) {
                 renderRefrigeratorUI();
             }
 
-// کاهش تایمر پیام
             if (messageTimer > 0) {
                 messageTimer -= delta;
             }
@@ -446,19 +444,16 @@ public class GameScreen implements Screen, ChatListener {
     private void handleAnimalBuildingInput() {
         if (animalBuildingController == null) return;
 
-        // اگر در حال انتخاب ساختمان برای حیوان هستیم، کلیدها B و K برای قرار دادن ساختمان جدید کار نکنند
         if (animalBuildingController.selectingBuildingForAnimal) {
             return;
         }
 
-        // شروع قرار دادن قفس
         if (Gdx.input.isKeyJustPressed(Input.Keys.K) &&
             !animalBuildingController.isPlacingCoop() &&
             !animalBuildingController.isPlacingBarn()) {
             animalBuildingController.startPlacingCoop(player.getPosition().x, player.getPosition().y);
         }
 
-        // شروع قرار دادن طویله
         if (Gdx.input.isKeyJustPressed(Input.Keys.B) &&
             !animalBuildingController.isPlacingBarn() &&
             !animalBuildingController.isPlacingCoop()) {
@@ -628,7 +623,6 @@ public class GameScreen implements Screen, ChatListener {
             if (animalBuildingController != null && animalBuildingController.isShowingAnimalList()) {
                 Gdx.app.log("GameScreen", "Animal list is showing, skipping tool selection");
             } else {
-                // انتخاب ابزار فقط زمانی که لیست حیوانات نمایش داده نمی‌شود
                 if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
                     selectToolSlot(0);
                 } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
@@ -695,7 +689,6 @@ public class GameScreen implements Screen, ChatListener {
 //                Gdx.app.log("GameScreen", "Player started moving");
             }
 
-            // کدهای مربوط به حیوانات
             if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
                 if (animalManager != null) {
                     animalManager.printAnimalsStatus();
@@ -723,14 +716,13 @@ public class GameScreen implements Screen, ChatListener {
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
                 if (animalManager != null && animalManager.getSelectedAnimal() != null) {
-                    boolean isBarn = true; // یا false برای قفس
-                    int buildingIndex = 0; // شاخص ساختمان مورد نظر
+                    boolean isBarn = true;
+                    int buildingIndex = 0; 
                     connectAnimalToBuilding(animalManager.getSelectedAnimal(), isBarn, buildingIndex);
                 }
             }
 
 
-            // باز/بسته کردن رابط کاربری یخچال
             if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
                 showRefrigeratorUI = !showRefrigeratorUI;
                 selectedPlayerSlot = -1;
@@ -742,14 +734,11 @@ public class GameScreen implements Screen, ChatListener {
                 }
             }
 
-// اگر رابط کاربری یخچال باز است
             if (showRefrigeratorUI) {
-                // انتخاب آیتم با کلیک موس
                 if (Gdx.input.justTouched()) {
                     int mouseX = Gdx.input.getX();
                     int mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
-                    // بررسی کلیک در موجودی کوله
                     if (mouseY > Gdx.graphics.getHeight() / 2) {
                         int itemsPerRow = 5;
                         int itemWidth = 200;
@@ -769,7 +758,6 @@ public class GameScreen implements Screen, ChatListener {
                             }
                         }
                     }
-                    // بررسی کلیک در موجودی یخچال
                     else {
                         int itemsPerRow = 5;
                         int itemWidth = 200;
@@ -791,7 +779,6 @@ public class GameScreen implements Screen, ChatListener {
                     }
                 }
 
-                // انتقال آیتم از کوله به یخچال
                 if (Gdx.input.isKeyJustPressed(Input.Keys.T) && selectedPlayerSlot != -1) {
                     InventoryItem selectedItem = inventoryManager.getPlayerInventory().getItem(selectedPlayerSlot);
                     if (selectedItem != null) {
@@ -816,7 +803,6 @@ public class GameScreen implements Screen, ChatListener {
                     }
                 }
 
-                // انتقال آیتم از یخچال به کوله
                 if (Gdx.input.isKeyJustPressed(Input.Keys.F) && selectedRefrigeratorSlot != -1) {
                     InventoryItem selectedItem = refrigerator.getInventory().getItem(selectedRefrigeratorSlot);
                     if (selectedItem != null) {
@@ -841,7 +827,6 @@ public class GameScreen implements Screen, ChatListener {
                     }
                 }
 
-                // جلوگیری از پردازش سایر ورودی‌ها وقتی رابط کاربری یخچال باز است
                 return;
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
@@ -874,16 +859,24 @@ public class GameScreen implements Screen, ChatListener {
                 }
             }
 
-            if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
-                CookingScreen cookingScreen = new CookingScreen(
-                    (Main)Gdx.app.getApplicationListener(),
-                    GameAssetManager.getGameAssetManager().getSkin(),
-                    inventoryManager,
-                    cookingManager,
-                    player
-                );
-                ((Main)Gdx.app.getApplicationListener()).setScreen(cookingScreen);
-                Gdx.app.log("GameScreen", "Opening cooking screen.");
+           if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
+                try {
+                    if (inventoryManager == null || cookingManager == null || player == null) {
+                        Gdx.app.log("GameScreen", "Cannot open CookingScreen: missing managers or player.");
+                    } else {
+                        CookingScreen cookingScreen = new CookingScreen(
+                            (Main)Gdx.app.getApplicationListener(),
+                            GameAssetManager.getGameAssetManager().getSkin(),
+                            inventoryManager,
+                            cookingManager,
+                            player
+                        );
+                        ((Main)Gdx.app.getApplicationListener()).setScreen(cookingScreen);
+                        Gdx.app.log("GameScreen", "Opening cooking screen.");
+                    }
+                } catch (Exception e) {
+                    Gdx.app.error("GameScreen", "Failed to open CookingScreen", e);
+                }
             }
 
         } catch (Exception e) {
@@ -1003,16 +996,13 @@ public class GameScreen implements Screen, ChatListener {
         worldController.getSpriteBatch().draw(whitePixel, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         whitePixel.dispose();
 
-        // رسم عنوان
         font.draw(worldController.getSpriteBatch(), "Refrigerator Contents", 20, Gdx.graphics.getHeight() - 20);
         font.draw(worldController.getSpriteBatch(), "Press R to close", Gdx.graphics.getWidth() - 150, Gdx.graphics.getHeight() - 20);
 
-        // رسم خط جدا کننده
         worldController.getSpriteBatch().setColor(1, 1, 1, 0.5f);
         worldController.getSpriteBatch().draw(whitePixel, 20, Gdx.graphics.getHeight() - 40, Gdx.graphics.getWidth() - 40, 2);
         worldController.getSpriteBatch().setColor(1, 1, 1, 1);
 
-        // رسم موجودی کوله
         font.draw(worldController.getSpriteBatch(), "Player Inventory:", 20, Gdx.graphics.getHeight() - 60);
         int x = 20;
         int y = Gdx.graphics.getHeight() - 100;
@@ -1022,15 +1012,12 @@ public class GameScreen implements Screen, ChatListener {
         for (int i = 0; i < inventoryManager.getPlayerInventory().getCapacity(); i++) {
             InventoryItem item = inventoryManager.getPlayerInventory().getItem(i);
             if (item != null) {
-                // رسم آیتم
                 if (item.getTexture() != null) {
                     worldController.getSpriteBatch().draw(item.getTexture(), x, y, 32, 32);
                 }
 
-                // رسم نام و تعداد
                 font.draw(worldController.getSpriteBatch(), item.getName() + " x" + item.getQuantity(), x + 40, y + 16);
 
-                // رسم کادر انتخاب
                 if (i == selectedPlayerSlot) {
                     worldController.getSpriteBatch().setColor(1, 1, 0, 0.5f);
                     worldController.getSpriteBatch().draw(whitePixel, x - 2, y - 2, 36, 36);
@@ -1047,7 +1034,6 @@ public class GameScreen implements Screen, ChatListener {
             }
         }
 
-        // رسم موجودی یخچال
         font.draw(worldController.getSpriteBatch(), "Refrigerator Contents:", 20, Gdx.graphics.getHeight() / 2);
         x = 20;
         y = Gdx.graphics.getHeight() / 2 - 40;
@@ -1056,15 +1042,12 @@ public class GameScreen implements Screen, ChatListener {
         for (int i = 0; i < refrigerator.getInventory().getCapacity(); i++) {
             InventoryItem item = refrigerator.getInventory().getItem(i);
             if (item != null) {
-                // رسم آیتم
                 if (item.getTexture() != null) {
                     worldController.getSpriteBatch().draw(item.getTexture(), x, y, 32, 32);
                 }
 
-                // رسم نام و تعداد
                 font.draw(worldController.getSpriteBatch(), item.getName() + " x" + item.getQuantity(), x + 40, y + 16);
 
-                // رسم کادر انتخاب
                 if (i == selectedRefrigeratorSlot) {
                     worldController.getSpriteBatch().setColor(1, 1, 0, 0.5f);
                     worldController.getSpriteBatch().draw(whitePixel, x - 2, y - 2, 36, 36);
@@ -1081,7 +1064,6 @@ public class GameScreen implements Screen, ChatListener {
             }
         }
 
-        // رسم راهنما
         font.draw(worldController.getSpriteBatch(), "Click on items to select them", 20, 60);
         font.draw(worldController.getSpriteBatch(), "Press T to transfer from player to refrigerator", 20, 40);
         font.draw(worldController.getSpriteBatch(), "Press F to transfer from refrigerator to player", 20, 20);
