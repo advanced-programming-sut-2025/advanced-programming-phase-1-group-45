@@ -1,9 +1,6 @@
 package com.proj.network.multiplayerGame;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -1136,7 +1133,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
 
         chatButton.setPosition(
             20,
-            mapButton.getHeight() + 20
+            Gdx.graphics.getHeight() - chatButton.getHeight() - 20
         );
 
         chatButton.addListener(new ClickListener() {
@@ -1151,20 +1148,31 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
         uistage.addActor(chatButton);
     }
     private ImageButton mapButton;
+    private ImageButton cheetButton;
 
     private void createMapButton() {
-        Texture chatIcon = new Texture("assets/map_icon.jpg");
-        TextureRegion chatR = new TextureRegion(chatIcon);
+        Texture cheetI = GameAssetManager.getGameAssetManager().getMapIcon();
+        TextureRegion mapR = new TextureRegion(cheetI);
+        TextureRegion cheetR = new TextureRegion(GameAssetManager.getGameAssetManager().getCheetIcon());
 
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
-        style.imageUp = new TextureRegionDrawable(chatR);
+        style.imageUp = new TextureRegionDrawable(mapR);
+
+        ImageButton.ImageButtonStyle style2 = new ImageButton.ImageButtonStyle();
+        style2.imageUp = new TextureRegionDrawable(cheetR);
 
         mapButton = new ImageButton(style);
         mapButton.setSize(128, 128);
 
         mapButton.setPosition(
             20,
-            Gdx.graphics.getHeight() - mapButton.getWidth() - 300
+            20
+        );
+
+        cheetButton = new ImageButton(style2);
+        cheetButton.setSize(127, 128);
+        cheetButton.setPosition(
+            20, cheetButton.getHeight() + 50
         );
 
         mapButton.addListener(new ClickListener() {
@@ -1175,6 +1183,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
         });
 
         uistage.addActor(mapButton);
+        uistage.addActor(cheetButton);
     }
 
     private com.badlogic.gdx.scenes.scene2d.ui.Image alertIcon;
