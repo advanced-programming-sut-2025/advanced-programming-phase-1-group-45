@@ -2,7 +2,7 @@ package com.proj.network;
 
 public class ServerMain {
     public static void main(String[] args) {
-        Server server = new Server();
+        GameServer server = new GameServer();
         server.start();
     }
 }
