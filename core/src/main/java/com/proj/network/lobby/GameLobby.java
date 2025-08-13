@@ -1,9 +1,9 @@
 package com.proj.network.lobby;
 
 import com.proj.network.ClientConnectionController;
-import com.proj.network.Game;
-import com.proj.network.Server;
-import com.proj.network.PlayerInGame;
+import com.proj.network.GameInstance;
+import com.proj.network.GameServer;
+import com.proj.network.PlayerGameState;
 import com.proj.network.message.JsonBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,15 +24,15 @@ public class GameLobby {
     private long lastActivityTime;
 
     private final Map<String, ClientConnectionController> players = new ConcurrentHashMap<>();
-    private final Map<String, PlayerInGame> playerStates = new ConcurrentHashMap<>();
+    private final Map<String, PlayerGameState> playerStates = new ConcurrentHashMap<>();
 
-    private Game game;
-    private Server server;
+    private GameInstance gameInstance;
+    private GameServer server;
 
     public GameLobby() {
     }
 
-    public GameLobby(String id, String name, String admin, int maxPlayers, boolean isPrivate, boolean isVisible, Server server) {
+    public GameLobby(String id, String name, String admin, int maxPlayers, boolean isPrivate, boolean isVisible, GameServer server) {
         this.id = id;
         this.name = name;
         this.admin = admin;
@@ -44,6 +44,9 @@ public class GameLobby {
         this.lastActivityTime = System.currentTimeMillis();
     }
 
+    /**
+     * افزودن بازیکن به لابی
+     */
     public void addPlayer(String username, ClientConnectionController handler) {
         players.put(username, handler);
         handler.setCurrentLobby(this);
@@ -55,28 +58,31 @@ public class GameLobby {
             broadcastMessage("SYSTEM", username + " is the new lobby admin");
         }
 
-        if (gameActive && game != null) {
-            PlayerInGame state = new PlayerInGame();
+        // ایجاد وضعیت بازی برای بازیکن جدید اگر بازی در حال اجراست
+        if (gameActive && gameInstance != null) {
+            PlayerGameState state = new PlayerGameState();
             state.setUsername(username);
             state.initialize();
             playerStates.put(username, state);
 
-            handler.sendMessage("GAME_STATE", game.getGameState());
+            // ارسال وضعیت فعلی بازی به بازیکن جدید
+            handler.sendMessage("GAME_STATE", gameInstance.getGameState());
         }
 
+        // اطلاع‌رسانی به همه بازیکنان
         broadcastMessage("LOBBY_UPDATE", getLobbyInfo().toString());
         server.notifyPlayerStatusUpdate();
     }
 
     public void sendPlayerPositions() {
         JSONArray players = new JSONArray();
-        Game game = server.getGameManager().getGameInstance(id);
-        if (game != null) {
-            for (PlayerInGame playerInGame : game.getAllPlayers()) {
+        GameInstance gameInstance = server.getGameManager().getGameInstance(id);
+        if (gameInstance != null) {
+            for (PlayerGameState playerGameState : gameInstance.getAllPlayers()) {
                 JSONObject position = new JSONObject();
-                position.put("username", playerInGame.getUsername()).put("x", playerInGame.getPosition().getX()).put("y",
-                    playerInGame.getPosition().getY()).put("mapName",
-                    playerInGame.getCurrentMapName());
+                position.put("username", playerGameState.getUsername()).put("x", playerGameState.getPosition().getX()).put("y",
+                    playerGameState.getPosition().getY()).put("mapName",
+                    playerGameState.getCurrentMapName());
                 players.put(position);
             }
 
@@ -105,7 +111,7 @@ public class GameLobby {
         }
 
         // اگر بازی در حال اجراست، بررسی کنیم آیا باید بازی را متوقف کنیم
-        if (gameActive && game != null && players.size() < 2) {
+        if (gameActive && gameInstance != null && players.size() < 2) {
             endGame("players are not enough to continue game");
         }
 
@@ -134,6 +140,40 @@ public class GameLobby {
         }
     }
 
+    /**
+     * شروع بازی
+     */
+    public boolean startGame() {
+        if (gameActive) {
+            return false; // بازی قبلاً شروع شده است
+        }
+
+        if (players.size() < 2) {
+            return false; // تعداد بازیکنان کافی نیست
+        }
+
+        gameActive = true;
+        gameInstance = new GameInstance(id, this);
+        gameInstance.initialize();
+
+        // ایجاد وضعیت اولیه برای هر بازیکن
+        for (String username : players.keySet()) {
+            PlayerGameState state = new PlayerGameState();
+            state.setUsername(username);
+            state.initialize();
+            playerStates.put(username, state);
+        }
+
+        // ارسال وضعیت بازی به همه بازیکنان
+        broadcastMessage("GAME_STATE", gameInstance.getGameState().toString());
+        broadcastMessage("GAME_STARTED", "game starded.. please choose your map and start gaming");
+
+        return true;
+    }
+
+    /**
+     * پایان بازی
+     */
     public void endGame(String reason) {
         if (!gameActive) {
             return;
@@ -141,15 +181,27 @@ public class GameLobby {
 
         gameActive = false;
 
+        // ارسال پیام پایان بازی به همه بازیکنان
         JSONObject endData = new JSONObject();
         endData.put("reason", reason);
         broadcastMessage("GAME_END", endData.toString());
 
+        // پاک کردن وضعیت بازی
         playerStates.clear();
-        game = null;
+        gameInstance = null;
     }
 
+    /**
+     * به‌روزرسانی وضعیت بازیکن
+     */
+    public void updatePlayerState(String username, PlayerGameState state) {
+        playerStates.put(username, state);
+        updateLastActivity();
+    }
 
+    /**
+     * دریافت اطلاعات لابی به صورت JSON
+     */
     public JSONObject getLobbyInfo() {
         return new JsonBuilder()
             .put("id", id)
@@ -164,6 +216,9 @@ public class GameLobby {
             .build();
     }
 
+    /**
+     * بررسی اعتبار رمز عبور
+     */
     public boolean checkPassword(String password) {
         if (!isPrivate) {
             return true;
@@ -171,10 +226,16 @@ public class GameLobby {
         return this.password != null && this.password.equals(password);
     }
 
+    /**
+     * به‌روزرسانی زمان آخرین فعالیت
+     */
     public void updateLastActivity() {
         this.lastActivityTime = System.currentTimeMillis();
     }
 
+    /**
+     * بررسی عدم فعالیت طولانی
+     */
     public boolean isInactive(long timeoutMs) {
         return System.currentTimeMillis() - lastActivityTime > timeoutMs;
     }
@@ -236,15 +297,15 @@ public class GameLobby {
         return players.size() >= maxPlayers;
     }
 
-    public PlayerInGame getPlayerState(String username) {
+    public PlayerGameState getPlayerState(String username) {
         return playerStates.get(username);
     }
 
-    public Game getGameInstance() {
-        return game;
+    public GameInstance getGameInstance() {
+        return gameInstance;
     }
 
-    public Server getGameServer() {
+    public GameServer getGameServer() {
         return server;
     }
 
@@ -260,8 +321,8 @@ public class GameLobby {
         this.admin = admin;
     }
 
-    public void setGameInstance(Game game) {
-        this.game = game;
+    public void setGameInstance(GameInstance gameInstance) {
+        this.gameInstance = gameInstance;
     }
 
     public void setLastActivityTime(long lastActivityTime) {
@@ -276,7 +337,7 @@ public class GameLobby {
         this.id = id;
     }
 
-    public void setServer(Server server) {
+    public void setServer(GameServer server) {
         this.server = server;
     }
 
