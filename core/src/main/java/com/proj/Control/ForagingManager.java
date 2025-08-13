@@ -36,17 +36,21 @@ public class ForagingManager {
 
     public void findEmptyTiles() {
         emptyTiles.clear();
+        emptyTilesCount = 0;
         for (Tile[] tile : gameMap.getLandLoader().getTiles()) {
             for (Tile tile1 : tile) {
-                if (tile1.isPassable()) {
-                    emptyTiles.add(tile1);
-                    emptyTilesCount++;
+                if (tile1.isPassable() && !tile1.isEnterPoint()) {
+                    if (!emptyTiles.contains(tile1, true)) {
+                        emptyTiles.add(tile1);
+                        emptyTilesCount++;
+                    }
                 }
             }
         }
     }
 
     public void spawnDailyRandomItems(Season currentSeason) {
+        findEmptyTiles();
         gameMap.removeForaging();
         if (gameMap.getMapName().equalsIgnoreCase("cave")) {
             spawnForagingMineral();
@@ -66,7 +70,7 @@ public class ForagingManager {
         if (seasonalItems.size == 0) return;
         int totalTiles = gameMap.getMapWidth() * gameMap.getMapHeight();
         int itemsToSpawn = Math.max(1, (int) (emptyTilesCount * 0.005));
-        for (int i = 0; i < itemsToSpawn; i++) {
+        for (int i = 0; i < Math.min(itemsToSpawn, emptyTiles.size) ; i++) {
             Tile tile = emptyTiles.random();
             emptyTiles.removeValue(tile, true);
             Point position = tile.getLocation();

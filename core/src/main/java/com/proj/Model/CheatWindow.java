@@ -51,7 +51,7 @@ public class CheatWindow {
                 showTimeInputDialog();
             }
         });
-        contentTable.add(timeButton).size(100, 100).padBottom(15);
+        contentTable.add(timeButton).size(100, 100).padRight(10);
         Texture dayNightIcon = new Texture("assets/day_and_night_icon.png");
         ImageButton dayButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(dayNightIcon)));
         dayButton.addListener(new ClickListener() {
@@ -60,7 +60,7 @@ public class CheatWindow {
                 showDayInputDialog();
             }
         });
-        contentTable.add(dayButton).size(100, 100).padBottom(15).padLeft(5).row();
+        contentTable.add(dayButton).size(100, 100).row();
 
         Table weatherTable = new Table();
         weatherTable.defaults().size(100, 100).pad(5);
@@ -152,7 +152,6 @@ public class CheatWindow {
                     String day = timeField.getText();
                     if (day.matches("^\\d+$")) {
 
-                        Main.getMain().getGameClient().changeDay(Integer.parseInt(day));
                     } else {
                         new Dialog("Error", skin).text("Invalid day format! Use numbers").button("OK").show(stage);
                     }

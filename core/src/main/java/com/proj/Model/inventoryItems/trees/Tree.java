@@ -13,7 +13,7 @@ import java.awt.*;
 public class Tree {
     private final TreeData data;
     private final int x, y;
-    private int currentStage = 4;
+    private int currentStage = 0;
     private int daysInCurrentStage = 0;
     private boolean hasProduct = false;
 

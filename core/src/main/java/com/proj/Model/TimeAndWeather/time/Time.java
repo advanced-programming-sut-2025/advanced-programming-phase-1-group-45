@@ -27,7 +27,7 @@ public class Time implements GameEventListener {
 
     public Time() {
         day = 1;
-        hour = 9;
+        hour = 21;
         minute = 0;
         dayOfWeek = DayOfWeek.Saturday;
         season = Season.SPRING;

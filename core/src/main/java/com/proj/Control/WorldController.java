@@ -152,6 +152,12 @@ public class WorldController {
         positionUiElement(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         farmInOutPoints = GameAssetManager.getGameAssetManager().getExitPointList(gameMap.getMapName());
         currentFarmInOutPoint = findExitEnterPointsById(maps.get(landName));
+        for (GameMap map : gameMaps.values()) {
+            FarmInOutPoint io = findExitEnterPointsById(maps.get(map.getMapName()));
+            for (Point point : io.getEnterPoints()) {
+                map.getTile(point.x, point.y).setIsEnterPoint(true);
+            }
+        }
         foragingManager = new ForagingManager();
     }
 

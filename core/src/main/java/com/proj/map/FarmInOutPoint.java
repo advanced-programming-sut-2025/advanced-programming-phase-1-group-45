@@ -1,7 +1,9 @@
 package com.proj.map;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class FarmInOutPoint {
     private String farmName;
@@ -24,6 +26,10 @@ public class FarmInOutPoint {
 
     public String getFarmName() {
         return farmName;
+    }
+
+    public List<Point> getEnterPoints() {
+        return new ArrayList<Point>(farmEnterPoints.keySet());
     }
 
     public int getMapId() {

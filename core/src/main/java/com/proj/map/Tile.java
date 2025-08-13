@@ -17,6 +17,7 @@ public class Tile {
     private boolean watered = false;
     private boolean fertilized = false;
     private boolean thundered = false;
+    private boolean isEnterPoint = false;
 
     public Tile(Point location, TileType type) {
         this.location = location;
@@ -30,6 +31,13 @@ public class Tile {
 
     public TileType getType() {
         return type;
+    }
+
+    public void setIsEnterPoint(boolean isEnterPoint) {
+        this.isEnterPoint = isEnterPoint;
+    }
+    public boolean isEnterPoint() {
+        return isEnterPoint;
     }
 
     public void setObject(LandObject landObject) {

@@ -420,7 +420,6 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             }
             uistage.act(delta);
             uistage.draw();
-
         } catch (Exception e) {
             if (worldController.getSpriteBatch().isDrawing()) {
                 worldController.getSpriteBatch().end();
