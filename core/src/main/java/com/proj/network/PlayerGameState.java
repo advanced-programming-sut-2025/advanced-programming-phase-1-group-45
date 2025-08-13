@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.proj.map.*;
 
-public class PlayerInGame {
+public class PlayerGameState {
     private String username;
     private farmName farm;
     private boolean readyToPlay;
@@ -15,22 +15,22 @@ public class PlayerInGame {
     private String currentMapName;
     private Position position;
     private boolean isMoving = false;
-//    private PlayerDirection direction = PlayerDirection.DOWN;
-//    private int energy = 100;
+    private PlayerDirection direction = PlayerDirection.DOWN;
+    private int energy = 100;
     private int score = 0;
     private Map<String, Integer> inventory = new HashMap<>();
     private Map<String, Integer> skills = new HashMap<>();
     private long lastActionTime;
 
-    public PlayerInGame() {
+    public PlayerGameState() {
         this.lastActionTime = System.currentTimeMillis();
     }
 
     public void initialize() {
         position = new Position(0, 0);
-//        energy = 100;
+        energy = 100;
         score = 0;
-//        direction = PlayerDirection.DOWN;
+        direction = PlayerDirection.DOWN;
         isMoving = false;
 
         inventory.put("coin", 100);
@@ -48,9 +48,9 @@ public class PlayerInGame {
         json.put("position", new JSONObject()
             .put("x", position.getX())
             .put("y", position.getY()));
-//        json.put("direction", direction.toString());
+        json.put("direction", direction.toString());
         json.put("isMoving", isMoving);
-//        json.put("energy", energy);
+        json.put("energy", energy);
         json.put("score", score);
 
         JSONObject inventoryJson = new JSONObject();
@@ -81,9 +81,9 @@ public class PlayerInGame {
         }
     }
 
-//    public void restoreEnergy(float amount) {
-//        energy = Math.min(100, energy + (int) amount);
-//    }
+    public void restoreEnergy(float amount) {
+        energy = Math.min(100, energy + (int) amount);
+    }
 
     // Getters and setters
     public String getUsername() {
@@ -115,21 +115,21 @@ public class PlayerInGame {
         isMoving = moving;
     }
 
-//    public PlayerDirection getDirection() {
-//        return direction;
-//    }
+    public PlayerDirection getDirection() {
+        return direction;
+    }
 
-//    public void setDirection(PlayerDirection direction) {
-//        this.direction = direction;
-//    }
+    public void setDirection(PlayerDirection direction) {
+        this.direction = direction;
+    }
 
-//    public int getEnergy() {
-//        return energy;
-//    }
+    public int getEnergy() {
+        return energy;
+    }
 
-//    public void setEnergy(int energy) {
-//        this.energy = energy;
-//    }
+    public void setEnergy(int energy) {
+        this.energy = energy;
+    }
 
     public int getScore() {
         return score;
