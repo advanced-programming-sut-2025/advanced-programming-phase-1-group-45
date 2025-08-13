@@ -93,7 +93,7 @@ public class CompositeMapSystem {
             addMapConfig("Beach", new Texture("map_pic/beach.jpg"), 0, 0, 104 * 16, 50 * 16);
             addMapConfig("BusStop", new Texture("map_pic/busstop.jpg"), 0, 0, 65 * 16, 30 * 16);
             addMapConfig("Forest", new Texture("map_pic/forest.jpg"), 0, 0, 120 * 16, 120 * 16);
-            addMapConfig("BackWoods", new Texture("map_pic/backwoods.jpg"), 0, 0, 50 * 16, 40 * 16);
+            addMapConfig("BackWoods", new Texture("map_pic/backWoods.jpg"), 0, 0, 50 * 16, 40 * 16);
         } catch (Exception e) {
             Gdx.app.error("CompositeMapSystem", "Error loading map textures", e);
         }
