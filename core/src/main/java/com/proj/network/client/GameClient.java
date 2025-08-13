@@ -3,9 +3,11 @@ package com.proj.network.client;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Disposable;
 import com.proj.map.farmName;
+import com.proj.network.GameInstance;
 import com.proj.network.event.GameEvent;
 import com.proj.network.event.LobbyEvent;
 import com.proj.network.event.NetworkEvent;
+import com.proj.network.lobby.GameLobby;
 import com.proj.network.message.AuthRequest;
 import com.proj.network.message.JsonBuilder;
 import com.proj.network.message.JsonParser;
@@ -164,6 +166,10 @@ public class GameClient implements Disposable, Runnable {
                     break;
                 case "LEAVE_SUCCESS":
                     handleLeaveLobby();
+                    break;
+
+                case "GAME_TIME":
+                    syncGameTime(data);
                     break;
 
                 case "LOBBIES_LIST":
@@ -395,6 +401,10 @@ public class GameClient implements Disposable, Runnable {
         System.out.println("GameClient  sending position " + x + " " + y);
     }
 
+    public void updateTimeInGame(float delta) {
+        sendMessage("UPDATE_TIME_IN_GAME", JsonBuilder.create().put("delta", delta).build());
+    }
+
     public void requestLobbiesList() {
         sendMessage("GET_LOBBIES", JsonBuilder.empty());
     }
@@ -406,6 +416,10 @@ public class GameClient implements Disposable, Runnable {
             .build();
 
         sendMessage("GAME_ACTION", data);
+    }
+
+    public void syncGameTime(JSONObject data) {
+            fireGameEvent(GameEvent.Type.UPDATE_TIME, data);
     }
 
     private void sendMessage(String type, JSONObject data) {
@@ -485,7 +499,6 @@ public class GameClient implements Disposable, Runnable {
 
     private void fireGameEvent(GameEvent.Type type, JSONObject data) {
         GameEvent event = new GameEvent(type, data.toString());
-        System.out.println("sending game postion");
         for (GameEventListener listener : gameListeners) {
                 (listener).handleGameEvent(event);
         }

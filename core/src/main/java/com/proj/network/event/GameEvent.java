@@ -4,6 +4,7 @@ public class GameEvent {
     public enum Type {
         START,
         UPDATE,
+        UPDATE_TIME,
         ENDED,
         ACTION,
         UPDATE_POSITIONS,

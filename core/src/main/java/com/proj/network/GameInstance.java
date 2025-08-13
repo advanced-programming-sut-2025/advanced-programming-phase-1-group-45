@@ -1,6 +1,8 @@
 package com.proj.network;
 
+import com.proj.Model.TimeAndWeather.time.Time;
 import com.proj.network.lobby.GameLobby;
+import com.proj.network.message.JsonBuilder;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.Map;
 public class GameInstance {
     private final String gameId;
     private final GameLobby lobby;
+    private  Time gameTimer;
+
     private final Map<String, PlayerGameState> playerStates = new HashMap<>();
     private boolean gameActive = false;
     private long lastActivityTime;
@@ -57,13 +61,23 @@ public class GameInstance {
         if (!gameActive) {
             return;
         }
-
+        gameTimer.update(deltaTime, false);
+        lobby.broadcastMessage("GAME_TIME", getTime().toString());
         // Update player states
         for (PlayerGameState playerState : playerStates.values()) {
             if (!playerState.isMoving()) {
                 playerState.restoreEnergy(deltaTime);
             }
         }
+    }
+    public JSONObject getTime() {
+        JSONObject time = JsonBuilder.create().put("hour", gameTimer.getHour()).
+            put("minute", gameTimer.getMinute())
+            .put("day", gameTimer.getDay()).put("season", gameTimer.getSeason().toString()).
+            put("weather", gameTimer.getWeather().getWeather()).
+            put("dayOfWeek", gameTimer.getDayOfWeek().toString()).
+            build();
+        return time;
     }
 
     public JSONObject getGameState() {
@@ -101,6 +115,7 @@ public class GameInstance {
                 return false;
             }
         }
+        gameTimer = new Time();
         return true;
     }
 

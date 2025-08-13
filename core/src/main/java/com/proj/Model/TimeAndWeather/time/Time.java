@@ -1,11 +1,17 @@
 package com.proj.Model.TimeAndWeather.time;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.proj.Main;
 import com.proj.Model.TimeAndWeather.DayOfWeek;
 import com.proj.Model.TimeAndWeather.Weather;
 import com.proj.map.Season;
+import com.proj.network.client.GameEventListener;
+import com.proj.network.event.GameEvent;
+import com.proj.network.event.NetworkEvent;
+import com.proj.network.message.JsonParser;
+import org.json.JSONObject;
 
-public class Time {
+public class Time implements GameEventListener {
     private int day;
     private int hour;
     private int minute;
@@ -29,6 +35,7 @@ public class Time {
         frame = 0;
         dayPassed = 0;
         isNight = hour >= 18;
+        Main.getMain().getGameClient().addGameListener(this);
     }
 
     public void update(float delta, boolean isPaused) {
@@ -174,4 +181,30 @@ public class Time {
         return sb.toString();
     }
 
+    @Override
+    public void handleGameEvent(GameEvent event) {
+        if (event.getType() == GameEvent.Type.UPDATE_TIME) {
+            JSONObject data = new JSONObject(event.getGameData());
+            int hour = JsonParser.getInt(data,"hour", 9);
+            int minute = JsonParser.getInt(data,"minute", 0);
+            int day = JsonParser.getInt(data,"day", 1);
+            String dayOfWeek = JsonParser.getString(data, "dayOfWeek", "Sunday");
+            DayOfWeek dayOfWeekEnum = DayOfWeek.valueOf(dayOfWeek);
+            String season = JsonParser.getString(data, "season", "SPRING");
+            String weather = JsonParser.getString(data, "weather", "SUNNY");
+            Season season1 = Season.valueOf(season);
+            Weather weather1 = Weather.valueOf(weather);
+            this.hour = hour;
+            this.minute = minute;
+            this.day = day;
+            this.season = season1;
+            this.weather = weather1;
+            this.dayOfWeek = dayOfWeekEnum;
+        }
+    }
+
+    @Override
+    public void handleNetworkEvent(NetworkEvent event) {
+
+    }
 }

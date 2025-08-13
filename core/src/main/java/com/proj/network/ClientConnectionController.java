@@ -166,8 +166,16 @@ public class ClientConnectionController implements Runnable {
                 receiveStateToStart(data);
                 break;
 
+            case "GAME_TIME":
+                syncGameTime(data);
+                break;
+
             case "READY_TO_PLAY":
                 readyToStart(data);
+                break;
+
+            case "UPDATE_TIME_IN_GAME":
+                updateTimeInGame(data);
                 break;
 
             case "GAME_ACTION":
@@ -413,6 +421,12 @@ public class ClientConnectionController implements Runnable {
         System.out.println("ClientController  sending position " + x + " " + y);
     }
 
+    private void updateTimeInGame(JSONObject data) {
+        GameInstance gameInstance = server.getGameManager().getGameInstance(currentLobby.getId());
+        float delta = data.getFloat("delta");
+        gameInstance.update(delta);
+    }
+
     public synchronized void sendMessage(String type, JSONObject data) {
         if (!running.get() || out == null) {
             return;
@@ -438,6 +452,10 @@ public class ClientConnectionController implements Runnable {
             .put("message", message)
             .build();
         sendMessage("ERROR", error);
+    }
+
+    private void syncGameTime(JSONObject data) {
+        sendMessage("GAME_TIME", data);
     }
 
     public void sendLobbiesList() {

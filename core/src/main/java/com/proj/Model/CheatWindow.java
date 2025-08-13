@@ -18,7 +18,6 @@ public class CheatWindow {
     private Window envWindow;
     private boolean isVisible = false;
 
-    // دکمه‌های آب و هوا
     private ImageButton sunnyBtn;
     private ImageButton rainyBtn;
     private ImageButton stormyBtn;
@@ -100,8 +99,9 @@ public class CheatWindow {
         button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                setCurrentWeather(weatherType); // Add this line
-                updateWeatherButtons();
+                setCurrentWeather(weatherType);
+
+                toggle();
             }
         });
         button.getImage().setColor(1, 1, 1, 0.8f);

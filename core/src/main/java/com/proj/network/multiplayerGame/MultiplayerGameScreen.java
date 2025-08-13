@@ -324,7 +324,8 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             }
 
             updateCamera();
-            gameTime.update(delta, timeIsPaused);
+            Main.getMain().getGameClient().updateTimeInGame(delta);
+//            gameTime.update(delta, timeIsPaused);
             worldController.update(delta);
             inventoryManager.update(delta, player);
             animalManager.update(delta);
