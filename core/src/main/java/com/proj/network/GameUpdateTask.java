@@ -4,17 +4,19 @@ import com.proj.network.lobby.GameLobby;
 
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * کلاس وظیفه به‌روزرسانی بازی
  */
 public class GameUpdateTask implements Runnable {
-    private final Server server;
+    private static final Logger logger = Logger.getLogger(GameUpdateTask.class.getName());
+    private final GameServer server;
     private static final int UPDATE_RATE = 60; // تعداد به‌روزرسانی در ثانیه
     private static final long FRAME_TIME = 1000 / UPDATE_RATE; // زمان هر فریم به میلی‌ثانیه
     private boolean running = true;
 
-    public GameUpdateTask(Server server) {
+    public GameUpdateTask(GameServer server) {
         this.server = server;
     }
 
@@ -55,11 +57,13 @@ public class GameUpdateTask implements Runnable {
         }
     }
 
-
+    /**
+     * به‌روزرسانی تمام بازی‌های فعال
+     */
     private void updateGames(float deltaTime) {
         for (GameLobby lobby : server.getGameLobbies().values()) {
             if (lobby.isGameActive()) {
-                Game game = server.getGameManager().getGameInstance(lobby.getId());
+                GameInstance game = server.getGameManager().getGameInstance(lobby.getId());
                 if (game != null) {
                     game.update(deltaTime);
 
@@ -83,9 +87,9 @@ public class GameUpdateTask implements Runnable {
             // بازیابی انرژی بازیکنان در حالت استراحت
             GameLobby lobby = findPlayerLobby(username);
             if (lobby != null && lobby.isGameActive()) {
-                Game game = server.getGameManager().getGameInstance(lobby.getId());
+                GameInstance game = server.getGameManager().getGameInstance(lobby.getId());
                 if (game != null) {
-                    PlayerInGame playerState = game.getPlayerState(username);
+                    PlayerGameState playerState = game.getPlayerState(username);
                     if (playerState != null && !playerState.isMoving()) {
                         // بازیابی انرژی در حالت استراحت
                         playerState.restoreEnergy(deltaTime * 2);
@@ -95,10 +99,16 @@ public class GameUpdateTask implements Runnable {
         }
     }
 
+    /**
+     * بررسی اتصال‌های قطع شده
+     */
     private void checkDisconnectedClients() {
         // پیاده‌سازی بررسی اتصال‌های قطع شده
     }
 
+    /**
+     * یافتن لابی بازیکن
+     */
     private GameLobby findPlayerLobby(String username) {
         for (GameLobby lobby : server.getGameLobbies().values()) {
             if (lobby.hasPlayer(username)) {
@@ -108,7 +118,9 @@ public class GameUpdateTask implements Runnable {
         return null;
     }
 
-
+    /**
+     * توقف ترد به‌روزرسانی
+     */
     public void stop() {
         running = false;
     }
