@@ -59,6 +59,7 @@ public class GameAssetManager {
     private Texture backpackTexture;
     private Texture exclamationIcon;
     private Texture mapIcon;
+    private Texture cheetIcon;
 
 
     private GameAssetManager() {
@@ -74,6 +75,8 @@ public class GameAssetManager {
         backpackTexture = new Texture(Gdx.files.internal("assets/backpack.png"));
         chatIcon = new Texture(Gdx.files.internal("assets/chat_icon.jpg"));
         exclamationIcon = new Texture("assets/exclamation_icon.png");
+        mapIcon = new Texture("assets/map_icon.jpg");
+        cheetIcon = new Texture("assets/cheet_icon.png");
         //clock
         clockTexture = new Texture("clock/clockmy.png");
         clockHand = new Texture("clock/clock_hand.png");
@@ -119,6 +122,14 @@ public class GameAssetManager {
         return cavePoints.get(farmName);
     }
 
+    public Texture getMapIcon() {
+        return mapIcon;
+    }
+
+    public Texture getCheetIcon() {
+        return cheetIcon;
+    }
+
     public Array<ForagingItem> getForagingMinerals() {
         return foragingLoader.getForagingMinerals();
     }
@@ -150,6 +161,7 @@ public class GameAssetManager {
     public Texture getChatIcon() {
         return chatIcon;
     }
+
     public TextureRegion getTexture(String path) {
         return new TextureRegion(new Texture(Gdx.files.internal(path)));
     }
@@ -157,9 +169,11 @@ public class GameAssetManager {
     public TextureRegion getSnowflake() {
         return snowflake;
     }
+
     public Texture getExclamationIcon() {
         return exclamationIcon;
     }
+
     public BitmapFont getTinyFont() {
         return tinyFont;
     }
