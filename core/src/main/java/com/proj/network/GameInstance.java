@@ -1,5 +1,6 @@
 package com.proj.network;
 
+import com.proj.Model.TimeAndWeather.Weather;
 import com.proj.Model.TimeAndWeather.time.GameTime;
 import com.proj.Model.TimeAndWeather.time.Time;
 import com.proj.network.lobby.GameLobby;
@@ -125,6 +126,22 @@ public class GameInstance {
         gameTimer = new GameTime();
         return true;
     }
+
+    public void changeWeather(Weather weather) {
+        gameTimer.setWeather(weather);
+        lobby.broadcastMessage("GAME_TIME", getTime().toString());
+    }
+
+    public void changeTime(int hour) {
+        gameTimer.advanceHour(hour);
+        lobby.broadcastMessage("GAME_TIME", getTime().toString());
+    }
+
+    public void changeDay(int day) {
+        gameTimer.advanceDay(day);
+        lobby.broadcastMessage("GAME_TIME", getTime().toString());
+    }
+
 
     public void updateLastActivityTime() {
         this.lastActivityTime = System.currentTimeMillis();

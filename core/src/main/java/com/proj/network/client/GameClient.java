@@ -449,6 +449,19 @@ public class GameClient implements Disposable, Runnable {
     }
 
 
+    public void changeWeather(String weatherType) {
+        sendMessage("CHANGE_WEATHER", (JsonBuilder.create().put("weather", weatherType).build()));
+    }
+
+    public void changeHour(int hour) {
+        sendMessage("CHANGE_HOUR", (JsonBuilder.create().put("hour", hour).build()));
+    }
+
+    public void changeDay(int day) {
+        sendMessage("CHANGE_DAY", (JsonBuilder.create().put("day", day).build()));
+    }
+
+
     public void disconnect() {
         if (running.compareAndSet(true, false)) {
             try {

@@ -51,8 +51,16 @@ public class CheatWindow {
                 showTimeInputDialog();
             }
         });
-
-        contentTable.add(timeButton).size(100, 100).padBottom(15).row();
+        contentTable.add(timeButton).size(100, 100).padBottom(15);
+        Texture dayNightIcon = new Texture("assets/day_and_night_icon.png");
+        ImageButton dayButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(dayNightIcon)));
+        dayButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                showDayInputDialog();
+            }
+        });
+        contentTable.add(dayButton).size(100, 100).padBottom(15).padLeft(5).row();
 
         Table weatherTable = new Table();
         weatherTable.defaults().size(100, 100).pad(5);
@@ -100,7 +108,7 @@ public class CheatWindow {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 setCurrentWeather(weatherType);
-
+                Main.getMain().getGameClient().changeWeather(weatherType.toLowerCase());
                 toggle();
             }
         });
@@ -116,8 +124,8 @@ public class CheatWindow {
                 if ((Boolean) object) { // OK pressed
                     TextField timeField = (TextField) getContentTable().findActor("timeInput");
                     String time = timeField.getText();
-                    if (time.matches("^\\d{1,2}:\\d{2}$")) {
-//                        main.setGameTime(time);
+                    if (time.matches("^\\d+$")) {
+                        Main.getMain().getGameClient().changeHour(Integer.parseInt(time));
                     } else {
                         new Dialog("Error", skin).text("Invalid time format! Use HH:mm").button("OK").show(stage);
                     }
@@ -129,6 +137,32 @@ public class CheatWindow {
         TextField timeInput = new TextField("", skin);
         timeInput.setName("timeInput");
         dialog.getContentTable().add(timeInput).width(150).padTop(10);
+        dialog.button("OK", true);
+        dialog.button("Cancel", false);
+        dialog.key(Input.Keys.ENTER, true);
+        dialog.show(stage);
+    }
+
+    private void showDayInputDialog() {
+        Dialog dialog = new Dialog("Set Day", skin) {
+            @Override
+            protected void result(Object object) {
+                if ((Boolean) object) { // OK pressed
+                    TextField timeField = (TextField) getContentTable().findActor("dayInput");
+                    String day = timeField.getText();
+                    if (day.matches("^\\d+$")) {
+                        Main.getMain().getGameClient().changeDay(Integer.parseInt(day));
+                    } else {
+                        new Dialog("Error", skin).text("Invalid day format! Use numbers").button("OK").show(stage);
+                    }
+                }
+            }
+        };
+
+        dialog.text("Enter day: ");
+        TextField dayInput = new TextField("", skin);
+        dayInput.setName("dayInput");
+        dialog.getContentTable().add(dayInput).width(150).padTop(10);
         dialog.button("OK", true);
         dialog.button("Cancel", false);
         dialog.key(Input.Keys.ENTER, true);

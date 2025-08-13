@@ -351,6 +351,7 @@ public class WorldController {
     public void render(OrthographicCamera camera) {
         gameMap.render(camera);
         gameMap.getSpriteBatch().setProjectionMatrix(camera.combined);
+        gameMap.getSpriteBatch().end();
         gameMap.getSpriteBatch().begin();
 
         weatherController.render(gameMap.getSpriteBatch(), gameTime.getWeather());

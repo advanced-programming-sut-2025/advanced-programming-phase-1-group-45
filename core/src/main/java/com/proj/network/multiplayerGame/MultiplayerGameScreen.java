@@ -332,7 +332,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             worldController.getSpriteBatch().begin();
             worldController.getSpriteBatch().setProjectionMatrix(camera.combined);
 
-            worldController.renderMap(camera);
+            worldController.render(camera);
             if (npcManager != null) {
 
                 for (NPCObject npc : npcManager.getNPCs()) {

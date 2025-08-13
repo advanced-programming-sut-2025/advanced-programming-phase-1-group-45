@@ -1,6 +1,7 @@
 package com.proj.network;
 
 import com.badlogic.gdx.Gdx;
+import com.proj.Model.TimeAndWeather.Weather;
 import com.proj.map.farmName;
 import com.proj.network.lobby.GameLobby;
 import com.proj.network.message.JsonBuilder;
@@ -172,6 +173,17 @@ public class ClientConnectionController implements Runnable {
 
             case "READY_TO_PLAY":
                 readyToStart(data);
+                break;
+            case "CHANGE_WEATHER":
+                changeGameWeather(data);
+                break;
+
+            case "CHANGE_HOUR" :
+                changeHour(data);
+                break;
+
+            case  "CHANGE_DAY":
+                changeDay(data);
                 break;
 
             case "UPDATE_TIME_IN_GAME":
@@ -456,6 +468,37 @@ public class ClientConnectionController implements Runnable {
 
     private void syncGameTime(JSONObject data) {
         sendMessage("GAME_TIME", data);
+    }
+    private void changeGameWeather(JSONObject data) {
+        GameInstance game = server.getGameManager().getGameInstance(currentLobby.getId());
+        String weather = JsonParser.getString(data, "weather", "");
+        Weather weather1 = Weather.SUNNY;
+        switch (weather) {
+            case "sunny":
+                weather1 = Weather.SUNNY;
+                break;
+                case "rainy":
+                    weather1 = Weather.RAINY;
+                    break;
+                    case "stormy":
+                        weather1 = Weather.STORMY;
+                        break;
+                        case "snowy":
+                            weather1 = Weather.SNOWY;
+                            break;
+        }
+        game.changeWeather(weather1);
+    }
+    private void changeHour(JSONObject data) {
+        GameInstance game = server.getGameManager().getGameInstance(currentLobby.getId());
+        int hour = JsonParser.getInt(data, "hour", 0);
+        game.changeTime(hour);
+    }
+
+    private void changeDay(JSONObject data) {
+        GameInstance game = server.getGameManager().getGameInstance(currentLobby.getId());
+        int day = JsonParser.getInt(data, "day", 0);
+        game.changeDay(day);
     }
 
     public void sendLobbiesList() {

@@ -316,7 +316,7 @@ public class GameScreen implements Screen, ChatListener {
             worldController.getSpriteBatch().begin();
             worldController.getSpriteBatch().setProjectionMatrix(camera.combined);
 
-            worldController.renderMap(camera);
+            worldController.render(camera);
             if (npcManager != null) {
 
                 for (NPCObject npc : npcManager.getNPCs()) {

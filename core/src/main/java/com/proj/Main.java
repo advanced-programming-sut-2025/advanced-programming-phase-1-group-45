@@ -271,6 +271,7 @@ public class Main extends Game implements NetworkEventListener {
         return gameClient;
     }
 
+
      public Refrigerator getRefrigerator() {
         return refrigerator;
     }

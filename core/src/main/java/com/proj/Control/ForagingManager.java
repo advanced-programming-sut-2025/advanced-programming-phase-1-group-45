@@ -47,6 +47,7 @@ public class ForagingManager {
     }
 
     public void spawnDailyRandomItems(Season currentSeason) {
+        gameMap.removeForaging();
         if (gameMap.getMapName().equalsIgnoreCase("cave")) {
             spawnForagingMineral();
         } else {

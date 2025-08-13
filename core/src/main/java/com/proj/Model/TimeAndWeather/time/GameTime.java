@@ -179,5 +179,53 @@ public class GameTime {
         sb.append(day);
         return sb.toString();
     }
+
+    public void setDay(int day) {
+        this.day = day;
+    }
+
+    public void setHour(int hour) {
+        this.hour = hour;
+    }
+
+    public void setMinute(int minute) {
+        this.minute = minute;
+    }
+
+    public void setSeason(Season season) {
+        this.season = season;
+    }
+
+    public void setWeather(Weather weather) {
+        this.weather = weather;
+    }
+
+    public void setDayOfWeek(DayOfWeek dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
+    }
+
+    public void setDayPassed(int dayPassed) {
+        this.dayPassed = dayPassed;
+    }
+
+    public void setFrame(float frame) {
+        this.frame = frame;
+    }
+
+    public void setPaused(boolean paused) {
+        isPaused = paused;
+    }
+
+    public void setNight(boolean night) {
+        isNight = night;
+    }
+
+    public void setDayChanged(boolean dayChanged) {
+        this.dayChanged = dayChanged;
+    }
+
+    public void setNewDay(boolean newDay) {
+        isNewDay = newDay;
+    }
 }
 

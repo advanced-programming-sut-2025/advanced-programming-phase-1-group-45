@@ -127,14 +127,37 @@ public class Time implements GameEventListener {
         return isNight;
     }
 
-    public int getDay() { return day; }
-    public Season getSeason() { return season; }
-    public int getHour() { return hour; }
-    public Weather getWeather() { return weather; }
-    public DayOfWeek getDayOfWeek() { return dayOfWeek; }
-    public int getDayPassed() { return dayPassed; }
-    public int getMinute() { return minute; }
-    public boolean isPaused() { return isPaused; }
+    public int getDay() {
+        return day;
+    }
+
+    public Season getSeason() {
+        return season;
+    }
+
+    public int getHour() {
+        return hour;
+    }
+
+    public Weather getWeather() {
+        return weather;
+    }
+
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public int getDayPassed() {
+        return dayPassed;
+    }
+
+    public int getMinute() {
+        return minute;
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
 
     public String getTimeForDisplay() {
         StringBuilder sb = new StringBuilder();
@@ -184,21 +207,34 @@ public class Time implements GameEventListener {
     @Override
     public void handleGameEvent(GameEvent event) {
         if (event.getType() == GameEvent.Type.UPDATE_TIME) {
-//            System.out.println("time update " + event.getGameData());
-
-            JSONObject data = new JSONObject(event.getGameData());
-            int hour = JsonParser.getInt(data,"hour", 9);
-            int minute = JsonParser.getInt(data,"minute", 0);
-            int day = JsonParser.getInt(data,"day", 1);
+            JSONObject en = new JSONObject(event.getGameData());
+            JSONObject data = new JSONObject(en.getString("data"));
+            int hour = JsonParser.getInt(data, "hour", 9);
+            int minute = JsonParser.getInt(data, "minute", 0);
+            int day = JsonParser.getInt(data, "day", 1);
             String dayOfWeek = JsonParser.getString(data, "dayOfWeek", "Sunday");
             DayOfWeek dayOfWeekEnum = DayOfWeek.valueOf(dayOfWeek);
             String season = JsonParser.getString(data, "season", "SPRING");
             String weather = JsonParser.getString(data, "weather", "SUNNY");
             Season season1 = Season.valueOf(season);
-            Weather weather1 = Weather.valueOf(weather);
-            boolean isNewDay = JsonParser.getBoolean(data, "isNewDay", false);
 
-            System.out.println("hout : " + hour + " min : " + minute + " day : " + day + " season : " + season + " weather1 : " + weather1);
+            Weather weather1 = Weather.SUNNY;
+            switch (weather) {
+                case "Sunny":
+                    weather1 = Weather.SUNNY;
+                    break;
+                case "Snowy":
+                    weather1 = Weather.SNOWY;
+                    break;
+                case "Rainy":
+                    weather1 = Weather.RAINY;
+                    break;
+                case "Stormy":
+                    weather1 = Weather.STORMY;
+                    break;
+            }
+            boolean isNewDay = JsonParser.getBoolean(data, "isNewDay", false);
+            System.out.println(isNewDay + " is new day");
             this.isNewDay = isNewDay;
             this.hour = hour;
             this.minute = minute;
@@ -206,7 +242,6 @@ public class Time implements GameEventListener {
             this.season = season1;
             this.weather = weather1;
             this.dayOfWeek = dayOfWeekEnum;
-
         }
     }
 
