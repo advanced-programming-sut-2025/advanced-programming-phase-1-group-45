@@ -1165,14 +1165,14 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
         mapButton.setSize(128, 128);
 
         mapButton.setPosition(
-            20,
-            20
+            chatButton.getX(),
+            cheetButton.getY() - mapButton.getHeight()-5
         );
 
         cheetButton = new ImageButton(style2);
         cheetButton.setSize(127, 128);
         cheetButton.setPosition(
-            20, cheetButton.getHeight() + 50
+            chatButton.getX(), mapButton.getY() - cheetButton.getHeight()-5
         );
 
         mapButton.addListener(new ClickListener() {
