@@ -22,7 +22,7 @@ import com.proj.Control.WorldController;
 import com.proj.Control.AnimalBuildingController;
 import com.proj.Main;
 import com.proj.Model.Animal.Animal;
-import com.proj.Model.CheetWindow;
+import com.proj.Model.CheatWindow;
 import com.proj.Model.Cooking.*;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.Inventory.InventoryItem;
@@ -43,7 +43,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.proj.Enums.Shop;
 import com.proj.View.ShopScreen;
 import com.proj.managers.ShopManager;
-import com.badlogic.gdx.graphics.Color;
 import com.proj.network.chat.ChatSystem;
 import com.proj.network.client.ChatListener;
 import com.proj.network.client.GameEventListener;
@@ -124,7 +123,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
     private String transferMessage = "";
     private float messageTimer = 0;
     private ChatSystem chatSystem;
-    private CheetWindow cheetWindow;
+    private CheatWindow cheatWindow;
 
 
     public MultiplayerGameScreen(Main main, farmName farm) {
@@ -231,7 +230,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
                 mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
 
                 chatSystem = new ChatSystem(main, uistage);
-                cheetWindow = new CheetWindow(main, uistage);
+                cheatWindow = new CheatWindow(main, uistage);
                 createChatButton();
                 createMapButton();
 
@@ -402,7 +401,6 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             worldController.getSpriteBatch().end();
 
             uistageViewport.apply();
-            uistage.act(delta);
             // رندر کردن رابط کاربری یخچال
             if (showRefrigeratorUI) {
                 renderRefrigeratorUI();
@@ -413,7 +411,6 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
                 messageTimer -= delta;
             }
 
-            uistage.draw();
 
             if (animalBuildingController == null ||
                 (!animalBuildingController.isPlacingBarn() &&
@@ -424,6 +421,8 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             if (animalBuildingController != null) {
                 animalBuildingController.updateCameraPosition(camera.position.x, camera.position.y);
             }
+            uistage.act(delta);
+            uistage.draw();
 
         } catch (Exception e) {
             if (worldController.getSpriteBatch().isDrawing()) {
@@ -606,7 +605,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             float moveDistance = 16;
             boolean moved = false;
 
-            if (chatSystem.isVisible() || cheetWindow.isVisible()) {
+            if (chatSystem.isVisible() || cheatWindow.isVisible()) {
                 return;
             }
 
@@ -1188,7 +1187,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
         cheetButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                cheetWindow.toggle();
+                cheatWindow.toggle();
             }
         });
 

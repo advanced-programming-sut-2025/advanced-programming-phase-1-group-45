@@ -155,7 +155,8 @@ public class CompositeMapSystem {
     private class CompositeMapActor extends Actor {
         @Override
         public void draw(Batch batch, float parentAlpha) {
-            // رسم پس‌زمینه ترکیبی
+            batch.end();
+            batch.begin();
             batch.draw(background, getX(), getY(), getWidth(), getHeight());
 
             // رسم نقشه‌های فردی
@@ -286,12 +287,12 @@ public class CompositeMapSystem {
         }
     }
 
-    public void render() {
-        if (isWindowOpen) {
-            stage.act(Gdx.graphics.getDeltaTime());
-            stage.draw();
-        }
-    }
+//    public void render() {
+//        if (isWindowOpen) {
+//            stage.act(Gdx.graphics.getDeltaTime());
+//            stage.draw();
+//        }
+//    }
 
     public void resize(int width, int height) {
         stage.getViewport().update(width, height, true);

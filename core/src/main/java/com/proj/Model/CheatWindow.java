@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.proj.Main;
 
-public class CheetWindow {
+public class CheatWindow {
     private final Stage stage;
     private final Skin skin;
     private final Main main;
@@ -26,7 +26,7 @@ public class CheetWindow {
 
     private String currentWeather = "SUNNY"; // مقدار پیش‌فرض
 
-    public CheetWindow(Main main, Stage stage) {
+    public CheatWindow(Main main, Stage stage) {
         this.main = main;
         this.stage = stage;
         this.skin = GameAssetManager.getGameAssetManager().getStardewSkin();
@@ -34,7 +34,7 @@ public class CheetWindow {
     }
 
     private void createUI() {
-        envWindow = new Window("CheetCodes", skin);
+        envWindow = new Window("CheatCodes", skin);
         envWindow.setSize(700, 400);
         envWindow.setPosition(100, 80);
         envWindow.setMovable(true);
@@ -82,14 +82,11 @@ public class CheetWindow {
         updateButtonStyle(snowyBtn, "SNOWY");
     }
     private void updateButtonStyle(ImageButton button, String weatherType) {
-        button.clearChildren();
-        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle(button.getStyle());
+        button.setColor(Color.WHITE);
 
         if (weatherType.equals(currentWeather)) {
             button.setColor(Color.PINK);
         }
-
-        button.setStyle(style);
     }
 
     public void setCurrentWeather(String weather) {
@@ -103,6 +100,7 @@ public class CheetWindow {
         button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                setCurrentWeather(weatherType); // Add this line
                 updateWeatherButtons();
             }
         });
