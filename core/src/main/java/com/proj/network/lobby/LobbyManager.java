@@ -2,16 +2,16 @@ package com.proj.network.lobby;
 
 
 import com.badlogic.gdx.Gdx;
-import com.proj.network.GameServer;
+import com.proj.network.Server;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LobbyManager {
     private Map<String, GameLobby> gameLobbies = new HashMap<>();
-    private GameServer server;
+    private Server server;
 
-    public LobbyManager(GameServer server) {
+    public LobbyManager(Server server) {
         this.server = server;
     }
 
