@@ -419,6 +419,7 @@ public class GameClient implements Disposable, Runnable {
     }
 
     public void syncGameTime(JSONObject data) {
+//        System.out.println("GameClient  syncGameTime");
             fireGameEvent(GameEvent.Type.UPDATE_TIME, data);
     }
 

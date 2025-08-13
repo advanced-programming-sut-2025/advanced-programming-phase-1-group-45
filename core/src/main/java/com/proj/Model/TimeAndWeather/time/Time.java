@@ -184,7 +184,7 @@ public class Time implements GameEventListener {
     @Override
     public void handleGameEvent(GameEvent event) {
         if (event.getType() == GameEvent.Type.UPDATE_TIME) {
-            System.out.println("time update");
+//            System.out.println("time update " + event.getGameData());
 
             JSONObject data = new JSONObject(event.getGameData());
             int hour = JsonParser.getInt(data,"hour", 9);
@@ -197,6 +197,8 @@ public class Time implements GameEventListener {
             Season season1 = Season.valueOf(season);
             Weather weather1 = Weather.valueOf(weather);
             boolean isNewDay = JsonParser.getBoolean(data, "isNewDay", false);
+
+            System.out.println("hout : " + hour + " min : " + minute + " day : " + day + " season : " + season + " weather1 : " + weather1);
             this.isNewDay = isNewDay;
             this.hour = hour;
             this.minute = minute;
