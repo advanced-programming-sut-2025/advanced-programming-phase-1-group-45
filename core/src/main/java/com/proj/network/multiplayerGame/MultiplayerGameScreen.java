@@ -387,22 +387,24 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             if (showFImage) drawCenteredImage(fImage);
             if (showGImage) drawCenteredImage(gImage);
             worldController.renderAfterPlayer();
+//            worldController.getSpriteBatch().end();
+//            worldController.getSpriteBatch().setProjectionMatrix(hudCamera.combined);
+//            worldController.getSpriteBatch().begin();
+//            energyBar.render(worldController.getSpriteBatch());
+//            if (player.getActiveBuff() != null) {
+//                Buff activeBuff = player.getActiveBuff();
+//                TextureRegion buffIcon = GameAssetManager.getGameAssetManager().getBuffIconTexture();
+//                if (buffIcon != null) {
+//                    worldController.getSpriteBatch().draw(buffIcon, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 50, 32, 32);
+//                }
+//                String buffText = activeBuff.effect + " (" + (int)player.getBuffRemainingTime() + "s)";
+//                font.draw(worldController.getSpriteBatch(), buffText, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 60);
+//            }
             worldController.getSpriteBatch().end();
-            worldController.getSpriteBatch().setProjectionMatrix(hudCamera.combined);
-            worldController.getSpriteBatch().begin();
-            energyBar.render(worldController.getSpriteBatch());
-            if (player.getActiveBuff() != null) {
-                Buff activeBuff = player.getActiveBuff();
-                TextureRegion buffIcon = GameAssetManager.getGameAssetManager().getBuffIconTexture();
-                if (buffIcon != null) {
-                    worldController.getSpriteBatch().draw(buffIcon, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 50, 32, 32);
-                }
-                String buffText = activeBuff.effect + " (" + (int)player.getBuffRemainingTime() + "s)";
-                font.draw(worldController.getSpriteBatch(), buffText, Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 60);
-            }
-            worldController.getSpriteBatch().end();
-
             uistageViewport.apply();
+
+
+
             if (showRefrigeratorUI) {
                 renderRefrigeratorUI();
             }
@@ -418,8 +420,13 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             if (animalBuildingController != null) {
                 animalBuildingController.updateCameraPosition(camera.position.x, camera.position.y);
             }
+
             uistage.act(delta);
+            if (worldController.getSpriteBatch().isDrawing()) {
+                worldController.getSpriteBatch().end();
+            }
             uistage.draw();
+
         } catch (Exception e) {
             if (worldController.getSpriteBatch().isDrawing()) {
                 worldController.getSpriteBatch().end();
