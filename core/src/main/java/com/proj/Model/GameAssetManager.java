@@ -35,6 +35,11 @@ public class GameAssetManager {
     private Texture summerClock;
     private Texture winterClock;
     private Texture chatIcon;
+    private Texture rainIcon;
+    private Texture snowIcon;
+    private Texture sunIcon;
+    private Texture stormIcon;
+    private Texture cheetTimeIcon;
 
     private HashMap<String, TextureRegion> weatherClocks;
 
@@ -77,6 +82,11 @@ public class GameAssetManager {
         exclamationIcon = new Texture("assets/exclamation_icon.png");
         mapIcon = new Texture("assets/map_icon.jpg");
         cheetIcon = new Texture("assets/cheet_icon.png");
+        rainIcon = new Texture("assets/rain_icon.png");
+        snowIcon = new Texture("assets/snow_icon.png");
+        sunIcon = new Texture("assets/sun_icon.png");
+        stormIcon = new Texture("assets/storm_icon.png");
+        cheetTimeIcon = new Texture("assets/time_icon.png");
         //clock
         clockTexture = new Texture("clock/clockmy.png");
         clockHand = new Texture("clock/clock_hand.png");
@@ -630,7 +640,29 @@ public class GameAssetManager {
         return eatingEffectTexture;
     }
 
+    public Texture getClockTexture() {
+        return clockTexture;
+    }
 
+    public Texture getRainIcon() {
+        return rainIcon;
+    }
+
+    public Texture getSnowIcon() {
+        return snowIcon;
+    }
+
+    public Texture getSunIcon() {
+        return sunIcon;
+    }
+
+    public Texture getStormIcon() {
+        return stormIcon;
+    }
+
+    public Texture getCheetTimeIcon() {
+        return cheetTimeIcon;
+    }
 }
 
 

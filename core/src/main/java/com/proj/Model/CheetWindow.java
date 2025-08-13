@@ -1,5 +1,7 @@
 package com.proj.Model;
 
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -19,8 +21,10 @@ public class CheetWindow {
     // دکمه‌های آب و هوا
     private ImageButton sunnyBtn;
     private ImageButton rainyBtn;
-    private ImageButton cloudyBtn;
+    private ImageButton stormyBtn;
     private ImageButton snowyBtn;
+
+    private String currentWeather = "SUNNY"; // مقدار پیش‌فرض
 
     public CheetWindow(Main main, Stage stage) {
         this.main = main;
@@ -31,8 +35,8 @@ public class CheetWindow {
 
     private void createUI() {
         envWindow = new Window("CheetCodes", skin);
-        envWindow.setSize(350, 200);
-        envWindow.setPosition(650, 20); // موقعیت متفاوت از پنجره چت
+        envWindow.setSize(700, 400);
+        envWindow.setPosition(100, 80);
         envWindow.setMovable(true);
         envWindow.setResizable(false);
 
@@ -40,8 +44,7 @@ public class CheetWindow {
         contentTable.pad(15);
         contentTable.defaults().pad(5);
 
-        // دکمه تنظیم زمان
-        Texture timeIcon = new Texture("assets/time_icon.png"); // آیکون ساعت
+        Texture timeIcon = new Texture("assets/time_icon.png");
         ImageButton timeButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(timeIcon)));
         timeButton.addListener(new ClickListener() {
             @Override
@@ -50,39 +53,61 @@ public class CheetWindow {
             }
         });
 
-        contentTable.add(timeButton).size(64, 64).padBottom(15).row();
-        contentTable.add(new Label("Set Time", skin)).row();
+        contentTable.add(timeButton).size(100, 100).padBottom(15).row();
 
-        // جدول دکمه‌های آب و هوا
         Table weatherTable = new Table();
-        weatherTable.defaults().size(48, 48).pad(5);
+        weatherTable.defaults().size(100, 100).pad(5);
 
-        sunnyBtn = createWeatherButton("assets/sunny.png", "SUNNY");
-        rainyBtn = createWeatherButton("assets/rainy.png", "RAINY");
-        cloudyBtn = createWeatherButton("assets/cloudy.png", "CLOUDY");
-        snowyBtn = createWeatherButton("assets/snowy.png", "SNOWY");
+        sunnyBtn = createWeatherButton(GameAssetManager.getGameAssetManager().getSunIcon(), "SUNNY");
+        rainyBtn = createWeatherButton(GameAssetManager.getGameAssetManager().getRainIcon(), "RAINY");
+        stormyBtn = createWeatherButton(GameAssetManager.getGameAssetManager().getStormIcon(), "STORMY");
+        snowyBtn = createWeatherButton(GameAssetManager.getGameAssetManager().getSnowIcon(), "SNOWY");
 
         weatherTable.add(sunnyBtn);
         weatherTable.add(rainyBtn);
-        weatherTable.add(cloudyBtn);
+        weatherTable.add(stormyBtn);
         weatherTable.add(snowyBtn);
 
         contentTable.add(weatherTable).padTop(10);
         envWindow.add(contentTable);
+        updateWeatherButtons();
 
         envWindow.setVisible(false);
         stage.addActor(envWindow);
     }
+    private void updateWeatherButtons() {
+        updateButtonStyle(sunnyBtn, "SUNNY");
+        updateButtonStyle(rainyBtn, "RAINY");
+        updateButtonStyle(stormyBtn, "STORMY");
+        updateButtonStyle(snowyBtn, "SNOWY");
+    }
+    private void updateButtonStyle(ImageButton button, String weatherType) {
+        button.clearChildren();
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle(button.getStyle());
 
-    private ImageButton createWeatherButton(String texturePath, final String weatherType) {
-        Texture texture = new Texture(texturePath);
+        if (weatherType.equals(currentWeather)) {
+            button.setColor(Color.PINK);
+        }
+
+        button.setStyle(style);
+    }
+
+    public void setCurrentWeather(String weather) {
+        this.currentWeather = weather;
+        updateWeatherButtons();
+    }
+
+    private ImageButton createWeatherButton(Texture texture1, final String weatherType) {
+        Texture texture = texture1;
         ImageButton button = new ImageButton(new TextureRegionDrawable(new TextureRegion(texture)));
         button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-//                main.setWeather(weatherType); // فراخوانی متد تغییر آب و هوا در Main
+                updateWeatherButtons();
             }
         });
+        button.getImage().setColor(1, 1, 1, 0.8f);
+
         return button;
     }
 
@@ -94,29 +119,28 @@ public class CheetWindow {
                     TextField timeField = (TextField) getContentTable().findActor("timeInput");
                     String time = timeField.getText();
                     if (time.matches("^\\d{1,2}:\\d{2}$")) {
-                        main.setGameTime(time); // فراخوانی متد تغییر زمان در Main
+//                        main.setGameTime(time);
                     } else {
-                        // نمایش خطا
                         new Dialog("Error", skin).text("Invalid time format! Use HH:mm").button("OK").show(stage);
                     }
                 }
             }
         };
 
-        dialog.text("Enter time (HH:mm):");
+        dialog.text("Enter hour: ");
         TextField timeInput = new TextField("", skin);
         timeInput.setName("timeInput");
         dialog.getContentTable().add(timeInput).width(150).padTop(10);
         dialog.button("OK", true);
         dialog.button("Cancel", false);
-        dialog.key(Input.Keys.ENTER, true); // Enter برای تایید
+        dialog.key(Input.Keys.ENTER, true);
         dialog.show(stage);
     }
 
     public void toggle() {
         isVisible = !isVisible;
         envWindow.setVisible(isVisible);
-        envWindow.toFront(); // نمایش پنجره در جلو
+        envWindow.toFront();
     }
 
     public boolean isVisible() {

@@ -146,6 +146,7 @@ public class ChatSystem {
 
         if (isPrivate && "Everyone".equals(recipient)) {
             addSystemMessage("Cannot send private message to Everyone");
+            addSystemMessage("Cannot send private message to Everyone");
             return;
         }
 

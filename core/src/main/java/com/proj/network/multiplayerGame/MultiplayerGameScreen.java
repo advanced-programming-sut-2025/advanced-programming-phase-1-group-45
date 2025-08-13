@@ -22,6 +22,7 @@ import com.proj.Control.WorldController;
 import com.proj.Control.AnimalBuildingController;
 import com.proj.Main;
 import com.proj.Model.Animal.Animal;
+import com.proj.Model.CheetWindow;
 import com.proj.Model.Cooking.*;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.Inventory.InventoryItem;
@@ -123,6 +124,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
     private String transferMessage = "";
     private float messageTimer = 0;
     private ChatSystem chatSystem;
+    private CheetWindow cheetWindow;
 
 
     public MultiplayerGameScreen(Main main, farmName farm) {
@@ -229,6 +231,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
                 mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
 
                 chatSystem = new ChatSystem(main, uistage);
+                cheetWindow = new CheetWindow(main, uistage);
                 createChatButton();
                 createMapButton();
 
@@ -603,7 +606,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             float moveDistance = 16;
             boolean moved = false;
 
-            if (chatSystem.isVisible()) {
+            if (chatSystem.isVisible() || cheetWindow.isVisible()) {
                 return;
             }
 
@@ -1166,7 +1169,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
 
         mapButton.setPosition(
             chatButton.getX(),
-            cheetButton.getY() - mapButton.getHeight()-5
+            chatButton.getY() - mapButton.getHeight()-5
         );
 
         cheetButton = new ImageButton(style2);
@@ -1179,6 +1182,13 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 compositeMapSystem.toggleMapWindow();
+            }
+        });
+
+        cheetButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                cheetWindow.toggle();
             }
         });
 
