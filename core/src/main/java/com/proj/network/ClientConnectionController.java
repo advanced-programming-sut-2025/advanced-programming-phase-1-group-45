@@ -424,7 +424,7 @@ public class ClientConnectionController implements Runnable {
     private void updateTimeInGame(JSONObject data) {
         GameInstance gameInstance = server.getGameManager().getGameInstance(currentLobby.getId());
         float delta = data.getFloat("delta");
-        gameInstance.update(delta);
+        gameInstance.updateTime(delta);
     }
 
     public synchronized void sendMessage(String type, JSONObject data) {

@@ -11,7 +11,7 @@ import com.proj.network.event.NetworkEvent;
 import com.proj.network.message.JsonParser;
 import org.json.JSONObject;
 
-public class Time implements GameEventListener {
+public class GameTime {
     private int day;
     private int hour;
     private int minute;
@@ -25,7 +25,7 @@ public class Time implements GameEventListener {
     boolean dayChanged = false;
     boolean isNewDay = true;
 
-    public Time() {
+    public GameTime() {
         day = 1;
         hour = 9;
         minute = 0;
@@ -35,7 +35,6 @@ public class Time implements GameEventListener {
         frame = 0;
         dayPassed = 0;
         isNight = hour >= 18;
-        Main.getMain().getGameClient().addGameListener(this);
     }
 
     public void update(float delta, boolean isPaused) {
@@ -180,36 +179,5 @@ public class Time implements GameEventListener {
         sb.append(day);
         return sb.toString();
     }
-
-    @Override
-    public void handleGameEvent(GameEvent event) {
-        if (event.getType() == GameEvent.Type.UPDATE_TIME) {
-            System.out.println("time update");
-
-            JSONObject data = new JSONObject(event.getGameData());
-            int hour = JsonParser.getInt(data,"hour", 9);
-            int minute = JsonParser.getInt(data,"minute", 0);
-            int day = JsonParser.getInt(data,"day", 1);
-            String dayOfWeek = JsonParser.getString(data, "dayOfWeek", "Sunday");
-            DayOfWeek dayOfWeekEnum = DayOfWeek.valueOf(dayOfWeek);
-            String season = JsonParser.getString(data, "season", "SPRING");
-            String weather = JsonParser.getString(data, "weather", "SUNNY");
-            Season season1 = Season.valueOf(season);
-            Weather weather1 = Weather.valueOf(weather);
-            boolean isNewDay = JsonParser.getBoolean(data, "isNewDay", false);
-            this.isNewDay = isNewDay;
-            this.hour = hour;
-            this.minute = minute;
-            this.day = day;
-            this.season = season1;
-            this.weather = weather1;
-            this.dayOfWeek = dayOfWeekEnum;
-
-        }
-    }
-
-    @Override
-    public void handleNetworkEvent(NetworkEvent event) {
-
-    }
 }
+

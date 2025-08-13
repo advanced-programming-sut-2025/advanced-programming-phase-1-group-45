@@ -1,5 +1,6 @@
 package com.proj.network;
 
+import com.proj.Model.TimeAndWeather.time.GameTime;
 import com.proj.Model.TimeAndWeather.time.Time;
 import com.proj.network.lobby.GameLobby;
 import com.proj.network.message.JsonBuilder;
@@ -13,7 +14,7 @@ import java.util.Map;
 public class GameInstance {
     private final String gameId;
     private final GameLobby lobby;
-    private  Time gameTimer;
+    private GameTime gameTimer;
 
     private final Map<String, PlayerGameState> playerStates = new HashMap<>();
     private boolean gameActive = false;
@@ -61,8 +62,7 @@ public class GameInstance {
         if (!gameActive) {
             return;
         }
-        gameTimer.update(deltaTime, false);
-        lobby.broadcastMessage("GAME_TIME", getTime().toString());
+
         // Update player states
         for (PlayerGameState playerState : playerStates.values()) {
             if (!playerState.isMoving()) {
@@ -70,12 +70,19 @@ public class GameInstance {
             }
         }
     }
+
+    public void updateTime(float deltaTime) {
+        gameTimer.update(deltaTime, false);
+        lobby.broadcastMessage("GAME_TIME", getTime().toString());
+    }
+
     public JSONObject getTime() {
         JSONObject time = JsonBuilder.create().put("hour", gameTimer.getHour()).
             put("minute", gameTimer.getMinute())
             .put("day", gameTimer.getDay()).put("season", gameTimer.getSeason().toString()).
             put("weather", gameTimer.getWeather().getWeather()).
             put("dayOfWeek", gameTimer.getDayOfWeek().toString()).
+            put("isNewDay", gameTimer.isNewDay()).
             build();
         return time;
     }
@@ -115,7 +122,7 @@ public class GameInstance {
                 return false;
             }
         }
-        gameTimer = new Time();
+        gameTimer = new GameTime();
         return true;
     }
 
