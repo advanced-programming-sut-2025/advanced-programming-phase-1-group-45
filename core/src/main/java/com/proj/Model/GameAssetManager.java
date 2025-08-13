@@ -108,7 +108,6 @@ public class GameAssetManager {
         spaceImageTexture = new Texture(Gdx.files.internal("NPCTable/npc_table.png"));
         loadFoodTextures();
         loadObjectTextures();
-        loadEffectTextures();
         loadCavePoint();
         defaultIngredientTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/foraging/Leek.png")));
     }
@@ -559,9 +558,7 @@ public class GameAssetManager {
         if (spaceImageTexture != null) {
             spaceImageTexture.dispose();
         }
-        if (buffIconTexture != null && buffIconTexture.getTexture() != null) {
-            buffIconTexture.getTexture().dispose();
-        }
+        
 
         if (eatingEffectTexture != null && eatingEffectTexture.getTexture() != null) {
             eatingEffectTexture.getTexture().dispose();
@@ -580,12 +577,6 @@ public class GameAssetManager {
                 texture.getTexture().dispose();
             }
         }
-    }
-
-
-    private void loadEffectTextures() {
-        buffIconTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/food/Burnt.png")));
-        eatingEffectTexture = new TextureRegion(new Texture(Gdx.files.internal("assets/food/Oil_of_Garlic_Buff.png")));
     }
 
     private void loadFoodTextures() {
@@ -632,13 +623,6 @@ public class GameAssetManager {
         return refrigeratorTexture;
     }
 
-    public TextureRegion getBuffIconTexture() {
-        return buffIconTexture;
-    }
-
-    public TextureRegion getEatingEffectTexture() {
-        return eatingEffectTexture;
-    }
 
     public Texture getClockTexture() {
         return clockTexture;
