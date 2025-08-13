@@ -172,7 +172,6 @@ public class GameMap {
     }
 
     public void removeForaging() {
-        System.out.println("removing foraging");
         for (Tile tile : foragingCropTiles) {
             tile.setPassable(true);
             tile.removeObject();

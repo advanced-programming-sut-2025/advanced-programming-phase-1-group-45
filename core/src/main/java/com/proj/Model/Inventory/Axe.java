@@ -1,6 +1,13 @@
 package com.proj.Model.Inventory;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
+import com.proj.Control.WorldController;
+import com.proj.Model.inventoryItems.crops.Crop;
+import com.proj.Model.inventoryItems.crops.GiantCrop;
+import com.proj.Model.inventoryItems.trees.Tree;
+import com.proj.map.GameMap;
+import com.proj.map.Tile;
 
 public class Axe extends Tool {
 
@@ -15,9 +22,18 @@ public class Axe extends Tool {
 
     @Override
     public boolean useOnTile(int tileX, int tileY) {
-        // Logic for using axe on a tile - cutting trees, breaking branches
-        // Return true if the action was successful
-        return true;
+        GameMap currentMap = WorldController.getInstance().getGameMap();
+        if (currentMap.getTreeManager() != null) {
+            Tree tree = currentMap.getTreeManager().getTreeAt(tileX, tileY);
+            if (tree != null) {
+                Array<InventoryItem> item = currentMap.getTreeManager().chopAt(tileX, tileY);
+                if (item != null) {
+                    for (InventoryItem itemm : item) {
+                    InventoryManager.getInstance().getPlayerInventory().addItem(itemm);}
+                    return true;
+                }
+            }
+        }        return true;
     }
 
     @Override

@@ -24,6 +24,7 @@ import com.proj.Control.NPCManager;
 import com.proj.Control.WorldController;
 import com.proj.Control.AnimalBuildingController;
 import com.proj.Model.Animal.Animal;
+import com.proj.Model.CheatWindow;
 import com.proj.Model.Cooking.*;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.Inventory.InventoryItem;
@@ -32,6 +33,7 @@ import com.proj.Model.Inventory.PlayerBag;
 import com.proj.Model.Inventory.Tool;
 import com.proj.Model.TimeAndWeather.time.Time;
 import com.proj.Model.mapObjects.NPCObject;
+import com.proj.View.CheatWindowSinglePlayer;
 import com.proj.map.farmName;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -42,7 +44,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.proj.Enums.Shop;
 import com.proj.View.ShopScreen;
 import com.proj.managers.ShopManager;
-import com.badlogic.gdx.graphics.Color;
 import com.proj.network.chat.ChatSystem;
 import com.proj.network.client.ChatListener;
 import com.proj.network.event.NetworkEvent;
@@ -75,6 +76,8 @@ public class GameScreen implements Screen, ChatListener {
     private PlayerBag playerBag;
     private AnimalBuildingController animalBuildingController;
     private AnimalManager animalManager;
+    private CheatWindowSinglePlayer cheatWindow;
+
 
     private ImageButton chatButton;
 
@@ -217,7 +220,9 @@ public class GameScreen implements Screen, ChatListener {
                 mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
 
                 chatSystem = new ChatSystem(main, uistage);
+                cheatWindow = new CheatWindowSinglePlayer(main, uistage, gameTime);
                 createChatButton();
+                createCheatButton();
 
                 main.getGameClient().addChatListener(this);
 
@@ -231,7 +236,6 @@ public class GameScreen implements Screen, ChatListener {
                         (float) worldController.getTileHeight() / 2;
                 }
 
-                player = new Player(worldController, startX, startY);
                 player = new Player(worldController, startX, startY);
 
                 refrigerator = new Refrigerator(player.getPosition().x + 50, player.getPosition().y + 50);
@@ -1116,7 +1120,30 @@ public class GameScreen implements Screen, ChatListener {
         uistage.addActor(chatButton);
     }
 
-    private com.badlogic.gdx.scenes.scene2d.ui.Image alertIcon;
+    private void createCheatButton() {
+         ImageButton cheatButton = null;
+        TextureRegion cheatR = new TextureRegion(GameAssetManager.getGameAssetManager().getCheetIcon());
+
+        ImageButton.ImageButtonStyle style2 = new ImageButton.ImageButtonStyle();
+        style2.imageUp = new TextureRegionDrawable(cheatR);
+
+        cheatButton = new ImageButton(style2);
+        cheatButton.setSize(127, 128);
+        cheatButton.setPosition(
+            chatButton.getX(), chatButton.getY() - cheatButton.getHeight()-5
+        );
+
+        cheatButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                cheatWindow.toggle();
+            }
+        });
+
+        uistage.addActor(cheatButton);
+    }
+
+    private Image alertIcon;
 
     private void showAlertIcon() {
         Texture exclamationTexture = GameAssetManager.getGameAssetManager().getExclamationIcon();

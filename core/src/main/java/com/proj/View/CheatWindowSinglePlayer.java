@@ -1,4 +1,4 @@
-package com.proj.Model;
+package com.proj.View;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
@@ -10,13 +10,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.proj.Main;
+import com.proj.Model.GameAssetManager;
+import com.proj.Model.TimeAndWeather.Weather;
+import com.proj.Model.TimeAndWeather.time.Time;
 
-public class CheatWindow {
+public class CheatWindowSinglePlayer{
     private final Stage stage;
     private final Skin skin;
     private final Main main;
     private Window envWindow;
     private boolean isVisible = false;
+    private Time timer;
 
     private ImageButton sunnyBtn;
     private ImageButton rainyBtn;
@@ -25,9 +29,10 @@ public class CheatWindow {
 
     private String currentWeather = "SUNNY"; // مقدار پیش‌فرض
 
-    public CheatWindow(Main main, Stage stage) {
+    public CheatWindowSinglePlayer(Main main, Stage stage, Time time) {
         this.main = main;
         this.stage = stage;
+        this.timer = time;
         this.skin = GameAssetManager.getGameAssetManager().getStardewSkin();
         createUI();
     }
@@ -66,7 +71,7 @@ public class CheatWindow {
         aDayButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Main.getMain().getGameClient().changeDay(1);
+                timer.advanceDay(1);
             }
         });
 
@@ -124,7 +129,7 @@ public class CheatWindow {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 setCurrentWeather(weatherType);
-                Main.getMain().getGameClient().changeWeather(weatherType.toLowerCase());
+                timer.setWeather(Weather.valueOf(weatherType));
                 toggle();
             }
         });
@@ -141,7 +146,7 @@ public class CheatWindow {
                     TextField timeField = (TextField) getContentTable().findActor("timeInput");
                     String time = timeField.getText();
                     if (time.matches("^\\d+$")) {
-                        Main.getMain().getGameClient().changeHour(Integer.parseInt(time));
+                        timer.advanceHour(Integer.parseInt(time));
                     } else {
                         new Dialog("Error", skin).text("Invalid time format! Use HH:mm").button("OK").show(stage);
                     }
@@ -167,7 +172,7 @@ public class CheatWindow {
                     TextField timeField = (TextField) getContentTable().findActor("dayInput");
                     String day = timeField.getText();
                     if (day.matches("^\\d+$")) {
-                        Main.getMain().getGameClient().changeDay(Integer.parseInt(day));
+                        timer.advanceDay(Integer.parseInt(day));
                     } else {
                         new Dialog("Error", skin).text("Invalid day format! Use numbers").button("OK").show(stage);
                     }

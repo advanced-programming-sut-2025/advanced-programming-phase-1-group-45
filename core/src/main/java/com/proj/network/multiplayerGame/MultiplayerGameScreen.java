@@ -1153,18 +1153,18 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
         uistage.addActor(chatButton);
     }
     private ImageButton mapButton;
-    private ImageButton cheetButton;
+    private ImageButton cheatButton;
 
     private void createMapButton() {
-        Texture cheetI = GameAssetManager.getGameAssetManager().getMapIcon();
-        TextureRegion mapR = new TextureRegion(cheetI);
-        TextureRegion cheetR = new TextureRegion(GameAssetManager.getGameAssetManager().getCheetIcon());
+        Texture cheatI = GameAssetManager.getGameAssetManager().getMapIcon();
+        TextureRegion mapR = new TextureRegion(cheatI);
+        TextureRegion cheatR = new TextureRegion(GameAssetManager.getGameAssetManager().getCheetIcon());
 
         ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
         style.imageUp = new TextureRegionDrawable(mapR);
 
         ImageButton.ImageButtonStyle style2 = new ImageButton.ImageButtonStyle();
-        style2.imageUp = new TextureRegionDrawable(cheetR);
+        style2.imageUp = new TextureRegionDrawable(cheatR);
 
         mapButton = new ImageButton(style);
         mapButton.setSize(128, 128);
@@ -1174,10 +1174,10 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             chatButton.getY() - mapButton.getHeight()-5
         );
 
-        cheetButton = new ImageButton(style2);
-        cheetButton.setSize(127, 128);
-        cheetButton.setPosition(
-            chatButton.getX(), mapButton.getY() - cheetButton.getHeight()-5
+        cheatButton = new ImageButton(style2);
+        cheatButton.setSize(127, 128);
+        cheatButton.setPosition(
+            chatButton.getX(), mapButton.getY() - cheatButton.getHeight()-5
         );
 
         mapButton.addListener(new ClickListener() {
@@ -1187,7 +1187,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
             }
         });
 
-        cheetButton.addListener(new ClickListener() {
+        cheatButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 cheatWindow.toggle();
@@ -1195,7 +1195,7 @@ public class MultiplayerGameScreen implements Screen, ChatListener, GameEventLis
         });
 
         uistage.addActor(mapButton);
-        uistage.addActor(cheetButton);
+        uistage.addActor(cheatButton);
     }
 
     private com.badlogic.gdx.scenes.scene2d.ui.Image alertIcon;

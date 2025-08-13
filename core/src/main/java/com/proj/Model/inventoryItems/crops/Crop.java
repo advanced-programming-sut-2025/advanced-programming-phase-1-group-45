@@ -109,7 +109,7 @@ public class Crop {
         if (!hasProduct) return null;
         Integer[] countRange = data.getProductCount();
         int count = MathUtils.random(countRange[0], countRange[1]);
-        InventoryItem item = ItemRegistry.getInstance().get(data.getName());
+        InventoryItem item = ItemRegistry.getInstance().get(data.getName().toLowerCase());
         item.setQuantity(count);
         hasProduct = false;
         if (data.getRegrowthTime() > 0) {

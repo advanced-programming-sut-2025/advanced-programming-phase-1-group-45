@@ -64,6 +64,7 @@ public class CropManager {
         crops.add(new Crop(data, tileX, tileY));
         map.getTile(tileX, tileY).setOccupied(true);
         map.getTile(tileX, tileY).setPassable(false);
+        map.getTile(tileX, tileY).setTilled(false);
         checkForGiantCrops();
         return true;
     }

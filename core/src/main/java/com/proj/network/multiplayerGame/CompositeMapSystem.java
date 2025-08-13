@@ -182,9 +182,7 @@ public class CompositeMapSystem {
                         getX() + mapPos.x - 6,
                         getY() + mapPos.y - 6,
                         12, 12);
-                    System.out.println("keshidam");
 
-                    // بازگردانی رنگ پیش‌فرض
                     batch.setColor(Color.WHITE);
                 }
             }
