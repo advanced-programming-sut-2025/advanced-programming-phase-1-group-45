@@ -374,7 +374,7 @@ public class GameScreen implements Screen, ChatListener {
             worldController.getSpriteBatch().setProjectionMatrix(hudCamera.combined);
             worldController.getSpriteBatch().begin();
             energyBar.render(worldController.getSpriteBatch());
-           
+
             worldController.getSpriteBatch().end();
 
             uistageViewport.apply();
@@ -709,7 +709,7 @@ public class GameScreen implements Screen, ChatListener {
             if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {
                 if (animalManager != null && animalManager.getSelectedAnimal() != null) {
                     boolean isBarn = true;
-                    int buildingIndex = 0; 
+                    int buildingIndex = 0;
                     connectAnimalToBuilding(animalManager.getSelectedAnimal(), isBarn, buildingIndex);
                 }
             }
