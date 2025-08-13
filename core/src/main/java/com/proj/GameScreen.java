@@ -50,6 +50,11 @@ import com.proj.network.event.NetworkEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import com.proj.Radio.RadioMenuScreen;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.g2d.*;
+import java.util.*;
+import java.awt.*;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,6 +126,10 @@ public class GameScreen implements Screen, ChatListener {
     private String transferMessage = "";
     private float messageTimer = 0;
     private ChatSystem chatSystem;
+    private Stage stage;
+    private Texture buttonImage;
+    private boolean showButtonImage = false;
+    private SpriteBatch batch;
 
 
     public GameScreen(Main main, farmName farm) {
@@ -218,6 +227,7 @@ public class GameScreen implements Screen, ChatListener {
                 Gdx.input.setInputProcessor(new InputMultiplexer(uistage));
                 mapPixelWidth = worldController.getMapWidth() * worldController.getTileWidth();
                 mapPixelHeight = worldController.getMapHeight() * worldController.getTileHeight();
+                batch = new SpriteBatch();
 
                 chatSystem = new ChatSystem(main, uistage);
                 cheatWindow = new CheatWindowSinglePlayer(main, uistage, gameTime);
@@ -253,6 +263,7 @@ public class GameScreen implements Screen, ChatListener {
                 dImage = new Texture(Gdx.files.internal("NPCDialogues/lewis_dialogue1.png"));
                 fImage = new Texture(Gdx.files.internal("NPCDialogues/pierre_dialogue1.png"));
                 gImage = new Texture(Gdx.files.internal("NPCDialogues/robin_dialogue1.png"));
+                buttonImage = new Texture(Gdx.files.internal("gift_list.png"));
 
                 playerBag = new PlayerBag(player, inventoryManager.getPlayerInventory());
                 playerBag.setScale(0.7f);
@@ -402,6 +413,19 @@ public class GameScreen implements Screen, ChatListener {
             if (animalBuildingController != null) {
                 animalBuildingController.updateCameraPosition(camera.position.x, camera.position.y);
             }
+            if (showButtonImage) {
+                batch.begin();
+
+                float width = 600;
+                float height = 600;
+
+                float x = Gdx.graphics.getWidth()/2 - width/2;
+                float y = Gdx.graphics.getHeight()/2 - height/2;
+
+                batch.draw(buttonImage, x, y, width, height);
+
+                batch.end();
+            }
 
         } catch (Exception e) {
             if (worldController.getSpriteBatch().isDrawing()) {
@@ -529,6 +553,7 @@ public class GameScreen implements Screen, ChatListener {
             if (dImage != null) dImage.dispose();
             if (fImage != null) fImage.dispose();
             if (gImage != null) gImage.dispose();
+            if (buttonImage != null) buttonImage.dispose();
             if (font != null) {
                 font.dispose();
             }
@@ -835,6 +860,10 @@ public class GameScreen implements Screen, ChatListener {
                         Gdx.app.error("GameScreen", "Error opening radio menu", e);
                     }
                 });
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.U)) {
+                showButtonImage = !showButtonImage;
+                Gdx.app.log("GameScreen", "U key pressed. Show image: " + showButtonImage);
             }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
