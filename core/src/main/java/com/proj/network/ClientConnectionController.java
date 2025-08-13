@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientConnectionController implements Runnable {
     private final Socket clientSocket;
-    private final GameServer server;
+    private final Server server;
     private PrintWriter out;
     private BufferedReader in;
     private String username = null;
@@ -27,7 +27,7 @@ public class ClientConnectionController implements Runnable {
     private static final long TIMEOUT_MS = 60000; // 1 minute
     private GameLobby currentLobby;
 
-    public ClientConnectionController(Socket socket, GameServer server) {
+    public ClientConnectionController(Socket socket, Server server) {
         this.clientSocket = socket;
         this.server = server;
         this.lastActivityTime = System.currentTimeMillis();
@@ -35,7 +35,7 @@ public class ClientConnectionController implements Runnable {
             this.out = new PrintWriter(socket.getOutputStream(), true);
             this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
-            System.err.println("ClientHandler initialization error: " + e.getMessage());
+            System.err.println("ClientController initialization error: " + e.getMessage());
         }
     }
 
@@ -88,14 +88,15 @@ public class ClientConnectionController implements Runnable {
         sendMessage("AUTH_REQUEST", requestData);
 
         String response = in.readLine();
+
         if (response == null) {
             return false;
         }
 
         try {
             NetworkMessage authMessage = NetworkMessage.parse(response);
+
             if (!"AUTH".equals(authMessage.getType())) {
-                sendError("AUTH_FAILED", "Invalid request type");
                 return false;
             }
 
@@ -104,12 +105,9 @@ public class ClientConnectionController implements Runnable {
             String password = JsonParser.getString(credentials, "password", "");
 
             if (username.isEmpty() || password.isEmpty()) {
-                sendError("AUTH_FAILED", "Missing username or password");
                 return false;
             }
 
-//            if (loggedIn) {
-            // Handle existing connections
             if (server.getConnectedClients().containsKey(username)) {
                 ClientConnectionController existingClient = server.getConnectedClients().get(username);
                 existingClient.sendMessage("DISCONNECT", JsonBuilder.create()
@@ -119,11 +117,8 @@ public class ClientConnectionController implements Runnable {
             }
             this.username = username;
             server.registerClient(username, this);
-
-            // Send structured auth success
             sendMessage("AUTH_SUCCESS", JsonBuilder.create()
                 .put("message", "Welcome " + username)
-                .put("username", username)
                 .build());
             return true;
 //            } else {
@@ -142,7 +137,7 @@ public class ClientConnectionController implements Runnable {
 
         switch (type) {
             case "CHAT":
-                processChatMessage(data);
+                sendChatMessage(data);
                 break;
 
             case "CREATE_LOBBY":
@@ -182,7 +177,7 @@ public class ClientConnectionController implements Runnable {
                 sendPlayerPositions(data);
                 break;
 
-                case "MOVE":
+            case "MOVE":
                 handlePlayerMovement(data);
                 break;
 
@@ -199,36 +194,36 @@ public class ClientConnectionController implements Runnable {
                 break;
 
             default:
-                Gdx.app.log("ClientHandler", "Unknown message type: " + type);
+                Gdx.app.log("ClientController", "Unknown message type: " + type);
                 sendError("UNKNOWN_TYPE", "Invalid message type");
                 break;
         }
     }
 
-    private void processChatMessage(JSONObject data) {
-        String messageText = JsonParser.getString(data, "message", "");
+    private void sendChatMessage(JSONObject message) {
+        String messageText = JsonParser.getString(message, "message", "");
         if (messageText.trim().isEmpty()) {
             return;
         }
 
-        if (messageText.length() > 200) {
-            messageText = messageText.substring(0, 200) + "...";
-        }
+//        if (messageText.length() > 200) {
+//            messageText = messageText.substring(0, 200) + "...";
+//        }
 
-        String recipient = JsonParser.getString(data, "recipient", null);
-        if (recipient != null) {
-            ClientConnectionController recipientHandler = server.getConnectedClients().get(recipient);
-            if (recipientHandler != null) {
+        String receiver = JsonParser.getString(message, "receiver", null);
+        if (receiver != null) {
+            ClientConnectionController receiverController = server.getConnectedClients().get(receiver);
+            if (receiverController != null) {
                 JSONObject privateMsg = JsonBuilder.create()
                     .put("sender", username)
                     .put("message", messageText)
                     .put("isPrivate", true)
                     .build();
 
-                recipientHandler.sendMessage("PRIVATE_CHAT", privateMsg);
+                receiverController.sendMessage("PRIVATE_CHAT", privateMsg);
                 sendMessage("PRIVATE_CHAT", privateMsg);
             } else {
-                sendError("USER_OFFLINE", "User " + recipient + " is not online");
+                sendError("USER_OFFLINE", "User " + receiver + " is not online");
             }
         } else {
             JSONObject publicMsg = JsonBuilder.create()
@@ -301,7 +296,7 @@ public class ClientConnectionController implements Runnable {
 
     private void receiveStateToStart(JSONObject data) {
         String farm = JsonParser.getString(data, "farmName", "Standard");
-        GameInstance game = server.getGameManager().getGameInstance(currentLobby.getId());
+        Game game = server.getGameManager().getGameInstance(currentLobby.getId());
         if (game == null) {
             sendError("GAME_NOT_FOUND", "Game not found for your lobby");
             return;
@@ -317,7 +312,7 @@ public class ClientConnectionController implements Runnable {
     }
 
     private void readyToStart(JSONObject data) {
-        GameInstance game = server.getGameManager().getGameInstance(currentLobby.getId());
+        Game game = server.getGameManager().getGameInstance(currentLobby.getId());
         if (game == null) {
             sendError("GAME_NOT_FOUND", "Game not found for your lobby");
             return;
@@ -395,12 +390,12 @@ public class ClientConnectionController implements Runnable {
     }
 
     private void handlePlayerMovement(JSONObject data) {
-        GameInstance game = server.getGameManager().getGameInstance(currentLobby.getId());
+        Game game = server.getGameManager().getGameInstance(currentLobby.getId());
         if (game == null) {
             sendError("GAME_NOT_FOUND", "Game not found for your lobby");
             return;
         }
-        PlayerGameState player = game.getPlayerState(username);
+        PlayerInGame player = game.getPlayerState(username);
         if (player == null) {
             sendError("PLAYER_NOT_FOUND", "Player not found for your lobby");
             return;

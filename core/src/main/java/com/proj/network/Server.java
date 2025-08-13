@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.*;
 
-public class GameServer {
+public class Server {
     private static final int PORT = 8080;
     private static final int MAX_PLAYERS = 100;
     private static final int THREAD_POOL_SIZE = 10;
@@ -32,7 +32,7 @@ public class GameServer {
     private ServerSocket serverSocket;
     private boolean running = false;
 
-    public GameServer() {
+    public Server() {
         this.threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
         this.maintenanceService = Executors.newScheduledThreadPool(1);
         this.gameManager = new GameManager(this);
@@ -42,7 +42,7 @@ public class GameServer {
 
     public void start() {
         if (running) {
-            System.out.println("GameServer " +  "server is already running");
+            System.out.println("Server " +  "server is already running");
             return;
         }
 
@@ -53,7 +53,7 @@ public class GameServer {
             serverSocket.bind(new InetSocketAddress(PORT));
 
             running = true;
-            System.out.println("GameServer " +  "Game server started on port " + PORT);
+            System.out.println("Server " +  "Game server started on port " + PORT);
 
             Thread gameUpdateThread = new Thread(new GameUpdateTask(this));
             gameUpdateThread.setDaemon(true);
@@ -63,7 +63,7 @@ public class GameServer {
             acceptConnections();
 
         } catch (IOException e) {
-            System.out.println("GameServer " +  "Error starting server" +  e);
+            System.out.println("Server " +  "Error starting server" +  e);
         } finally {
             shutdown();
         }
@@ -77,7 +77,7 @@ public class GameServer {
                 gameManager.checkInactiveGames();
                 logServerStats();
             } catch (Exception e) {
-                System.out.println("GameServer " +  "Error in maintenance tasks" +  e);
+                System.out.println("Server " +  "Error in maintenance tasks" +  e);
             }
         }, MAINTENANCE_INTERVAL_SECONDS, MAINTENANCE_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
@@ -86,10 +86,10 @@ public class GameServer {
         try {
             while (running && !serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("GameServer " +  "New connection from: " + clientSocket.getInetAddress());
+                System.out.println("Server " +  "New connection from: " + clientSocket.getInetAddress());
 
                 if (connectedClients.size() >= MAX_PLAYERS) {
-                    System.out.println("GameServer " +  "Server is full. New connection rejected.");
+                    System.out.println("Server " +  "Server is full. New connection rejected.");
                     sendServerFullMessage(clientSocket);
                     clientSocket.close();
                     continue;
@@ -100,7 +100,7 @@ public class GameServer {
             }
         } catch (IOException e) {
             if (running && !serverSocket.isClosed()) {
-                System.out.println("GameServer " +  "Error accepting connections" + e);
+                System.out.println("Server " +  "Error accepting connections" + e);
             }
         }
     }
@@ -118,7 +118,7 @@ public class GameServer {
             response.put("data", data);
             out.println(response.toString());
         } catch (IOException e) {
-            System.out.println("GameServer " +  "Error sending server full message" + e);
+            System.out.println("Server " +  "Error sending server full message" + e);
         }
     }
 
@@ -132,7 +132,7 @@ public class GameServer {
         }
         connectedClients.put(username, clientController);
         broadcastSystemMessage(username + " joined the game");
-        System.out.println("GameServer " +  "User registered: " + username);
+        System.out.println("Server " +  "User registered: " + username);
         notifyPlayerStatusUpdate();
     }
 
@@ -140,7 +140,7 @@ public class GameServer {
         connectedClients.remove(username);
         lobbyManager.removePlayer(username);
         broadcastSystemMessage(username + " left the game");
-        System.out.println("GameServer " +  "User removed: " + username);
+        System.out.println("Server " +  "User removed: " + username);
         notifyPlayerStatusUpdate();
     }
 
@@ -163,7 +163,7 @@ public class GameServer {
     }
 
     public void createLobby(String lobbyName, String admin, String password, int maxPlayers, boolean isPrivate, boolean isVisible) {
-        System.out.println("GameServer " +  "Creating a new lobby: " + lobbyName);
+        System.out.println("Server " +  "Creating a new lobby: " + lobbyName);
 
         GameLobby lobby = lobbyManager.createAndGetLobby(lobbyName, admin, password, maxPlayers, isPrivate, isVisible);
         ClientConnectionController adminHandler = connectedClients.get(admin);
@@ -179,7 +179,7 @@ public class GameServer {
 
         }
 
-        System.out.println("GameServer " +  "Lobby created: " + lobbyName + " with ID: " + lobby.getId());
+        System.out.println("Server " +  "Lobby created: " + lobbyName + " with ID: " + lobby.getId());
     }
     public void broadcastLobbiesList() {
         for (ClientConnectionController clientController : connectedClients.values()) {
@@ -192,7 +192,7 @@ public class GameServer {
         ClientConnectionController client = connectedClients.get(username);
 
         if (client == null) {
-            System.out.println("GameServer " +  "Username not found: " + username);
+            System.out.println("Server " +  "Username not found: " + username);
             return;
         }
 
@@ -253,7 +253,7 @@ public class GameServer {
         ClientConnectionController client = connectedClients.get(username);
 
         if (client == null) {
-            System.out.println("GameServer " +  "Username not found: " + username);
+            System.out.println("Server " +  "Username not found: " + username);
             return;
         }
 
@@ -348,7 +348,7 @@ public class GameServer {
         for (Map.Entry<String, ClientConnectionController> entry : new ConcurrentHashMap<>(connectedClients).entrySet()) {
             ClientConnectionController clientController = entry.getValue();
             if (clientController.isTimedOut()) {
-                System.out.println("GameServer " +  "User removed due to inactivity: " + entry.getKey());
+                System.out.println("Server " +  "User removed due to inactivity: " + entry.getKey());
                 clientController.shutdown();
                 removeClient(entry.getKey());
             }
@@ -362,13 +362,13 @@ public class GameServer {
             GameLobby lobby = entry.getValue();
             if (lobby.isEmpty() || (lobby.isInactive(inactivityTimeout) && !lobby.isGameActive())) {
                 lobbyManager.getGameLobbiesMap().remove(entry.getKey());
-                System.out.println("GameServer " +  "Inactive lobby removed: " + entry.getKey());
+                System.out.println("Server " +  "Inactive lobby removed: " + entry.getKey());
             }
         }
     }
 
     private void logServerStats() {
-        System.out.println("GameServer " +  String.format(
+        System.out.println("Server " +  String.format(
             "Server stats: %d online users, %d active lobbies, %d running games",
             connectedClients.size(),
             lobbyManager.getGameLobbiesMap().size(),
@@ -439,9 +439,9 @@ public class GameServer {
             maintenanceService.shutdownNow();
             dbHelper.disconnect();
 
-            System.out.println("GameServer" +  "Server closed successfully");
+            System.out.println("Server" +  "Server closed successfully");
         } catch (IOException e) {
-            System.out.println("GameServer" +  "Error closing server" + e);
+            System.out.println("Server" +  "Error closing server" + e);
         }
     }
 

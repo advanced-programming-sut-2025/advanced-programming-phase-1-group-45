@@ -8,33 +8,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GameInstance {
+public class Game {
+    private Server server;
     private final String gameId;
     private final GameLobby lobby;
-    private final Map<String, PlayerGameState> playerStates = new HashMap<>();
+    private final Map<String, PlayerInGame> players = new HashMap<>();
     private boolean gameActive = false;
     private long lastActivityTime;
     private long lastUpdateTime;
     private static final long UPDATE_INTERVAL_MS = 1000;
 
-    public GameInstance(String gameId, GameLobby lobby) {
+    public Game(String gameId, GameLobby lobby) {
         this.gameId = gameId;
         this.lobby = lobby;
         this.lastActivityTime = System.currentTimeMillis();
         this.lastUpdateTime = System.currentTimeMillis();
+        server = lobby.getGameServer();
     }
 
     public List<String> getPlayers() {
-        return new ArrayList<>(playerStates.keySet());
+        return new ArrayList<>(players.keySet());
     }
 
     public void initialize() {
-        // Create initial state for each player
         for (String username : lobby.getPlayers().keySet()) {
-            PlayerGameState state = new PlayerGameState();
-            state.setUsername(username);
-            state.initialize();
-            playerStates.put(username, state);
+            PlayerInGame player = new PlayerInGame();
+            player.setUsername(username);
+            player.initialize();
+            players.put(username, player);
         }
         gameActive = true;
     }
@@ -44,7 +45,7 @@ public class GameInstance {
             return false;
         }
 
-        PlayerGameState playerState = playerStates.get(username);
+        PlayerInGame playerState = players.get(username);
         if (playerState == null) {
             return false;
         }
@@ -58,12 +59,12 @@ public class GameInstance {
             return;
         }
 
-        // Update player states
-        for (PlayerGameState playerState : playerStates.values()) {
-            if (!playerState.isMoving()) {
-                playerState.restoreEnergy(deltaTime);
-            }
-        }
+        // Update player players
+//        for (PlayerInGame playerState : players.values()) {
+//            if (!playerState.isMoving()) {
+//                playerState.restoreEnergy(deltaTime);
+//            }
+//        }
     }
 
     public JSONObject getGameState() {
@@ -72,7 +73,7 @@ public class GameInstance {
         gameState.put("active", gameActive);
 
         JSONObject playersData = new JSONObject();
-        for (Map.Entry<String, PlayerGameState> entry : playerStates.entrySet()) {
+        for (Map.Entry<String, PlayerInGame> entry : players.entrySet()) {
             playersData.put(entry.getKey(), entry.getValue().toJSON());
         }
         gameState.put("players", playersData);
@@ -89,14 +90,14 @@ public class GameInstance {
         return false;
     }
 
-    public PlayerGameState getPlayerState(String username) {
-        return playerStates.get(username);
+    public PlayerInGame getPlayerState(String username) {
+        return players.get(username);
     }
-    public List<PlayerGameState> getAllPlayers() {
-        return new ArrayList<>(playerStates.values());
+    public List<PlayerInGame> getAllPlayers() {
+        return new ArrayList<>(players.values());
     }
     public boolean allAreReadyToPlay() {
-        for (PlayerGameState playerState : playerStates.values()) {
+        for (PlayerInGame playerState : players.values()) {
             if (!playerState.isReadyToPlay()) {
                 return false;
             }

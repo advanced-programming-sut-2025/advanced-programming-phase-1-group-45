@@ -139,15 +139,6 @@ public class GameClient implements Disposable, Runnable {
                     fireEvent(NetworkEvent.Type.AUTH_REQUEST, data.toString());
                     break;
 
-                case "AUTH_SUCCESS":
-                    handleAuthSuccess(data);
-                    break;
-
-                case "AUTH_FAILED":
-                    fireEvent(NetworkEvent.Type.AUTH_FAILED,
-                        JsonParser.getString(data, "message", "Authentication failed"));
-                    break;
-
                 case "LOBBY_CREATED":
                     handleLobbyCreated(data);
                     break;
@@ -183,7 +174,7 @@ public class GameClient implements Disposable, Runnable {
                     break;
 
                 case "PRIVATE_CHAT":
-                    handlePrivateChat(data);
+                    privateChatParser(data);
                     break;
 
                 case "SYSTEM":
@@ -300,7 +291,7 @@ public class GameClient implements Disposable, Runnable {
         fireLobbyEvent(LobbyEvent.Type.LEFT, JsonBuilder.empty());
     }
 
-    private void handlePrivateChat(JSONObject data) {
+    private void privateChatParser(JSONObject data) {
         try {
             String sender = JsonParser.getString(data, "sender", "Unknown");
             String message = JsonParser.getString(data, "message", "");
