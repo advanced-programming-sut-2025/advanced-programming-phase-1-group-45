@@ -1,4 +1,3 @@
-// CookingManager.java
 package com.proj.Model.Cooking;
 
 import com.badlogic.gdx.Gdx;
@@ -280,4 +279,9 @@ public class CookingManager {
         }
         Gdx.app.log("CookingManager", "Recipe " + recipeName + " not found to learn.");
     }
+
+    public Inventory getRefrigeratorInventory() {
+        return refrigeratorInventory;
+    }
+
 }
