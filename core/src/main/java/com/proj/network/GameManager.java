@@ -11,13 +11,13 @@ import java.util.logging.Logger;
 
 public class GameManager {
     private static final Logger logger = Logger.getLogger(GameManager.class.getName());
-    private final Server server;
-    private final Map<String, Game> activeGames = new ConcurrentHashMap<>();
+    private final GameServer server;
+    private final Map<String, GameInstance> activeGames = new ConcurrentHashMap<>();
 
     private final Map<String, Long> lastUpdateTimes = new HashMap<>();
     private static final long UPDATE_INTERVAL_MS = 100;
 
-    public GameManager(Server server) {
+    public GameManager(GameServer server) {
         this.server = server;
     }
 
@@ -28,15 +28,15 @@ public class GameManager {
 
         String gameId = lobby.getId();
 
-        Game game = new Game(gameId, lobby);
-        activeGames.put(gameId, game);
+        GameInstance gameInstance = new GameInstance(gameId, lobby);
+        activeGames.put(gameId, gameInstance);
         lastUpdateTimes.put(gameId, System.currentTimeMillis());
 
         lobby.setGameActive(true);
 
-        game.initialize();
+        gameInstance.initialize();
 
-        JSONObject initialState = game.getGameState();
+        JSONObject initialState = gameInstance.getGameState();
         lobby.broadcastMessage("GAME_STATE", initialState.toString());
         lobby.broadcastMessage("GAME_STARTED", "game started");
 
@@ -45,7 +45,7 @@ public class GameManager {
     }
 
     public boolean processGameAction(String gameId, String username, String action, JSONObject actionData) {
-        Game game = activeGames.get(gameId);
+        GameInstance game = activeGames.get(gameId);
 
         if (game == null) {
             logger.warning("Game ended: " + gameId);
@@ -83,7 +83,7 @@ public class GameManager {
 
 
     public void endGame(String gameId, String winner) {
-        Game game = activeGames.get(gameId);
+        GameInstance game = activeGames.get(gameId);
         if (game == null) {
             return;
         }
@@ -110,7 +110,7 @@ public class GameManager {
     }
 
 
-    public Game getGameInstance(String gameId) {
+    public GameInstance getGameInstance(String gameId) {
         return activeGames.get(gameId);
     }
 
@@ -119,8 +119,8 @@ public class GameManager {
         long currentTime = System.currentTimeMillis();
         long inactivityTimeout = 10 * 60 * 1000; // 10 دقیقه
 
-        for (Map.Entry<String, Game> entry : new HashMap<>(activeGames).entrySet()) {
-            Game game = entry.getValue();
+        for (Map.Entry<String, GameInstance> entry : new HashMap<>(activeGames).entrySet()) {
+            GameInstance game = entry.getValue();
 
             if (currentTime - game.getLastActivityTime() > inactivityTimeout) {
                 logger.info("inactive game ended: " + game.getGameId());
