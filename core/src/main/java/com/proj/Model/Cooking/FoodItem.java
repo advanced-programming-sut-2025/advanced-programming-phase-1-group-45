@@ -33,15 +33,15 @@ public class FoodItem extends InventoryItem {
 
     @Override
     public void use() {
-        // This method is not called directly, but use(Player player) is called instead.
     }
 
     public void use(Player player) {
         player.restoreEnergy(energyRestored);
-        player.startEatingAnimation();
-        if (buffEffect != null && !buffEffect.isEmpty()) {
+        TextureRegion tex = this.getTexture();
+        player.startEatingAnimation(tex);        if (buffEffect != null && !buffEffect.isEmpty()) {
             player.applyBuff(new Buff(buffEffect, buffDurationHours, 0));
         }
         Gdx.app.log("FoodItem", "Player consumed " + getName() + ". Energy: " + energyRestored + ", Buff: " + buffEffect);
     }
 }
+
