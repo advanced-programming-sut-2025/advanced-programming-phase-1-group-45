@@ -71,8 +71,6 @@ public class TreeData {
             lightningTexture = assetManager.getTexture(texturePaths.get(texturePaths.size - 1));
         }
     }
-
-    // Getters
     public String getId() {
         return id;
     }
