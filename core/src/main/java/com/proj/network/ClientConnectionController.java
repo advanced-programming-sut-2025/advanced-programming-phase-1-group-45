@@ -25,7 +25,7 @@ public class ClientConnectionController implements Runnable {
     private String username = null;
     private final AtomicBoolean running = new AtomicBoolean(true);
     private long lastActivityTime;
-    private static final long TIMEOUT_MS = 60000; // 1 minute
+    private static final long TIMEOUT_MS = 60000; 
     private GameLobby currentLobby;
 
     public ClientConnectionController(Socket socket, GameServer server) {
@@ -46,12 +46,11 @@ public class ClientConnectionController implements Runnable {
             if (!login()) {
                 return;
             }
-
-            String inputLine;
-            while (running.get() && (inputLine = in.readLine()) != null) {
+            String command;
+            while (running.get() && (command = in.readLine()) != null) {
                 updateLastActivity();
                 try {
-                    Command message = Command.parse(inputLine);
+                    Command message = Command.parse(command);
                     processMessage(message);
                 } catch (IOException e) {
                     sendError("INVALID_FORMAT", "Invalid message format");
@@ -82,19 +81,16 @@ public class ClientConnectionController implements Runnable {
     }
 
     private boolean login() throws IOException {
-        // Send structured auth request
         String response = in.readLine();
         if (response == null) {
             return false;
         }
-
         try {
             Command loginMessage = Command.parse(response);
             if (!"AUTH".equals(loginMessage.getType())) {
                 sendError("AUTH_FAILED", "Invalid request type");
                 return false;
             }
-
             JSONObject credentials = loginMessage.getData();
             String username = JsonParser.getString(credentials, "username", "");
             String password = JsonParser.getString(credentials, "password", "");
@@ -117,7 +113,7 @@ public class ClientConnectionController implements Runnable {
                 .build());
             return true;
         } catch (Exception e) {
-            System.err.println("Login failed " + "Invalid login command format");
+            e.printStackTrace();
             return false;
         }
     }
@@ -125,14 +121,13 @@ public class ClientConnectionController implements Runnable {
     private void processMessage(Command message) {
         String type = message.getType();
         JSONObject data = message.getData();
-
         switch (type) {
             case "CHAT":
                 processChatMessage(data);
                 break;
 
             case "CREATE_LOBBY":
-                createLobby(data);
+                newLobby(data);
                 break;
 
             case "JOIN_LOBBY":
@@ -253,7 +248,7 @@ public class ClientConnectionController implements Runnable {
         }
     }
 
-    private void createLobby(JSONObject data) {
+    private void newLobby(JSONObject data) {
         String name = JsonParser.getString(data, "name", "");
         int maxPlayers = JsonParser.getInt(data, "maxPlayers", 4);
         boolean isPrivate = JsonParser.getBoolean(data, "isPrivate", false);
@@ -332,10 +327,9 @@ public class ClientConnectionController implements Runnable {
     private void startGame(JSONObject data) {
         String lobbyId = JsonParser.getString(data, "lobbyId", "");
         if (lobbyId.isEmpty()) {
-            sendError("GAME_START_FAILED", "Lobby ID is required");
+            sendError("error", "Lobby ID is required");
             return;
         }
-
         try {
             server.startGame(lobbyId, username);
         } catch (Exception e) {
@@ -358,7 +352,6 @@ public class ClientConnectionController implements Runnable {
 
     private void sendPlayerPositions(JSONObject data) {
         sendMessage("PLAYER_POSITIONS", data);
-//        System.out.println("ClientController  sending position ");
     }
 
     private void handlePlayerMovement(JSONObject data) {
