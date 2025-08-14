@@ -237,33 +237,6 @@ public class GameMap {
         return true;
     }
 
-
-//    public ResourceItem pickNaturalResource(Point playerPoint) {
-//        Tile tile = loader.getTiles()[playerPoint.x][playerPoint.y];
-//        if (tile == null) return null;
-//        Object item = tile.getLandObject();
-//        if (item instanceof ResourceItem) {
-//            ResourceItem naturalResource = (ResourceItem) item;
-//            tile.removeObject();
-//            tile.setPassable(true);
-//            for (MapLayer layer : loader.getMap().getLayers()) {
-//                if (layer instanceof TiledMapTileLayer) {
-//                    TiledMapTileLayer.Cell cell = ((TiledMapTileLayer) layer).getCell(playerPoint.x, playerPoint.y);
-//                    if (cell == null) continue;
-//                    int first = loader.getMap().getTileSets().getTileSet("untitled tile sheet").
-//                        getProperties().get("firstgid", Integer.class);
-//                    TiledMapTile tile1 = loader.getMap().getTileSets().getTileSet("untitled tile sheet").
-//                        getTile(first + 227);
-//                    if (tile1 == null) continue;
-//                    cell.setTile(tile1);
-//                }
-//            }
-//            return naturalResource;
-//        }
-//        return null;
-//    }
-
-
     public ResourceItem pickNaturalResource(Point playerPoint) {
         Tile tile = loader.getTiles()[playerPoint.x][playerPoint.y];
         if (tile == null) return null;
