@@ -19,7 +19,6 @@ public class GameServer {
     private static final int port = 8080;
     private static final int MAX_PLAYERS = 100;
     private static final int threadPoolNum = 10;
-    private static final int MAINTENANCE_INTERVAL_SECONDS = 60;
 
     private final Map<String, ClientConnectionController> connectedClients = new ConcurrentHashMap<>();
     private final LobbyManager lobbyManager;
@@ -51,25 +50,15 @@ public class GameServer {
             serverSocket.bind(new InetSocketAddress(port));
             running = true;
             System.out.println("Game server started on port " + port);
+            Thread gameUpdateThread = new Thread(new GameUpdateTask(this));
+            gameUpdateThread.setDaemon(true);
+            gameUpdateThread.start();
             listener();
         } catch (IOException e) {
             System.out.println("error starting server" +  e);
         } finally {
             shutdown();
         }
-    }
-
-    private void scheduleMaintenanceTasks() {
-        maintenanceService.scheduleAtFixedRate(() -> {
-            try {
-                checkDisconnectedClients();
-                checkInactiveLobbies();
-                gameManager.checkInactiveGames();
-                logServerStats();
-            } catch (Exception e) {
-                System.out.println("GameServer " +  "Error in maintenance tasks" +  e);
-            }
-        }, MAINTENANCE_INTERVAL_SECONDS, MAINTENANCE_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
 
     private void listener() {
@@ -288,7 +277,7 @@ public class GameServer {
 
         for (Map.Entry<String, GameLobby> entry : new ConcurrentHashMap<>(lobbyManager.getGameLobbiesMap()).entrySet()) {
             GameLobby lobby = entry.getValue();
-            if (lobby.isEmpty())) {
+            if (lobby.isEmpty() || (lobby.isInactive(inactivityTimeout) && !lobby.isGameActive())) {
                 lobbyManager.getGameLobbiesMap().remove(entry.getKey());
                 System.out.println("GameServer " +  "Inactive lobby removed: " + entry.getKey());
             }
