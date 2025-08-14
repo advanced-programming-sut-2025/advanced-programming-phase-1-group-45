@@ -9,6 +9,7 @@ import com.proj.Model.GameAssetManager;
 import com.proj.View.AvatarCreationView;
 import com.proj.View.ChangeInfoMenuView;
 import com.proj.View.MainMenuView;
+import com.proj.View.SignupMenuView;
 
 public class MainMenuController {
     private MainMenuView view;
@@ -60,5 +61,21 @@ public class MainMenuController {
                 Gdx.app.exit();
             }
         });
+    }
+
+    public void handleBackButton() {
+
+        view.getBackButton().addListener(new ClickListener() {
+
+            @Override
+
+            public void clicked(InputEvent event, float x, float y) {
+
+                Main.getMain().setScreen(new SignupMenuView(new SignupMenuController(), skin));
+
+            }
+
+        });
+
     }
 }
