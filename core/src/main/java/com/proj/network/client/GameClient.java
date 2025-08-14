@@ -1,7 +1,5 @@
 {
-    private static final long PING_INTERVAL = 15000; // 15 seconds
-
-    private final String serverAddress;
+    private final String serverIp;
     private final int serverPort;
     private Socket clientSocket;
     private PrintWriter out;
@@ -19,8 +17,8 @@
 
     private final List<ChatListener> chatListeners = new ArrayList<>();
 
-    public GameClient(String serverAddress, int serverPort) {
-        this.serverAddress = serverAddress;
+    public GameClient(String serverIp, int serverPort) {
+        this.serverIp = serverIp;
         this.serverPort = serverPort;
     }
 
