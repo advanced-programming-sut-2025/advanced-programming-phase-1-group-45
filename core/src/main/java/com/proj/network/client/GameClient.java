@@ -98,7 +98,6 @@
 
     private void handleCommands(String command) {
         try {
-            // Use the NetworkMessage factory for safe parsing
             Command message = Command.parse(command);
             processCommand(message);
         } catch (Exception e) {
@@ -158,11 +157,6 @@
                     handlePrivateChat(data);
                     break;
 
-                case "SYSTEM":
-                    sendEvent(NetworkEvent.Type.SYSTEM_MESSAGE,
-                        JsonParser.getString(data, "message", "System message"));
-                    break;
-
                 case "START":
                     fireGameEvent(GameEvent.Type.START, JsonBuilder.empty());
                     break;
@@ -171,10 +165,6 @@
                         fireGameEvent(GameEvent.Type.UPDATE_POSITIONS, data );
                         break;
 
-                case "PONG":
-                    // Ping response - no action needed
-                    break;
-
                 case "ERROR":
                     handleError(data);
                     break;
@@ -182,8 +172,6 @@
                     String sender = JsonParser.getString(data, "sender", "Unknown");
                     String chatMessage = JsonParser.getString(data, "message", "");
                     boolean isPrivate = JsonParser.getBoolean(data, "isPrivate", false);
-
-                    // Send to any chat listeners
                     for (NetworkEventListener listener : listeners) {
                         if (listener instanceof ChatListener) {
                             ((ChatListener) listener).onChatMessage(sender, chatMessage, isPrivate);
@@ -279,7 +267,6 @@
             for (ChatListener listener : chatListeners) {
                 listener.onChatMessage(sender, message, true);
             }
-//            fireChatEvent(NetworkEvent.Type.PRIVATE_MESSAGE, sender + ": " + message);
         } catch (Exception e) {
             sendEvent(NetworkEvent.Type.ERROR, "Error processing private chat: " + e.getMessage());
         }
@@ -364,7 +351,6 @@
         }
         JSONObject data = JsonBuilder.create().put("x", x).put("y", y).put("mapName", map).build();
         sendMessage("MOVE", data);
-//        System.out.println("GameClient  sending position " + x + " " + y);
     }
 
     public void updateTimeInGame(float delta) {
@@ -385,7 +371,6 @@
     }
 
     public void syncGameTime(JSONObject data) {
-//        System.out.println("GameClient  syncGameTime");
             fireGameEvent(GameEvent.Type.UPDATE_TIME, data);
     }
 
