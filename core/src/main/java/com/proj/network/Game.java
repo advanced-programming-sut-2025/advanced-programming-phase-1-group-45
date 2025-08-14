@@ -33,7 +33,6 @@ public class Game {
     }
 
     public void initialize() {
-        // Create initial state for each player
         for (String username : lobby.getPlayers().keySet()) {
             PlayerInGame state = new PlayerInGame();
             state.setUsername(username);
@@ -44,11 +43,6 @@ public class Game {
     }
 
 
-    public void update(float deltaTime) {
-        if (!gameActive) {
-            return;
-        }
-    }
 
     public void updateTime(float deltaTime) {
         gameTimer.update(deltaTime, false);
