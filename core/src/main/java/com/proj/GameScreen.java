@@ -374,7 +374,7 @@ public class GameScreen implements Screen, ChatListener {
             if (animalBuildingController != null) {
                 animalBuildingController.render(worldController.getSpriteBatch());
             }
-
+            handleAnimalBuildingClick();
             if (playerBag != null) {
                 playerBag.render(worldController.getSpriteBatch(), camera);
             }
@@ -890,15 +890,15 @@ public class GameScreen implements Screen, ChatListener {
             if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
                 Gdx.app.postRunnable(() -> {
                     try {
-                        ScoreboardController controller = new ScoreboardController(main.getDatabaseHelper());
-                        ScoreboardView scoreboardScreen = new ScoreboardView(controller);
-
-                        scoreboardScreen.setBackCallback(() -> {
-                            main.setScreen(this);
-                            Gdx.input.setInputProcessor(stage);
-                        });
-
-                        main.setScreen(scoreboardScreen);
+//                        ScoreboardController controller = new ScoreboardController(main.getDatabaseHelper());
+//                        ScoreboardView scoreboardScreen = new ScoreboardView(controller);
+//
+//                        scoreboardScreen.setBackCallback(() -> {
+//                            main.setScreen(this);
+//                            Gdx.input.setInputProcessor(stage);
+//                        });
+//
+//                        main.setScreen(scoreboardScreen);
                     } catch (Exception e) {
                         Gdx.app.error("GameScreen", "Error opening scoreboard", e);
                     }
@@ -1247,5 +1247,19 @@ public class GameScreen implements Screen, ChatListener {
         }
         chatSystem.updateOnlinePlayers(onlinePlayers);
     }
+    private void handleAnimalBuildingClick() {
+        if (animalBuildingController == null || !animalBuildingController.isShowingInterior()) {
+            return;
+        }
 
+        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+            float mouseX = Gdx.input.getX();
+            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // تبدیل به مختصات Y بالا
+
+
+            if (animalBuildingController.handleClick(mouseX, mouseY)) {
+                System.out.println("کلیک روی حیوان تشخیص داده شد!");
+            }
+        }
+    }
 }
