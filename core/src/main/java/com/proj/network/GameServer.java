@@ -8,7 +8,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -17,9 +16,9 @@ import java.util.UUID;
 import java.util.concurrent.*;
 
 public class GameServer {
-    private static final int PORT = 8080;
+    private static final int port = 8080;
     private static final int MAX_PLAYERS = 100;
-    private static final int THREAD_POOL_SIZE = 10;
+    private static final int threadPoolNum = 10;
     private static final int MAINTENANCE_INTERVAL_SECONDS = 60;
 
     private final Map<String, ClientConnectionController> connectedClients = new ConcurrentHashMap<>();
@@ -33,7 +32,7 @@ public class GameServer {
     private boolean running = false;
 
     public GameServer() {
-        this.threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+        this.threadPool = Executors.newFixedThreadPool(threadPoolNum);
         this.maintenanceService = Executors.newScheduledThreadPool(1);
         this.gameManager = new GameManager(this);
         this.dbHelper = new DatabaseHelper();
@@ -45,25 +44,20 @@ public class GameServer {
             System.out.println("GameServer " +  "server is already running");
             return;
         }
-
         try {
             dbHelper.connect();
             serverSocket = new ServerSocket();
             serverSocket.setReuseAddress(true);
-            serverSocket.bind(new InetSocketAddress(PORT));
-
+            serverSocket.bind(new InetSocketAddress(port));
             running = true;
-            System.out.println("GameServer " +  "Game server started on port " + PORT);
-
+            System.out.println("Game server started on port " + port);
             Thread gameUpdateThread = new Thread(new GameUpdateTask(this));
             gameUpdateThread.setDaemon(true);
             gameUpdateThread.start();
-
             scheduleMaintenanceTasks();
-            acceptConnections();
-
+            listener();
         } catch (IOException e) {
-            System.out.println("GameServer " +  "Error starting server" +  e);
+            System.out.println("error starting server" +  e);
         } finally {
             shutdown();
         }
@@ -82,15 +76,13 @@ public class GameServer {
         }, MAINTENANCE_INTERVAL_SECONDS, MAINTENANCE_INTERVAL_SECONDS, TimeUnit.SECONDS);
     }
 
-    private void acceptConnections() {
+    private void listener() {
         try {
             while (running && !serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("GameServer " +  "New connection from: " + clientSocket.getInetAddress());
 
                 if (connectedClients.size() >= MAX_PLAYERS) {
-                    System.out.println("GameServer " +  "Server is full. New connection rejected.");
-                    sendServerFullMessage(clientSocket);
+                    System.out.println("Server is full. New connection rejected.");
                     clientSocket.close();
                     continue;
                 }
@@ -100,29 +92,13 @@ public class GameServer {
             }
         } catch (IOException e) {
             if (running && !serverSocket.isClosed()) {
-                System.out.println("GameServer " +  "Error accepting connections" + e);
+                System.out.println("Server can not accept connections" + e);
             }
         }
     }
 
-    private void sendServerFullMessage(Socket socket) {
-        try {
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            JSONObject response = new JSONObject();
-            response.put("type", "ERROR");
 
-            JSONObject data = new JSONObject();
-            data.put("code", "SERVER_FULL");
-            data.put("message", "Server is full. Please try again later.");
-
-            response.put("data", data);
-            out.println(response.toString());
-        } catch (IOException e) {
-            System.out.println("GameServer " +  "Error sending server full message" + e);
-        }
-    }
-
-    public void registerClient(String username, ClientConnectionController clientController) {
+    public void loginClient(String username, ClientConnectionController clientController) {
         if (connectedClients.containsKey(username)) {
             ClientConnectionController oldHandler = connectedClients.get(username);
             oldHandler.sendMessage("DISCONNECT", JsonBuilder.create()
@@ -131,20 +107,19 @@ public class GameServer {
             oldHandler.shutdown();
         }
         connectedClients.put(username, clientController);
-        broadcastSystemMessage(username + " joined the game");
-        System.out.println("GameServer " +  "User registered: " + username);
+        System.out.println("User accepted: " + username);
         notifyPlayerStatusUpdate();
     }
 
     public void removeClient(String username) {
         connectedClients.remove(username);
         lobbyManager.removePlayer(username);
-        broadcastSystemMessage(username + " left the game");
-        System.out.println("GameServer " +  "User removed: " + username);
+        broadcast(username + " left the game");
+        System.out.println("User removed: " + username);
         notifyPlayerStatusUpdate();
     }
 
-    public void broadcastSystemMessage(String message) {
+    public void broadcast(String message) {
         JSONObject messageObj = new JSONObject();
         messageObj.put("type", "SYSTEM");
 
@@ -166,19 +141,15 @@ public class GameServer {
         System.out.println("GameServer " +  "Creating a new lobby: " + lobbyName);
 
         GameLobby lobby = lobbyManager.createAndGetLobby(lobbyName, admin, password, maxPlayers, isPrivate, isVisible);
-        ClientConnectionController adminHandler = connectedClients.get(admin);
-        if (adminHandler != null) {
-            lobby.addPlayer(admin, adminHandler);
-
+        ClientConnectionController adminThread = connectedClients.get(admin);
+        if (adminThread != null) {
+            lobby.addPlayer(admin, adminThread);
             JSONObject response = new JSONObject();
             response.put("type", "LOBBY_CREATED");
             response.put("data", lobby.getLobbyInfo());
-
-            adminHandler.sendRaw(response.toString());
+            adminThread.sendRaw(response.toString());
             broadcastLobbiesList();
-
         }
-
         System.out.println("GameServer " +  "Lobby created: " + lobbyName + " with ID: " + lobby.getId());
     }
     public void broadcastLobbiesList() {
@@ -200,14 +171,6 @@ public class GameServer {
         errorResponse.put("type", "ERROR");
         JSONObject errorData = new JSONObject();
 
-        if (lobby == null) {
-            errorData.put("code", "LOBBY_NOT_FOUND");
-            errorData.put("message", "Lobby not found");
-            errorResponse.put("data", errorData);
-            client.sendRaw(errorResponse.toString());
-            return;
-        }
-
         if (lobby.isFull()) {
             errorData.put("code", "LOBBY_FULL");
             errorData.put("message", "Lobby is full: " + lobby.getId());
@@ -216,7 +179,7 @@ public class GameServer {
             return;
         }
 
-        if (lobby.isGameActive() && !lobby.hasPlayer(username)) {
+        if (lobby.isGameActive()) {
             errorData.put("code", "GAME_ACTIVE");
             errorData.put("message", "The game in this lobby is already active");
             errorResponse.put("data", errorData);
@@ -243,9 +206,6 @@ public class GameServer {
         successResponse.put("type", "JOIN_SUCCESS");
         successResponse.put("data", lobby.getLobbyInfo());
         client.sendRaw(successResponse.toString());
-
-        System.out.println("new join broadcast");
-//        broadcastLobbiesList();
     }
 
     public void startGame(String lobbyId, String username) {
@@ -253,14 +213,12 @@ public class GameServer {
         ClientConnectionController client = connectedClients.get(username);
 
         if (client == null) {
-            System.out.println("GameServer " +  "Username not found: " + username);
+            System.out.println("username not found: " + username);
             return;
         }
-
         JSONObject errorResponse = new JSONObject();
         errorResponse.put("type", "ERROR");
         JSONObject errorData = new JSONObject();
-
         if (lobby == null) {
             errorData.put("code", "LOBBY_NOT_FOUND");
             errorData.put("message", "Lobby not found");
@@ -309,28 +267,6 @@ public class GameServer {
         }
     }
 
-    public void processGameAction(String username, String action, String actionData) {
-        GameLobby playerLobby = findPlayerLobby(username);
-
-        if (playerLobby == null || !playerLobby.isGameActive()) {
-            ClientConnectionController client = connectedClients.get(username);
-            if (client != null) {
-                JSONObject error = new JSONObject();
-                error.put("type", "ERROR");
-
-                JSONObject errorData = new JSONObject();
-                errorData.put("code", "NOT_IN_GAME");
-                errorData.put("message", "You are not in any active game");
-                error.put("data", errorData);
-
-                client.sendRaw(error.toString());
-            }
-            return;
-        }
-
-        gameManager.processGameAction(playerLobby, username, action, actionData);
-    }
-
     public GameLobby findPlayerLobby(String username) {
         for (GameLobby lobby : lobbyManager.getGameLobbies()) {
             if (lobby.hasPlayer(username)) {
@@ -338,10 +274,6 @@ public class GameServer {
             }
         }
         return null;
-    }
-
-    private String generateLobbyId() {
-        return "lobby_" + UUID.randomUUID().toString().substring(0, 8);
     }
 
     private void checkDisconnectedClients() {
@@ -415,7 +347,7 @@ public class GameServer {
         running = false;
 
         try {
-            broadcastSystemMessage("Server is shutting down");
+            broadcast("Server is shutting down");
 
             for (ClientConnectionController clientController : connectedClients.values()) {
                 clientController.shutdown();
