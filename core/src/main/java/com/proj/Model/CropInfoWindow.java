@@ -90,7 +90,7 @@ public class CropInfoWindow extends Window {
             rowTable.add(cropCell).size(iconSize + 20, iconSize + 40).pad(spacing);
 
             if ((i + 1) % COLUMNS == 0 || i == crops.size - 1) {
-                contentTable.add(rowTable).padBottom(20).row(); // فاصله بین ردیف‌ها
+                contentTable.add(rowTable).padBottom(20).row(); 
                 rowTable = new Table();
                 rowTable.defaults().pad(spacing).center();
 
