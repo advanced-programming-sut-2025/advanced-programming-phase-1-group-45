@@ -68,20 +68,6 @@ public class GameManager {
         return success;
     }
 
-    public void processGameAction(GameLobby lobby, String username, String action, String actionData) {
-        if (lobby == null || !lobby.isGameActive()) {
-            return;
-        }
-
-        try {
-            JSONObject jsonData = new JSONObject(actionData);
-            processGameAction(lobby.getId(), username, action, jsonData);
-        } catch (Exception e) {
-            logger.warning("خطا در پردازش داده اکشن: " + e.getMessage());
-        }
-    }
-
-
     public void endGame(String gameId, String winner) {
         GameInstance game = activeGames.get(gameId);
         if (game == null) {
@@ -90,9 +76,8 @@ public class GameManager {
 
         GameLobby lobby = game.getLobby();
 
-        JSONObject endGameData = new JSONObject();
-        endGameData.put("winner", winner);
-        endGameData.put("gameId", gameId);
+        JSONObject endGameData = JsonBuilder.create().
+        .put("gameId", gameId);
         lobby.broadcastMessage("GAME_END", endGameData.toString());
 
         lobby.setGameActive(false);
@@ -102,11 +87,6 @@ public class GameManager {
         } catch (Exception e) {
             logger.warning("error in receiving game result:  " + e.getMessage());
         }
-
-        activeGames.remove(gameId);
-        lastUpdateTimes.remove(gameId);
-
-        logger.info("Game ended: " + gameId + "، winner: " + winner);
     }
 
 
@@ -117,7 +97,7 @@ public class GameManager {
 
     public void checkInactiveGames() {
         long currentTime = System.currentTimeMillis();
-        long inactivityTimeout = 10 * 60 * 1000; // 10 دقیقه
+        long inactivityTimeout = 10 * 60 * 1000; 
 
         for (Map.Entry<String, GameInstance> entry : new HashMap<>(activeGames).entrySet()) {
             GameInstance game = entry.getValue();
