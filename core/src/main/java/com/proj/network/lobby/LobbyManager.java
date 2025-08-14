@@ -62,6 +62,4 @@ public class LobbyManager {
     public Map<String, GameLobby> getGameLobbiesMap() {
         return gameLobbies;
     }
-
-    public enum GameLobbyStatus {WAITING, IN_GAME}
 }
