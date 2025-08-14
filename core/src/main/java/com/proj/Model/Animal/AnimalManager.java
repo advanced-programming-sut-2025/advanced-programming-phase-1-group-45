@@ -1,4 +1,4 @@
-package com.proj.Control;
+package com.proj.Model.Animal;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.proj.Model.Animal.Animal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +21,7 @@ public class AnimalManager {
     private Animal selectedAnimal = null;
     private boolean showingAnimalMenu = false;
     private boolean showingBuyMenu = false;
-
+    private FeedingController feedingController;
     private BitmapFont font;
     private GlyphLayout layout;
     private Texture whitePixelTexture;
@@ -44,6 +43,8 @@ public class AnimalManager {
         font = new BitmapFont();
         layout = new GlyphLayout();
         createWhitePixelTexture();
+        feedingController = new FeedingController();
+
     }
 
     private void createWhitePixelTexture() {
@@ -144,6 +145,8 @@ public class AnimalManager {
                 selectedAnimal = null;
                 showingAnimalMenu = false;
             }
+            if (feedingController != null) feedingController.update(delta);
+
         }
 
         if (showingBuyMenu && Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
@@ -250,6 +253,8 @@ public class AnimalManager {
         if (pettingAnimal != null) {
             renderPettingAnimation(batch);
         }
+        if (feedingController != null) feedingController.render(batch);
+
 
         if (showingAnimalMenu && selectedAnimal != null) {
             renderAnimalMenu(batch);
@@ -258,6 +263,8 @@ public class AnimalManager {
         if (showingBuyMenu) {
             renderBuyMenu(batch);
         }
+
+
     }
 
     private void renderFeedingAnimation(SpriteBatch batch) {
@@ -563,7 +570,13 @@ public class AnimalManager {
     public void startFeeding(Animal animal) {
         feedingAnimal = animal;
         feedingTime = 0;
+        // مسیر تصویر غذا را به‌دلخواه تنظیم کن:
+        String foodTexturePath = "assets/Animals/Food/FeedPlate.png"; // اگر ندارید خالی بگذار ""
+        if (feedingController != null) {
+            feedingController.startFeedingVisual(animal, foodTexturePath);
+        }
     }
+
 
     public void startPetting(Animal animal) {
         pettingAnimal = animal;
@@ -593,5 +606,16 @@ public class AnimalManager {
         if (hayHopperFullTexture != null) {
             hayHopperFullTexture.dispose();
         }
+
+
+        if (feedingController != null) feedingController.dispose();
+
     }
+
+
+    // در AnimalManager
+    public List<Animal> getAnimals() {
+        return animals;
+    }
+
 }

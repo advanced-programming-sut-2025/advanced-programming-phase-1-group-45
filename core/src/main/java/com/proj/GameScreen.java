@@ -21,6 +21,8 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.proj.Control.*;
 import com.proj.Model.Animal.Animal;
+import com.proj.Model.Animal.AnimalBuildingController;
+import com.proj.Model.Animal.AnimalManager;
 import com.proj.Model.Cooking.*;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.Inventory.InventoryItem;

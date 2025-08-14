@@ -1,4 +1,4 @@
-package com.proj.Control;
+package com.proj.Model.Animal;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.proj.map.GameMap;
-import com.proj.Model.Animal.Animal;
 
 import java.util.ArrayList;
 import java.util.HashMap;
