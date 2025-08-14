@@ -890,15 +890,15 @@ public class GameScreen implements Screen, ChatListener {
             if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
                 Gdx.app.postRunnable(() -> {
                     try {
-//                        ScoreboardController controller = new ScoreboardController(main.getDatabaseHelper());
-//                        ScoreboardView scoreboardScreen = new ScoreboardView(controller);
-//
-//                        scoreboardScreen.setBackCallback(() -> {
-//                            main.setScreen(this);
-//                            Gdx.input.setInputProcessor(stage);
-//                        });
-//
-//                        main.setScreen(scoreboardScreen);
+                        ScoreboardController controller = new ScoreboardController(main.getDatabaseHelper());
+                        ScoreboardView scoreboardScreen = new ScoreboardView(main,controller);
+
+                        scoreboardScreen.setBackCallback(() -> {
+                            main.setScreen(this);
+                            Gdx.input.setInputProcessor(stage);
+                        });
+
+                        main.setScreen(scoreboardScreen);
                     } catch (Exception e) {
                         Gdx.app.error("GameScreen", "Error opening scoreboard", e);
                     }
