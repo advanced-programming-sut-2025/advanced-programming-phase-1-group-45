@@ -42,11 +42,6 @@ public class Time implements GameEventListener {
         this.isPaused = isPaused;
         if (!isPaused) {
             frame++;
-            // frame = 1/60 sec
-            // 60 frame = 1 sec
-            //30 sec = 1 hour (*120)
-            //30*13 = 390 sec = 1 day
-            // 6 min , 30 sec = 1 day
             if (frame >= 30) {
                 frame = 0;
                 minute++;
