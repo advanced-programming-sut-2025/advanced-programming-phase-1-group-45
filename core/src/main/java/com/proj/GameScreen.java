@@ -24,7 +24,6 @@ import com.proj.Control.NPCManager;
 import com.proj.Control.WorldController;
 import com.proj.Control.AnimalBuildingController;
 import com.proj.Model.Animal.Animal;
-import com.proj.Model.CheatWindow;
 import com.proj.Model.Cooking.*;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.Inventory.InventoryItem;
@@ -50,16 +49,12 @@ import com.proj.network.event.NetworkEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import com.proj.Radio.RadioMenuScreen;
-import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.g2d.*;
-import java.util.*;
+
 import java.awt.*;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import java.awt.*;
 
 public class GameScreen implements Screen, ChatListener {
     private Player player;
@@ -130,6 +125,10 @@ public class GameScreen implements Screen, ChatListener {
     private Texture buttonImage;
     private boolean showButtonImage = false;
     private SpriteBatch batch;
+    private boolean showPizzaOnPlayer = false;
+    private float pizzaTimer = 0f;
+    private final float PIZZA_DURATION = 3f;
+    private com.badlogic.gdx.graphics.g2d.TextureRegion pizzaTexture = null;
 
 
     public GameScreen(Main main, farmName farm) {
@@ -354,6 +353,26 @@ public class GameScreen implements Screen, ChatListener {
                 }
             }
             player.render(worldController.getSpriteBatch());
+            if (showPizzaOnPlayer && pizzaTexture != null && player != null) {
+                float px = player.getPosition().x;
+                float py = player.getPosition().y;
+
+                float width = 24f;
+                float height = 24f;
+
+                float drawX = px - width / 2f;
+                float drawY = py + (player.getMaxEnergy() > 0 ? 20f : 20f);
+
+                worldController.getSpriteBatch().draw(pizzaTexture, drawX, drawY, width, height);
+
+                pizzaTimer -= delta;
+                if (pizzaTimer <= 0f) {
+                    showPizzaOnPlayer = false;
+                    pizzaTexture = null;
+                    pizzaTimer = 0f;
+                }
+            }
+
             animalManager.render(worldController.getSpriteBatch());
             if (animalBuildingController != null) {
                 animalBuildingController.render(worldController.getSpriteBatch());
@@ -867,24 +886,21 @@ public class GameScreen implements Screen, ChatListener {
             }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-                InventoryItem selectedItem = inventoryManager.getPlayerInventory().getSelectedItem();
-                if (selectedItem instanceof FoodItem) {
-                    FoodItem food = (FoodItem) selectedItem;
-                    if (food.getQuantity() > 0) {
-                        food.use(player);
-                        food.decreaseQuantity(1);
-                        if (food.getQuantity() <= 0) {
-                            inventoryManager.getPlayerInventory().removeItem(inventoryManager.getPlayerInventory().getSelectedSlot());
-                        }
+                if (player != null) {
+                    pizzaTexture = com.proj.Model.GameAssetManager.getGameAssetManager().getFoodTexture("Pizza");
+
+                    if (pizzaTexture != null) {
+                        showPizzaOnPlayer = true;
+                        pizzaTimer = PIZZA_DURATION;
+                        Gdx.app.log("GameScreen", "Showing pizza on player for " + PIZZA_DURATION + "s");
                     } else {
-                        Gdx.app.log("GameScreen", "No " + food.getName() + " left to eat.");
+                        Gdx.app.log("GameScreen", "No pizza texture available");
                     }
-                } else {
-                    Gdx.app.log("GameScreen", "Selected item is not edible.");
                 }
             }
 
-           if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
+
+            if (Gdx.input.isKeyJustPressed(Input.Keys.O)) {
                 try {
                     if (inventoryManager == null || cookingManager == null || player == null) {
                         Gdx.app.log("GameScreen", "Cannot open CookingScreen: missing managers or player.");

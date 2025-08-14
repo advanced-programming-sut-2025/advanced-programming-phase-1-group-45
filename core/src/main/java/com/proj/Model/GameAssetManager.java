@@ -558,7 +558,7 @@ public class GameAssetManager {
         if (spaceImageTexture != null) {
             spaceImageTexture.dispose();
         }
-        
+
 
         if (eatingEffectTexture != null && eatingEffectTexture.getTexture() != null) {
             eatingEffectTexture.getTexture().dispose();

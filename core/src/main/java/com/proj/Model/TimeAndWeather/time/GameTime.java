@@ -1,15 +1,9 @@
 package com.proj.Model.TimeAndWeather.time;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.proj.Main;
 import com.proj.Model.TimeAndWeather.DayOfWeek;
 import com.proj.Model.TimeAndWeather.Weather;
 import com.proj.map.Season;
-import com.proj.network.client.GameEventListener;
-import com.proj.network.event.GameEvent;
-import com.proj.network.event.NetworkEvent;
-import com.proj.network.message.JsonParser;
-import org.json.JSONObject;
 
 public class GameTime {
     private int day;

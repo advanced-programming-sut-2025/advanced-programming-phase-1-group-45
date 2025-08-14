@@ -11,13 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.proj.Control.AvatarCreationController;
 import com.proj.Control.MultiPlayerAvatarController;
 import com.proj.Main;
 import com.proj.Model.Character;
 import com.proj.map.farmName;
 import com.proj.network.client.GameEventListener;
-import com.proj.network.client.NetworkEventListener;
 import com.proj.network.event.GameEvent;
 import com.proj.network.event.NetworkEvent;
 
