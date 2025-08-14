@@ -2,6 +2,8 @@ package com.proj.Database;
 
 import com.proj.Model.User;
 import java.sql.*;
+import com.proj.Model.ScoreboardEntry;
+import java.util.*;
 
 import static com.proj.Control.Authenticator.isUsernameUnique;
 
@@ -16,6 +18,8 @@ public class DatabaseHelper {
             System.out.println("Database "+ "Connected to SQLite database at: " + System.getProperty("user.dir"));
             createUserTable();
             createGameResultsTable();
+            createCharacterTable();
+            migrateDatabase();
             logAllUsers();
         } catch (Exception e) {
             System.out.println("Database"+ "Connection error: " + e.getMessage());
@@ -31,6 +35,154 @@ public class DatabaseHelper {
         } catch (SQLException e) {
             System.out.println("Database"+ "Disconnection error: " + e.getMessage());
         }
+    }
+      public void createCharacterTable() {
+
+        String createTableSQL = "CREATE TABLE IF NOT EXISTS characters ("
+
+            + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+
+            + "user_id INTEGER NOT NULL UNIQUE,"
+
+            + "character_path TEXT NOT NULL,"
+
+            + "animal_path TEXT NOT NULL,"
+
+            + "farm_name TEXT NOT NULL,"
+
+            + "farm_type TEXT NOT NULL,"
+
+            + "money INTEGER DEFAULT 1000,"
+
+            + "FOREIGN KEY(user_id) REFERENCES users(id))";
+
+        executeUpdate(createTableSQL);
+        System.out.println("Database " + "Character table created/verified");
+
+    }
+
+    public boolean updatePlayerMoney(int userId, int money) {
+
+        String sql = "UPDATE characters SET money = ? WHERE user_id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+
+            pstmt.setInt(1, money);
+
+            pstmt.setInt(2, userId);
+
+            int rowsAffected = pstmt.executeUpdate();
+
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+
+            System.out.println("Database"+ "Error updating money: " + e.getMessage());
+
+            return false;
+
+        }
+
+    }
+
+    public List<ScoreboardEntry> getScoreboardData() {
+
+        List<ScoreboardEntry> entries = new ArrayList<>();
+
+        // Hardcoded list of the 40 specified usernames
+
+        List<String> usernames = Arrays.asList(
+
+            "fati", "arm", "at", "ta", "ty", "yt", "name", "nam", "us", "me",
+
+            "job", "use", "ak", "ka", "ee", "er", "ga", "ha", "PR", "JJ",
+
+            "s2", "s1", "s3", "KK", "PK", "FB", "KV", "JH", "MN", "FQ",
+
+            "RTU", "fatemeB", "sara", "OOO", "arm2", "mi2", "", "HH", "H", "aa"
+
+        );
+
+
+
+        // Create placeholders for SQL IN clause
+
+        String placeholders = String.join(",", Collections.nCopies(usernames.size(), "?"));
+
+        String sql = "SELECT u.username, COALESCE(c.money, 0) AS money, " +
+
+            "COALESCE(c.quests_completed, 0) AS quests, " +
+
+            "COALESCE(c.skill_level, 1) AS skill_level " +
+
+            "FROM users u " +
+
+            "LEFT JOIN characters c ON u.id = c.user_id " +
+
+            "WHERE u.username IN (" + placeholders + ") " +
+
+            "ORDER BY money DESC";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            // Set usernames for the IN clause
+            for (int i = 0; i < usernames.size(); i++) {
+                pstmt.setString(i + 1, usernames.get(i));
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    String username = rs.getString("username");
+                    int money = rs.getInt("money");
+                    int quests = rs.getInt("quests");
+                    int skillLevel = rs.getInt("skill_level");
+                    entries.add(new ScoreboardEntry(username, money, quests, skillLevel));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Database error getting scoreboard data: " + e.getMessage());
+        }
+        return entries;
+    }
+
+    public boolean saveCharacter(int userId, String characterPath, String animalPath, String farmName, String farmType, int money) {
+        String sql = "INSERT OR REPLACE INTO characters (user_id, character_path, animal_path, farm_name, farm_type, money) "
+            + "VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            pstmt.setString(2, characterPath);
+            pstmt.setString(3, animalPath);
+            pstmt.setString(4, farmName);
+            pstmt.setString(5, farmType);
+            pstmt.setInt(6, 1000); // ADD MONEY VALUE
+
+            pstmt.executeUpdate();
+            System.out.println("Database "+ "Character saved for user: " + userId);
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Database"+ "Error saving character: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public Map<String, String> loadCharacter(int userId) {
+        String sql = "SELECT * FROM characters WHERE user_id = ?";
+        Map<String, String> characterData = new HashMap<>();
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                characterData.put("character_path", rs.getString("character_path"));
+                characterData.put("animal_path", rs.getString("animal_path"));
+                characterData.put("farm_name", rs.getString("farm_name"));
+                characterData.put("farm_type", rs.getString("farm_type"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Database"+ "Error loading character: " + e.getMessage());
+        }
+        return characterData;
     }
 
     public void createUserTable() {
@@ -69,6 +221,14 @@ public class DatabaseHelper {
         } catch (SQLException e) {
             System.out.println("Database"+ "Update error: " + e.getMessage() + "\nQuery: " + query);
         }
+    }
+
+     public void migrateDatabase() {
+        // Add money column if it doesn't exist
+        addColumnIfNotExists("characters", "money", "INTEGER DEFAULT 1000");
+        // Set default money for existing players
+        String updateSql = "UPDATE characters SET money = 1000 WHERE money IS NULL";
+        executeUpdate(updateSql);
     }
 
     public ResultSet executeQuery(String query) {
@@ -295,6 +455,13 @@ public class DatabaseHelper {
         } catch (SQLException e) {
             System.out.println("Database"+ "Email update error: " + e.getMessage());
             return false;
+        }
+    }
+
+    private boolean columnExists(String table, String column) throws SQLException {
+        DatabaseMetaData meta = connection.getMetaData();
+        try (ResultSet rs = meta.getColumns(null, null, table, column)) {
+            return rs.next();
         }
     }
 
