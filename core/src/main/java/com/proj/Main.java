@@ -89,6 +89,9 @@ public class Main extends Game implements NetworkEventListener {
             currentMusic = null;
         }
     }
+    public DatabaseHelper getDatabaseHelper() {
+        return dbHelper;
+    }
 //ino comment kardam chon nemidoonestam parametr avali ro chi bedam*******************
     /*public void startNewGame() {// in jadide
         if (getScreen() != null) {
