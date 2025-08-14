@@ -150,5 +150,27 @@ public class Inventory {
     public Map<Integer, InventoryItem> getItems() {
         return items;
     }
+
+
+    public int addItemAndReturnSlot(InventoryItem item) {
+        if (item == null) return -1;
+
+        for (Map.Entry<Integer, InventoryItem> e : items.entrySet()) {
+            InventoryItem existingItem = e.getValue();
+            if (existingItem.canStack(item)) {
+                existingItem.increaseQuantity(item.getQuantity());
+                return e.getKey();
+            }
+        }
+
+        for (int i = 0; i < capacity; i++) {
+            if (!items.containsKey(i)) {
+                items.put(i, item);
+                return i;
+            }
+        }
+        return -1;
+    }
+
 }
 

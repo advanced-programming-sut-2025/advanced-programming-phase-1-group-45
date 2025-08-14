@@ -41,6 +41,8 @@ public class InventoryManager {
 
     private void loadTextures() {
 
+        itemTextures.put("Ring", new TextureRegion(new Texture(Gdx.files.internal("IMG_7031.jpeg"))));
+        itemTextures.put("Flower", new TextureRegion(new Texture(Gdx.files.internal("IMG_7032.jpeg"))));
 
         itemTextures.put("hoe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Hoe/Hoe.png"))));
         itemTextures.put("pickaxe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/PickAxe/starter.png")))); // Uncommented this line
@@ -90,20 +92,28 @@ public class InventoryManager {
         playerInventory.addItem(new WateringCan("watering_can_basic", "Watering Can", itemTextures.get("watering_can_basic"), 1)); // Uncommented this line
         playerInventory.addItem(new FishingRod("fishing_rod_basic", "Fishing Rod", itemTextures.get("fishing_rod_basic"), 1)); // Uncommented this line
         playerInventory.addItem(new Scythe("scythe_basic", "Scythe", itemTextures.get("scythe_basic"), 1));
-    }
+        SimpleItem ring = new SimpleItem("Ring", "Ring", itemTextures.get("Ring"), false, 1);
+        SimpleItem flower = new SimpleItem("Flower", "Flower", itemTextures.get("Flower"), false, 1);
+
+        int ringSlot = playerInventory.addItemAndReturnSlot(ring);
+        int flowerSlot = playerInventory.addItemAndReturnSlot(flower);
+
+        if (ringSlot >= 0) {
+            playerInventory.selectSlot(ringSlot);
+            playerInventory.setNoToolSelected(false);
+        } else if (flowerSlot >= 0) {
+            playerInventory.selectSlot(flowerSlot);
+            playerInventory.setNoToolSelected(false);
+        }}
 
     public void initialize(int screenWidth, int screenHeight) {
-        // Create the inventory UI using the loaded textures
         inventoryUI = new StardewInventoryUI(playerInventory, 10, screenHeight - 10,
             inventoryBackground, inventorySlots, selectedSlotHighlight);
     }
 
-    // Added update method to handle inventory updates
     public void update(float delta, Player player) {
-        // Update inventory
         playerInventory.update(delta);
 
-        // Handle inventory UI input
         if (inventoryUI != null) {
             inventoryUI.handleInput();
         }
@@ -247,7 +257,7 @@ public class InventoryManager {
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
         } else {
             TextureRegion texture = itemTextures.get(itemId);
-            
+
             if (texture == null) {
                 Gdx.app.log("InventoryManager", "Creating placeholder for: " + itemId);
                 texture = createPlaceholderTexture();

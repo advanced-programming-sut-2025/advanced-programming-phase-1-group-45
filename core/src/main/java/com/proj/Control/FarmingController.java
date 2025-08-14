@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.proj.Model.Inventory.InventoryItem;
 import com.proj.Model.inventoryItems.SeedItem;
-import com.proj.Model.inventoryItems.crops.Crop;
 import com.proj.Model.inventoryItems.crops.CropManager;
 import com.proj.Model.inventoryItems.crops.GiantCrop;
 import com.proj.Model.inventoryItems.fertilizer.FertilizerSelectionListener;
@@ -13,7 +12,6 @@ import com.proj.Model.inventoryItems.trees.TreeManager;
 import com.proj.PlayerDirection;
 import com.proj.map.GameMap;
 import com.proj.map.Season;
-import com.proj.map.Tile;
 
 public class FarmingController implements SeedSelectionListener, FertilizerSelectionListener {
     private GameMap gameMap;

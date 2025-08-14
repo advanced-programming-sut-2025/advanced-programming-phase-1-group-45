@@ -19,10 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.proj.Control.AnimalManager;
-import com.proj.Control.NPCManager;
-import com.proj.Control.WorldController;
-import com.proj.Control.AnimalBuildingController;
+import com.proj.Control.*;
 import com.proj.Model.Animal.Animal;
 import com.proj.Model.Cooking.*;
 import com.proj.Model.GameAssetManager;
@@ -50,7 +47,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import com.proj.Radio.RadioMenuScreen;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.proj.View.ScoreboardView;
 
 import java.awt.*;
 
@@ -676,7 +672,13 @@ public class GameScreen implements Screen, ChatListener {
                     selectToolSlot(4);
                 } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_6)) {
                     selectToolSlot(5);
-                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
+                } else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_7)) {
+                selectToolSlot(6);}
+                else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_8)) {
+                selectToolSlot(7);}
+                else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_9)) {
+                    selectToolSlot(8);
+                }else if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
                     if (inventoryManager != null && inventoryManager.getPlayerInventory() != null) {
                         inventoryManager.getPlayerInventory().selectNoTool();
                         Gdx.app.log("GameScreen", "Selected no tool");

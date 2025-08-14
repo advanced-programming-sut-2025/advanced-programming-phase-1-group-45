@@ -1,6 +1,5 @@
 package com.proj.Control;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,15 +22,12 @@ import com.proj.Model.TimeAndWeather.WeatherController;
 import com.proj.Model.inventoryItems.ForagingInventoryWindow;
 import com.proj.Model.inventoryItems.SeedInventoryWindow;
 import com.proj.Model.inventoryItems.crops.CropInventoryWindow;
-import com.proj.Model.inventoryItems.fertilizer.BasicFertilizer;
-import com.proj.Model.inventoryItems.fertilizer.DeluxeFertilizer;
 import com.proj.Model.inventoryItems.fertilizer.FertilizeWindow;
 import com.proj.Model.inventoryItems.seeds.ItemRegistry;
 import com.proj.Player;
 import com.proj.map.FarmInOutPoint;
 import com.proj.map.GameMap;
 import com.proj.map.Season;
-import com.proj.GameScreen;
 import com.proj.map.farmName;
 
 import java.awt.*;

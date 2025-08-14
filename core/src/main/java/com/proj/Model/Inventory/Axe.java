@@ -3,11 +3,8 @@ package com.proj.Model.Inventory;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
 import com.proj.Control.WorldController;
-import com.proj.Model.inventoryItems.crops.Crop;
-import com.proj.Model.inventoryItems.crops.GiantCrop;
 import com.proj.Model.inventoryItems.trees.Tree;
 import com.proj.map.GameMap;
-import com.proj.map.Tile;
 
 public class Axe extends Tool {
 

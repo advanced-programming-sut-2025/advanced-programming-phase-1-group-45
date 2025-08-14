@@ -26,7 +26,6 @@ public class PlayerBag {
     private float toolbarX;
     private float toolbarY;
 
-    // مناطق کلیک برای ابزارها در نوار ابزار
     private int[][] toolbarSlots = {
         {76, 336, 36, 36},  // ابزار 1: {x, y, width, height}
         {112, 336, 36, 36}, // ابزار 2

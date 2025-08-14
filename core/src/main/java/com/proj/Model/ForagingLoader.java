@@ -9,7 +9,6 @@ import com.badlogic.gdx.utils.Json;
 import com.proj.Model.inventoryItems.ForagingItem;
 import com.proj.map.Season;
 
-import javax.swing.*;
 import java.util.Arrays;
 
 public class ForagingLoader {

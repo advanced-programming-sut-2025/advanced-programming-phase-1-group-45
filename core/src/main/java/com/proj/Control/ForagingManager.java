@@ -14,7 +14,6 @@ import com.proj.map.TileType;
 
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 public class ForagingManager {
     private Array<ForagingItem> foragingCrops = new Array<>();
