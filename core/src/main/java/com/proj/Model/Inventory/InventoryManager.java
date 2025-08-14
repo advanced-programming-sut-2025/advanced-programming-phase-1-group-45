@@ -43,6 +43,7 @@ public class InventoryManager {
 
         itemTextures.put("Ring", new TextureRegion(new Texture(Gdx.files.internal("IMG_7031.jpeg"))));
         itemTextures.put("Flower", new TextureRegion(new Texture(Gdx.files.internal("IMG_7032.jpeg"))));
+        itemTextures.put("Shears", new TextureRegion(new Texture(Gdx.files.internal("items/Shears.png"))));
 
         itemTextures.put("hoe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/Hoe/Hoe.png"))));
         itemTextures.put("pickaxe_basic", new TextureRegion(new Texture(Gdx.files.internal("items/PickAxe/starter.png")))); // Uncommented this line
@@ -94,17 +95,22 @@ public class InventoryManager {
         playerInventory.addItem(new Scythe("scythe_basic", "Scythe", itemTextures.get("scythe_basic"), 1));
         SimpleItem ring = new SimpleItem("Ring", "Ring", itemTextures.get("Ring"), false, 1);
         SimpleItem flower = new SimpleItem("Flower", "Flower", itemTextures.get("Flower"), false, 1);
+        SimpleItem shears = new SimpleItem("Shears", "Shears", itemTextures.get("Shears"), false, 1);
 
         int ringSlot = playerInventory.addItemAndReturnSlot(ring);
         int flowerSlot = playerInventory.addItemAndReturnSlot(flower);
-
+        int shearsSlot = playerInventory.addItemAndReturnSlot(shears);
         if (ringSlot >= 0) {
             playerInventory.selectSlot(ringSlot);
             playerInventory.setNoToolSelected(false);
         } else if (flowerSlot >= 0) {
             playerInventory.selectSlot(flowerSlot);
             playerInventory.setNoToolSelected(false);
-        }}
+        }else if (shearsSlot >= 0) {
+            playerInventory.selectSlot(shearsSlot);
+            playerInventory.setNoToolSelected(false);
+        }
+    }
 
     public void initialize(int screenWidth, int screenHeight) {
         inventoryUI = new StardewInventoryUI(playerInventory, 10, screenHeight - 10,
