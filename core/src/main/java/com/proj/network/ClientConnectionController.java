@@ -53,10 +53,10 @@ public class ClientConnectionController implements Runnable {
                     Command message = Command.parse(command);
                     processMessage(message);
                 } catch (IOException e) {
-                    sendError("INVALID_FORMAT", "Invalid message format");
+                    e.printStackTrace();
                 } catch (Exception e) {
                     System.err.println("Message processing error: " + e.getMessage());
-                    sendError("PROCESSING_ERROR", "Error processing request");
+                    e.printStackTrace();
                 }
             }
         } catch (IOException e) {
@@ -88,7 +88,7 @@ public class ClientConnectionController implements Runnable {
         try {
             Command loginMessage = Command.parse(response);
             if (!"AUTH".equals(loginMessage.getType())) {
-                sendError("AUTH_FAILED", "Invalid request type");
+                    e.printStackTrace();
                 return false;
             }
             JSONObject credentials = loginMessage.getData();
@@ -257,7 +257,7 @@ public class ClientConnectionController implements Runnable {
         try {
             server.createLobby(name, username, password, maxPlayers, isPrivate, isVisible);
         } catch (Exception e) {
-            sendError("LOBBY_DOESNT_CREATED", "Error creating lobby: " + e.getMessage());
+                    e.printStackTrace();
         }
     }
 
@@ -267,7 +267,7 @@ public class ClientConnectionController implements Runnable {
         try {
             server.joinLobby(lobbyId, username, password);
         } catch (Exception e) {
-            sendError("Error", "Error joining lobby: " + e.getMessage());
+                    e.printStackTrace();
         }
     }
 
@@ -275,7 +275,7 @@ public class ClientConnectionController implements Runnable {
         String farm = JsonParser.getString(data, "farmName", "Standard");
         Game game = server.getGameManager().getGameInstance(currentLobby.getId());
         if (game == null) {
-            sendError("GAME_NOT_FOUND", "Game not found for your lobby");
+                    e.printStackTrace();
             return;
         }
         farmName selected = farmName.STANDARD;
@@ -291,7 +291,7 @@ public class ClientConnectionController implements Runnable {
     private void readyToStart(JSONObject data) {
         Game game = server.getGameManager().getGameInstance(currentLobby.getId());
         if (game == null) {
-            sendError("GAME_NOT_FOUND", "Game not found for your lobby");
+                    e.printStackTrace();
             return;
         }
         game.getPlayerState(username).setReadyToPlay(true);
@@ -314,7 +314,7 @@ public class ClientConnectionController implements Runnable {
                 server.broadcast("Lobby: " + lobby.getName() + " was removed");
             }
         } else {
-            sendError("NOT_IN_LOBBY", "You are not in any lobby");
+                    e.printStackTrace();
         }
     }
 
@@ -322,13 +322,12 @@ public class ClientConnectionController implements Runnable {
     private void startGame(JSONObject data) {
         String lobbyId = JsonParser.getString(data, "lobbyId", "");
         if (lobbyId.isEmpty()) {
-            sendError("error", "Lobby ID is required");
             return;
         }
         try {
             server.startGame(lobbyId, username);
         } catch (Exception e) {
-            sendError("GAME_START_FAILED", "Error starting game: " + e.getMessage());
+                    e.printStackTrace();
         }
     }
 
@@ -340,7 +339,6 @@ public class ClientConnectionController implements Runnable {
     private void sendPlayersInGame() {
         Game game = server.getGameManager().getGameInstance(currentLobby.getId());
         if (game == null) {
-            sendError("GAME_NOT_FOUND", "Game not found for your lobby");
             return;
         }
     }
@@ -352,12 +350,10 @@ public class ClientConnectionController implements Runnable {
     private void handlePlayerMovement(JSONObject data) {
         Game game = server.getGameManager().getGameInstance(currentLobby.getId());
         if (game == null) {
-            sendError("GAME_NOT_FOUND", "Game not found for your lobby");
             return;
         }
         PlayerInGame player = game.getPlayerState(username);
         if (player == null) {
-            sendError("PLAYER_NOT_FOUND", "Player not found for your lobby");
             return;
         }
         float x = data.getFloat("x");
@@ -390,14 +386,6 @@ public class ClientConnectionController implements Runnable {
         } catch (Exception e) {
             System.err.println("Failed to send message to client: " + e.getMessage());
         }
-    }
-
-    private void sendError(String code, String message) {
-        JSONObject error = JsonBuilder.create()
-            .put("code", code)
-            .put("message", message)
-            .build();
-        sendMessage("ERROR", error);
     }
 
     private void syncGameTime(JSONObject data) {
