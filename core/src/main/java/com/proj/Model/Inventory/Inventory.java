@@ -12,7 +12,7 @@ public class Inventory {
     private Map<Integer, InventoryItem> items;
     private int selectedSlot = 0;
     private boolean isVisible = false;
-    private boolean noToolSelected = true; // برای شروع بدون ابزار
+    private boolean noToolSelected = true;
     private int money = 1000;
 
     public Inventory() {
@@ -139,7 +139,6 @@ public class Inventory {
     }
 
     public void update(float delta) {
-        // Update all tools in inventory
         for (InventoryItem item : items.values()) {
             if (item instanceof Tool) {
                 ((Tool) item).update(delta);

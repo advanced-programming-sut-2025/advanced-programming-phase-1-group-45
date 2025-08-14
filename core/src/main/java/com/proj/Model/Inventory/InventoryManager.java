@@ -26,7 +26,7 @@ public class InventoryManager {
 
     public InventoryManager() {
         itemTextures = new HashMap<>();
-        playerInventory = new Inventory(24); // Start with medium backpack
+        playerInventory = new Inventory(24);
         loadTextures();
         loadInventoryUI();
         createInitialTools();
@@ -125,7 +125,6 @@ public class InventoryManager {
         }
     }
 
-    // Added render method to render the inventory UI
     public void render(SpriteBatch batch) {
         if (inventoryUI != null) {
             inventoryUI.render(batch);

@@ -11,7 +11,7 @@ public class Hoe extends Tool {
 
     @Override
     protected float getBaseEnergyCost() {
-        return 5.0f; // Base energy cost for Hoe
+        return 5.0f;
     }
 
     @Override
@@ -26,7 +26,6 @@ public class Hoe extends Tool {
     @Override
     public void use() {
         super.use();
-        // Additional hoe-specific use logic
     }
 }
 

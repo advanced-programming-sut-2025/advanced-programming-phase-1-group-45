@@ -19,7 +19,7 @@ public class Pickaxe extends Tool {
 
     @Override
     protected float getBaseEnergyCost() {
-        return 5.0f; // Base energy cost for Pickaxe
+        return 5.0f;
     }
 
     @Override
@@ -58,6 +58,5 @@ public class Pickaxe extends Tool {
     @Override
     public void use() {
         super.use();
-        // Additional pickaxe-specific use logic
     }
 }

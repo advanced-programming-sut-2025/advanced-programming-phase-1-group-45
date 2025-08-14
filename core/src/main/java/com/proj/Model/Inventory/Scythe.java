@@ -21,7 +21,7 @@ public class Scythe extends Tool {
 
     @Override
     protected float getBaseEnergyCost() {
-        return 2.0f; // Base energy cost for Scythe
+        return 2.0f;
     }
 
     @Override
@@ -77,6 +77,5 @@ public class Scythe extends Tool {
     @Override
     public void use() {
         super.use();
-        // Additional scythe-specific use logic
     }
 }

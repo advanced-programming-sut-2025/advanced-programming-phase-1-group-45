@@ -23,16 +23,7 @@ public class PlayerBag {
     private float toolbarX;
     private float toolbarY;
 
-    private int[][] toolbarSlots = {
-        {76, 336, 36, 36},  // ابزار 1: {x, y, width, height}
-        {112, 336, 36, 36}, // ابزار 2
-        {148, 336, 36, 36}, // ابزار 3
-        {184, 336, 36, 36}, // ابزار 4
-        {220, 336, 36, 36}, // ابزار 5
-        {256, 336, 36, 36}  // ابزار 6
-    };
 
-    private int[] noToolButton = {292, 336, 36, 36}; // دکمه بدون ابزار کنار ابزارهای دیگر
 
     public PlayerBag(Player player, Inventory inventory) {
         this.player = player;
@@ -139,33 +130,7 @@ public class PlayerBag {
                 float bagX = player.getPosition().x + offsetX;
                 float bagY = player.getPosition().y + offsetY;
 
-                for (int i = 0; i < toolbarSlots.length && i < inventory.getCapacity(); i++) {
-                    float toolX = bagX + toolbarSlots[i][0] * scale;
-                    float toolY = bagY + toolbarSlots[i][1] * scale;
-                    float toolWidth = toolbarSlots[i][2] * scale;
-                    float toolHeight = toolbarSlots[i][3] * scale;
 
-                    Gdx.app.log("PlayerBag", "Tool slot " + i + " rect: " + toolX + ", " + toolY + ", " + toolWidth + ", " + toolHeight);
-
-                    if (touchPos.x >= toolX && touchPos.x < toolX + toolWidth &&
-                        touchPos.y >= toolY && touchPos.y < toolY + toolHeight) {
-                        inventory.selectSlot(i);
-                        Gdx.app.log("PlayerBag", "Selected tool slot: " + i);
-                        return;
-                    }
-                }
-
-                float noToolX = bagX + noToolButton[0] * scale;
-                float noToolY = bagY + noToolButton[1] * scale;
-                float noToolWidth = noToolButton[2] * scale;
-                float noToolHeight = noToolButton[3] * scale;
-
-                if (touchPos.x >= noToolX && touchPos.x < noToolX + noToolWidth &&
-                    touchPos.y >= noToolY && touchPos.y < noToolY + noToolHeight) {
-                    selectNoTool();
-                    Gdx.app.log("PlayerBag", "Selected no tool");
-                    return;
-                }
             } catch (Exception e) {
                 Gdx.app.error("PlayerBag", "Error in checkToolbarClick", e);
                 e.printStackTrace();

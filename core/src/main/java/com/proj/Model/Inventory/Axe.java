@@ -14,7 +14,7 @@ public class Axe extends Tool {
 
     @Override
     protected float getBaseEnergyCost() {
-        return 5.0f; // Base energy cost for Axe
+        return 5.0f;
     }
 
     @Override
@@ -36,6 +36,5 @@ public class Axe extends Tool {
     @Override
     public void use() {
         super.use();
-        // Additional axe-specific use logic if needed
     }
 }

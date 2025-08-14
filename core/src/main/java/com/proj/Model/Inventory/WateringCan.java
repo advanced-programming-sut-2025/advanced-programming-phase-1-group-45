@@ -11,23 +11,23 @@ public class WateringCan extends Tool {
     public WateringCan(String id, String name, TextureRegion texture, int level) {
         super(id, name, texture, ToolType.WATERING_CAN, level);
         setCapacityByLevel(level);
-        this.waterAmount = capacity; // Start with full water
+        this.waterAmount = capacity;
     }
 
     private void setCapacityByLevel(int level) {
         switch (level) {
-            case 1: this.capacity = 40; break;  // Basic
-            case 2: this.capacity = 55; break;  // Copper
-            case 3: this.capacity = 70; break;  // Steel
-            case 4: this.capacity = 85; break;  // Gold
-            case 5: this.capacity = 100; break; // Iridium
+            case 1: this.capacity = 40; break;
+            case 2: this.capacity = 55; break;
+            case 3: this.capacity = 70; break;
+            case 4: this.capacity = 85; break;
+            case 5: this.capacity = 100; break;
             default: this.capacity = 40;
         }
     }
 
     @Override
     protected float getBaseEnergyCost() {
-        return 5.0f; // Base energy cost for Watering Can
+        return 5.0f;
     }
 
     @Override
@@ -42,20 +42,16 @@ public class WateringCan extends Tool {
             waterAmount--;
             return true;
         }
-        return false; // Not enough water
+        return false;
     }
 
-    public boolean fillWater() {
-        // Logic to fill the watering can when used near water source
-        waterAmount = capacity;
-        return true;
-    }
+
 
     @Override
     public void upgrade() {
         super.upgrade();
         setCapacityByLevel(getLevel());
-        this.waterAmount = capacity; // Refill after upgrade
+        this.waterAmount = capacity; 
     }
 
     public int getWaterAmount() {

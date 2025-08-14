@@ -14,12 +14,11 @@ public class FishingRod extends Tool {
 
     @Override
     protected float getBaseEnergyCost() {
-        return 8.0f; // Base energy cost for Fishing Rod
+        return 8.0f;
     }
 
     @Override
     public boolean useOnTile(int tileX, int tileY) {
-        // Check if the tile is water
         boolean isWaterTile = checkIfWaterTile(tileX, tileY);
 
         if (isWaterTile && !isCasting) {
@@ -30,9 +29,7 @@ public class FishingRod extends Tool {
     }
 
     private boolean checkIfWaterTile(int tileX, int tileY) {
-        // Logic to check if the tile is water
-        // This would interact with the game's tile system
-        return true; // Placeholder
+        return true;
     }
 
     private void startCasting() {
@@ -43,28 +40,25 @@ public class FishingRod extends Tool {
     public void update(float delta) {
         if (isCasting) {
             castTime += delta;
-            // After some time, there's a chance to catch fish
-            if (castTime > 3.0f) { // 3 seconds example
+            if (castTime > 3.0f) {
                 attemptCatchFish();
             }
         }
     }
 
     private void attemptCatchFish() {
-        // Logic for catching fish based on level and other factors
         isCasting = false;
         castTime = 0;
     }
 
     @Override
     public float getEnergyCost() {
-        // Adjust energy cost based on rod type
         float baseCost = super.getEnergyCost();
         switch (getLevel()) {
-            case 1: return baseCost;          // Training Rod
-            case 2: return baseCost * 0.75f;  // Bamboo Rod
-            case 3: return baseCost * 0.5f;   // Fiberglass Rod
-            case 4: return baseCost * 0.25f;  // Iridium Rod
+            case 1: return baseCost;
+            case 2: return baseCost * 0.75f;
+            case 3: return baseCost * 0.5f;
+            case 4: return baseCost * 0.25f;
             default: return baseCost;
         }
     }

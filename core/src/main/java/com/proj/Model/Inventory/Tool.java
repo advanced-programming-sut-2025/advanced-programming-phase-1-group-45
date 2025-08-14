@@ -32,7 +32,7 @@ public abstract class Tool extends InventoryItem {
     public void use() {
         if (!inUse) {
             inUse = true;
-            useAnimationTimer = 0.5f; // Animation duration in seconds
+            useAnimationTimer = 0.5f;
         }
     }
 
@@ -70,7 +70,7 @@ public abstract class Tool extends InventoryItem {
 
     public float getUseAnimationProgress() {
         if (!inUse) return 0;
-        return 1 - (useAnimationTimer / 0.5f); // 0 to 1 progress
+        return 1 - (useAnimationTimer / 0.5f);
     }
 
     @Override
