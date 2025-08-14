@@ -1,7 +1,5 @@
 package com.proj.Model.TimeAndWeather.snowy;
 
-// SnowRenderer.java
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
