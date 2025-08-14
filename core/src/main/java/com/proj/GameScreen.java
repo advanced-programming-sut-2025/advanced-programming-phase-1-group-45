@@ -50,6 +50,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import com.proj.Radio.RadioMenuScreen;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.proj.View.ScoreboardView;
 
 import java.awt.*;
 
@@ -883,6 +884,23 @@ public class GameScreen implements Screen, ChatListener {
             if (Gdx.input.isKeyJustPressed(Input.Keys.U)) {
                 showButtonImage = !showButtonImage;
                 Gdx.app.log("GameScreen", "U key pressed. Show image: " + showButtonImage);
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.G)) {
+                Gdx.app.postRunnable(() -> {
+                    try {
+                        ScoreboardController controller = new ScoreboardController(main.getDatabaseHelper());
+                        ScoreboardView scoreboardScreen = new ScoreboardView(controller);
+
+                        scoreboardScreen.setBackCallback(() -> {
+                            main.setScreen(this);
+                            Gdx.input.setInputProcessor(stage);
+                        });
+
+                        main.setScreen(scoreboardScreen);
+                    } catch (Exception e) {
+                        Gdx.app.error("GameScreen", "Error opening scoreboard", e);
+                    }
+                });
             }
 
             if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
