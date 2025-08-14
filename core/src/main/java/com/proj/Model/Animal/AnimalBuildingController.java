@@ -21,14 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 public class AnimalBuildingController {
-    // Building textures
     private Texture barnTexture;
     private Texture coopTexture;
     private Texture barnInteriorTexture;
     private Texture coopInteriorTexture;
     private Texture listBackgroundTexture;
 
-    // Building placement state
     private boolean isPlacingBarn = false;
     private boolean isPlacingCoop = false;
     private float barnX = 0;
@@ -37,21 +35,18 @@ public class AnimalBuildingController {
     private float coopY = 0;
     private final float MOVEMENT_SPEED = 5.0f;
 
-    // Placed buildings
     private float[] placedBarnsX = new float[100];
     private float[] placedBarnsY = new float[100];
     private int barnCount = 0;
     private float[] placedCoopsX = new float[100];
     private float[] placedCoopsY = new float[100];
     private int coopCount = 0;
-    private int selectedListIndex = -1; // شاخص حیوان انتخاب شده در لیست
-    private boolean highlightSelection = false; // برای نمایش انتخاب فعلی
+    private int selectedListIndex = -1;
+    private boolean highlightSelection = false;
     private boolean waitingForBuildingSelection = false;
-    // Animals in buildings
     private List<Animal>[] animalsInBarns = new List[100];
     private List<Animal>[] animalsInCoops = new List[100];
 
-    // Interior view state
     private boolean showingInterior = false;
     private boolean showingBarnInterior = false;
     private boolean showingCoopInterior = false;
@@ -61,12 +56,10 @@ public class AnimalBuildingController {
     private Animal selectedAnimal = null;
     private boolean showingAnimalMenu = false;
 
-    // Free animals
     private List<Animal> freeAnimals = new ArrayList<>();
     private static final float DIRECTION_CHANGE_INTERVAL = 2.0f;
     private static final float MAX_DISTANCE = 5 * 16; // Assuming tileSize is 16
 
-    // Animal animations
     private Map<String, Animation<TextureRegion>> walkUpAnimations = new HashMap<>();
     private Map<String, Animation<TextureRegion>> walkDownAnimations = new HashMap<>();
     private Map<String, Animation<TextureRegion>> walkLeftAnimations = new HashMap<>();
@@ -76,19 +69,16 @@ public class AnimalBuildingController {
     private Map<String, TextureRegion> idleFrames = new HashMap<>();
     private static final float FRAME_DURATION = 0.15f;
 
-    // Rendering
     private ShapeRenderer shapeRenderer;
     private float interiorX;
     private float interiorY;
     private float interiorScale = 0f;
 
-    // UI components
     private BitmapFont font;
     private BitmapFont animalNameFont;
     private GlyphLayout layout;
     private Texture whitePixelTexture;
 
-    // Animal list
     private boolean showingAnimalList = false;
     private List<AnimalDisplayData> animalsToDisplay = new ArrayList<>();
     private float listX;
@@ -102,13 +92,11 @@ public class AnimalBuildingController {
     private float cameraX = 0;
     private float cameraY = 0;
     public boolean selectingBuildingForAnimal = false;
-    // Textures
     private Map<String, Texture> animalTextures = new HashMap<>();
     private Map<String, Texture> productTextures = new HashMap<>();
     private Texture hayHopperTexture;
     private Texture hayHopperFullTexture;
 
-    // Animation state
     private Animal feedingAnimal = null;
     private float feedingTime = 0;
     private static final float FEEDING_DURATION = 2.0f;
@@ -128,7 +116,6 @@ public class AnimalBuildingController {
     public void updateCameraPosition(float x, float y) {
         this.cameraX = x;
         this.cameraY = y;
-        // اگر لیست نمایش داده می‌شود، موقعیت آن را نیز به‌روز کنید
         if (showingAnimalList) {
             updateListPosition();
         }
@@ -136,7 +123,6 @@ public class AnimalBuildingController {
 
     public AnimalBuildingController(GameMap gameMap) {
         try {
-            // Load textures
             barnTexture = new Texture(Gdx.files.internal("assets/Animals/Barn/Barn.png"));
             coopTexture = new Texture(Gdx.files.internal("assets/Animals/Coop/Coop.png"));
             barnInteriorTexture = new Texture(Gdx.files.internal("assets/Animals/Barn/barninside.png"));
@@ -145,13 +131,11 @@ public class AnimalBuildingController {
             hayHopperFullTexture = new Texture(Gdx.files.internal("assets/Animals/Hay_Hopper_Full.png"));
             listBackgroundTexture = new Texture(Gdx.files.internal("assets/Animals/list.png"));
 
-            // Initialize animal lists
             for (int i = 0; i < 100; i++) {
                 animalsInBarns[i] = new ArrayList<>();
                 animalsInCoops[i] = new ArrayList<>();
             }
 
-            // Initialize rendering tools
             shapeRenderer = new ShapeRenderer();
             font = new BitmapFont();
             animalNameFont = new BitmapFont();
@@ -159,11 +143,9 @@ public class AnimalBuildingController {
             layout = new GlyphLayout();
             createWhitePixelTexture();
 
-            // Initialize animal display list
             updateListPosition();
             loadAnimalsToDisplay();
 
-            // Load animal textures and animations
             loadAnimalTextures();
             loadAnimalListTextures();
             loadAnimalAnimations();
@@ -189,17 +171,14 @@ public class AnimalBuildingController {
     }
 
     private void updateListPosition() {
-        // Scale the list to make it smaller
         listWidth = listBackgroundTexture.getWidth() * listScale;
         listHeight = listBackgroundTexture.getHeight() * listScale;
 
-        // Position the list relative to camera position
         float screenWidth = Gdx.graphics.getWidth();
         float screenHeight = Gdx.graphics.getHeight();
 
-        // نمایش لیست در گوشه بالا سمت راست دوربین
-        listX = cameraX-100 ; // تنظیم فاصله از مرکز دوربین
-        listY = cameraY-200 ; // تنظیم فاصله از مرکز دوربین
+        listX = cameraX - 100;
+        listY = cameraY - 200;
     }
 
 
@@ -254,41 +233,33 @@ public class AnimalBuildingController {
             Texture spriteSheet = animalTextures.get(animalType);
 
             if (spriteSheet != null) {
-                int cols = 4; // تعداد ستون‌ها همیشه 4 است
+                int cols = 4;
                 int rows;
 
-                // تنظیم تعداد ردیف‌ها براساس نوع حیوان
                 if (animalType.equals("rabbit") || animalType.equals("chicken") || animalType.equals("dinosaur")) {
                     rows = 7;
                 } else if (animalType.equals("duck")) {
                     rows = 14;
                 } else {
-                    rows = 4; // برای گاو، گوسفند، بز و خوک
+                    rows = 4;
                 }
 
                 int frameWidth = spriteSheet.getWidth() / cols;
                 int frameHeight = spriteSheet.getHeight() / rows;
 
-                // تقسیم اسپرایت‌شیت به فریم‌ها
                 TextureRegion[][] tmp = TextureRegion.split(spriteSheet, frameWidth, frameHeight);
 
-                // ذخیره فریم ایستا
                 idleFrames.put(animalType, tmp[0][0]);
 
-                // ساخت انیمیشن‌ها براساس نوع حیوان
                 switch (animalType) {
                     case "cow":
                     case "goat":
                     case "sheep":
                     case "pig":
-                        // ردیف اول: حرکت به پایین
                         walkDownAnimations.put(animalType, createAnimation(tmp[0], 0, 4));
-                        // ردیف دوم: حرکت به چپ/راست
                         walkLeftAnimations.put(animalType, createFlippedAnimation(tmp[1], 0, 4));
                         walkRightAnimations.put(animalType, createAnimation(tmp[1], 0, 4));
-                        // ردیف سوم: حرکت به بالا
                         walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
-                        // ردیف چهارم: ناز کردن
                         petAnimations.put(animalType, createAnimation(tmp[3], 0, 4));
                         break;
 
@@ -298,7 +269,6 @@ public class AnimalBuildingController {
                         walkLeftAnimations.put(animalType, createFlippedAnimation(tmp[1], 0, 4));
                         walkRightAnimations.put(animalType, createAnimation(tmp[1], 0, 4));
                         walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
-                        // ردیف پنجم: ناز کردن
                         petAnimations.put(animalType, createAnimation(tmp[4], 0, 4));
                         break;
 
@@ -307,7 +277,6 @@ public class AnimalBuildingController {
                         walkRightAnimations.put(animalType, createAnimation(tmp[1], 0, 4));
                         walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
                         walkDownAnimations.put(animalType, createAnimation(tmp[3], 0, 4));
-                        // ردیف پنجم: ناز کردن
                         petAnimations.put(animalType, createAnimation(tmp[4], 0, 4));
                         break;
 
@@ -316,7 +285,6 @@ public class AnimalBuildingController {
                         walkRightAnimations.put(animalType, createFlippedAnimation(tmp[0], 0, 4));
                         walkUpAnimations.put(animalType, createAnimation(tmp[2], 0, 4));
                         walkDownAnimations.put(animalType, createAnimation(tmp[3], 0, 4));
-                        // ردیف دوازدهم: ناز کردن
                         petAnimations.put(animalType, createAnimation(tmp[12], 0, 4));
                         break;
                 }
@@ -336,17 +304,14 @@ public class AnimalBuildingController {
         Array<TextureRegion> animationFrames = new Array<>(TextureRegion.class);
         for (int i = startIndex; i < startIndex + frameCount && i < frames.length; i++) {
             TextureRegion region = new TextureRegion(frames[i]);
-            region.flip(true, false); // برعکس کردن افقی
+            region.flip(true, false);
             animationFrames.add(region);
         }
         return new Animation<>(FRAME_DURATION, animationFrames, Animation.PlayMode.LOOP);
     }
 
 
-
-
     public void update(float delta) {
-        // کنترل‌های جابجایی ساختمان‌ها
         if (isPlacingBarn) {
             if (Gdx.input.isKeyPressed(Input.Keys.W)) {
                 barnY += MOVEMENT_SPEED;
@@ -371,7 +336,6 @@ public class AnimalBuildingController {
         }
 
         if (isPlacingCoop) {
-            // کنترل‌های مشابه برای قفس
             if (Gdx.input.isKeyPressed(Input.Keys.W)) {
                 coopY += MOVEMENT_SPEED;
             }
@@ -394,16 +358,13 @@ public class AnimalBuildingController {
             }
         }
 
-        // کنترل لیست حیوانات - این قسمت را اصلاح می‌کنیم
         if (showingAnimalList) {
-            // انتخاب حیوان با کلیدهای عددی ۱ تا ۸
             for (int i = 0; i < Math.min(TOTAL_SLOTS, animalsToDisplay.size()); i++) {
                 if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1 + i) ||
                     Gdx.input.isKeyJustPressed(Input.Keys.NUMPAD_1 + i)) {
                     selectedListIndex = i;
                     highlightSelection = true;
 
-                    // اصلاح این قسمت - مقداردهی مستقیم نوع حیوان
                     AnimalDisplayData data = animalsToDisplay.get(i);
                     selectedAnimalType = data.name.toLowerCase();
                     selectingBuildingForAnimal = true;
@@ -414,42 +375,34 @@ public class AnimalBuildingController {
         }
 
         if (selectedAnimalType != null && selectingBuildingForAnimal) {
-            // انتخاب طویله با کلید Z
             if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
                 if (barnCount > 0) {
                     transferAnimalToBuilding(selectedAnimalType, true, 0);
                     selectingBuildingForAnimal = false;
                     selectedAnimalType = null;
                 } else {
-                    System.out.println("هیچ طویله‌ای وجود ندارد!");
                 }
                 return;
             }
 
-            // انتخاب قفس با کلید X
             if (Gdx.input.isKeyJustPressed(Input.Keys.X)) {
                 if (coopCount > 0) {
                     transferAnimalToBuilding(selectedAnimalType, false, 0);
                     selectingBuildingForAnimal = false;
                     selectedAnimalType = null;
                 } else {
-                    System.out.println("هیچ قفسی وجود ندارد!");
                 }
                 return;
             }
 
-            // لغو انتخاب با ESCAPE
             if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
                 selectedAnimalType = null;
                 selectingBuildingForAnimal = false;
-                System.out.println("انتخاب حیوان لغو شد.");
             }
         }
 
 
-        // کنترل‌های داخل ساختمان
         if (showingInterior) {
-            // کلیدهای تعامل با حیوان انتخاب شده
             if (selectedAnimal != null) {
                 if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
                     startPetting(selectedAnimal);
@@ -472,13 +425,11 @@ public class AnimalBuildingController {
                 }
             }
 
-            // خروج از نمای داخلی با ESCAPE
             if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
                 closeInteriorView();
             }
         }
 
-        // نمایش/مخفی کردن لیست حیوانات با کلید L
         if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
             showingAnimalList = !showingAnimalList;
             if (showingAnimalList) {
@@ -488,16 +439,14 @@ public class AnimalBuildingController {
 
         if (showingInterior && Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             float mouseX = Gdx.input.getX();
-            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // تبدیل به مختصات Y بالا
+            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
             List<Animal> animals = showingBarnInterior ?
                 animalsInBarns[selectedBuildingIndex] :
                 animalsInCoops[selectedBuildingIndex];
 
-            // بررسی کلیک روی هر حیوان
             for (Animal animal : animals) {
                 if (isClickOnAnimal(animal, mouseX, mouseY)) {
-                    System.out.println("کلیک روی حیوان: " + animal.getName());
                     selectedAnimal = animal;
                     showingAnimalMenu = true;
                     break;
@@ -514,17 +463,23 @@ public class AnimalBuildingController {
     }
 
 
-
-
     private void chooseRandomDirection(Animal animal) {
-        int direction = (int)(Math.random() * 5);
+        int direction = (int) (Math.random() * 5);
         Animal.Direction newDirection;
 
         switch (direction) {
-            case 0: newDirection = Animal.Direction.UP; break;
-            case 1: newDirection = Animal.Direction.DOWN; break;
-            case 2: newDirection = Animal.Direction.LEFT; break;
-            case 3: newDirection = Animal.Direction.RIGHT; break;
+            case 0:
+                newDirection = Animal.Direction.UP;
+                break;
+            case 1:
+                newDirection = Animal.Direction.DOWN;
+                break;
+            case 2:
+                newDirection = Animal.Direction.LEFT;
+                break;
+            case 3:
+                newDirection = Animal.Direction.RIGHT;
+                break;
             default:
                 animal.setMoving(false);
                 return;
@@ -542,10 +497,18 @@ public class AnimalBuildingController {
         float moveAmount = 80f * delta;
 
         switch (animal.getDirection()) {
-            case UP: nextY += moveAmount; break;
-            case DOWN: nextY -= moveAmount; break;
-            case LEFT: nextX -= moveAmount; break;
-            case RIGHT: nextX += moveAmount; break;
+            case UP:
+                nextY += moveAmount;
+                break;
+            case DOWN:
+                nextY -= moveAmount;
+                break;
+            case LEFT:
+                nextX -= moveAmount;
+                break;
+            case RIGHT:
+                nextX += moveAmount;
+                break;
         }
 
         float homeX = currentX;
@@ -591,7 +554,6 @@ public class AnimalBuildingController {
                 batch.setColor(1, 1, 1, 1);
             }
 
-            // Render free animals
             for (Animal animal : freeAnimals) {
                 if (animal.isFree()) {
                     renderAnimal(batch, animal);
@@ -617,10 +579,10 @@ public class AnimalBuildingController {
 
                 batch.draw(currentFrame, feedingAnimal.getX(), feedingAnimal.getY());
 
-                float hopperX = feedingAnimal.getX() + currentFrame.getRegionWidth()/2 - hayHopperTexture.getWidth()/2;
+                float hopperX = feedingAnimal.getX() + currentFrame.getRegionWidth() / 2 - hayHopperTexture.getWidth() / 2;
                 float hopperY = feedingAnimal.getY() - hayHopperTexture.getHeight();
 
-                Texture hopperTexture = feedingTime < FEEDING_DURATION/2 ?
+                Texture hopperTexture = feedingTime < FEEDING_DURATION / 2 ?
                     hayHopperFullTexture : hayHopperTexture;
                 batch.draw(hopperTexture, hopperX, hopperY);
             }
@@ -634,7 +596,7 @@ public class AnimalBuildingController {
 
             if (petAnimation != null) {
                 TextureRegion currentFrame = petAnimation.getKeyFrame(pettingTime, false);
-                batch.setColor(1, 1, 1, 0.8f + 0.2f * (float)Math.sin(pettingTime * 10));
+                batch.setColor(1, 1, 1, 0.8f + 0.2f * (float) Math.sin(pettingTime * 10));
                 batch.draw(currentFrame, pettingAnimal.getX(), pettingAnimal.getY());
                 batch.setColor(1, 1, 1, 1);
             }
@@ -656,7 +618,6 @@ public class AnimalBuildingController {
             float slotY = listY + (1 - row) * slotHeight;
 
             if (i < animalsToDisplay.size()) {
-                // نمایش قاب برجسته برای حیوان انتخاب شده
                 if (highlightSelection && selectedListIndex == i) {
                     batch.setColor(1, 0.8f, 0.2f, 0.7f); // رنگ زرد برای انتخاب
                     batch.draw(whitePixelTexture, slotX, slotY, slotWidth, slotHeight);
@@ -676,13 +637,11 @@ public class AnimalBuildingController {
                     batch.draw(animalTexture, imageX, imageY, imageWidth, imageHeight);
                 }
 
-                // نمایش شماره کلید برای انتخاب
                 font.setColor(1, 1, 1, 1);
                 String keyNumber = String.valueOf(i + 1);
                 layout.setText(font, keyNumber);
                 font.draw(batch, keyNumber, slotX + 10, slotY + slotHeight - 10);
 
-                // نمایش نام حیوان
                 layout.setText(animalNameFont, animalName);
                 float textX = slotX + (slotWidth - layout.width) / 2;
                 float textY = slotY + slotHeight - 30;
@@ -691,10 +650,8 @@ public class AnimalBuildingController {
             }
         }
 
-        // دکمه بستن
         renderButton(batch, "Close", listX + listWidth - 60, listY + 10, 50, 20);
     }
-
 
 
     public void selectAnimalFromList(String animalType) {
@@ -702,41 +659,33 @@ public class AnimalBuildingController {
         showingAnimalList = false;
         highlightSelection = false;
         selectedListIndex = -1;
-        selectingBuildingForAnimal = true; // فعال کردن حالت انتخاب ساختمان
+        selectingBuildingForAnimal = true;
         waitingForBuildingSelection = true;
-        System.out.println("حیوان " + animalType + " انتخاب شد. برای قرار دادن در طویله کلید B و برای قفس کلید K را فشار دهید.");
     }
 
 
     private void placeSelectedAnimalInBuilding(boolean isBarn, int buildingIndex) {
         if (selectedAnimalType == null) return;
 
-        // ایجاد حیوان جدید با نوع انتخاب شده
-        String animalName = selectedAnimalType + "_" + (int)(Math.random() * 1000);
+        String animalName = selectedAnimalType + "_" + (int) (Math.random() * 1000);
         Animal newAnimal = new Animal(animalName, selectedAnimalType);
 
-        // تعیین موقعیت تصادفی برای حیوان در ساختمان
-        float x = 100 + (float)(Math.random() * 300);
-        float y = 100 + (float)(Math.random() * 300);
+        float x = 100 + (float) (Math.random() * 300);
+        float y = 100 + (float) (Math.random() * 300);
         newAnimal.setPosition(x, y);
 
-        // قرار دادن حیوان در ساختمان
         if (isBarn) {
             if (buildingIndex < barnCount) {
                 animalsInBarns[buildingIndex].add(newAnimal);
-                System.out.println(selectedAnimalType + " با نام " + animalName + " در طویله قرار گرفت.");
             }
         } else {
             if (buildingIndex < coopCount) {
                 animalsInCoops[buildingIndex].add(newAnimal);
-                System.out.println(selectedAnimalType + " با نام " + animalName + " در قفس قرار گرفت.");
             }
         }
     }
 
 
-
-    // متد برای چک کردن وضعیت انتظار برای انتخاب ساختمان
     public boolean isWaitingForBuildingSelection() {
         return waitingForBuildingSelection && selectedAnimalType != null;
     }
@@ -749,7 +698,6 @@ public class AnimalBuildingController {
         float padding = 30;
         float lineSpacing = 40;
 
-        // اطمینان از اینکه منو داخل صفحه باشه
         if (menuX + menuWidth > Gdx.graphics.getWidth()) {
             menuX = Gdx.graphics.getWidth() - menuWidth - 10;
         }
@@ -757,7 +705,6 @@ public class AnimalBuildingController {
             menuY = Gdx.graphics.getHeight() - menuHeight - 10;
         }
 
-        // پس‌زمینه منو
         batch.setColor(0.15f, 0.15f, 0.15f, 0.9f);
         batch.draw(whitePixelTexture, menuX, menuY, menuWidth, menuHeight);
         batch.setColor(1, 1, 1, 1);
@@ -767,7 +714,6 @@ public class AnimalBuildingController {
             float textX = menuX + padding;
             float textY = menuY + menuHeight - padding;
 
-            // اطلاعات حیوان
             String[] info = {
                 selectedAnimal.getName() + " (" + selectedAnimal.getType() + ")",
                 "Friendship: " + selectedAnimal.getFriendship(),
@@ -782,7 +728,6 @@ public class AnimalBuildingController {
                 textY -= lineSpacing;
             }
 
-            // دکمه‌ها (چیدمان به صورت دو ستون)
             float btnWidth = 100;
             float btnHeight = 25;
             float btnStartY = menuY + padding;
@@ -806,7 +751,6 @@ public class AnimalBuildingController {
             }
         }
     }
-
 
 
     private void renderButton(SpriteBatch batch, String text, float x, float y, float width, float height) {
@@ -836,7 +780,6 @@ public class AnimalBuildingController {
         float menuX = selectedAnimal.getX() + 50;
         float menuY = selectedAnimal.getY() + 50;
 
-        // Adjust menu position if it would go off screen
         if (menuX + menuWidth > Gdx.graphics.getWidth()) {
             menuX = Gdx.graphics.getWidth() - menuWidth - 10;
         }
@@ -844,7 +787,6 @@ public class AnimalBuildingController {
             menuY = Gdx.graphics.getHeight() - menuHeight - 10;
         }
 
-        // Check if buttons are clicked
         if (isClickOnButton(mouseX, mouseY, menuX + 10, menuY + 10, 80, 20)) {
             startPetting(selectedAnimal);
         } else if (isClickOnButton(mouseX, mouseY, menuX + 110, menuY + 10, 80, 20)) {
@@ -866,30 +808,14 @@ public class AnimalBuildingController {
     }
 
 
-    private boolean isClickOnBuilding(float buildingX, float buildingY, float width, float height, float mouseX, float mouseY) {
-        // افزایش ناحیه کلیک برای راحتی کاربر
-        float hitboxExpansion = 30.0f;
-
-        boolean result = mouseX >= (buildingX - hitboxExpansion) &&
-            mouseX <= (buildingX + width + hitboxExpansion) &&
-            mouseY >= (buildingY - hitboxExpansion) &&
-            mouseY <= (buildingY + height + hitboxExpansion);
-
-        return result;
-    }
-
-
     private boolean isClickOnAnimal(Animal animal, float mouseX, float mouseY) {
-        // از تصاویر TAKI برای تشخیص کلیک استفاده می‌کنیم
         Texture texture = animalListTextures.get(animal.getType().toLowerCase());
         if (texture == null) return false;
 
-        // مقیاس بزرگتر برای نمایش حیوان
-        float scale = 2.0f;  // همان مقیاسی که در renderAnimal استفاده می‌شود
+        float scale = 2.0f;
         float width = texture.getWidth() * scale;
         float height = texture.getHeight() * scale;
 
-        // افزایش ناحیه کلیک برای راحتی کاربر
         float hitboxExpansion = 50.0f;
 
         boolean result = mouseX >= (animal.getX() - hitboxExpansion) &&
@@ -897,32 +823,10 @@ public class AnimalBuildingController {
             mouseY >= (animal.getY() - hitboxExpansion) &&
             mouseY <= (animal.getY() + height + hitboxExpansion);
 
-        if (result) {
-            System.out.println("کلیک روی حیوان " + animal.getName() + " تشخیص داده شد.");
-            System.out.println("موقعیت حیوان: X=" + animal.getX() + ", Y=" + animal.getY());
-            System.out.println("موقعیت کلیک: X=" + mouseX + ", Y=" + mouseY);
-            System.out.println("ابعاد حیوان: W=" + width + ", H=" + height);
-        }
 
         return result;
     }
 
-
-
-    private boolean isInInteriorBounds(float x, float y) {
-        float screenWidth = Gdx.graphics.getWidth();
-        float screenHeight = Gdx.graphics.getHeight();
-
-        Texture interiorTexture = showingBarnInterior ? barnInteriorTexture : coopInteriorTexture;
-        float scale = Math.min(screenWidth / interiorTexture.getWidth(), screenHeight / interiorTexture.getHeight()) * interiorScale;
-        float scaledWidth = interiorTexture.getWidth() * scale;
-        float scaledHeight = interiorTexture.getHeight() * scale;
-        float interiorX = (screenWidth - scaledWidth) / 2;
-        float interiorY = (screenHeight - scaledHeight) / 2;
-
-        return x >= interiorX && x <= interiorX + scaledWidth &&
-            y >= interiorY && y <= interiorY + scaledHeight;
-    }
 
     public void startPlacingBarn(float x, float y) {
         isPlacingBarn = true;
@@ -991,7 +895,6 @@ public class AnimalBuildingController {
     }
 
     public void sellAnimal(Animal animal) {
-        // Implement selling logic here
         if (showingBarnInterior && selectedBuildingIndex >= 0) {
             animalsInBarns[selectedBuildingIndex].remove(animal);
         } else if (showingCoopInterior && selectedBuildingIndex >= 0) {
@@ -1012,8 +915,8 @@ public class AnimalBuildingController {
         if (touchX >= listX && touchX <= listX + listWidth &&
             touchY >= listY && touchY <= listY + listHeight) {
 
-            int col = (int)((touchX - listX) / slotWidth);
-            int row = 1 - (int)((touchY - listY) / slotHeight);
+            int col = (int) ((touchX - listX) / slotWidth);
+            int row = 1 - (int) ((touchY - listY) / slotHeight);
             int index = row * SLOTS_PER_ROW + col;
 
             if (index >= 0 && index < animalsToDisplay.size()) {
@@ -1076,17 +979,13 @@ public class AnimalBuildingController {
 
 
     private void renderInterior(SpriteBatch batch) {
-        // استفاده از کد اصلی شما برای رندر داخل ساختمان
         Texture interiorTexture = showingBarnInterior ? barnInteriorTexture : coopInteriorTexture;
 
-        // ذخیره ماتریس پروجکشن فعلی
         Matrix4 originalMatrix = batch.getProjectionMatrix();
 
-        // تنظیم ماتریس پروجکشن جدید برای نمایش کامل عکس
         Matrix4 screenMatrix = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         batch.setProjectionMatrix(screenMatrix);
 
-        // محاسبه ابعاد متناسب با حفظ نسبت تصویر
         float imageWidth = interiorTexture.getWidth();
         float imageHeight = interiorTexture.getHeight();
         float screenWidth = Gdx.graphics.getWidth();
@@ -1096,17 +995,13 @@ public class AnimalBuildingController {
         float scaledWidth = imageWidth * scale;
         float scaledHeight = imageHeight * scale;
 
-        // محاسبه موقعیت برای نمایش در مرکز صفحه
         float x = (screenWidth - scaledWidth) / 2;
         float y = (screenHeight - scaledHeight) / 2;
 
-        // نمایش تصویر با ابعاد محاسبه شده
         batch.draw(interiorTexture, x, y, scaledWidth, scaledHeight);
 
-        // بازگرداندن ماتریس پروجکشن اصلی
         batch.setProjectionMatrix(originalMatrix);
 
-        // رندر حیوانات داخل ساختمان
         List<Animal> animals = showingBarnInterior ?
             animalsInBarns[selectedBuildingIndex] :
             animalsInCoops[selectedBuildingIndex];
@@ -1115,65 +1010,53 @@ public class AnimalBuildingController {
             renderAnimal(batch, animal);
         }
 
-        // نمایش منوی حیوان اگر حیوانی انتخاب شده باشد
         if (showingAnimalMenu && selectedAnimal != null) {
             renderAnimalMenu(batch);
         }
     }
 
     public void transferAnimalToBuilding(String animalType, boolean isBarn, int buildingIndex) {
-        // ایجاد یک حیوان جدید با نوع انتخاب شده
-        String animalName = animalType + "_" + (int)(Math.random() * 1000);
+        String animalName = animalType + "_" + (int) (Math.random() * 1000);
         Animal newAnimal = new Animal(animalName, animalType);
 
-        // تنظیم موقعیت تصادفی برای حیوان در ساختمان
-        float x = 100 + (float)(Math.random() * 200);
-        float y = 100 + (float)(Math.random() * 200);
+        float x = 100 + (float) (Math.random() * 200);
+        float y = 100 + (float) (Math.random() * 200);
         newAnimal.setPosition(x, y);
 
-        // مقداردهی جهت اولیه و وضعیت حیوان
         newAnimal.setDirection(Animal.Direction.DOWN);
         newAnimal.setMoving(false);
         newAnimal.setFree(false);
 
-        // اضافه کردن حیوان به ساختمان مناسب
         if (isBarn) {
             if (buildingIndex < barnCount) {
                 animalsInBarns[buildingIndex].add(newAnimal);
-                System.out.println(animalType + " با نام " + animalName + " به طویله اضافه شد.");
             }
         } else {
             if (buildingIndex < coopCount) {
                 animalsInCoops[buildingIndex].add(newAnimal);
-                System.out.println(animalType + " با نام " + animalName + " به قفس اضافه شد.");
             }
         }
 
-        // نمایش داخل ساختمان بعد از قرار دادن حیوان
         showingInterior = true;
         showingBarnInterior = isBarn;
         showingCoopInterior = !isBarn;
         selectedBuildingIndex = buildingIndex;
 
-        // پاک کردن حالت انتخاب
         selectedAnimalType = null;
         selectingBuildingForAnimal = false;
     }
 
-    // در کلاس AnimalBuildingController
     public boolean handleClick(float mouseX, float mouseY) {
         if (!showingInterior) {
             return false;
         }
 
-        // بررسی کلیک روی حیوانات داخل ساختمان
         List<Animal> animals = showingBarnInterior ?
             animalsInBarns[selectedBuildingIndex] :
             animalsInCoops[selectedBuildingIndex];
 
         for (Animal animal : animals) {
             if (isClickOnAnimal(animal, mouseX, mouseY)) {
-                System.out.println("کلیک روی حیوان: " + animal.getName());
                 selectedAnimal = animal;
                 showingAnimalMenu = true;
                 return true;
@@ -1187,13 +1070,12 @@ public class AnimalBuildingController {
     private void renderAnimal(SpriteBatch batch, Animal animal) {
         String animalType = animal.getType().toLowerCase();
 
-        // از تصاویر تکی TAKI استفاده می‌کنیم
+
         Texture animalTexture = animalListTextures.get(animalType);
 
         if (animalTexture != null) {
-            // نمایش نشانگر انتخاب برای حیوان انتخاب شده
             if (selectedAnimal == animal) {
-                batch.setColor(1, 1, 0, 0.5f); // رنگ زرد نیمه شفاف
+                batch.setColor(1, 1, 0, 0.5f);
                 float scale = 2.0f;
                 float width = animalTexture.getWidth() * scale;
                 float height = animalTexture.getHeight() * scale;
@@ -1202,45 +1084,35 @@ public class AnimalBuildingController {
                     animal.getY() - 5,
                     width + 10,
                     height + 10);
-                batch.setColor(1, 1, 1, 1); // بازگشت به رنگ عادی
+                batch.setColor(1, 1, 1, 1);
             }
 
-            // مقیاس بزرگتر برای نمایش حیوان
-            float scale = 2.0f;  // این مقدار را می‌توانید تنظیم کنید
+            float scale = 2.0f;
 
-            // محاسبه ابعاد جدید
             float width = animalTexture.getWidth() * scale;
             float height = animalTexture.getHeight() * scale;
 
-            // رسم حیوان با سایز بزرگتر
             batch.draw(animalTexture, animal.getX(), animal.getY(), width, height);
 
-            // رسم نام حیوان بالای آن
             if (font != null) {
                 font.setColor(1, 1, 1, 1);
                 layout.setText(font, animal.getName());
                 font.draw(batch, animal.getName(),
-                    animal.getX() + (width/2) - layout.width/2,
+                    animal.getX() + (width / 2) - layout.width / 2,
                     animal.getY() + height + 15);
             }
 
-            // رسم محصول اگر حیوان محصولی داشته باشد
             if (animal.hasProduct()) {
                 Texture productTexture = productTextures.get(animal.getProduct());
                 if (productTexture != null) {
                     batch.draw(productTexture,
-                        animal.getX() + (width/2) - productTexture.getWidth()/2,
+                        animal.getX() + (width / 2) - productTexture.getWidth() / 2,
                         animal.getY() + height + 25);
                 }
             }
         }
     }
 
-    /**
-     * نمایش داخل ساختمان
-     * @param isBarn آیا ساختمان طویله است؟
-     * @param index شماره ساختمان
-     */
     public void showBuildingInterior(boolean isBarn, int index) {
         showingInterior = true;
         showingBarnInterior = isBarn;
@@ -1249,31 +1121,21 @@ public class AnimalBuildingController {
         selectedAnimal = null;
         showingAnimalMenu = false;
 
-        // اطمینان از اینکه لیست حیوانات موجود است
         List<Animal> animals = isBarn ? animalsInBarns[index] : animalsInCoops[index];
 
-        System.out.println("نمایش داخل " + (isBarn ? "طویله" : "قفس") + " شماره " + (index + 1));
-        System.out.println("تعداد حیوانات داخل: " + animals.size());
 
-        // اگر هیچ حیوانی در ساختمان نباشد، یک حیوان نمونه اضافه کنیم
         if (animals.isEmpty()) {
-            // اضافه کردن یک حیوان نمونه متناسب با نوع ساختمان
             String animalType = isBarn ? "cow" : "chicken";
-            String animalName = animalType + "_" + (int)(Math.random() * 1000);
+            String animalName = animalType + "_" + (int) (Math.random() * 1000);
             Animal newAnimal = new Animal(animalName, animalType);
 
-            // تنظیم موقعیت تصادفی برای حیوان در ساختمان
-            float x = 100 + (float)(Math.random() * 200);
-            float y = 100 + (float)(Math.random() * 200);
+            float x = 100 + (float) (Math.random() * 200);
+            float y = 100 + (float) (Math.random() * 200);
             newAnimal.setPosition(x, y);
 
-            // اضافه کردن حیوان به ساختمان
             animals.add(newAnimal);
-
-            System.out.println("یک " + animalType + " با نام " + animalName + " به ساختمان اضافه شد.");
         }
     }
-
 
 
     public void closeInteriorView() {
@@ -1284,84 +1146,5 @@ public class AnimalBuildingController {
         showingAnimalMenu = false;
         selectedAnimal = null;
     }
-
-    public void setShowingAnimalList(boolean showing) {
-        showingAnimalList = showing;
-    }
-
-    public void cancelPlacement() {
-        isPlacingBarn = false;
-        isPlacingCoop = false;
-    }
-
-    /**
-     * بررسی وجود حداقل یک طویله در نقشه
-     */
-    public boolean hasBarn() {
-        return barnCount > 0;
-    }
-
-    /**
-     * بررسی وجود حداقل یک قفس در نقشه
-     */
-    public boolean hasCoop() {
-        return coopCount > 0;
-    }
-
-    /**
-     * نمایش نزدیک‌ترین طویله به موقعیت داده شده
-     */
-    public void showNearestBarn(float x, float y) {
-        if (barnCount == 0) {
-            System.out.println("هیچ طویله‌ای در نقشه وجود ندارد!");
-            return;
-        }
-
-        // پیدا کردن نزدیک‌ترین طویله
-        int nearestBarnIndex = 0;
-        float minDistance = Float.MAX_VALUE;
-
-        for (int i = 0; i < barnCount; i++) {
-            float distance = calculateDistance(x, y, placedBarnsX[i], placedBarnsY[i]);
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestBarnIndex = i;
-            }
-        }
-
-        // نمایش داخل نزدیک‌ترین طویله
-        showBuildingInterior(true, nearestBarnIndex);
-    }
-
-    /**
-     * نمایش نزدیک‌ترین قفس به موقعیت داده شده
-     */
-    public void showNearestCoop(float x, float y) {
-        if (coopCount == 0) {
-            System.out.println("هیچ قفسی در نقشه وجود ندارد!");
-            return;
-        }
-
-        // پیدا کردن نزدیک‌ترین قفس
-        int nearestCoopIndex = 0;
-        float minDistance = Float.MAX_VALUE;
-
-        for (int i = 0; i < coopCount; i++) {
-            float distance = calculateDistance(x, y, placedCoopsX[i], placedCoopsY[i]);
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestCoopIndex = i;
-            }
-        }
-
-        // نمایش داخل نزدیک‌ترین قفس
-        showBuildingInterior(false, nearestCoopIndex);
-    }
-
-    private float calculateDistance(float x1, float y1, float x2, float y2) {
-        return (float) Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-    }
-
-
 
 }

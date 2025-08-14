@@ -570,11 +570,8 @@ public class AnimalManager {
     public void startFeeding(Animal animal) {
         feedingAnimal = animal;
         feedingTime = 0;
-        // مسیر تصویر غذا را به‌دلخواه تنظیم کن:
-        String foodTexturePath = "assets/Animals/Food/FeedPlate.png"; // اگر ندارید خالی بگذار ""
         if (feedingController != null) {
-            feedingController.startFeedingVisual(animal, foodTexturePath);
-        }
+    }
     }
 
 
@@ -612,10 +609,5 @@ public class AnimalManager {
 
     }
 
-
-    // در AnimalManager
-    public List<Animal> getAnimals() {
-        return animals;
-    }
 
 }
