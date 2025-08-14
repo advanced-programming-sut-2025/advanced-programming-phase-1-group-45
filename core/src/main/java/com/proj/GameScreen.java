@@ -722,14 +722,14 @@ public class GameScreen implements Screen, ChatListener {
                 Gdx.app.log("GameScreen", "Toggled image: " + showGImage);
             }
 
-            if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
+            /*if (Gdx.input.isKeyJustPressed(Input.Keys.L)) {
                 if (isInteracting) {
                     // Close current interaction
                     isInteracting = false;
                     currentInteractingNPC = null;
                 } else {
                 }
-            }
+            }*/
 
             if (moved) {
 //                Gdx.app.log("GameScreen", "Player started moving");
