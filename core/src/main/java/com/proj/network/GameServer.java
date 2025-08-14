@@ -51,10 +51,6 @@ public class GameServer {
             serverSocket.bind(new InetSocketAddress(port));
             running = true;
             System.out.println("Game server started on port " + port);
-            Thread gameUpdateThread = new Thread(new GameUpdateTask(this));
-            gameUpdateThread.setDaemon(true);
-            gameUpdateThread.start();
-            scheduleMaintenanceTasks();
             listener();
         } catch (IOException e) {
             System.out.println("error starting server" +  e);
@@ -292,7 +288,7 @@ public class GameServer {
 
         for (Map.Entry<String, GameLobby> entry : new ConcurrentHashMap<>(lobbyManager.getGameLobbiesMap()).entrySet()) {
             GameLobby lobby = entry.getValue();
-            if (lobby.isEmpty() || (lobby.isInactive(inactivityTimeout) && !lobby.isGameActive())) {
+            if (lobby.isEmpty())) {
                 lobbyManager.getGameLobbiesMap().remove(entry.getKey());
                 System.out.println("GameServer " +  "Inactive lobby removed: " + entry.getKey());
             }
