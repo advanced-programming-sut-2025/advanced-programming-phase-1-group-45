@@ -66,6 +66,7 @@ public class MainMenuView implements Screen {
         controller.handleNewGameButton();
         controller.handleLoadGameButton();
         controller.handleExitButton();
+        controller.handleBackButton();
     }
 
     @Override
@@ -92,4 +93,5 @@ public class MainMenuView implements Screen {
     public TextButton getNewGameButton() { return newGameButton; }
     public TextButton getLoadGameButton() { return loadGameButton; }
     public TextButton getExitButton() { return exitButton; }
+    public TextButton getBackButton() { return backButton; }
 }

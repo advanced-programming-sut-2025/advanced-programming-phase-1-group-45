@@ -13,6 +13,9 @@ import com.proj.Control.ScoreboardController;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.ScoreboardEntry;
 import java.util.List;
+import com.proj.GameScreen;
+import com.proj.Main;
+import com.proj.map.farmName;
 
 
 public class ScoreboardView implements Screen {
@@ -23,9 +26,11 @@ public class ScoreboardView implements Screen {
     private Runnable backCallback;
     private Texture backgroundTexture;
     private Image backgroundImage;
+    private final Main game;
 
 
-    public ScoreboardView(ScoreboardController controller) {
+    public ScoreboardView(Main game, ScoreboardController controller) {
+         this.game = game;
         this.controller = controller;
         this.stage = new Stage(new ScreenViewport());
         this.skin = GameAssetManager.getGameAssetManager().getSkin();
@@ -78,8 +83,10 @@ public class ScoreboardView implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                if (backCallback != null) {
-                    Gdx.app.postRunnable(() -> backCallback.run());
+                if (game.getGameScreen() != null) {
+                    game.setScreen(game.getGameScreen());
+                } else {
+                    game.setScreen(new GameScreen(game, farmName.STANDARD));
                 }
             }
         });
