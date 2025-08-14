@@ -205,11 +205,6 @@ public class ClientConnectionController implements Runnable {
         if (messageText.trim().isEmpty()) {
             return;
         }
-
-        if (messageText.length() > 200) {
-            messageText = messageText.substring(0, 200) + "...";
-        }
-
         String recipient = JsonParser.getString(data, "recipient", null);
         if (recipient != null) {
             ClientConnectionController recipientHandler = server.getConnectedClients().get(recipient);
