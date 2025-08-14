@@ -106,7 +106,6 @@ public class ChatSystem {
         messageField.setTextFieldListener((textField, c) -> {
             if (c == '\n') {
                 sendMessage();
-               // event.cancel();
             }
         });
     }
@@ -155,12 +154,7 @@ public class ChatSystem {
 
             if (isPrivate) {
                 addMessage("You to " + recipient + " (private): " + message);
-            } else {
-
-                // The server will broadcast this back to all clients including us
-            }
-
-            // Clear the message field
+            } 
             messageField.setText("");
             stage.setKeyboardFocus(messageField);
         } else {
@@ -208,8 +202,6 @@ public class ChatSystem {
 
         String currentSelection = recipientSelect.getSelected();
         recipientSelect.setItems(onlinePlayers.toArray(new String[0]));
-
-        // Try to restore previous selection
         if (onlinePlayers.contains(currentSelection)) {
             recipientSelect.setSelected(currentSelection);
         } else {
