@@ -21,6 +21,10 @@ import com.proj.Model.Inventory.InventoryManager;
 import com.proj.Player;
 import com.proj.managers.PriceManager;
 import com.proj.managers.ShopManager;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.proj.GameScreen;
+import com.proj.map.farmName;
 
 import java.util.Collections;
 
@@ -35,6 +39,7 @@ public class ShopScreen implements Screen {
     private final Skin skin;
     private Label shopTitleLabel; // Add for dynamic title
     private SelectBox<Shop> shopSelectBox; //
+    private TextButton backButton;
 
     // UI Components
     private Table mainTable;
@@ -142,17 +147,21 @@ public class ShopScreen implements Screen {
         contentTable.add(playerScroll).width(400).height(300).pad(5).row();
 
         mainTable.add(contentTable).colspan(3).padBottom(15).row();
+        backButton = new TextButton("Back", skin);
+        headerTable.add(backButton);
 
-        // Exit button
-        TextButton exitButton = new TextButton("Exit", skin);
-        exitButton.addListener(new ChangeListener() {
+         backButton.addListener(new ClickListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                exitShop();
+            public void clicked(InputEvent event, float x, float y) {
+                // Use the Main's gameScreen reference
+                if (game.getGameScreen() != null) {
+                    game.setScreen(game.getGameScreen());
+                } else {
+                    // Fallback to creating new GameScreen if reference is null
+                    game.setScreen(new GameScreen(game, farmName.STANDARD));
+                }
             }
         });
-        mainTable.add(exitButton).colspan(3);
-
         // Initial display
         refreshItemsDisplay();
     }
