@@ -273,11 +273,9 @@ public class GameServer {
     }
 
     private void checkInactiveLobbies() {
-        long inactivityTimeout = 30 * 60 * 1000;
-
         for (Map.Entry<String, GameLobby> entry : new ConcurrentHashMap<>(lobbyManager.getGameLobbiesMap()).entrySet()) {
             GameLobby lobby = entry.getValue();
-            if (lobby.isEmpty() || (lobby.isInactive(inactivityTimeout) && !lobby.isGameActive())) {
+            if (lobby.isEmpty())) {
                 lobbyManager.getGameLobbiesMap().remove(entry.getKey());
                 System.out.println("GameServer " +  "Inactive lobby removed: " + entry.getKey());
             }
