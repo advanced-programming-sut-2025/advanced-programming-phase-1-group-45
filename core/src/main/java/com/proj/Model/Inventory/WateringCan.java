@@ -51,7 +51,7 @@ public class WateringCan extends Tool {
     public void upgrade() {
         super.upgrade();
         setCapacityByLevel(getLevel());
-        this.waterAmount = capacity; 
+        this.waterAmount = capacity;
     }
 
     public int getWaterAmount() {

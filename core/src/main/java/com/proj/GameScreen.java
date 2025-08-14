@@ -165,7 +165,7 @@ public class GameScreen implements Screen, ChatListener {
         return worldController != null ? worldController.getPlayerSpawnPoint() : null;
     }
 
-    private List<Texture> npcTextures = new ArrayList<>(); // Add this class field
+    private List<Texture> npcTextures = new ArrayList<>(); 
 
     private void placeNPCs() {
         if (npcManager == null) {
@@ -254,8 +254,8 @@ public class GameScreen implements Screen, ChatListener {
                     player,
                     Gdx.graphics.getWidth() - 10,
                     50,
-                    60,  // width
-                    105   // height
+                    60,
+                    105
                 );
                 aImage = new Texture(Gdx.files.internal("NPCDialogues/george_dialogue1.png"));
                 sImage = new Texture(Gdx.files.internal("NPCDialogues/leah_dialogue1.png"));
@@ -296,7 +296,6 @@ public class GameScreen implements Screen, ChatListener {
         } else if (player.getPosition().y > 300 && player.getPosition().y < 400) {
             return Shop.CARPENTER;
         }
-        // Default to general store
         return Shop.GENERAL_STORE;
     }
 
@@ -382,20 +381,16 @@ public class GameScreen implements Screen, ChatListener {
                 playerBag.render(worldController.getSpriteBatch(), camera);
             }
             if (showSpaceImage && spaceImage != null) {
-                // Save current projection matrix
                 Matrix4 originalProjection = worldController.getSpriteBatch().getProjectionMatrix();
 
-                // Switch to screen coordinates
                 Matrix4 screenProjection = new Matrix4()
                     .setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 worldController.getSpriteBatch().setProjectionMatrix(screenProjection);
 
-                // Draw centered
                 float x = (Gdx.graphics.getWidth() - spaceImage.getWidth()) / 2;
                 float y = (Gdx.graphics.getHeight() - spaceImage.getHeight()) / 2;
                 worldController.getSpriteBatch().draw(spaceImage, x, y);
 
-                // Restore original projection
                 worldController.getSpriteBatch().setProjectionMatrix(originalProjection);
             }
             if (showAImage) drawCenteredImage(aImage);
@@ -613,7 +608,7 @@ public class GameScreen implements Screen, ChatListener {
                 (animalBuildingController.isPlacingBarn() ||
                     animalBuildingController.isPlacingCoop() ||
                     animalBuildingController.isShowingInterior() ||
-                    animalBuildingController.isShowingAnimalList())) {  // اضافه کردن این شرط
+                    animalBuildingController.isShowingAnimalList())) {
                 System.out.println("Skipping player movement - special state active");
                 return;
             }
@@ -689,7 +684,6 @@ public class GameScreen implements Screen, ChatListener {
                 }
             }
 
-            // ADD THIS SPACE KEY HANDLING
             if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
                 showSpaceImage = !showSpaceImage; // Toggle visibility
                 Gdx.app.log("GameScreen", "Space pressed. showSpaceImage: " + showSpaceImage);
@@ -1049,7 +1043,6 @@ public class GameScreen implements Screen, ChatListener {
         worldController.getSpriteBatch().begin();
         worldController.getSpriteBatch().setProjectionMatrix(hudCamera.combined);
 
-        // رسم پس‌زمینه نیمه‌شفاف
         Texture whitePixel = new Texture(1, 1, Pixmap.Format.RGBA8888);
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(0, 0, 0, 0.7f);
@@ -1257,11 +1250,10 @@ public class GameScreen implements Screen, ChatListener {
 
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             float mouseX = Gdx.input.getX();
-            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY(); // تبدیل به مختصات Y بالا
+            float mouseY = Gdx.graphics.getHeight() - Gdx.input.getY();
 
 
             if (animalBuildingController.handleClick(mouseX, mouseY)) {
-                System.out.println("کلیک روی حیوان تشخیص داده شد!");
             }
         }
     }

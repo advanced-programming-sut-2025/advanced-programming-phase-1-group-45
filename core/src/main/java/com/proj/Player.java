@@ -57,7 +57,7 @@ public class Player implements GameEventListener {
 
 
 
-    private TextureRegion eatingTexture; // current food texture to show
+    private TextureRegion eatingTexture;
     private float eatingDisplayTimer = 0f;
     private static final float EATING_DISPLAY_DURATION = 3.0f;
 
@@ -65,7 +65,7 @@ public class Player implements GameEventListener {
         this.worldController = worldController;
         this.position = new Vector2(startX, startY);
         this.targetPosition = new Vector2(startX, startY);
-        this.money = 1000; // Starting money
+        this.money = 1000;
         this.inventory = new Inventory(24);
         this.boundingBox = new Rectangle(position.x - WIDTH/4, position.y - HEIGHT/4, WIDTH/2, HEIGHT/2);
         loadAnimations();
