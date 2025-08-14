@@ -169,7 +169,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
 
         CheckBox visibleCheckbox = new CheckBox(" Visible", skin);
         visibleCheckbox.setName("visible");
-        visibleCheckbox.setChecked(true); // پیش‌فرض فعال
+        visibleCheckbox.setChecked(true);
         typeTable.add(visibleCheckbox).padLeft(20);
         content.add(typeTable).left().row();
 
@@ -339,7 +339,6 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
 
                 case GAME_STARTED:
                     handleStartGame();
-//                    game.switchToGameScreen();
                     break;
 
                 case LOBBY_UPDATE:
@@ -398,15 +397,12 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
 
         try {
             JSONArray players = data.getJSONArray("onlinePlayers");
-
-            // ایجاد ردیف هدر
             Table headerRow = new Table();
             headerRow.setBackground(skin.getDrawable("background"));
 
-            // افزایش فاصله بین ستون‌ها با pad بیشتر
-            headerRow.add(new Label("Player", skin)).width(120).pad(5, 20, 5, 5); // چپ:20, راست:10
-            headerRow.add(new Label("Status", skin)).width(100).pad(5, 15, 5, 35); // چپ:15, راست:15
-            headerRow.add(new Label("Lobby", skin)).width(150).left(); // چپ:10, راست:20
+            headerRow.add(new Label("Player", skin)).width(120).pad(5, 20, 5, 5); 
+            headerRow.add(new Label("Status", skin)).width(100).pad(5, 15, 5, 35); 
+            headerRow.add(new Label("Lobby", skin)).width(150).left(); 
             onlinePlayersTable.add(headerRow).fillX().row();
 
             onlinePlayersTable.add(createSeparator()).colspan(3).growX().height(1).padBottom(5).row();
@@ -490,7 +486,6 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         if (isSearchByID) {
             LobbyInfo foundLobby = null;
 
-            // جستجو در لابی‌ها
             for (LobbyInfo lobby : lobbiesMap.values()) {
                 if (lobby.getId().equals(currentSearchId)) {
                     foundLobby = lobby;
@@ -509,8 +504,6 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         // Lobby rows
         for (LobbyInfo lobby : lobbiesMap.values()) {
             if (lobby.isVisible() || lobby.players.contains(gameClient.getUsername())) {
-                // Skip current lobby
-//            if (lobby.getId().equals(currentLobbyId)) continue;
                 addLobbyToTable(lobby);
             }
         }
@@ -626,11 +619,9 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         mainTable.pad(20);
         stage.addActor(mainTable);
 
-        // عنوان اصلی
         titleLabel = new Label("Multiplayer Lobby", skin);
-        mainTable.add(titleLabel).colspan(2).padBottom(30).row(); // تغییر به colspan=2
+        mainTable.add(titleLabel).colspan(2).padBottom(30).row();
 
-        // بخش لابی جاری (عرض کمتر)
         Table currentLobbySection = new Table();
         currentLobbySection.setBackground(skin.getDrawable("background"));
         currentLobbySection.pad(15);
@@ -650,11 +641,9 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
 
         mainTable.add(currentLobbySection).colspan(2).minWidth(400).padBottom(20).row(); // تغییر به colspan=2
 
-        // بخش اصلی با دو ستون
         Table contentTable = new Table();
         contentTable.defaults().grow().space(20);
 
-        // ستون سمت چپ: بازیکنان آنلاین (عرض کمتر)
         Table playersColumn = new Table();
         playersColumn.setBackground(skin.getDrawable("background"));
         playersColumn.pad(15);
@@ -666,11 +655,10 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         onlinePlayersScrollPane = new ScrollPane(onlinePlayersTable, skin);
         onlinePlayersScrollPane.setFadeScrollBars(false);
         onlinePlayersScrollPane.setScrollbarsVisible(true);
-        playersColumn.add(onlinePlayersScrollPane).minHeight(300).minWidth(400).grow().row(); // عرض کمتر
+        playersColumn.add(onlinePlayersScrollPane).minHeight(300).minWidth(400).grow().row(); 
 
-        contentTable.add(playersColumn).minWidth(350); // عرض کمتر
+        contentTable.add(playersColumn).minWidth(350);   
 
-        // ستون سمت راست: لابی‌های موجود
         Table lobbiesColumn = new Table();
         lobbiesColumn.setBackground(skin.getDrawable("background"));
         lobbiesColumn.pad(15);
@@ -678,7 +666,6 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         Label availableLobbiesTitle = new Label("Available Lobbies", skin);
         lobbiesColumn.add(availableLobbiesTitle).padBottom(10).row();
 
-        // بخش جستجو
         Table searchSection = new Table();
         searchSection.defaults().space(5);
 
@@ -704,7 +691,7 @@ public class LobbyScreen implements Screen, LobbyEventListener, LobbyListListene
         lobbiesColumn.add(createButton).padTop(10);
 
         contentTable.add(lobbiesColumn).minWidth(500);
-        mainTable.add(contentTable).colspan(2).row(); // تغییر به colspan=2
+        mainTable.add(contentTable).colspan(2).row();
 
         setupEventListeners();
         updateCurrentLobbyInfo();
