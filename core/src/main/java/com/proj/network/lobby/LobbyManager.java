@@ -2,7 +2,6 @@ package com.proj.network.lobby;
 
 
 import com.badlogic.gdx.Gdx;
-import com.proj.network.GameInstance;
 import com.proj.network.GameServer;
 
 import java.util.*;
@@ -40,36 +39,17 @@ public class LobbyManager {
 
                 if (lobby.isEmpty() && !lobby.isGameActive()) {
                     gameLobbies.remove(lobby.getId());
-                    Gdx.app.log("GameServer", "lobby was deleted" + lobby.getId());
+                    System.err.println("GameServer" + "lobby was deleted" + lobby.getId());
                 }
             }
         }
     }
 
-    public GameLobby findPlayerLobby(String username) {
-        for (GameLobby lobby : gameLobbies.values()) {
-            if (lobby.hasPlayer(username)) {
-                return lobby;
-            }
-        }
-        return null;
-    }
 
     private String generateLobbyId() {
         return "lobby_" + UUID.randomUUID().toString().substring(0, 8);
     }
 
-    private void checkInactiveLobbies() {
-        long inactivityTimeout = 30 * 60 * 1000; // 30 minutes
-
-        for (Map.Entry<String, GameLobby> entry : new ConcurrentHashMap<>(gameLobbies).entrySet()) {
-            GameLobby lobby = entry.getValue();
-            if (lobby.isEmpty() || (lobby.isInactive(inactivityTimeout) && !lobby.isGameActive())) {
-                gameLobbies.remove(entry.getKey());
-                Gdx.app.log("GameServer", "lobby was deleted " + entry.getKey());
-            }
-        }
-    }
 
     public GameLobby getGameLobby(String lobbyId) {
         return gameLobbies.get(lobbyId);
