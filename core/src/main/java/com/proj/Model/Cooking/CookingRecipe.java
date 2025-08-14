@@ -1,4 +1,3 @@
-// CookingRecipe.java
 package com.proj.Model.Cooking;
 
 import com.proj.Model.Cooking.FoodItem;

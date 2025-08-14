@@ -1,4 +1,3 @@
-// Refrigerator.java
 package com.proj.Model.Cooking;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -47,6 +46,5 @@ public class Refrigerator {
     }
 
     public void dispose() {
-        // Texture is managed by GameAssetManager, no need to dispose here.
     }
 }

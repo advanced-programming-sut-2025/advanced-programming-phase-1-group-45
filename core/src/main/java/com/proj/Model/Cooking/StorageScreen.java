@@ -37,11 +37,9 @@ public class StorageScreen implements Screen {
 
         batch.begin();
 
-        // Draw title
         font.draw(batch, "Storage System", 20, Gdx.graphics.getHeight() - 20);
         font.draw(batch, "Press ESC to return", 20, Gdx.graphics.getHeight() - 40);
 
-        // Draw player inventory
         font.draw(batch, "Player Inventory:", 20, Gdx.graphics.getHeight() - 80);
         int y = Gdx.graphics.getHeight() - 100;
         for (Map.Entry<Integer, InventoryItem> entry : playerInventory.getItems().entrySet()) {
@@ -52,7 +50,6 @@ public class StorageScreen implements Screen {
             }
         }
 
-        // Draw refrigerator inventory
         font.draw(batch, "Refrigerator:", 20, Gdx.graphics.getHeight() / 2);
         y = Gdx.graphics.getHeight() / 2 - 20;
         for (Map.Entry<Integer, InventoryItem> entry : refrigeratorInventory.getItems().entrySet()) {
@@ -65,7 +62,6 @@ public class StorageScreen implements Screen {
 
         batch.end();
 
-        // Handle input
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen(gameScreen);
             dispose();

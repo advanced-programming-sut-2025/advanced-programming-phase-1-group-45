@@ -64,7 +64,6 @@ public class CookingScreen implements Screen {
         scroll.setFadeScrollBars(false);
         root.add(scroll).colspan(3).expand().fill().height(360).row();
 
-        // recipes
         List<CookingRecipe> recipes = cookingManager != null ? cookingManager.getAvailableRecipes() : null;
         if (recipes == null || recipes.isEmpty()) {
             listTable.add(new Label("No recipes available.", skin)).row();
@@ -74,14 +73,12 @@ public class CookingScreen implements Screen {
                 entry.setBackground(skin.newDrawable("white", new Color(0,0,0,0.15f)));
                 entry.left().pad(8).padBottom(10);
 
-                // result icon (bigger)
                 TextureRegion resTex = null;
                 try { resTex = recipe.getResultItem() != null ? recipe.getResultItem().getTexture() : null; } catch (Throwable ignored){}
                 Image resImg = resTex != null ? new Image(resTex) : new Image();
                 resImg.setSize(48,48);
                 entry.add(resImg).size(48,48).left().padRight(8);
 
-                // name + ingredients list
                 Table mid = new Table(skin);
                 Label name = new Label(recipe.getRecipeName(), skin);
                 name.setColor(recipe.isLearned() ? Color.WHITE : Color.LIGHT_GRAY);
@@ -97,7 +94,6 @@ public class CookingScreen implements Screen {
                     Image ingImg = ingTex != null ? new Image(ingTex) : new Image();
                     ingImg.setSize(20,20);
 
-                    // quantity and available count
                     int available = countAvailable(id);
                     Label q = new Label(available + "/" + qty, skin);
                     q.setColor(available >= qty ? Color.GREEN : Color.RED);
@@ -112,25 +108,21 @@ public class CookingScreen implements Screen {
 
                 entry.add(mid).expandX().fillX().left().padRight(8);
 
-                // action column: Cook / Learn / Locked
                 Table actions = new Table(skin);
                 final TextButton actionBtn = new TextButton(recipe.isLearned() ? "Cook" : "Learn", skin);
                 actions.add(actionBtn).row();
 
-                // progress bar (hidden initially)
                 final ProgressBar progress = new ProgressBar(0f, 1f, 0.01f, false, skin);
                 progress.setValue(0f);
                 progress.setVisible(false);
                 actions.add(progress).width(120).padTop(6).row();
 
-                // locked overlay if not learned
                 if (!recipe.isLearned()) {
                     Label lock = new Label("Locked", skin);
                     lock.setColor(Color.GRAY);
                     actions.add(lock).row();
                 }
 
-                // listener
                 actionBtn.addListener(new ClickListener(){
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
@@ -147,7 +139,6 @@ public class CookingScreen implements Screen {
             }
         }
 
-        // bottom: hints
         Table hints = new Table(skin);
         hints.add(new Label("Tips: Press Esc to close. Cook uses " + CookingManager.ENERGY_COST_PER_COOK + " energy.", skin)).left();
         root.add(hints).colspan(3).left().padTop(8).row();
@@ -177,7 +168,6 @@ public class CookingScreen implements Screen {
             if (cookingManager == null) { setStatus("Cannot learn: no manager", Color.RED); return; }
             cookingManager.learnRecipe(recipe.getRecipeName());
             setStatus(recipe.getRecipeName() + " learned!", Color.CYAN);
-            // refresh UI
             createUI();
         } catch (Throwable t) {
             Gdx.app.error("CookingScreen", "doLearn", t);
@@ -188,11 +178,9 @@ public class CookingScreen implements Screen {
     private void doCookWithAnimation(CookingRecipe recipe, TextButton btn, ProgressBar progress) {
         try {
             if (cookingManager == null || player == null) { setStatus("Cannot cook: missing data", Color.RED); return; }
-            // quick pre-check
             if (!cookingManager.canCook(recipe)) { setStatus("Not enough ingredients", Color.RED); return; }
             if (player.getCurrentEnergy() < CookingManager.ENERGY_COST_PER_COOK) { setStatus("Not enough energy", Color.RED); return; }
 
-            // disable button, show progress
             btn.setDisabled(true);
             progress.setVisible(true);
             progress.setValue(0f);
@@ -208,34 +196,26 @@ public class CookingScreen implements Screen {
                     progress.setValue(v);
                     if (v >= 1f) {
                         this.cancel();
-                        // actually cook (consumes ingredients, adds result, uses energy)
                         boolean ok = cookingManager.cook(recipe.getRecipeName(), player);
                         if (ok) {
                             setStatus(recipe.getRecipeName() + " cooked!", Color.GREEN);
-                            // if the result is a FoodItem, make player start eating animation showing its texture
                             com.proj.Model.Cooking.FoodItem res = recipe.getResultItem();
                             if (res != null) {
-                                // get texture if available
                                 TextureRegion t = res.getTexture();
-                                // give player the eaten item (we'll simulate immediate eat: show graphic and restore energy)
-                                // Option A: add to inventory (default)
                                 if (inventoryManager != null && inventoryManager.getPlayerInventory() != null) {
                                     inventoryManager.getPlayerInventory().addItem(res);
                                 }
-                                // Optionally auto-eat: if you want auto-eat uncomment below:
                                 player.startEatingAnimation(t);
                                 player.restoreEnergy(res.getEnergyRestored());
                             }
                         } else {
                             setStatus("Failed to cook " + recipe.getRecipeName(), Color.RED);
                         }
-                        // restore button & hide progress after short delay
                         Timer.schedule(new Timer.Task(){
                             @Override public void run() {
                                 btn.setDisabled(false);
                                 progress.setVisible(false);
                                 progress.setValue(0f);
-                                // refresh UI for counts and button states
                                 createUI();
                             }
                         }, 0.5f);

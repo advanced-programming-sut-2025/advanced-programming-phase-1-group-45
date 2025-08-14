@@ -187,7 +187,6 @@ public class CookingManager {
                 int requiredQuantity = entry.getValue();
                 int removedCount = 0;
 
-                // Try to remove from player inventory
                 for (Map.Entry<Integer, InventoryItem> playerItemEntry : playerInventory.getItems().entrySet()) {
                     InventoryItem playerItem = playerItemEntry.getValue();
                     if (playerItem != null && playerItem.getId().equals(ingredientId)) {
