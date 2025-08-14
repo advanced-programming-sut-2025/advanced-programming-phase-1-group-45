@@ -23,7 +23,7 @@ public class CheatWindow {
     private ImageButton stormyBtn;
     private ImageButton snowyBtn;
 
-    private String currentWeather = "SUNNY"; // مقدار پیش‌فرض
+    private String currentWeather = "SUNNY"; 
 
     public CheatWindow(Main main, Stage stage) {
         this.main = main;
@@ -51,7 +51,6 @@ public class CheatWindow {
                 showTimeInputDialog();
             }
         });
-//        contentTable.add(timeButton).size(100, 100).padRight(5).left();
         Texture dayNightIcon = new Texture("assets/day_and_night_icon.png");
         ImageButton dayButton = new ImageButton(new TextureRegionDrawable(new TextureRegion(dayNightIcon)));
         dayButton.addListener(new ClickListener() {
@@ -75,8 +74,6 @@ public class CheatWindow {
         buttonTable.add(dayButton).size(100, 100).padRight(5);
         buttonTable.add(aDayButton).size(80, 80);
         contentTable.add(buttonTable).row();
-
-//        contentTable.add(dayButton).size(100, 100).row();
 
         Table weatherTable = new Table();
         weatherTable.defaults().size(100, 100).pad(5);
