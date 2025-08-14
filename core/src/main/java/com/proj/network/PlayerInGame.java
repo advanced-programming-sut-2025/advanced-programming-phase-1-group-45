@@ -9,18 +9,12 @@ public class PlayerInGame {
     private String currentMapName;
     private Position position;
     private int score = 0;
-    private float lastActionTime;
 
-    public PlayerInGame() {
-        this.lastActionTime = System.currentTimeMillis();
-    }
 
     public void initialize() {
         position = new Position(0, 0);
         score = 0;
     }
-
-    // Getters and setters
     public String getUsername() {
         return username;
     }
