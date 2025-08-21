@@ -275,7 +275,7 @@ public class GameServer {
     private void checkInactiveLobbies() {
         for (Map.Entry<String, GameLobby> entry : new ConcurrentHashMap<>(lobbyManager.getGameLobbiesMap()).entrySet()) {
             GameLobby lobby = entry.getValue();
-            if (lobby.isEmpty())) {
+            if (lobby.isEmpty()) {
                 lobbyManager.getGameLobbiesMap().remove(entry.getKey());
                 System.out.println("GameServer " +  "Inactive lobby removed: " + entry.getKey());
             }
