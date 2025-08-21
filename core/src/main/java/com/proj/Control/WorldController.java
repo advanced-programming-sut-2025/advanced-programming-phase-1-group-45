@@ -17,7 +17,7 @@ import com.proj.Model.CropInfoWindow;
 import com.proj.Model.GameAssetManager;
 import com.proj.Model.Inventory.InventoryManager;
 import com.proj.Model.TimeAndWeather.time.*;
-import com.proj.Model.TimeAndWeather.TimeRenderer;
+//import com.proj.Model.TimeAndWeather.TimeRenderer;
 import com.proj.Model.TimeAndWeather.WeatherController;
 import com.proj.Model.inventoryItems.ForagingInventoryWindow;
 import com.proj.Model.inventoryItems.SeedInventoryWindow;
@@ -47,7 +47,7 @@ public class WorldController {
     private String currentFarmName;
 
     private final WeatherController weatherController;
-    private TimeRenderer timeRenderer;
+   // private TimeRenderer timeRenderer;
     private Time gameTime;
     private Stage uistage;
 
