@@ -47,7 +47,6 @@ import com.proj.network.client.ChatListener;
 import com.proj.network.event.NetworkEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import com.proj.Radio.RadioMenuScreen;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.proj.View.ScoreboardView;
 
@@ -868,17 +867,6 @@ public class GameScreen implements Screen, ChatListener {
                 }
 
                 return;
-            }
-            if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-                Gdx.app.postRunnable(() -> {
-                    try {
-                        RadioMenuScreen radioScreen = new RadioMenuScreen(main, this);
-                        main.setScreen(radioScreen);
-                        Gdx.app.log("GameScreen", "Opened radio menu");
-                    } catch (Exception e) {
-                        Gdx.app.error("GameScreen", "Error opening radio menu", e);
-                    }
-                });
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.U)) {
                 showButtonImage = !showButtonImage;
