@@ -1,4 +1,26 @@
-{
+package com.proj.network.client;
+
+import com.badlogic.gdx.Gdx;
+import com.proj.map.farmName;
+import com.proj.network.client.*;
+import com.proj.network.event.GameEvent;
+import com.proj.network.event.LobbyEvent;
+import com.proj.network.event.NetworkEvent;
+import com.proj.network.message.AuthRequest;
+import com.proj.network.message.JsonBuilder;
+import com.proj.network.message.JsonParser;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+public class GameClient {
     private final String serverIp;
     private final int serverPort;
     private Socket clientSocket;
@@ -54,6 +76,7 @@
             lobbyListListeners.add(listener);
         }
     }
+
     public void addGameListener(GameEventListener listener) {
         if (!gameListeners.contains(listener)) {
             gameListeners.add(listener);
@@ -71,12 +94,13 @@
     public void removeNetworkEventListener(NetworkEventListener listener) {
         listeners.remove(listener);
     }
+
     public void removeGameListener(GameEventListener listener) {
         gameListeners.remove(listener);
     }
 
 
-    @Override
+    /*@Override
     public void run() {
         try {
             while (isRunning.get()) {
@@ -92,7 +116,7 @@
         } finally {
             disconnect();
         }
-    }
+    }*/
 
     private void handleCommands(String command) {
         try {
@@ -117,14 +141,14 @@
                     handleLobbyCreated(data);
                     break;
 
-                case "LOBBY_UPDATE" :
+                case "LOBBY_UPDATE":
                     handleLobbyUpdate(data);
                     break;
 
                 case "JOIN_SUCCESS":
                     handleJoinLobby(data);
                     break;
-                case "LOBBY_ADDED" :
+                case "LOBBY_ADDED":
                     handleLobbyAdded(data);
                     break;
                 case "LEAVE_SUCCESS":
@@ -139,9 +163,9 @@
                     fireLobbyListEvent(data);
                     break;
 
-                    case "PLAYERS_LIST":
-                        handleOnlinePlayersResponse(data);
-                        break;
+                case "PLAYERS_LIST":
+                    handleOnlinePlayersResponse(data);
+                    break;
 
                 case "GAME_STARTED":
                     fireLobbyEvent(LobbyEvent.Type.GAME_STARTED, data);
@@ -159,9 +183,9 @@
                     fireGameEvent(GameEvent.Type.START, JsonBuilder.empty());
                     break;
 
-                    case "PLAYER_POSITIONS":
-                        fireGameEvent(GameEvent.Type.UPDATE_POSITIONS, data );
-                        break;
+                case "PLAYER_POSITIONS":
+                    fireGameEvent(GameEvent.Type.UPDATE_POSITIONS, data);
+                    break;
 
                 case "ERROR":
                     handleError(data);
@@ -341,7 +365,7 @@
     }
 
     public void sendPlayerNewPosition(float x, float y, String mapName) {
-        String map = mapName ;
+        String map = mapName;
         for (farmName f : farmName.values()) {
             if (mapName.equalsIgnoreCase(f.getFarmName())) {
                 map = "Farm";
@@ -369,7 +393,7 @@
     }
 
     public void syncGameTime(JSONObject data) {
-            fireGameEvent(GameEvent.Type.UPDATE_TIME, data);
+        fireGameEvent(GameEvent.Type.UPDATE_TIME, data);
     }
 
     private void sendMessage(String type, JSONObject data) {
@@ -463,7 +487,7 @@
     private void fireGameEvent(GameEvent.Type type, JSONObject data) {
         GameEvent event = new GameEvent(type, data.toString());
         for (GameEventListener listener : gameListeners) {
-                (listener).handleGameEvent(event);
+            (listener).handleGameEvent(event);
         }
     }
 
@@ -498,4 +522,5 @@
     public void removeChatListener(ChatListener listener) {
         chatListeners.remove(listener);
     }
+}
 }
