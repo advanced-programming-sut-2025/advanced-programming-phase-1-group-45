@@ -117,7 +117,6 @@ public class GameClient implements Disposable, Runnable {
 
     private void handleCommands(String command) {
         try {
-            // Use the NetworkMessage factory for safe parsing
             Command message = Command.parse(command);
             processCommand(message);
         } catch (Exception e) {
@@ -453,15 +452,10 @@ public class GameClient implements Disposable, Runnable {
         disconnect();
     }
 
-    // Event management
     public void addNetworkListener(NetworkEventListener listener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener);
         }
-    }
-
-    public void removeNetworkListener(NetworkEventListener listener) {
-        listeners.remove(listener);
     }
 
     private void sendEvent(NetworkEvent.Type type, String message) {
