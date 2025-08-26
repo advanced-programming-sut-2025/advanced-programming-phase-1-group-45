@@ -48,9 +48,9 @@ public class GameUpdateTask implements Runnable {
     private void updateGames(float deltaTime) {
         for (GameLobby lobby : server.getGameLobbies().values()) {
             if (lobby.isGameActive()) {
-                Game game = server.getGameManager().getGameInstance(lobby.getId());
+                Game game = server.getGameManager().getGame(lobby.getId());
                 if (game != null) {
-                    game.update(deltaTime);
+                    game.updateTime(deltaTime);
                 }
             }
         }

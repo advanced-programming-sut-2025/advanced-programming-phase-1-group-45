@@ -58,7 +58,7 @@ public class GameLobby {
 
     public void sendPlayerPositions() {
         JSONArray players = new JSONArray();
-        Game game = server.getGameManager().getGameInstance(id);
+        Game game = server.getGameManager().getGame(id);
         if (game != null) {
             for (PlayerInGame playerInGame : game.getAllPlayers()) {
                 JSONObject position = new JSONObject();

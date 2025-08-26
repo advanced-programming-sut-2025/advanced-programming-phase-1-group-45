@@ -1,6 +1,7 @@
 package com.proj.network;
 
 import com.proj.network.lobby.GameLobby;
+import com.proj.network.message.JsonBuilder;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.logging.Logger;
 public class GameManager {
     private static final Logger logger = Logger.getLogger(GameManager.class.getName());
     private final GameServer server;
-    private final Map<String, GameInstance> activeGames = new ConcurrentHashMap<>();
+    private final Map<String, Game> activeGames = new ConcurrentHashMap<>();
 
     private final Map<String, Long> lastUpdateTimes = new HashMap<>();
     private static final long UPDATE_INTERVAL_MS = 100;
@@ -28,56 +29,27 @@ public class GameManager {
 
         String gameId = lobby.getId();
 
-        GameInstance gameInstance = new GameInstance(gameId, lobby);
+        Game gameInstance = new Game(gameId, lobby);
         activeGames.put(gameId, gameInstance);
         lastUpdateTimes.put(gameId, System.currentTimeMillis());
 
         lobby.setGameActive(true);
-
         gameInstance.initialize();
-
-        JSONObject initialState = gameInstance.getGameState();
-        lobby.broadcastMessage("GAME_STATE", initialState.toString());
         lobby.broadcastMessage("GAME_STARTED", "game started");
 
         logger.info("the new game started:  " + gameId);
         return true;
     }
 
-    public boolean processGameAction(String gameId, String username, String action, JSONObject actionData) {
-        GameInstance game = activeGames.get(gameId);
-
-        if (game == null) {
-            logger.warning("Game ended: " + gameId);
-            return false;
-        }
-
-        boolean success = game.processAction(username, action, actionData);
-
-        if (success) {
-            game.updateLastActivityTime();
-
-            long currentTime = System.currentTimeMillis();
-            if (currentTime - lastUpdateTimes.getOrDefault(gameId, 0L) > UPDATE_INTERVAL_MS) {
-                JSONObject newState = game.getGameState();
-                game.getLobby().broadcastMessage("GAME_STATE", newState.toString());
-                lastUpdateTimes.put(gameId, currentTime);
-            }
-        }
-
-        return success;
-    }
-
     public void endGame(String gameId, String winner) {
-        GameInstance game = activeGames.get(gameId);
+        Game game = activeGames.get(gameId);
         if (game == null) {
             return;
         }
 
         GameLobby lobby = game.getLobby();
 
-        JSONObject endGameData = JsonBuilder.create().
-        .put("gameId", gameId);
+        JSONObject endGameData = JsonBuilder.create().put("gameId", gameId).build();
         lobby.broadcastMessage("GAME_END", endGameData.toString());
 
         lobby.setGameActive(false);
@@ -90,17 +62,17 @@ public class GameManager {
     }
 
 
-    public GameInstance getGameInstance(String gameId) {
+    public Game getGame(String gameId) {
         return activeGames.get(gameId);
     }
 
 
     public void checkInactiveGames() {
         long currentTime = System.currentTimeMillis();
-        long inactivityTimeout = 10 * 60 * 1000; 
+        long inactivityTimeout = 10 * 60 * 1000;
 
-        for (Map.Entry<String, GameInstance> entry : new HashMap<>(activeGames).entrySet()) {
-            GameInstance game = entry.getValue();
+        for (Map.Entry<String, Game> entry : new HashMap<>(activeGames).entrySet()) {
+            Game game = entry.getValue();
 
             if (currentTime - game.getLastActivityTime() > inactivityTimeout) {
                 logger.info("inactive game ended: " + game.getGameId());

@@ -1,14 +1,15 @@
 package com.proj.network.client;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Disposable;
 import com.proj.map.farmName;
-import com.proj.network.client.*;
 import com.proj.network.event.GameEvent;
 import com.proj.network.event.LobbyEvent;
 import com.proj.network.event.NetworkEvent;
 import com.proj.network.message.AuthRequest;
 import com.proj.network.message.JsonBuilder;
 import com.proj.network.message.JsonParser;
+import com.proj.network.message.Command;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -20,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class GameClient {
-    private final String serverIp;
+public class GameClient implements Disposable, Runnable {
+    private final String serverAddress;
     private final int serverPort;
     private Socket clientSocket;
     private PrintWriter out;
@@ -39,8 +40,8 @@ public class GameClient {
 
     private final List<ChatListener> chatListeners = new ArrayList<>();
 
-    public GameClient(String serverIp, int serverPort) {
-        this.serverIp = serverIp;
+    public GameClient(String serverAddress, int serverPort) {
+        this.serverAddress = serverAddress;
         this.serverPort = serverPort;
     }
 
@@ -57,8 +58,6 @@ public class GameClient {
                 clientToServerThread = new Thread(this, "Network-Thread");
                 clientToServerThread.start();
             }
-
-            startPingTask();
             sendEvent(NetworkEvent.Type.CONNECTED, "client is connected to server");
         } catch (IOException e) {
             Gdx.app.error("GameClient", "Connection error", e);
@@ -76,7 +75,6 @@ public class GameClient {
             lobbyListListeners.add(listener);
         }
     }
-
     public void addGameListener(GameEventListener listener) {
         if (!gameListeners.contains(listener)) {
             gameListeners.add(listener);
@@ -94,13 +92,12 @@ public class GameClient {
     public void removeNetworkEventListener(NetworkEventListener listener) {
         listeners.remove(listener);
     }
-
     public void removeGameListener(GameEventListener listener) {
         gameListeners.remove(listener);
     }
 
 
-    /*@Override
+    @Override
     public void run() {
         try {
             while (isRunning.get()) {
@@ -116,10 +113,11 @@ public class GameClient {
         } finally {
             disconnect();
         }
-    }*/
+    }
 
     private void handleCommands(String command) {
         try {
+            // Use the NetworkMessage factory for safe parsing
             Command message = Command.parse(command);
             processCommand(message);
         } catch (Exception e) {
@@ -141,14 +139,14 @@ public class GameClient {
                     handleLobbyCreated(data);
                     break;
 
-                case "LOBBY_UPDATE":
+                case "LOBBY_UPDATE" :
                     handleLobbyUpdate(data);
                     break;
 
                 case "JOIN_SUCCESS":
                     handleJoinLobby(data);
                     break;
-                case "LOBBY_ADDED":
+                case "LOBBY_ADDED" :
                     handleLobbyAdded(data);
                     break;
                 case "LEAVE_SUCCESS":
@@ -179,12 +177,21 @@ public class GameClient {
                     handlePrivateChat(data);
                     break;
 
+                case "SYSTEM":
+                    sendEvent(NetworkEvent.Type.SYSTEM_MESSAGE,
+                        JsonParser.getString(data, "message", "System message"));
+                    break;
+
                 case "START":
                     fireGameEvent(GameEvent.Type.START, JsonBuilder.empty());
                     break;
 
                 case "PLAYER_POSITIONS":
-                    fireGameEvent(GameEvent.Type.UPDATE_POSITIONS, data);
+                    fireGameEvent(GameEvent.Type.UPDATE_POSITIONS, data );
+                    break;
+
+                case "PONG":
+                    // Ping response - no action needed
                     break;
 
                 case "ERROR":
@@ -194,6 +201,8 @@ public class GameClient {
                     String sender = JsonParser.getString(data, "sender", "Unknown");
                     String chatMessage = JsonParser.getString(data, "message", "");
                     boolean isPrivate = JsonParser.getBoolean(data, "isPrivate", false);
+
+                    // Send to any chat listeners
                     for (NetworkEventListener listener : listeners) {
                         if (listener instanceof ChatListener) {
                             ((ChatListener) listener).onChatMessage(sender, chatMessage, isPrivate);
@@ -289,6 +298,7 @@ public class GameClient {
             for (ChatListener listener : chatListeners) {
                 listener.onChatMessage(sender, message, true);
             }
+//            fireChatEvent(NetworkEvent.Type.PRIVATE_MESSAGE, sender + ": " + message);
         } catch (Exception e) {
             sendEvent(NetworkEvent.Type.ERROR, "Error processing private chat: " + e.getMessage());
         }
@@ -365,7 +375,7 @@ public class GameClient {
     }
 
     public void sendPlayerNewPosition(float x, float y, String mapName) {
-        String map = mapName;
+        String map = mapName ;
         for (farmName f : farmName.values()) {
             if (mapName.equalsIgnoreCase(f.getFarmName())) {
                 map = "Farm";
@@ -407,20 +417,6 @@ public class GameClient {
             sendEvent(NetworkEvent.Type.ERROR, "Error sending message: " + e.getMessage());
         }
     }
-
-    private void startPingTask() {
-        new Thread(() -> {
-            while (isRunning.get()) {
-                try {
-                    Thread.sleep(PING_INTERVAL);
-                    sendMessage("PING", JsonBuilder.empty());
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }, "Ping-Thread").start();
-    }
-
 
     public void changeWeather(String weatherType) {
         sendMessage("CHANGE_WEATHER", (JsonBuilder.create().put("weather", weatherType).build()));
@@ -522,5 +518,4 @@ public class GameClient {
     public void removeChatListener(ChatListener listener) {
         chatListeners.remove(listener);
     }
-}
 }

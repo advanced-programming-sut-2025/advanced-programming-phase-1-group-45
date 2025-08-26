@@ -25,7 +25,7 @@ public class ClientConnectionController implements Runnable {
     private String username = null;
     private final AtomicBoolean running = new AtomicBoolean(true);
     private long lastActivityTime;
-    private static final long TIMEOUT_MS = 60000; 
+    private static final long TIMEOUT_MS = 60000;
     private GameLobby currentLobby;
 
     public ClientConnectionController(Socket socket, GameServer server) {
@@ -88,7 +88,6 @@ public class ClientConnectionController implements Runnable {
         try {
             Command loginMessage = Command.parse(response);
             if (!"AUTH".equals(loginMessage.getType())) {
-                    e.printStackTrace();
                 return false;
             }
             JSONObject credentials = loginMessage.getData();
@@ -273,9 +272,8 @@ public class ClientConnectionController implements Runnable {
 
     private void receiveStateToStart(JSONObject data) {
         String farm = JsonParser.getString(data, "farmName", "Standard");
-        Game game = server.getGameManager().getGameInstance(currentLobby.getId());
+        Game game = server.getGameManager().getGame(currentLobby.getId());
         if (game == null) {
-                    e.printStackTrace();
             return;
         }
         farmName selected = farmName.STANDARD;
@@ -289,9 +287,8 @@ public class ClientConnectionController implements Runnable {
     }
 
     private void readyToStart(JSONObject data) {
-        Game game = server.getGameManager().getGameInstance(currentLobby.getId());
+        Game game = server.getGameManager().getGame(currentLobby.getId());
         if (game == null) {
-                    e.printStackTrace();
             return;
         }
         game.getPlayerState(username).setReadyToPlay(true);
@@ -314,7 +311,6 @@ public class ClientConnectionController implements Runnable {
                 server.broadcast("Lobby: " + lobby.getName() + " was removed");
             }
         } else {
-                    e.printStackTrace();
         }
     }
 
@@ -337,7 +333,7 @@ public class ClientConnectionController implements Runnable {
 
 
     private void sendPlayersInGame() {
-        Game game = server.getGameManager().getGameInstance(currentLobby.getId());
+        Game game = server.getGameManager().getGame(currentLobby.getId());
         if (game == null) {
             return;
         }
@@ -348,7 +344,7 @@ public class ClientConnectionController implements Runnable {
     }
 
     private void handlePlayerMovement(JSONObject data) {
-        Game game = server.getGameManager().getGameInstance(currentLobby.getId());
+        Game game = server.getGameManager().getGame(currentLobby.getId());
         if (game == null) {
             return;
         }
@@ -365,7 +361,7 @@ public class ClientConnectionController implements Runnable {
     }
 
     private void updateTimeInGame(JSONObject data) {
-        Game game = server.getGameManager().getGameInstance(currentLobby.getId());
+        Game game = server.getGameManager().getGame(currentLobby.getId());
         float delta = data.getFloat("delta");
         game.updateTime(delta);
     }
@@ -392,7 +388,7 @@ public class ClientConnectionController implements Runnable {
         sendMessage("GAME_TIME", data);
     }
     private void changeGameWeather(JSONObject data) {
-        Game game = server.getGameManager().getGameInstance(currentLobby.getId());
+        Game game = server.getGameManager().getGame(currentLobby.getId());
         String weather = JsonParser.getString(data, "weather", "");
         Weather weather1 = Weather.SUNNY;
         switch (weather) {
@@ -412,13 +408,13 @@ public class ClientConnectionController implements Runnable {
         game.changeWeather(weather1);
     }
     private void changeHour(JSONObject data) {
-        Game game = server.getGameManager().getGameInstance(currentLobby.getId());
+        Game game = server.getGameManager().getGame(currentLobby.getId());
         int hour = JsonParser.getInt(data, "hour", 0);
         game.changeTime(hour);
     }
 
     private void changeDay(JSONObject data) {
-        Game game = server.getGameManager().getGameInstance(currentLobby.getId());
+        Game game = server.getGameManager().getGame(currentLobby.getId());
         int day = JsonParser.getInt(data, "day", 0);
         game.changeDay(day);
     }
