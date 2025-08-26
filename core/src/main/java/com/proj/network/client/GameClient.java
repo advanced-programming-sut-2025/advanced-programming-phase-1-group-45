@@ -188,11 +188,6 @@ public class GameClient implements Disposable, Runnable {
                 case "PLAYER_POSITIONS":
                     fireGameEvent(GameEvent.Type.UPDATE_POSITIONS, data );
                     break;
-
-                case "PONG":
-                    // Ping response - no action needed
-                    break;
-
                 case "ERROR":
                     handleError(data);
                     break;
@@ -200,8 +195,6 @@ public class GameClient implements Disposable, Runnable {
                     String sender = JsonParser.getString(data, "sender", "Unknown");
                     String chatMessage = JsonParser.getString(data, "message", "");
                     boolean isPrivate = JsonParser.getBoolean(data, "isPrivate", false);
-
-                    // Send to any chat listeners
                     for (NetworkEventListener listener : listeners) {
                         if (listener instanceof ChatListener) {
                             ((ChatListener) listener).onChatMessage(sender, chatMessage, isPrivate);
@@ -297,7 +290,6 @@ public class GameClient implements Disposable, Runnable {
             for (ChatListener listener : chatListeners) {
                 listener.onChatMessage(sender, message, true);
             }
-//            fireChatEvent(NetworkEvent.Type.PRIVATE_MESSAGE, sender + ": " + message);
         } catch (Exception e) {
             sendEvent(NetworkEvent.Type.ERROR, "Error processing private chat: " + e.getMessage());
         }
